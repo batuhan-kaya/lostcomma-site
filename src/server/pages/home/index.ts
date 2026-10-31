@@ -1,3 +1,4 @@
+import { boardProjects, type BoardProject } from '../../data/content';
 import { html, type Safe } from '../../html';
 import { istanbulTime } from '../../layout/chrome';
 import type { Ctx, Page } from '../../page';
@@ -44,7 +45,12 @@ export interface HomeOptions {
   error?: boolean;
 }
 
-export function homePage(opts: HomeOptions = {}): Page {
+/** What the homepage reads from the database. */
+export interface HomeData {
+  board: BoardProject[];
+}
+
+export function homePage(opts: HomeOptions = {}): Page<HomeData> {
   return {
     id: 'home',
     theme: 'paper',
@@ -54,10 +60,11 @@ export function homePage(opts: HomeOptions = {}): Page {
     styles: ['home'],
     title: (t) => t('Yaratıcı yazılım stüdyosu'),
     description: (t) => t('İstanbul’da web siteleri ve uygulamalar tasarlayıp kodlayan bir ekip.'),
-    body: (ctx) => html`${hero(ctx)}
+    load: async (ctx) => ({ board: await boardProjects(ctx.db, ctx.lang) }),
+    body: (ctx, d) => html`${hero(ctx)}
 ${manifesto(ctx)}
 ${services(ctx)}
-${board(ctx)}
+${board(ctx, d.board)}
 ${process(ctx)}
 ${brief(ctx, { theme: CONTACT_THEME, sent: !!opts.sent, error: !!opts.error })}`,
     footer: bigFooter,

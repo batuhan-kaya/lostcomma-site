@@ -196,8 +196,8 @@ export class Board {
   private render(): void {
     const B = this.board;
     if (!B) return;
-    this.frames.forEach((el, i) => {
-      const [x, y] = POS[i] ?? [0, 0];
+    this.frames.forEach((el) => {
+      const [x, y] = POS[Number(el.dataset.bf)] ?? [0, 0];
       const sx = mod(x + this.px, TW) - 560;
       const sy = mod(y + this.py, TH) - 460;
       el.style.transform = `translate3d(${sx.toFixed(1)}px,${sy.toFixed(1)}px,0)`;

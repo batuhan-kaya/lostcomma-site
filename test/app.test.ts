@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { MemoryInbox } from '../src/server/api/inbox';
 import { buildApp } from '../src/server/app';
 import { loadConfig } from '../src/server/config';
 import { STATIC_PAGES } from '../src/server/pages';
@@ -10,7 +9,6 @@ let app: Awaited<ReturnType<typeof buildApp>>;
 
 beforeAll(async () => {
   app = await buildApp({
-    inbox: new MemoryInbox(),
     config: loadConfig({ NODE_ENV: 'test', SITE_URL: SITE }),
     now: () => new Date('2026-10-31T09:41:00+03:00'),
   });

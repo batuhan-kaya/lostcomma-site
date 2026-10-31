@@ -2,8 +2,9 @@ import { randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { BRIEF_BUDGETS, BRIEF_TIMES, BRIEF_TYPES } from '../content/home';
+import { addBrief } from '../data/briefs';
+import type { Db } from '../db';
 import { href } from '../routes';
-import type { Inbox } from './inbox';
 import { RateLimit } from './rate';
 
 const one = <T extends readonly [string, ...string[]]>(values: T) =>
@@ -18,7 +19,7 @@ export const BriefSchema = z.object({
   time: one(BRIEF_TIMES),
   budget: one(BRIEF_BUDGETS),
   name: z.string().trim().max(60).catch(''),
-  email: z.string().trim().max(200).email(),
+  email: z.string().trim().max(200).pipe(z.email()),
   message: z.string().trim().max(2000).catch(''),
   /** Honeypot: people never see it · bots fill it. */
   company: z.string().optional(),
@@ -27,13 +28,13 @@ export const BriefSchema = z.object({
 export type BriefInput = z.input<typeof BriefSchema>;
 
 export interface BriefOptions {
-  inbox: Inbox;
+  db: Db;
   siteUrl: string;
   now?: () => Date;
   limit?: RateLimit;
 }
 
-export function registerBrief(app: FastifyInstance, { inbox, siteUrl, now = () => new Date(), limit = new RateLimit(5, 10 * 60_000) }: BriefOptions): void {
+export function registerBrief(app: FastifyInstance, { db, siteUrl, now = () => new Date(), limit = new RateLimit(5, 10 * 60_000) }: BriefOptions): void {
   const siteHost = new URL(siteUrl).host;
 
   app.post('/api/brief', async (req, reply) => {
@@ -69,9 +70,9 @@ export function registerBrief(app: FastifyInstance, { inbox, siteUrl, now = () =
     if (b.company) return wantsJson ? reply.send({ ok: true }) : back('sent');
 
     const id = randomUUID();
-    await inbox.add({
+    await addBrief(db, {
       id,
-      at: now().toISOString(),
+      createdAt: now(),
       lang: b.lang,
       types: b.types,
       time: b.time ?? null,

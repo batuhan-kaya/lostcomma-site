@@ -36,11 +36,26 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 
 ## Homepage (src/server/pages/home · src/client/home)
 
-- Long structured copy (manifesto edits · services · projects · steps · brief choices) lives per language in `src/server/content/home.ts`. Short UI copy stays in `t()`.
+- Long structured copy (manifesto edits · services · steps · brief choices) lives per language in `src/server/content/home.ts`. Short UI copy stays in `t()`. Board projects come from the database (`projects.board_slot` 0–6 · frame 7 is the Lab). A project with a cover shows it · without one it shows its drawn `art` from `pages/home/art.ts`.
 - Client data comes from the `<script type="application/json" id="page-data">` block (`page.data`). Never inline executable scripts or `style=""` (strict CSP).
-- The brief is a real form posting to `/api/brief` (works without JS · redirects to `?brief=sent|error`). With JS it posts JSON. Briefs go to `DATA_DIR/briefs.jsonl` until phase 3. `BRIEF_LIMIT` = briefs per address per 10 minutes.
+- The brief is a real form posting to `/api/brief` (works without JS · redirects to `?brief=sent|error`). With JS it posts JSON. Briefs go to the `briefs` table. `BRIEF_LIMIT` = briefs per address per 10 minutes.
 - Contact colour: `CONTACT_THEME` in `src/server/pages/home/index.ts` (ink · paper · lime · coral · blue).
 - The shy comma egg sets `localStorage['lc-comma']`; `html.found` then shows the comma in the logo on every page.
+
+## Data (src/server/db · src/server/data)
+
+- PostgreSQL through Drizzle. `DATABASE_URL`: `postgres://…` in production (required) · `pglite://<dir>` for local development (the default · `data/pglite`) · `memory://` in unit tests. PGlite is a dev dependency only.
+- Schema in `src/server/db/schema.ts` with `casing: 'snake_case'`. After a change: `npm run db:generate` and commit `drizzle/`. A test fails when schema and migrations drift. Never edit a migration that is already on main: add a new one.
+- Migrations run on every boot. `SEED` fills an empty database: `sample` (default outside production · the design board content in `db/sample.ts`) · `demo` (sample plus a generated cover on board frame 0 · e2e) · `none` (production). Seeding never overwrites existing content on boot. `npm run db:seed` overwrites the sample rows on purpose.
+- Language text lives in `*_text` tables (one row per language). Pages read through `src/server/data/content.ts`, which falls back to the other language and says so (`textLang`). Slugs are per language.
+- Database content follows the comma rule too (a test checks the sample).
+- Pages with data declare `load(ctx)`. Its result is the second argument of `body` · `footer` · `data`. `ctx.db` is the database.
+
+## Images (src/server/media)
+
+- One upload → AVIF and WebP at 320 · 640 · 960 · 1280 · 1920 · 2560 (never upscaled) in `DATA_DIR/media/<hash>/` served at `/media/` with a one-year immutable cache. The original goes to `DATA_DIR/originals/` and is never served. Variants are rotated upright and carry no camera or GPS data.
+- Render with `picture(media, { lang, sizes })`. Always give a real `sizes`. `priority: true` only above the fold. Alt text comes from the media row per language · pass `alt: ''` when nearby text already names the thing.
+- Until the panel exists: `npm run media -- cover <project no> <file> --alt-tr "…" --alt-en "…"` (or `node dist/server/cli.js media …` in the container).
 
 ## i18n
 
@@ -61,11 +76,18 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 | `npm test` | vitest unit + Fastify inject tests |
 | `npm run test:e2e` | Playwright against the built server (console errors · axe · comma rule · overflow) |
 | `npm run check` | everything above in order |
+| `npm run db:generate` | write a migration after a schema change |
+| `npm run db:migrate` · `npm run db:seed` | apply migrations · load the sample content |
+| `npm run media -- add\|cover\|list` | run images through the pipeline |
 
 ## Layout
 
 ```
-src/server/      Fastify app · html templating · i18n · routes · layout · pages
+src/server/      Fastify app · html templating · i18n · routes · layout · pages · cli.ts
+src/server/db    schema · connection · seed · sample content
+src/server/data  queries shaped for pages
+src/server/media image pipeline · picture()
+drizzle/         generated SQL migrations (committed)
 src/client/      browser modules (one entry per page + shared)
 src/styles/      tokens · base · layout · per-page CSS
 i18n/en.json     English catalog

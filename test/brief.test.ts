@@ -1,13 +1,16 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
-import { MemoryInbox } from '../src/server/api/inbox';
 import { RateLimit } from '../src/server/api/rate';
 import { buildApp } from '../src/server/app';
 import { loadConfig } from '../src/server/config';
+import { recentBriefs } from '../src/server/data/briefs';
+import { briefs } from '../src/server/db/schema';
 
 const SITE = 'https://lostcomma.co';
-const inbox = new MemoryInbox();
-const app = await buildApp({ inbox, config: loadConfig({ NODE_ENV: 'test', SITE_URL: SITE }), now: () => new Date('2026-10-31T12:00:00Z') });
+const app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: SITE, SEED: 'none' }), now: () => new Date('2026-10-31T12:00:00Z') });
 afterAll(() => app.close());
+
+/** What reached the database, oldest first. */
+const stored = async () => (await recentBriefs(app.db)).reverse();
 
 let ip = 0;
 /** A fresh client address per test so the rate limit never leaks between tests. */
@@ -20,8 +23,8 @@ const post = (payload: unknown, headers: Record<string, string> = {}, raw?: stri
     payload: raw ?? JSON.stringify(payload),
   });
 
-beforeEach(() => {
-  inbox.items.length = 0;
+beforeEach(async () => {
+  await app.db.delete(briefs);
 });
 
 describe('POST /api/brief (fetch)', () => {
@@ -29,22 +32,24 @@ describe('POST /api/brief (fetch)', () => {
     const res = await post({ lang: 'tr', types: ['website', 'app', 'app'], time: '1m', budget: 'b15', name: '  Batu ', email: 'batu@example.com', message: 'Merhaba' });
     expect(res.statusCode).toBe(200);
     expect(res.json()).toEqual({ ok: true });
-    expect(inbox.items).toHaveLength(1);
-    expect(inbox.items[0]).toMatchObject({ lang: 'tr', types: ['website', 'app'], time: '1m', budget: 'b15', name: 'Batu', email: 'batu@example.com', message: 'Merhaba', at: '2026-10-31T12:00:00.000Z' });
-    expect(inbox.items[0]?.id).toMatch(/^[0-9a-f-]{36}$/);
+    const rows = await stored();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ lang: 'tr', types: ['website', 'app'], time: '1m', budget: 'b15', name: 'Batu', email: 'batu@example.com', message: 'Merhaba', status: 'new' });
+    expect(rows[0]?.createdAt.toISOString()).toBe('2026-10-31T12:00:00.000Z');
+    expect(rows[0]?.id).toMatch(/^[0-9a-f-]{36}$/);
   });
 
   it('only needs an email', async () => {
     const res = await post({ email: 'a@b.co' });
     expect(res.statusCode).toBe(200);
-    expect(inbox.items[0]).toMatchObject({ lang: 'en', types: [], time: null, budget: null, name: '' });
+    expect((await stored())[0]).toMatchObject({ lang: 'en', types: [], time: null, budget: null, name: '' });
   });
 
   it('rejects a missing or broken email and says which field', async () => {
     const res = await post({ name: 'x', email: 'nope' });
     expect(res.statusCode).toBe(422);
     expect(res.json()).toEqual({ ok: false, error: 'invalid', fields: ['email'] });
-    expect(inbox.items).toHaveLength(0);
+    expect(await stored()).toHaveLength(0);
   });
 
   it('rejects unknown choices', async () => {
@@ -54,19 +59,19 @@ describe('POST /api/brief (fetch)', () => {
 
   it('caps long fields', async () => {
     expect((await post({ email: 'a@b.co', message: 'x'.repeat(2001) })).statusCode).toBe(200);
-    expect(inbox.items[0]?.message).toBe('');
+    expect((await stored())[0]?.message).toBe('');
   });
 
   it('answers bots politely and stores nothing (honeypot)', async () => {
     const res = await post({ email: 'bot@spam.io', company: 'Spam Inc' });
     expect(res.statusCode).toBe(200);
-    expect(inbox.items).toHaveLength(0);
+    expect(await stored()).toHaveLength(0);
   });
 
   it('refuses posts from other sites', async () => {
     const res = await post({ email: 'a@b.co' }, { origin: 'https://evil.example' });
     expect(res.statusCode).toBe(403);
-    expect(inbox.items).toHaveLength(0);
+    expect(await stored()).toHaveLength(0);
   });
 
   it('accepts posts from our own origin', async () => {
@@ -79,12 +84,12 @@ describe('POST /api/brief (form without JS)', () => {
     const res = await post(null, {}, 'lang=tr&types=website&types=motion&time=3m&budget=unsure&name=Ay%C5%9Fe&email=ayse%40example.com&message=&company=');
     expect(res.statusCode).toBe(303);
     expect(res.headers.location).toBe('/tr?brief=sent#contact');
-    expect(inbox.items[0]).toMatchObject({ types: ['website', 'motion'], time: '3m', budget: 'unsure', name: 'Ayşe' });
+    expect((await stored())[0]).toMatchObject({ types: ['website', 'motion'], time: '3m', budget: 'unsure', name: 'Ayşe' });
   });
 
   it('a single checkbox value still becomes a list', async () => {
     await post(null, {}, 'lang=en&types=app&email=a%40b.co');
-    expect(inbox.items[0]?.types).toEqual(['app']);
+    expect((await stored())[0]?.types).toEqual(['app']);
   });
 
   it('redirects back with an error when the email is missing', async () => {

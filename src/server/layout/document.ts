@@ -12,7 +12,7 @@ export function jsonData(value: unknown): Safe {
   return raw(`<script type="application/json" id="page-data">${JSON.stringify(value).replace(/</g, '\\u003c')}</script>`);
 }
 
-export function documentHtml(page: Page, ctx: Ctx): Safe {
+export function documentHtml<D>(page: Page<D>, ctx: Ctx, data: D): Safe {
   const { t, lang, site, assets } = ctx;
   const name = page.title(t);
   const title = page.id === 'home' ? `Lost Comma · ${name}` : `${name} · Lost Comma`;
@@ -59,11 +59,11 @@ ${js.map((s) => html`<script type="module" src="${s}"></script>`)}
 <div class="pg" data-root data-host="${page.host ?? 'design'}">
 ${header(ctx, page.section, { home: page.home })}
 <main id="main">
-${page.body(ctx)}
+${page.body(ctx, data)}
 </main>
 ${!page.bare && page.next ? nextBand(ctx, page.next) : ''}
-${!page.bare ? (page.footer ? page.footer(ctx) : footer(ctx)) : ''}
-${page.data ? jsonData(page.data(ctx)) : ''}
+${!page.bare ? (page.footer ? page.footer(ctx, data) : footer(ctx)) : ''}
+${page.data ? jsonData(page.data(ctx, data)) : ''}
 </div>
 </body>
 </html>`;

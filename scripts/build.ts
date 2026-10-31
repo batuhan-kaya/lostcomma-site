@@ -144,8 +144,8 @@ async function buildOnce() {
   writeManifest();
 
   await esbuild.build({
-    entryPoints: [join(root, 'src/server/index.ts')],
-    outfile: join(dist, 'server/index.js'),
+    entryPoints: { index: join(root, 'src/server/index.ts'), cli: join(root, 'src/server/cli.ts') },
+    outdir: join(dist, 'server'),
     platform: 'node',
     target: 'node22',
     format: 'esm',
