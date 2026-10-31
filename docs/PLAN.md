@@ -18,7 +18,7 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | İçerik | markdown-it (Notes) · sharp + opentype.js (OG görselleri) |
 | Görsel | sharp · her görsel AVIF ve WebP olarak 320 ile 2560 px arası altı genişlikte · içerik hash'li adres · bir yıl önbellek |
 | Formlar | zod şemaları · sunucu ve istemci aynı şemayı kullanır |
-| Panel | Discord ile giriş · TOTP 2FA · team ve admin rolleri |
+| Panel | Tek kullanıcı (Batuhan) · klasik şifre · şifre hash'lenerek saklanır · oturum çerezi · deneme sınırı |
 | Test | vitest (birim + Fastify inject) · Playwright (e2e) · axe (erişilebilirlik) |
 | Yayın | Docker Compose · Caddy · sunucudaki diğer siteler etkilenmez |
 | Font | Anybody · Geist · Martian Mono (OFL) · woff2 olarak kendi sunucumuzdan · Google Fonts yok |
@@ -54,13 +54,13 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 2 | Ana sayfa | "Live" tasarımı + iletişim bölümü · mobil düzen | Bitti |
 | 3 | Veri katmanı | Drizzle şeması · migration · seed · içerik modeli · görsel hattı (sharp · AVIF ve WebP · srcset) · briefler veritabanına | Bitti |
 | 4 | Work + Case | Layers paneli · vaka sayfası sürüm geçmişi | Bitti |
-| 5 | Services + hizmet detayları | Araç seç ve çiz · Web siteleri (yeniden boyutlanan çerçeve) · Uygulamalar (başparmak alanı) · Kimlik (favicon'dan reklam panosuna) · Hareket (eğri düzenleyici ve makara) | PR bekliyor |
-| 6 | Process + Studio | Kurgu masası zaman çizelgesi · haftalık ritim · ayarlar penceresi · vapurlu İstanbul haritası · sakin renk ve yoğunluk | PR bekliyor |
+| 5 | Services + hizmet detayları | Araç seç ve çiz · Web siteleri (yeniden boyutlanan çerçeve) · Uygulamalar (başparmak alanı) · Kimlik (favicon'dan reklam panosuna) · Hareket (eğri düzenleyici ve makara) | Bitti |
+| 6 | Process + Studio | Kurgu masası zaman çizelgesi · haftalık ritim · ayarlar penceresi · vapurlu İstanbul haritası · sakin renk ve yoğunluk | Bitti |
 | 7 | Notes + Note | Bul ve blame · yay oyun alanı · RSS · OG görselleri | |
 | 8 | Lab | Canlı örnekler · ekran dışında duraklatma · performans bütçesi · hareket vitrini kararı | |
 | 9 | Start | Ofis saatleri · saat dilimi · randevu · form · bildirim | |
 | 10 | Now + Uses + 404 | Duvar takvimi · klavye · geri al | |
-| 11 | Panel | Discord girişi · 2FA · roller · içerik yönetimi · denetim kaydı | |
+| 11 | Panel | Şifreyle giriş (tek kullanıcı) · içerik ve görsel yönetimi · denetim kaydı | |
 | 12 | Sertleştirme | SEO · performans · erişilebilirlik · çapraz tarayıcı | |
 | 13 | Yayın | Staging · Compose + Caddy · yedekleme · izleme | |
 
@@ -92,5 +92,5 @@ Gerçek görsel gelmesi gereken her yer `docs/GORSELLER.md` dosyasında tutulur 
 - Ekip adları · rolleri · portreler ve stüdyo adresi (6. aşamadan itibaren Stüdyo'da yer tutucu)
 - Bütün sayfalar için renk turu (Batuhan'ın isteğiyle sonraya bırakıldı)
 - E-posta gönderimi için SMTP sağlayıcısı (9. aşama)
-- Discord uygulaması (client id ve secret) (11. aşama)
+- Panel şifresi: ilk girişte Batuhan kendisi belirler · sunucuda sadece hash'i durur (11. aşama)
 - Sunucudaki mevcut ters vekil düzeni: Caddy ortak mı · ağ adı · port (13. aşama)
