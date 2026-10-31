@@ -61,10 +61,25 @@ function comma(): void {
   }
 }
 
+/**
+ * Images from the pipeline carry their dominant colour (data-c). It fills the box while the image
+ * loads and is removed afterwards. Set through the CSSOM: the CSP allows no style attributes.
+ */
+function placeholders(): void {
+  for (const img of document.querySelectorAll<HTMLImageElement>('img[data-c]')) {
+    if (img.complete && img.naturalWidth) continue;
+    img.style.backgroundColor = img.dataset.c ?? '';
+    const done = () => img.removeAttribute('style');
+    img.addEventListener('load', done, { once: true });
+    img.addEventListener('error', done, { once: true });
+  }
+}
+
 comma();
 startClock();
 langSwitch();
 menu();
+placeholders();
 
 // Page modules run before DOMContentLoaded and register their scenes first.
 document.addEventListener('DOMContentLoaded', () => getCrew()?.start());

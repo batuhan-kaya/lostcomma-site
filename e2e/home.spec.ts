@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
+import pg from 'pg';
 import { watchErrors } from './checks';
 
 const visibleCursors = (page: Page) =>
@@ -95,6 +95,21 @@ test.describe('homepage · desktop interactions', () => {
     await expect(page.locator('[data-bf="1"]')).toBeFocused();
   });
 
+  test('board: a project with a cover shows the image from the pipeline · opening it keeps the image', async ({ page }) => {
+    const errors = watchErrors(page);
+    await page.goto('/en');
+    await toSection(page, 'work');
+    const img = page.locator('[data-bf="0"] picture img');
+    await expect(img).toHaveAttribute('alt', '');
+    await expect.poll(() => img.evaluate((e: HTMLImageElement) => e.complete && e.naturalWidth)).toBeGreaterThan(0);
+    expect(await img.evaluate((e: HTMLImageElement) => e.currentSrc)).toMatch(/\/media\/[0-9a-f]{16}\/\d+\.avif$/);
+    await page.locator('[data-bf="0"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[data-ovart] picture img')).toBeVisible();
+    await expect(page.getByRole('dialog').locator('h3')).toHaveText('Sailing club');
+    expect(errors).toEqual([]);
+  });
+
   test('process: Next moves the prototype on', async ({ page }) => {
     await page.goto('/en');
     await toSection(page, 'prc');
@@ -131,8 +146,14 @@ test.describe('homepage · brief', () => {
     await expect(page.locator('[data-ptags] span')).toHaveText(['Website', 'App', '1 month', '€5–15k']);
     await expect(page.locator('[data-msg="2"]')).toBeVisible({ timeout: 8000 });
     await expect(page.locator('[data-hi]')).toHaveText('Hi Batu. Thanks for the brief.');
-    const stored = readFileSync('test-results/data/briefs.jsonl', 'utf8');
-    expect(stored).toContain(mail);
+    // Against a real Postgres (CI) the row is checked too · the in-memory database lives inside the server.
+    if (process.env.E2E_DATABASE_URL) {
+      const client = new pg.Client({ connectionString: process.env.E2E_DATABASE_URL });
+      await client.connect();
+      const { rows } = await client.query('select name, types, time, budget from briefs where email = $1', [mail]);
+      await client.end();
+      expect(rows).toEqual([{ name: 'Batu', types: ['website', 'app'], time: '1m', budget: 'b15' }]);
+    }
     await page.locator('[data-again]').click();
     await expect(page.locator('[data-fb]')).toBeVisible();
     expect(errors).toEqual([]);

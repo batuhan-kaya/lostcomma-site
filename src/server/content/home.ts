@@ -20,8 +20,8 @@ export interface Service {
   say: string;
 }
 
-export interface Project {
-  no: string;
+/** The Lab frame at the end of the board (projects come from the database). */
+export interface LabFrame {
   name: string;
   what: string;
 }
@@ -47,7 +47,7 @@ export interface HomeContent {
   manifesto: Seg[];
   comments: { who: Who; text: string }[];
   services: Service[];
-  projects: Project[];
+  lab: LabFrame;
   notes: string[];
   steps: Step[];
   types: Choice[];
@@ -91,16 +91,7 @@ const en: HomeContent = {
     { name: 'Identity', lab: 'Identity', size: '1080 × 1080', desc: 'Names and marks and type and voice. Systems that hold up from a favicon to a billboard.', dl: 'Logo · type · colour · guidelines', code: CODE.id, say: 'perfect square' },
     { name: 'Motion', lab: 'Motion', size: '1920 × 820', desc: 'Interface motion and brand films. The small details that make people smile without knowing why.', dl: 'UI motion · brand films · micro interactions', code: CODE.mo, say: 'cinematic' },
   ],
-  projects: [
-    { no: 'No. 014', name: 'Sailing club', what: 'Website and app · 2026' },
-    { no: 'No. 011', name: 'Ceramics studio', what: 'Identity and online shop · 2026' },
-    { no: 'No. 009', name: 'Music festival', what: 'Identity and motion · 2025' },
-    { no: 'No. 008', name: 'Fintech app', what: 'iOS and Android · 2025' },
-    { no: 'No. 006', name: 'Coffee roaster', what: 'Packaging and website · 2025' },
-    { no: 'No. 004', name: 'Architecture office', what: 'Website · 2024' },
-    { no: 'No. 002', name: 'Bookshop', what: 'Identity and online shop · 2024' },
-    { no: 'Lab', name: 'Type that breathes', what: 'Experiment · ongoing' },
-  ],
+  lab: { name: 'Type that breathes', what: 'Experiment · ongoing' },
   notes: ['Still my favourite.', 'Look at that type.', 'Can we do this one again?', 'Pixel perfect. Finally.'],
   steps: [
     { name: 'Listen', time: '1 to 2 weeks', text: 'We ask a lot of questions and then a few more. Workshops and research until the problem is sharper than the brief.', get: 'Brief · research · direction' },
@@ -159,16 +150,7 @@ const tr: HomeContent = {
     { name: 'Kimlik', lab: 'Kimlik', size: '1080 × 1080', desc: 'İsimler ve işaretler ve yazı ve ses tonu. Favicon’dan reklam panosuna kadar ayakta duran sistemler.', dl: 'Logo · yazı · renk · kılavuz', code: CODE.id, say: 'tam kare' },
     { name: 'Hareket', lab: 'Hareket', size: '1920 × 820', desc: 'Arayüz hareketleri ve marka filmleri. İnsanları nedenini bilmeden gülümseten küçük detaylar.', dl: 'Arayüz hareketi · marka filmi · mikro etkileşim', code: CODE.mo, say: 'sinematik' },
   ],
-  projects: [
-    { no: 'No. 014', name: 'Yelken kulübü', what: 'Web sitesi ve uygulama · 2026' },
-    { no: 'No. 011', name: 'Seramik atölyesi', what: 'Kimlik ve online mağaza · 2026' },
-    { no: 'No. 009', name: 'Müzik festivali', what: 'Kimlik ve hareket · 2025' },
-    { no: 'No. 008', name: 'Fintech uygulaması', what: 'iOS ve Android · 2025' },
-    { no: 'No. 006', name: 'Kahve kavurucusu', what: 'Ambalaj ve web sitesi · 2025' },
-    { no: 'No. 004', name: 'Mimarlık ofisi', what: 'Web sitesi · 2024' },
-    { no: 'No. 002', name: 'Kitapçı', what: 'Kimlik ve online mağaza · 2024' },
-    { no: 'Lab', name: 'Nefes alan yazı', what: 'Deney · sürüyor' },
-  ],
+  lab: { name: 'Nefes alan yazı', what: 'Deney · sürüyor' },
   notes: ['Hâlâ en sevdiğim.', 'Şu yazıya bak.', 'Bunu bir daha yapalım mı?', 'Piksel piksel. Sonunda.'],
   steps: [
     { name: 'Dinle', time: '1 ila 2 hafta', text: 'Çok soru sorarız ve sonra birkaç tane daha. Problem brief’ten daha net olana kadar atölyeler ve araştırma.', get: 'Brief · araştırma · yön' },

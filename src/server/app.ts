@@ -1,15 +1,20 @@
+import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import formbody from '@fastify/formbody';
 import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
+import { sql } from 'drizzle-orm';
 import { registerBrief } from './api/brief';
-import { FileInbox, type Inbox } from './api/inbox';
 import { RateLimit } from './api/rate';
 import { Assets } from './assets';
 import type { Config } from './config';
+import { openDatabase, safeUrl, type Database, type Db } from './db';
+import { seedIfEmpty } from './db/seed';
 import { isLang, LANGS, negotiate, translator, type Lang } from './i18n';
 import { documentHtml } from './layout/document';
-import type { Ctx, Page } from './page';
+import { addDemoCover } from './media/demo';
+import { mediaDirs } from './media/ingest';
+import type { AnyPage, Ctx } from './page';
 import { homePage, notFound, STATIC_PAGES } from './pages';
 import { href, type RouteId } from './routes';
 import { securityHeaders } from './security';
@@ -19,8 +24,25 @@ export interface AppOptions {
   config: Config;
   /** Injected clock for tests. */
   now?: () => Date;
-  /** Where briefs go. Defaults to a JSON lines file in DATA_DIR. */
-  inbox?: Inbox;
+  /** An open database (tests share one). Defaults to opening config.DATABASE_URL · closed with the app. */
+  database?: Database;
+}
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    db: Db;
+  }
+}
+
+/**
+ * Brings the database up to date and fills an empty one (SEED). Runs on every boot:
+ * migrations that already ran are skipped · seeding never touches existing content.
+ */
+export async function prepareDatabase(database: Database, config: Config): Promise<void> {
+  await database.migrate();
+  if (config.SEED === 'none') return;
+  await seedIfEmpty(database.db);
+  if (config.SEED === 'demo') await addDemoCover(database.db, mediaDirs(config.DATA_DIR));
 }
 
 export const LANG_COOKIE = 'lang';
@@ -34,13 +56,23 @@ export function readCookie(header: string | undefined, name: string): string | u
   return undefined;
 }
 
-export async function buildApp({ config, now = () => new Date(), inbox }: AppOptions) {
+export async function buildApp({ config, now = () => new Date(), database }: AppOptions) {
   const app = Fastify({
     logger: config.NODE_ENV === 'test' ? false : { level: config.NODE_ENV === 'production' ? 'info' : 'debug' },
     trustProxy: true,
   });
   const publicDir = resolve(config.PUBLIC_DIR);
   const assets = new Assets(publicDir, config.NODE_ENV === 'development');
+
+  const owned = !database;
+  const dbh = database ?? (await openDatabase(config.DATABASE_URL));
+  if (owned) {
+    app.log.info({ db: safeUrl(config.DATABASE_URL) }, 'database');
+    app.addHook('onClose', () => dbh.close());
+    await prepareDatabase(dbh, config);
+  }
+  const db = dbh.db;
+  app.decorate('db', db);
 
   // One canonical form per URL: no trailing slash (except the root).
   app.addHook('onRequest', async (req, reply) => {
@@ -58,7 +90,7 @@ export async function buildApp({ config, now = () => new Date(), inbox }: AppOpt
 
   await app.register(formbody, { bodyLimit: 16_384 });
   registerBrief(app, {
-    inbox: inbox ?? new FileInbox(resolve(config.DATA_DIR, 'briefs.jsonl')),
+    db,
     siteUrl: config.SITE_URL,
     now,
     limit: new RateLimit(config.BRIEF_LIMIT, 10 * 60_000),
@@ -70,6 +102,21 @@ export async function buildApp({ config, now = () => new Date(), inbox }: AppOpt
     index: false,
     immutable: true,
     maxAge: '365d',
+  });
+
+  // Image variants from the pipeline. Content-hashed names · cached for a year · originals are never served.
+  const media = mediaDirs(config.DATA_DIR);
+  mkdirSync(media.public, { recursive: true });
+  await app.register(fastifyStatic, {
+    root: resolve(media.public),
+    prefix: '/media/',
+    decorateReply: false,
+    index: false,
+    list: false,
+    dotfiles: 'deny',
+    immutable: true,
+    maxAge: '365d',
+    allowedPath: (path) => /^\/[0-9a-f]{16}\/\d{2,4}\.(avif|webp)$/.test(path),
   });
 
   app.get('/favicon.svg', (_req, reply) => {
@@ -87,18 +134,20 @@ export async function buildApp({ config, now = () => new Date(), inbox }: AppOpt
       alt,
       assets,
       now: now(),
+      db,
     };
   }
 
-  function send(reply: FastifyReply, page: Page, ctx: Ctx, status = 200) {
+  async function send(reply: FastifyReply, page: AnyPage, ctx: Ctx, status = 200) {
+    const data = page.load ? await page.load(ctx) : undefined;
     return reply
       .status(status)
       .type('text/html; charset=utf-8')
       .header('cache-control', 'no-cache')
-      .send(documentHtml(page, ctx).value);
+      .send(documentHtml(page, ctx, data).value);
   }
 
-  for (const [id, page] of Object.entries(STATIC_PAGES) as [RouteId, Page][]) {
+  for (const [id, page] of Object.entries(STATIC_PAGES) as [RouteId, AnyPage][]) {
     const alt = { tr: href('tr', id), en: href('en', id) };
     for (const lang of LANGS) {
       app.get(alt[lang], (req, reply) => {
@@ -116,7 +165,17 @@ export async function buildApp({ config, now = () => new Date(), inbox }: AppOpt
     return reply.redirect(href(lang, 'home'), 302);
   });
 
-  app.get('/healthz', () => ({ ok: true }));
+  // Docker's healthcheck: the process answers and the database does too.
+  app.get('/healthz', async (_req, reply) => {
+    reply.header('cache-control', 'no-store');
+    try {
+      await db.execute(sql`select 1`);
+      return { ok: true };
+    } catch (err) {
+      app.log.error(err, 'healthz: database unreachable');
+      return reply.status(503).send({ ok: false });
+    }
+  });
 
   app.get('/robots.txt', (_req, reply) => reply.type('text/plain; charset=utf-8').send(robotsTxt(config.SITE_URL)));
 

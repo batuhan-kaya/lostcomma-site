@@ -1,24 +1,50 @@
 # Lost Comma site. Own project name so it never collides with the other stacks on the server.
 # The app only listens on the loopback interface: the existing reverse proxy forwards to it.
-# Phase 13 (deploy) adapts this to the server's proxy setup. Postgres joins in phase 3.
+# Postgres publishes no port at all: only the web container reaches it on this stack's own network.
+# Phase 13 (deploy) adapts this to the server's proxy setup.
 name: lostcomma
 
 services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: lostcomma
+      POSTGRES_USER: lostcomma
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      # Postgres 18 keeps its data in a versioned folder under this path.
+      - lostcomma-pg:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lostcomma -d lostcomma"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    shm_size: 128mb
+    security_opt:
+      - no-new-privileges:true
+
   web:
     build: .
     image: lostcomma-site:latest
     restart: unless-stopped
     env_file: .env
+    environment:
+      DATABASE_URL: postgres://lostcomma:${POSTGRES_PASSWORD}@db:5432/lostcomma
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "127.0.0.1:${LOSTCOMMA_PORT:-3300}:3000"
     read_only: true
     tmpfs:
       - /tmp
     volumes:
-      # Briefs land here until the database arrives (phase 3).
+      # Uploaded images and their variants.
       - lostcomma-data:/app/data
     security_opt:
       - no-new-privileges:true
 
 volumes:
   lostcomma-data:
+  lostcomma-pg:

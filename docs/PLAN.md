@@ -14,8 +14,9 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | HTML | Sunucuda üretilir (`html` etiketli şablon · otomatik kaçış). JS olmadan da içerik okunur. |
 | İstemci | Sayfa başına küçük TS modülleri · esbuild ile paketlenir · hash'li dosya adları |
 | Dil | Türkçe kaynak metin `t('…')` · İngilizce katalog `i18n/en.json` · acorn ile çıkarma ve kontrol |
-| Veri | PostgreSQL 16 · Drizzle (3. aşamadan itibaren) |
+| Veri | PostgreSQL 18 · Drizzle · testlerde ve Docker'sız geliştirmede PGlite (WebAssembly'ye derlenmiş gerçek Postgres) |
 | İçerik | markdown-it (Notes) · sharp + opentype.js (OG görselleri) |
+| Görsel | sharp · her görsel AVIF ve WebP olarak 320 ile 2560 px arası altı genişlikte · içerik hash'li adres · bir yıl önbellek |
 | Formlar | zod şemaları · sunucu ve istemci aynı şemayı kullanır |
 | Panel | Discord ile giriş · TOTP 2FA · team ve admin rolleri |
 | Test | vitest (birim + Fastify inject) · Playwright (e2e) · axe (erişilebilirlik) |
@@ -50,8 +51,8 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 |---|---|---|---|
 | 0 | Temel | Sunucu · dil sistemi · adresler · fontlar · header ve footer · test altyapısı · Docker · CI | Bitti |
 | 1 | Ortak etkileşim katmanı | İmleç motoru (hero'da ekip · aşağıda tek ev sahibi) · roll etiketleri · next band · azaltılmış hareket · dokunmatik davranış | Bitti |
-| 2 | Ana sayfa | "Live" tasarımı + iletişim bölümü · mobil düzen | PR bekliyor |
-| 3 | Veri katmanı | Drizzle şeması · migration · seed · içerik modeli · görsel hattı (sharp · AVIF ve WebP · srcset) · briefler veritabanına | |
+| 2 | Ana sayfa | "Live" tasarımı + iletişim bölümü · mobil düzen | Bitti |
+| 3 | Veri katmanı | Drizzle şeması · migration · seed · içerik modeli · görsel hattı (sharp · AVIF ve WebP · srcset) · briefler veritabanına | PR bekliyor |
 | 4 | Work + Case | Layers paneli · vaka sayfası sürüm geçmişi | |
 | 5 | Services + Websites | Araç seç ve çiz · yeniden boyutlanan çerçeve | |
 | 6 | Process + Studio | Zaman çizelgesi · ayarlar penceresi · İstanbul haritası | |

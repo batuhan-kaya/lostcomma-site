@@ -1,4 +1,5 @@
 import type { Assets } from './assets';
+import type { Db } from './db';
 import type { Safe } from './html';
 import type { Lang, T } from './i18n';
 import type { RouteId } from './routes';
@@ -19,6 +20,8 @@ export interface Ctx {
   assets: Assets;
   /** Server time used for the footer clock and dated copy. */
   now: Date;
+  /** Content lives here (see src/server/data). Read it in a page's load(). */
+  db: Db;
 }
 
 export interface NextBand {
@@ -31,7 +34,11 @@ export interface NextBand {
 
 export type CrewName = 'design' | 'code' | 'motion';
 
-export interface Page {
+/**
+ * A page. Pages with content from the database declare load(): it runs before rendering and
+ * its result reaches body · footer · data as the second argument.
+ */
+export interface Page<D = undefined> {
   id: RouteId | 'notFound';
   theme: ThemeId;
   /** The cursor that hosts the sections below the hero (sections may override with data-host). */
@@ -40,7 +47,9 @@ export interface Page {
   section?: RouteId;
   title: (t: T) => string;
   description: (t: T) => string;
-  body: (ctx: Ctx) => Safe;
+  /** Fetches what the page needs before it renders. */
+  load?: (ctx: Ctx) => Promise<D>;
+  body: (ctx: Ctx, data: D) => Safe;
   next?: NextBand;
   /** Client entries to load besides the shared one. */
   scripts?: string[];
@@ -53,7 +62,10 @@ export interface Page {
   /** The homepage: interactive presence avatars in the header. */
   home?: boolean;
   /** Replaces the shared footer (the homepage has its big wordmark footer). */
-  footer?: (ctx: Ctx) => Safe;
+  footer?: (ctx: Ctx, data: D) => Safe;
   /** Extra JSON handed to the page's client module (rendered as a non-executable data block). */
-  data?: (ctx: Ctx) => unknown;
+  data?: (ctx: Ctx, data: D) => unknown;
 }
+
+/** The route table holds pages with different data. */
+export type AnyPage = Page<any>;

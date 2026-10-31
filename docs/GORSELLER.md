@@ -2,16 +2,26 @@
 
 Sitede gerçek görsel (fotoğraf · ekran görüntüsü · video) gelmesi gereken her yer burada. Her aşamada güncellenir. Proje sonunda Batuhan'a bu liste teslim edilir.
 
-Görseller sunucuda sharp ile AVIF ve WebP'ye çevrilip birkaç boyutta servis edilecek (3. aşama: görsel hattı). Bu yüzden teslim edilen dosya büyük ve kaliteli olmalı: en az aşağıdaki boyutun iki katı.
+Görsel hattı 3. aşamada kuruldu: her görsel sunucuda AVIF ve WebP'ye çevrilir ve 320 · 640 · 960 · 1280 · 1920 · 2560 px genişliklerinde servis edilir (asla büyütülmez). Bu yüzden teslim edilen dosya büyük ve kaliteli olmalı: en az aşağıdaki boyutun iki katı. Kamera ve konum bilgisi otomatik silinir · yan yatmış fotoğraflar düzeltilir.
 
-Durum sütunu: **CSS** = şu an kodla çizilmiş bir illüstrasyon duruyor · **Boş** = henüz yer tutucu · **Gerekmez** = kodla yapılan ve öyle kalacak bir şey.
+## Nasıl teslim edilir
+
+- Fotoğraf ve ekran görüntüsü: JPEG · PNG · WebP · AVIF · HEIC (iPhone) · TIFF. SVG kabul edilmez (logo ve ikonlar ayrı yoldan gelir · B9).
+- Her görsel için iki kısa açıklama (alt metin): Türkçe ve İngilizce · virgülsüz. Görme engelli ziyaretçiler ekran okuyucuda bunu duyar.
+- Dosya adı önemli değil · hangi yere gittiğini bu listedeki numarayla söylemen yeterli (A1 · No. 014 gibi).
+- Panel gelene kadar (11. aşama) görselleri ben eklerim: `npm run media -- cover 14 dosya.jpg --alt-tr "…" --alt-en "…"`.
+- Video (A6 ve hareket işleri) için ayrı bir hat gerekecek: MP4 ve WebM · poster karesi · sessiz döngü. Hareket vitrini kararıyla birlikte (8. aşama) kurulur.
+
+Durum sütunu: **Hazır** = yer görsel almaya hazır · görsel gelene kadar çizim duruyor · **CSS** = şu an kodla çizilmiş bir illüstrasyon duruyor ve görseli alacak kod henüz yok · **Boş** = henüz yer tutucu · **Gerekmez** = kodla yapılan ve öyle kalacak bir şey.
+
+Panodaki çerçevelerin şekli farklı (yatay ve dikey). Kapak çerçeveye göre kırpılır ve açılan kartta 3:2 görünür: önemli kısım ortada kalsın.
 
 ## Ana sayfa (2. aşama)
 
 | # | Yer | Ne lazım | Oran · teslim boyutu | Durum |
 |---|---|---|---|---|
-| A1 | Pano · 8 proje kapağı | Her proje için bir kapak (ekran görüntüsü · ürün fotoğrafı · afiş) | 520×340 → 1040×680 · 300×400 → 600×800 · 340×440 → 680×880 · 460×300 → 920×600 · 540×340 → 1080×680 · 320×420 → 640×840 · 420×300 → 840×600 | CSS |
-| A2 | Pano · açılan proje kartı | Aynı kapak daha büyük | 3:2 · 1200×800 | CSS |
+| A1 | Pano · 7 proje kapağı + Lab | Panodaki her proje için bir kapak (ekran görüntüsü · ürün fotoğrafı · afiş) · Lab çerçevesi kodla çizili kalabilir | 520×340 → 1040×680 · 300×400 → 600×800 · 340×440 → 680×880 · 460×300 → 920×600 · 540×340 → 1080×680 · 320×420 → 640×840 · 420×300 → 840×600 | Hazır: kapak eklenen proje görseli gösterir · eklenmeyen çizimini |
+| A2 | Pano · açılan proje kartı | A1 ile aynı kapak (ayrıca gerekmez) | 3:2 · 1200×800 | Hazır |
 | A3 | Hizmetler çerçevesi · Web sitesi | Gerçek bir sitenin masaüstü ekranı | 780×488 → 1560×976 | CSS (LODOS örneği) |
 | A4 | Hizmetler çerçevesi · Uygulama | Gerçek bir uygulama ekranı | 282×610 → 564×1220 | CSS |
 | A5 | Hizmetler çerçevesi · Kimlik | Logo · yazı · renk sayfası | 520×520 → 1040×1040 | CSS |

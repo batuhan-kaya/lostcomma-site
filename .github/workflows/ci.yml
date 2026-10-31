@@ -13,6 +13,21 @@ jobs:
   check:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    # Unit tests use PGlite in memory · e2e runs against a real Postgres like production.
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: lostcomma
+          POSTGRES_PASSWORD: lostcomma
+          POSTGRES_DB: lostcomma_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U lostcomma -d lostcomma_e2e"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      E2E_DATABASE_URL: postgres://lostcomma:lostcomma@localhost:5432/lostcomma_e2e
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -39,11 +54,26 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
-      - run: docker build -t lostcomma-site .
-      - name: smoke test the image
+      - name: start the compose stack (web + postgres)
         run: |
-          docker run -d --name web -p 3000:3000 -e SITE_URL=http://localhost:3000 lostcomma-site
-          for i in $(seq 1 20); do curl -fsS localhost:3000/healthz && break; sleep 1; done
-          curl -fsS -o /dev/null -w "%{http_code}\n" localhost:3000/en
-          curl -fsS -o /dev/null -w "%{http_code}\n" localhost:3000/tr/isler
-          docker logs web
+          cp .env.example .env
+          sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/; s#^SITE_URL=.*#SITE_URL=http://127.0.0.1:3300#" .env
+          docker compose up -d --build --wait --wait-timeout 120
+      - name: smoke test
+        run: |
+          curl -fsS 127.0.0.1:3300/healthz
+          curl -fsS -o /dev/null -w "%{http_code}\n" 127.0.0.1:3300/en
+          curl -fsS -o /dev/null -w "%{http_code}\n" 127.0.0.1:3300/tr/isler
+          # An empty production database still renders the homepage (no board projects yet).
+          curl -fsS 127.0.0.1:3300/en | grep -q 'data-bf="7"'
+          # A brief lands in Postgres.
+          curl -fsS -H 'content-type: application/json' -d '{"lang":"en","email":"smoke@example.com","types":["website"]}' 127.0.0.1:3300/api/brief
+          test "$(docker compose exec -T db psql -U lostcomma -d lostcomma -tAc "select count(*) from briefs where email = 'smoke@example.com'")" = "1"
+          # Postgres is not reachable from the host.
+          if (exec 3<>/dev/tcp/127.0.0.1/5432) 2>/dev/null; then echo "postgres port is exposed"; exit 1; fi
+      - name: logs
+        if: always()
+        run: docker compose logs --no-color
+      - name: stop
+        if: always()
+        run: docker compose down -v

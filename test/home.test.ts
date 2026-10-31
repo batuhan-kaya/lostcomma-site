@@ -1,10 +1,9 @@
 import { afterAll, describe, expect, it } from 'vitest';
-import { MemoryInbox } from '../src/server/api/inbox';
 import { buildApp } from '../src/server/app';
 import { loadConfig } from '../src/server/config';
 import { HOME } from '../src/server/content/home';
 
-const app = await buildApp({ inbox: new MemoryInbox(), config: loadConfig({ NODE_ENV: 'test', SITE_URL: 'https://lostcomma.co' }), now: () => new Date('2026-10-28T10:00:00+03:00') });
+const app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: 'https://lostcomma.co' }), now: () => new Date('2026-10-28T10:00:00+03:00') });
 afterAll(() => app.close());
 
 for (const lang of ['tr', 'en'] as const) {
@@ -63,7 +62,6 @@ describe('content', () => {
       changes: HOME[l].manifesto.filter((s) => typeof s !== 'string').map((s) => (typeof s === 'string' ? '' : s.who)),
       comments: HOME[l].comments.map((c) => c.who),
       services: HOME[l].services.length,
-      projects: HOME[l].projects.length,
       steps: HOME[l].steps.length,
       types: HOME[l].types.map((x) => x.who),
       times: HOME[l].times.map((x) => x.who),

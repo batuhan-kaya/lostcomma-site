@@ -362,6 +362,9 @@
 .ovr .btn.g:hover { background: var(--milk); color: var(--ink); }
 /* board art (container units so it scales with the frame) */
 .ar { position: absolute; inset: 0; display: block; }
+.ba .pic, .ba .pic img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ba .pic img { object-fit: cover; }
+.ar-none { background: #1b1b1e; }
 .ar svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .ar-sail { background: linear-gradient(180deg, #F7CDA6 0%, #F0A78B 30%, #C7869A 48%, #4C6297 58%, #1C3564 78%, #0E1F40 100%); }
 .ar-sail .su { position: absolute; left: 60%; top: 22%; width: 15cqw; height: 15cqw; border-radius: 50%; background: radial-gradient(circle, #FFF4D6, #FFD39A 60%, rgba(255,200,140,0) 72%); }
