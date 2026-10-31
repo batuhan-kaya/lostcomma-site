@@ -10,8 +10,12 @@ import { manifesto } from './manifesto';
 import { process } from './process';
 import { services } from './services';
 
-/** The contact section colour (Contact A–D from the design board). Ink until Batuhan picks. */
-export const CONTACT_THEME: ContactTheme = 'ink';
+/**
+ * The contact section colour (Contact A–D from the design board). Blue for now: the colour of the
+ * original Live contact · it breaks the paper → ink rhythm right before the dark footer.
+ * Batuhan will revisit it.
+ */
+export const CONTACT_THEME: ContactTheme = 'blue';
 
 const LETTERS_A = ['l', 'o', 's', 't'];
 const LETTERS_B = ['c', 'o', 'm', 'm', 'a'];

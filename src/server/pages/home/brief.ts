@@ -51,7 +51,7 @@ ${c.times.map(
 </div>
 </fieldset>
 <fieldset class="blk" data-blk="budget" data-tm="" data-yn="${t('sen')}">
-<div class="bhd"><legend class="blab"><span class="mono">03</span>${t('Kabaca bütçe')}</legend><span class="bh mono">${t('Örnek aralıklar')}</span></div>
+<div class="bhd"><legend class="blab"><span class="mono">03</span>${t('Kabaca bütçe')}</legend><span class="bh mono">${t('Kesin olması gerekmiyor')}</span></div>
 <div class="chips">${c.budgets.map(
     (b, i) => html`<label class="chip" data-chip="${i}"><input class="sr" type="radio" name="budget" value="${BRIEF_BUDGETS[i]}">${b.n}</label>`,
   )}</div>

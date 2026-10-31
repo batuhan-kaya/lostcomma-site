@@ -8,6 +8,7 @@ Studio site for Lost Comma (Istanbul creative software studio: web · apps · id
 - Never change code without his explicit approval. Work phase by phase as in `docs/PLAN.md`. Finish a phase, show results (tests + screenshots in both languages), wait for approval.
 - Every phase after 0 lives on its own branch (`phase-N-name`) and arrives as a pull request. Merging the PR is the approval. Never push to `main` directly.
 - `npm run check` must be green before a phase is handed over.
+- Every place that needs a real image (photo · screenshot · video) goes into `docs/GORSELLER.md` in the phase that creates it. Batuhan gets the full list at the end. The site must not ship imageless.
 - Other Docker-hosted sites run on the same server. Deploy changes must never bind 80/443 or touch other stacks.
 
 ## Brand rules (enforced by tests)

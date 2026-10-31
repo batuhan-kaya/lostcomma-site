@@ -322,6 +322,8 @@ export class Crew {
     const ctrl = new AbortController();
     this.ctrl = ctrl;
     this.section = sec;
+    // Lets page CSS adjust cursors per section (a blue cursor on a blue section).
+    this.layer.dataset.sec = sec;
     const team = sec === 'hero';
     const host = this.hostOf(sec);
 

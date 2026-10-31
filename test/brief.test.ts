@@ -26,11 +26,11 @@ beforeEach(() => {
 
 describe('POST /api/brief (fetch)', () => {
   it('stores a valid brief', async () => {
-    const res = await post({ lang: 'tr', types: ['website', 'app', 'app'], time: '1m', budget: 'b40', name: '  Batu ', email: 'batu@example.com', message: 'Merhaba' });
+    const res = await post({ lang: 'tr', types: ['website', 'app', 'app'], time: '1m', budget: 'b15', name: '  Batu ', email: 'batu@example.com', message: 'Merhaba' });
     expect(res.statusCode).toBe(200);
     expect(res.json()).toEqual({ ok: true });
     expect(inbox.items).toHaveLength(1);
-    expect(inbox.items[0]).toMatchObject({ lang: 'tr', types: ['website', 'app'], time: '1m', budget: 'b40', name: 'Batu', email: 'batu@example.com', message: 'Merhaba', at: '2026-10-31T12:00:00.000Z' });
+    expect(inbox.items[0]).toMatchObject({ lang: 'tr', types: ['website', 'app'], time: '1m', budget: 'b15', name: 'Batu', email: 'batu@example.com', message: 'Merhaba', at: '2026-10-31T12:00:00.000Z' });
     expect(inbox.items[0]?.id).toMatch(/^[0-9a-f-]{36}$/);
   });
 

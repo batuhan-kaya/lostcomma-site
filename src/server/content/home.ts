@@ -123,10 +123,10 @@ const en: HomeContent = {
     { n: 'No rush', p: 'whenever it is ready', who: 'motion', say: 'the best kind' },
   ],
   budgets: [
-    { n: 'Under €15k', say: 'we can start small' },
-    { n: '€15–40k', say: 'good starting point' },
-    { n: '€40–80k', say: 'lots of room to explore' },
-    { n: '€80k+', say: 'dream project' },
+    { n: 'Under €5k', say: 'we can start small' },
+    { n: '€5–15k', say: 'good starting point' },
+    { n: '€15–40k', say: 'lots of room to explore' },
+    { n: '€40k+', say: 'dream project' },
     { n: 'Not sure yet', say: 'totally fine. we will help' },
   ],
   doing: { design: 'Looking around the file', code: 'Reading the codebase', motion: 'Tweaking an easing curve' },
@@ -191,10 +191,10 @@ const tr: HomeContent = {
     { n: 'Acele yok', p: 'hazır olduğunda', who: 'motion', say: 'en güzeli' },
   ],
   budgets: [
-    { n: '15 bin € altı', say: 'küçük başlayabiliriz' },
-    { n: '15–40 bin €', say: 'iyi bir başlangıç' },
-    { n: '40–80 bin €', say: 'keşfetmeye bol yer' },
-    { n: '80 bin € üstü', say: 'hayal projesi' },
+    { n: '5 bin € altı', say: 'küçük başlayabiliriz' },
+    { n: '5–15 bin €', say: 'iyi bir başlangıç' },
+    { n: '15–40 bin €', say: 'keşfetmeye bol yer' },
+    { n: '40 bin € üstü', say: 'hayal projesi' },
     { n: 'Henüz bilmiyorum', say: 'hiç sorun değil. yardım ederiz' },
   ],
   doing: { design: 'Dosyaya göz atıyor', code: 'Kodu okuyor', motion: 'Bir yumuşatma eğrisiyle uğraşıyor' },
@@ -205,4 +205,4 @@ export const HOME: Record<Lang, HomeContent> = { tr, en };
 /** Stable ids posted by the brief form (never shown). */
 export const BRIEF_TYPES = ['website', 'app', 'identity', 'motion'] as const;
 export const BRIEF_TIMES = ['asap', '1m', '3m', '6m', 'norush'] as const;
-export const BRIEF_BUDGETS = ['b15', 'b40', 'b80', 'b80plus', 'unsure'] as const;
+export const BRIEF_BUDGETS = ['b5', 'b15', 'b40', 'b40plus', 'unsure'] as const;

@@ -128,7 +128,7 @@ test.describe('homepage · brief', () => {
     await page.locator('[data-send]').click();
     await expect(page.locator('[data-thread]')).toBeVisible();
     await expect(page.locator('[data-pinsum]')).toHaveText('Batu needs a website and an app within a month.');
-    await expect(page.locator('[data-ptags] span')).toHaveText(['Website', 'App', '1 month', '€15–40k']);
+    await expect(page.locator('[data-ptags] span')).toHaveText(['Website', 'App', '1 month', '€5–15k']);
     await expect(page.locator('[data-msg="2"]')).toBeVisible({ timeout: 8000 });
     await expect(page.locator('[data-hi]')).toHaveText('Hi Batu. Thanks for the brief.');
     const stored = readFileSync('test-results/data/briefs.jsonl', 'utf8');

@@ -51,12 +51,12 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 0 | Temel | Sunucu · dil sistemi · adresler · fontlar · header ve footer · test altyapısı · Docker · CI | Bitti |
 | 1 | Ortak etkileşim katmanı | İmleç motoru (hero'da ekip · aşağıda tek ev sahibi) · roll etiketleri · next band · azaltılmış hareket · dokunmatik davranış | Bitti |
 | 2 | Ana sayfa | "Live" tasarımı + iletişim bölümü · mobil düzen | PR bekliyor |
-| 3 | Veri katmanı | Drizzle şeması · migration · seed · içerik modeli | |
+| 3 | Veri katmanı | Drizzle şeması · migration · seed · içerik modeli · görsel hattı (sharp · AVIF ve WebP · srcset) · briefler veritabanına | |
 | 4 | Work + Case | Layers paneli · vaka sayfası sürüm geçmişi | |
 | 5 | Services + Websites | Araç seç ve çiz · yeniden boyutlanan çerçeve | |
 | 6 | Process + Studio | Zaman çizelgesi · ayarlar penceresi · İstanbul haritası | |
 | 7 | Notes + Note | Bul ve blame · yay oyun alanı · RSS · OG görselleri | |
-| 8 | Lab | Canlı örnekler · ekran dışında duraklatma · performans bütçesi | |
+| 8 | Lab | Canlı örnekler · ekran dışında duraklatma · performans bütçesi · hareket vitrini kararı | |
 | 9 | Start | Ofis saatleri · saat dilimi · randevu · form · bildirim | |
 | 10 | Now + Uses + 404 | Duvar takvimi · klavye · geri al | |
 | 11 | Panel | Discord girişi · 2FA · roller · içerik yönetimi · denetim kaydı | |
@@ -78,6 +78,10 @@ Taslaklar sadece 1440 px masaüstü. Her sayfa aşamasında 1024 · 768 · 390 p
    - `prefers-reduced-motion` ile de çalışıyor
 5. Taslakla yan yana ekran görüntüsü karşılaştırması
 6. Commit + push · kısa özet
+
+## Görseller
+
+Gerçek görsel gelmesi gereken her yer `docs/GORSELLER.md` dosyasında tutulur ve her aşamada güncellenir. Proje sonunda tam liste teslim edilir.
 
 ## Batuhan'dan gelecekler (ilgili aşamaya kadar)
 

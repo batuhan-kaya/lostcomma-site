@@ -746,3 +746,5 @@ button.cur { padding: 0; border: 0; background: none; color: inherit; font: inhe
 .frow { align-items: center; }
 /* Turkish heading breaks after the box: the size label goes to its right. */
 :lang(tr) .sbox .sz { left: calc(100% + 14px); top: 50%; transform: translateY(-50%); }
+/* The design cursor on the blue contact section gets a light ring. */
+.crew[data-sec="ctc"] .c-design :is(.tag, .bub) { box-shadow: inset 0 0 0 1.5px #F2F1EC; }
