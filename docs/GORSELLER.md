@@ -28,12 +28,23 @@ Panodaki çerçevelerin şekli farklı (yatay ve dikey). Kapak çerçeveye göre
 | A6 | Hizmetler çerçevesi · Hareket | Kısa döngü video (sessiz · 6 ile 12 sn) + poster | 820×350 → 1640×700 · MP4 + WebM | CSS |
 | A7 | Süreç · 5 ekran | İsteğe bağlı: atölye · eskiz · prototip · kod · yayın fotoğrafları | 156×212 → 624×848 | CSS |
 
+## İşler ve vaka sayfaları (4. aşama)
+
+Her projenin kapağı tek bir görsel: ana sayfa panosu · İşler önizlemesi · tuval görünümü · vaka sayfasının hero'su aynı kapağı kullanır ve her yerde kendi şekline göre kırpar. Bu yüzden kapak geniş olsun ve önemli kısım ortada dursun.
+
+| # | Yer | Ne lazım | Oran · teslim boyutu | Durum |
+|---|---|---|---|---|
+| C1 | Proje kapağı (her proje) | Projenin en iyi tek görseli | 16:9 ya da daha geniş · en az 2720×1120 | Hazır: kapağı olmayan proje çizimini gösterir |
+| C2 | Vaka · sürüm geçmişi | Her sürüm için bir ekran: eskiz fotoğrafı · tel çerçeve · tasarım · kodlanmış hal · yayın · uygulama | 16:10 · 1800×1125 | Hazır: görseli olmayan sürüm kapağı gösterir (örnek projede çizili site) |
+| C3 | Vaka · detaylar | Yakın plan detaylar (bileşen · ikon · ambalaj · hareket karesi) | Kare ya da 2:1 · 1000×1000 veya 1800×900 | Hazır (görsel karosu) |
+| C4 | Vaka · alıntı ve sonuçlar | Müşteriden bir cümle · gerçek sayılar | Metin | Yer tutucu ([X] · [İsim]) |
+
+Renk paleti ve yazı karoları görsel istemez: renk kodları ve font adı yeter.
+
 ## Sonraki aşamalarda gelecekler (taslaklardan)
 
 | # | Sayfa | Ne lazım | Not |
 |---|---|---|---|
-| B1 | İşler | 14 projenin kapak görseli (Katmanlar paneli önizlemesi) | A1 ile aynı görseller kullanılabilir |
-| B2 | Vaka sayfası | Her vaka için: hero görseli · eskiz · wireframe · son ekranlar · telefon ekranları · sonuç görselleri | Proje başına 6 ile 12 görsel |
 | B3 | Hizmet detayı · Web siteleri | Yeniden boyutlanan çerçevedeki örnek site | Şu an "kil" seramik sitesi örneği |
 | B4 | Hizmet detayı · Uygulamalar · Kimlik · Hareket | Tasarımı henüz yok | 5. aşamada karar |
 | B5 | Stüdyo | Ekip portreleri (3 kişi) · stüdyo ve İstanbul fotoğrafları | Portreler aynı ışık ve fonla |

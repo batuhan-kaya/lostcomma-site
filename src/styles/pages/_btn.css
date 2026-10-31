@@ -1,0 +1,10 @@
+/* Pill buttons in the page colours (the homepage has its own in home.css). */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 26px;
+  border: 0; border-radius: 999px; font: 600 17px/1 var(--sans); text-decoration: none; cursor: pointer;
+  transition: background-color .3s, color .3s, transform .45s var(--ease-pop);
+}
+.btn.f { background: var(--pfg); color: var(--pbg); }
+.btn.f:hover { background: var(--acc); color: var(--pbg); transform: rotate(-2deg); }
+.btn.g { border: 1.5px solid currentColor; background: transparent; color: inherit; }
+.btn.g:hover { background: var(--pfg); color: var(--pbg); }

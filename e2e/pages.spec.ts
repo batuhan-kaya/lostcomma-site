@@ -5,6 +5,10 @@ import { axeProblems, fontsReady, horizontalOverflow, visibleCommas, watchErrors
 
 const cases = [
   ...(Object.keys(STATIC_PAGES) as RouteId[]).flatMap((id) => (['tr', 'en'] as const).map((lang) => ({ path: href(lang, id), status: 200 }))),
+  // Case studies: the full sample in both languages and a short one.
+  { path: '/tr/isler/yelken-kulubu', status: 200 },
+  { path: '/en/work/sailing-club', status: 200 },
+  { path: '/en/work/ferry-timetable', status: 200 },
   { path: '/tr/yok-boyle-bir-sayfa', status: 404 },
   { path: '/en/no-such-page', status: 404 },
 ];

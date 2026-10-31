@@ -1,16 +1,22 @@
 import { esc } from './html';
-import { LANGS } from './i18n';
+import { LANGS, type Lang } from './i18n';
 import { href, type RouteId } from './routes';
 
 export function robotsTxt(site: string): string {
   return ['User-agent: *', 'Allow: /', 'Disallow: /panel', '', `Sitemap: ${site}/sitemap.xml`, ''].join('\n');
 }
 
-export function sitemapXml(site: string, ids: RouteId[]): string {
-  const urls = ids.flatMap((id) =>
-    LANGS.map((lang) => {
-      const links = LANGS.map((l) => `<xhtml:link rel="alternate" hreflang="${l}" href="${esc(site + href(l, id))}"/>`).join('');
-      return `<url><loc>${esc(site + href(lang, id))}</loc>${links}</url>`;
+/** One page in each language it exists in. */
+export type Alternates = Partial<Record<Lang, string>>;
+
+export function sitemapXml(site: string, ids: RouteId[], more: Alternates[] = []): string {
+  const pages: Alternates[] = [...ids.map((id) => Object.fromEntries(LANGS.map((l) => [l, href(l, id)]))), ...more];
+  const urls = pages.flatMap((alt) =>
+    LANGS.flatMap((lang) => {
+      const path = alt[lang];
+      if (!path) return [];
+      const links = LANGS.flatMap((l) => (alt[l] ? [`<xhtml:link rel="alternate" hreflang="${l}" href="${esc(site + alt[l])}"/>`] : [])).join('');
+      return [`<url><loc>${esc(site + path)}</loc>${links}</url>`];
     }),
   );
   return (

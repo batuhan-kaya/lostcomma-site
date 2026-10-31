@@ -90,6 +90,7 @@ test.describe('homepage · desktop interactions', () => {
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
     await expect(dialog.locator('h3')).toHaveText('Seramik atölyesi');
+    await expect(dialog.locator('[data-ovlink]')).toHaveAttribute('href', '/tr/isler/seramik-atolyesi');
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
     await expect(page.locator('[data-bf="1"]')).toBeFocused();

@@ -52,8 +52,8 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 0 | Temel | Sunucu · dil sistemi · adresler · fontlar · header ve footer · test altyapısı · Docker · CI | Bitti |
 | 1 | Ortak etkileşim katmanı | İmleç motoru (hero'da ekip · aşağıda tek ev sahibi) · roll etiketleri · next band · azaltılmış hareket · dokunmatik davranış | Bitti |
 | 2 | Ana sayfa | "Live" tasarımı + iletişim bölümü · mobil düzen | Bitti |
-| 3 | Veri katmanı | Drizzle şeması · migration · seed · içerik modeli · görsel hattı (sharp · AVIF ve WebP · srcset) · briefler veritabanına | PR bekliyor |
-| 4 | Work + Case | Layers paneli · vaka sayfası sürüm geçmişi | |
+| 3 | Veri katmanı | Drizzle şeması · migration · seed · içerik modeli · görsel hattı (sharp · AVIF ve WebP · srcset) · briefler veritabanına | Bitti |
+| 4 | Work + Case | Layers paneli · vaka sayfası sürüm geçmişi | PR bekliyor |
 | 5 | Services + Websites | Araç seç ve çiz · yeniden boyutlanan çerçeve | |
 | 6 | Process + Studio | Zaman çizelgesi · ayarlar penceresi · İstanbul haritası | |
 | 7 | Notes + Note | Bul ve blame · yay oyun alanı · RSS · OG görselleri | |

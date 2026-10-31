@@ -3,9 +3,10 @@
  * and returns the text in that language, falling back to the other one when a row is missing
  * (`textLang` says which one was used, so the page can set lang="" on it).
  */
-import { and, asc, desc, eq, inArray, isNotNull, lte } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull, lte, max } from 'drizzle-orm';
 import type { Db } from '../db';
-import { notes, noteText, people, projects, projectText } from '../db/schema';
+import { media, notes, noteText, people, projects, projectText } from '../db/schema';
+import { StorySchema, storyMedia, type Story } from '../db/story';
 import type { Lang } from '../i18n';
 import type { MediaRef } from '../media/picture';
 
@@ -35,7 +36,12 @@ export interface ProjectCard {
   art: string | null;
   cover: MediaRef | null;
   textLang: Lang;
+  /** This website (the "You are here" layer). */
+  here: boolean;
 }
+
+/** The slug of the project that is this website. */
+export const HERE_SLUG = 'lost-comma';
 
 export interface BoardProject extends ProjectCard {
   slot: number;
@@ -47,6 +53,12 @@ export interface ProjectPage extends ProjectCard {
   siteUrl: string | null;
   /** The slug in each language for the language switch. */
   slugs: Partial<Record<Lang, string>>;
+  /** The case study. A project without one (or with a broken one) gets the short case page. */
+  story: Story | null;
+  /** Images the story points at, by media id. */
+  media: Record<number, MediaRef>;
+  /** The next live layer down the list (wraps around to the newest). */
+  next: ProjectCard | null;
 }
 
 const projectWith = { texts: true, cover: true } as const;
@@ -72,6 +84,7 @@ function card(row: ProjectRow, lang: Lang): ProjectCard {
     art: row.art,
     cover: mediaRef(row.cover),
     textLang: t.lang,
+    here: row.texts.some((x) => x.slug === HERE_SLUG),
   };
 }
 
@@ -102,13 +115,38 @@ export async function projectBySlug(db: Db, lang: Lang, slug: string): Promise<P
   const row = await db.query.projects.findFirst({ where: and(eq(projects.id, hit.projectId), eq(projects.status, 'live')), with: projectWith });
   if (!row) return null;
   const t = pickText(row.texts, lang)!;
+
+  const parsed = row.story ? StorySchema.safeParse(row.story) : null;
+  const story = parsed?.success ? parsed.data : null;
+  const ids = story ? storyMedia(story) : [];
+  const images = ids.length ? await db.select().from(media).where(inArray(media.id, ids)) : [];
+
+  const live = await db.query.projects.findMany({ where: eq(projects.status, 'live'), orderBy: desc(projects.no), with: projectWith });
+  const at = live.findIndex((p) => p.id === row.id);
+  const after = live.length > 1 ? live[(at + 1) % live.length] : undefined;
+
   return {
     ...card(row, lang),
     summary: t.summary,
     client: t.client,
     siteUrl: row.siteUrl,
     slugs: Object.fromEntries(row.texts.map((x) => [x.lang, x.slug])),
+    story,
+    media: Object.fromEntries(images.map((m) => [m.id, mediaRef(m)!])),
+    next: after?.texts.length ? card(after, lang) : null,
   };
+}
+
+/** The number the next project will get ("Your project could be layer 017"). */
+export async function nextProjectNumber(db: Db): Promise<number> {
+  const [row] = await db.select({ n: max(projects.no) }).from(projects);
+  return (row?.n ?? 0) + 1;
+}
+
+/** Every live case page in both languages (sitemap). */
+export async function caseSlugs(db: Db): Promise<Partial<Record<Lang, string>>[]> {
+  const rows = await db.query.projects.findMany({ where: eq(projects.status, 'live'), orderBy: desc(projects.no), with: { texts: true } });
+  return rows.map((r) => Object.fromEntries(r.texts.map((x) => [x.lang, x.slug])));
 }
 
 export interface NoteCard {

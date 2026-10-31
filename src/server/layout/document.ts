@@ -14,9 +14,10 @@ export function jsonData(value: unknown): Safe {
 
 export function documentHtml<D>(page: Page<D>, ctx: Ctx, data: D): Safe {
   const { t, lang, site, assets } = ctx;
-  const name = page.title(t);
+  const name = page.title(t, data);
+  const theme = typeof page.theme === 'function' ? page.theme(data) : page.theme;
   const title = page.id === 'home' ? `Lost Comma · ${name}` : `${name} · Lost Comma`;
-  const description = page.description(t);
+  const description = page.description(t, data);
   const url = site + ctx.path;
 
   const alternates = LANGS.flatMap((l) => {
@@ -30,7 +31,7 @@ export function documentHtml<D>(page: Page<D>, ctx: Ctx, data: D): Safe {
   const js = ['app', ...(page.scripts ?? [])].map((n) => assets.js(n, lang)).filter((u): u is string => !!u);
 
   return html`<!doctype html>
-<html lang="${lang}" class="th-${page.theme}" data-page="${page.id}">
+<html lang="${lang}" class="th-${theme}" data-page="${page.id}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -48,7 +49,7 @@ ${xDefault ? html`<link rel="alternate" hreflang="x-default" href="${site + xDef
 <meta property="og:url" content="${url}">
 <meta property="og:locale" content="${OG_LOCALE[lang]}">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="${THEMES[page.theme]}">
+<meta name="theme-color" content="${THEMES[theme]}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 ${fonts.map((f) => html`<link rel="preload" href="${f}" as="font" type="font/woff2" crossorigin>`)}
 ${css.map((c) => html`<link rel="stylesheet" href="${c}">`)}

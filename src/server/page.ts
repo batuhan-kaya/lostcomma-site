@@ -40,15 +40,21 @@ export type CrewName = 'design' | 'code' | 'motion';
  */
 export interface Page<D = undefined> {
   id: RouteId | 'notFound';
-  theme: ThemeId;
+  /** A fixed theme · or one picked from the data (a case study chooses its own colours). */
+  theme: ThemeId | ((data: D) => ThemeId);
   /** The cursor that hosts the sections below the hero (sections may override with data-host). */
   host?: CrewName;
   /** Which header link is active. */
   section?: RouteId;
-  title: (t: T) => string;
-  description: (t: T) => string;
-  /** Fetches what the page needs before it renders. */
-  load?: (ctx: Ctx) => Promise<D>;
+  title: (t: T, data: D) => string;
+  description: (t: T, data: D) => string;
+  /**
+   * Fetches what the page needs before it renders. Pages on a route with params (case · note)
+   * get them here and return null when nothing matches: the visitor gets the 404 page.
+   */
+  load?: (ctx: Ctx, params: Record<string, string>) => Promise<D | null>;
+  /** Pages on a route with params: their address in each language (language switch · hreflang · canonical). */
+  paths?: (data: D) => Record<Lang, string | null>;
   body: (ctx: Ctx, data: D) => Safe;
   next?: NextBand;
   /** Client entries to load besides the shared one. */

@@ -1,0 +1,14 @@
+// GitHub Codespaces: the whole site in the browser for review (docs/ONIZLEME.md).
+// Code → Codespaces → Create codespace on <branch>. The site opens in a new tab when it is ready.
+{
+  "name": "Lost Comma · preview",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "hostRequirements": { "cpus": 2 },
+  "postCreateCommand": "npm ci",
+  "postAttachCommand": "npm run preview",
+  "waitFor": "postCreateCommand",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "Lost Comma", "onAutoForward": "openBrowser" }
+  }
+}
