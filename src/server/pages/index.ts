@@ -2,6 +2,8 @@ import type { AnyPage } from '../page';
 import type { RouteId } from '../routes';
 import { casePage } from './case';
 import { homePage } from './home';
+import { servicePage } from './service';
+import { servicesPage } from './services';
 import * as stubs from './stub';
 import { workPage } from './work';
 
@@ -9,7 +11,7 @@ import { workPage } from './work';
 export const STATIC_PAGES: Partial<Record<RouteId, AnyPage>> = {
   home: homePage(),
   work: workPage,
-  services: stubs.services,
+  services: servicesPage,
   process: stubs.process,
   studio: stubs.studio,
   notes: stubs.notes,
@@ -22,6 +24,7 @@ export const STATIC_PAGES: Partial<Record<RouteId, AnyPage>> = {
 /** Pages on a route with params. load() finds the content · null is a 404. */
 export const PARAM_PAGES: Partial<Record<RouteId, AnyPage>> = {
   case: casePage,
+  service: servicePage,
 };
 
 export { notFound } from './notFound';

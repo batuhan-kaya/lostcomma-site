@@ -8,6 +8,7 @@ import { registerBrief } from './api/brief';
 import { RateLimit } from './api/rate';
 import { Assets } from './assets';
 import type { Config } from './config';
+import { SERVICE_KEYS, SERVICE_SLUGS } from './content/services';
 import { caseSlugs } from './data/content';
 import { openDatabase, safeUrl, type Database, type Db } from './db';
 import { seedIfEmpty } from './db/seed';
@@ -197,7 +198,8 @@ export async function buildApp({ config, now = () => new Date(), database }: App
 
   app.get('/sitemap.xml', async (_req, reply) => {
     const cases = (await caseSlugs(db)).map((slugs) => Object.fromEntries(LANGS.flatMap((l) => (slugs[l] ? [[l, href(l, 'case', { slug: slugs[l] })]] : []))));
-    return reply.type('application/xml; charset=utf-8').send(sitemapXml(config.SITE_URL, Object.keys(STATIC_PAGES) as RouteId[], cases));
+    const services = SERVICE_KEYS.map((k) => Object.fromEntries(LANGS.map((l) => [l, href(l, 'service', { slug: SERVICE_SLUGS[k][l] })])));
+    return reply.type('application/xml; charset=utf-8').send(sitemapXml(config.SITE_URL, Object.keys(STATIC_PAGES) as RouteId[], [...services, ...cases]));
   });
 
   function notFoundPage(req: FastifyRequest, reply: FastifyReply) {

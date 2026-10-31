@@ -108,6 +108,20 @@ export async function listProjects(db: Db, lang: Lang): Promise<ProjectCard[]> {
   return rows.filter((r) => r.texts.length).map((r) => card(r, lang));
 }
 
+/** Service pages: the newest live projects of one discipline (this website is left out). */
+export async function projectsOf(db: Db, lang: Lang, discipline: Discipline, limit = 3): Promise<ProjectCard[]> {
+  const rows = await db.query.projects.findMany({
+    where: and(eq(projects.discipline, discipline), eq(projects.status, 'live')),
+    orderBy: desc(projects.no),
+    with: projectWith,
+  });
+  return rows
+    .filter((r) => r.texts.length)
+    .map((r) => card(r, lang))
+    .filter((p) => !p.here)
+    .slice(0, limit);
+}
+
 /** A case study by its slug in this language. NDA and draft projects have no public page. */
 export async function projectBySlug(db: Db, lang: Lang, slug: string): Promise<ProjectPage | null> {
   const hit = await db.query.projectText.findFirst({ where: and(eq(projectText.lang, lang), eq(projectText.slug, slug)) });

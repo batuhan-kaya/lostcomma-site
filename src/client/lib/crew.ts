@@ -237,6 +237,14 @@ export class Crew {
     this.wake();
   }
 
+  /** Where a cursor's arrow tip is right now in viewport coordinates · null when it is off stage. */
+  tip(name: Name): { x: number; y: number } | null {
+    const c = this.cursors[name];
+    if (c.hidden || !c.placed) return null;
+    const rr = this.root.getBoundingClientRect();
+    return { x: rr.left + c.x + 3, y: rr.top + c.y + 2 };
+  }
+
   /** Is this cursor on stage right now? */
   visible(name: Name): boolean {
     return !this.cursors[name].hidden;

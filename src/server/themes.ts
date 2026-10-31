@@ -19,5 +19,5 @@ export const THEMES = {
 export type ThemeId = keyof typeof THEMES;
 
 /** Next band wipe colors. CSS: .nb-<id> sets --nbg and --nfg. */
-export const NEXT_TONES = ['paper', 'ink', 'night', 'pink', 'milk', 'lab', 'lime', 'sun'] as const;
+export const NEXT_TONES = ['paper', 'ink', 'night', 'pink', 'milk', 'lab', 'lime', 'sun', 'blue'] as const;
 export type NextTone = (typeof NEXT_TONES)[number];

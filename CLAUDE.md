@@ -60,6 +60,15 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Case colours come from `story.theme`. `--acc` is the accent · `--sunk` and `--raise` derive from the theme (exact values for navy).
 - The history section is hosted by the teammate who made the current version (`data-host` follows the version).
 
+## Services (src/server/pages/services · service · src/client/services.ts · service.ts)
+
+- Copy for the overview and the four services lives per language in `src/server/content/services.ts` (checklists · hoods · tiers · hero sentences). Short UI copy stays in `t()`. Slugs: `SERVICE_SLUGS`. Prices are `[FİYAT]` / `[PRICE]` until Batuhan sends them.
+- The overview hero is a drawing board (one tool per service). The team draws one of each · reduced motion starts it drawn · a keyboard press on a tool stamps one.
+- Detail pages are one param page (`service`). Theme = hero colour (Websites blue · Apps lime · Identity pink · Motion ink). Websites wraps everything below the hero and the footer in `.below.th-paper`.
+- Each hero renders its first state on the server and `src/client/service/<key>.ts` brings it to life. Logic both sides need lives in `src/shared/` (checklist verdict · thumb geometry · bezier curve · contrast). CSS keeps a few first-state numbers (act boxes · handle spots) and a unit test keeps them equal to `src/shared`.
+- Work below a service comes from the database by discipline (`projectsOf`). Motion shows it as a reel of loops that pause off screen.
+- Every service page has the same beats: hero · get (twelve things) · hood (a working mock) · price · rel or reel · next tool.
+
 ## Images (src/server/media)
 
 - One upload → AVIF and WebP at 320 · 640 · 960 · 1280 · 1920 · 2560 (never upscaled) in `DATA_DIR/media/<hash>/` served at `/media/` with a one-year immutable cache. The original goes to `DATA_DIR/originals/` and is never served. Variants are rotated upright and carry no camera or GPS data.
@@ -99,6 +108,7 @@ src/server/data  queries shaped for pages
 src/server/media image pipeline · picture()
 drizzle/         generated SQL migrations (committed)
 src/client/      browser modules (one entry per page + shared)
+src/shared/      pure logic used by both server and client
 src/styles/      tokens · base · layout · per-page CSS
 i18n/en.json     English catalog
 scripts/         build · dev · i18n
