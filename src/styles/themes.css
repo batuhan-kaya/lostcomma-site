@@ -1,0 +1,21 @@
+/* Page themes. Keep backgrounds in sync with src/server/themes.ts (checked by test/themes.test.ts). */
+.th-paper { --pbg: #ECECE8; --pfg: #0E0E0F; --pmu: #5E5E5A; --rule: rgba(14,14,15,.14); --acc: #3B35FF; }
+.th-ink { --pbg: #0E0E0F; --pfg: #F2F1EC; --pmu: #8E8E8A; --rule: rgba(242,241,236,.13); --acc: #CDF23A; }
+.th-navy { --pbg: #0F1F3A; --pfg: #F6EFE6; --pmu: #9AA6BD; --rule: rgba(246,239,230,.14); --acc: #F7CDA6; }
+.th-blue { --pbg: #3B35FF; --pfg: #F2F1EC; --pmu: rgba(242,241,236,.72); --rule: rgba(242,241,236,.24); --acc: #CDF23A; }
+.th-night { --pbg: #141416; --pfg: #F2F1EC; --pmu: #8E8E8A; --rule: rgba(242,241,236,.12); --acc: #FF9BD2; }
+.th-pink { --pbg: #FF9BD2; --pfg: #0E0E0F; --pmu: rgba(14,14,15,.66); --rule: rgba(14,14,15,.18); --acc: #0E0E0F; }
+.th-milk { --pbg: #F2F1EC; --pfg: #0E0E0F; --pmu: #5E5E5A; --rule: rgba(14,14,15,.13); --acc: #3B35FF; }
+.th-lab { --pbg: #161618; --pfg: #F2F1EC; --pmu: #8E8E8A; --rule: rgba(242,241,236,.12); --acc: #CDF23A; }
+.th-lime { --pbg: #CDF23A; --pfg: #0E0E0F; --pmu: rgba(14,14,15,.66); --rule: rgba(14,14,15,.2); --acc: #0E0E0F; }
+.th-sun { --pbg: #FFC633; --pfg: #0E0E0F; --pmu: rgba(14,14,15,.66); --rule: rgba(14,14,15,.2); --acc: #0E0E0F; }
+
+/* Next band wipe colours. */
+.nb-paper { --nbg: #ECECE8; --nfg: #0E0E0F; }
+.nb-ink { --nbg: #0E0E0F; --nfg: #CDF23A; }
+.nb-night { --nbg: #161618; --nfg: #F2F1EC; }
+.nb-pink { --nbg: #FF9BD2; --nfg: #0E0E0F; }
+.nb-milk { --nbg: #F2F1EC; --nfg: #0E0E0F; }
+.nb-lab { --nbg: #161618; --nfg: #CDF23A; }
+.nb-lime { --nbg: #CDF23A; --nfg: #0E0E0F; }
+.nb-sun { --nbg: #FFC633; --nfg: #0E0E0F; }

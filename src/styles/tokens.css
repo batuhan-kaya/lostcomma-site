@@ -1,0 +1,32 @@
+:root {
+  --ink: #0E0E0F;
+  --paper: #ECECE8;
+  --milk: #F2F1EC;
+  --dim: #8E8E8A;
+  --grey: #5E5E5A;
+  --blue: #3B35FF;
+  --coral: #FF5A2B;
+  --lime: #CDF23A;
+  --pink: #FF9BD2;
+  --sun: #FFC633;
+  --mint: #3EE0A8;
+  --navy: #0F1F3A;
+
+  --sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --display: 'Anybody', 'Geist', ui-sans-serif, sans-serif;
+  --mono: 'Martian Mono', ui-monospace, monospace;
+
+  --ease-roll: cubic-bezier(.7, 0, .2, 1);
+  --ease-pop: cubic-bezier(.2, 1.6, .3, 1);
+
+  --gut: 40px;
+  --head: 92px;
+}
+
+@media (max-width: 1024px) {
+  :root { --gut: 28px; --head: 80px; }
+}
+
+@media (max-width: 640px) {
+  :root { --gut: 18px; --head: 68px; }
+}

@@ -1,0 +1,6 @@
+/* Phase 0 placeholder pages. Each page phase replaces its stub with the real design. */
+.stub { padding: calc(var(--head) + clamp(48px, 7vw, 96px)) 0 clamp(80px, 10vw, 140px); }
+.stub .wrap { padding: 0 var(--gut); }
+.stub .kick { margin-bottom: 28px; }
+.stub .cta { margin-top: 40px; }
+.nf { min-height: 100vh; }

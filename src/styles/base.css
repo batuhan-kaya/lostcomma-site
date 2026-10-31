@@ -1,0 +1,136 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--pbg);
+  color: var(--pfg);
+  scroll-padding-top: 24px;
+}
+
+body {
+  margin: 0;
+  background: var(--pbg);
+  color: var(--pfg);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+i, b, em { font-style: normal; }
+::selection { background: var(--lime); color: var(--ink); }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+
+.pg { position: relative; min-height: 100vh; overflow-x: clip; }
+
+.skip {
+  position: absolute;
+  left: 12px;
+  top: -64px;
+  z-index: 100;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--milk);
+  font-weight: 600;
+  text-decoration: none;
+  transition: top .2s;
+}
+.skip:focus { top: 12px; }
+
+/* ---------- type ---------- */
+.mono {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  font-variation-settings: 'wdth' 87.5, 'wght' 450;
+}
+.url { text-transform: none; }
+
+.h1 {
+  margin: 0;
+  max-width: 16ch;
+  font-family: var(--display);
+  font-size: clamp(52px, 9.4vw, 140px);
+  font-weight: 400;
+  line-height: .9;
+  letter-spacing: -.05em;
+  font-variation-settings: 'wdth' 80, 'wght' 840;
+  text-wrap: balance;
+}
+
+.h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(44px, 6.7vw, 96px);
+  font-weight: 400;
+  line-height: .92;
+  letter-spacing: -.045em;
+  font-variation-settings: 'wdth' 80, 'wght' 800;
+  text-wrap: balance;
+}
+
+.lede {
+  max-width: 34ch;
+  margin: 32px 0 0;
+  color: var(--pmu);
+  font-size: clamp(19px, 1.7vw, 23px);
+  line-height: 1.36;
+  text-wrap: pretty;
+}
+
+mark { padding: 0 .06em; border-radius: 3px; background: var(--lime); color: var(--ink); }
+
+/* ---------- small parts ---------- */
+.wrap { position: relative; max-width: 1440px; margin: 0 auto; }
+.kick { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin: 0; color: var(--pmu); }
+.fi { display: inline-block; width: 10px; height: 10px; border: 1.5px solid currentColor; border-radius: 2px; }
+.caret { display: inline-block; overflow: hidden; width: 2px; height: .78em; margin: 0 .2em; background: currentColor; animation: blink 1.1s steps(1) infinite; }
+
+/* Team colours: design · code · motion · you. */
+.c-design { --c: #3B35FF; --on: #F2F1EC; }
+.c-code { --c: #3EE0A8; --on: #0E0E0F; }
+.c-motion { --c: #FF9BD2; --on: #0E0E0F; }
+.c-you { --c: #CDF23A; --on: #0E0E0F; }
+
+/* ---------- roll labels ----------
+   Page language on top · other language below. The language switch adds .rolling to <html>. */
+.rl {
+  display: inline-block;
+  box-sizing: content-box;
+  height: 1.3em;
+  padding-top: .3em;
+  margin-top: -.3em;
+  overflow: hidden;
+  line-height: 1.3;
+  vertical-align: bottom;
+}
+.rl > span { display: block; white-space: nowrap; transition: transform .6s var(--ease-roll); }
+.rl > span + span { margin-top: .4em; }
+.rolling .rl > span { transform: translateY(calc(-100% - .4em)); }
+.rl.d1 > span { transition-delay: .04s; }
+.rl.d2 > span { transition-delay: .08s; }
+.rl.d3 > span { transition-delay: .12s; }
+.rl.d4 > span { transition-delay: .16s; }
+.rl.d5 > span { transition-delay: .2s; }
+
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes ping {
+  0% { box-shadow: 0 0 0 0 rgba(62,224,168,.6); }
+  100% { box-shadow: 0 0 0 10px rgba(62,224,168,0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

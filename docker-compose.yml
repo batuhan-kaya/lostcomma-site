@@ -1,0 +1,18 @@
+# Lost Comma site. Own project name so it never collides with the other stacks on the server.
+# The app only listens on the loopback interface: the existing reverse proxy forwards to it.
+# Phase 13 (deploy) adapts this to the server's proxy setup. Postgres joins in phase 3.
+name: lostcomma
+
+services:
+  web:
+    build: .
+    image: lostcomma-site:latest
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:${LOSTCOMMA_PORT:-3300}:3000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
