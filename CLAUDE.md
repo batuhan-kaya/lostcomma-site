@@ -91,6 +91,19 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Performance budget (`src/shared/lab.ts`): every drawing is timed · a `Meter` steps its quality down after it stays over budget (fewer pixels · fewer marks) and back up when there is room. The hero shows the cost of a frame. An e2e test keeps the page's JS under 64 kb.
 - Pause all · reduced motion starts paused. A teammate's cursor can stand in for the pointer (motion plays with the spring chain).
 
+## Start (src/server/pages/start · src/client/start.ts · src/shared/booking.ts)
+
+- Office hours: twenty minute calls every half hour from 10:30 to 17:00 Istanbul time on the next ten working days (never today). Istanbul is UTC+3 all year. All slot math lives in `src/shared/booking.ts` (server and browser).
+- Without JS it is a form: days are links (`?day=`) · every slot is a radio in Istanbul time · it posts to `/api/booking` and redirects to `?ticket=<token>#book` (or `?booking=taken|error|slow&day=`). With JS the visitor's time zone fills the clocks and the ruler · only slots inside both working days (09:00 to 18:00 theirs · 10:00 to 18:00 ours) show · labelled in their time · it posts JSON and the ticket replaces the panel.
+- `bookings` table: one booked call per instant (partial unique index) · a cancelled call frees the slot. `BOOK_LIMIT` = bookings per address per hour. `/api/booking/<token>.ics` is the calendar file.
+- Copy per language in `src/server/content/start.ts` (including both emails). The phone number is a placeholder.
+
+## Mail (src/server/mail)
+
+- Every message goes into the `outbox` table first. The `Postman` sends what is pending through `MAIL_URL` (any SMTP · `log://` prints) · retries failures every five minutes · gives up after five tries · skips anything older than two days. Without `MAIL_URL` nothing is sent and nothing is lost.
+- A booking sends two: the studio's (Turkish · reply goes to the visitor) and the visitor's (their language · calendar invitation attached). A brief sends one to the studio. `MAIL_TO` is the studio inbox · `MAIL_FROM` the sender · `MEET_URL` an optional video link template with `{ticket}`.
+- Mail copy keeps the comma rule. `npm run bookings` · `npm run mail -- test <address>` · `npm run mail -- outbox` · `npm run mail -- retry`.
+
 ## Share images (src/server/og)
 
 - Every page links `/og/<page address>.png?v=<hash>` (1200 × 630). The server draws it from our own fonts: woff2 unpacked once with wawoff2 · letters to outlines with fontkit · sharp turns the SVG into a PNG. Cached in `DATA_DIR/og/` by content. A page can set its label · title · cursor with `og()` (notes do). 404 pages have none.
@@ -125,6 +138,8 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 | `npm run db:generate` | write a migration after a schema change |
 | `npm run db:migrate` · `npm run db:seed` | apply migrations · load the sample content |
 | `npm run media -- add\|cover\|list` | run images through the pipeline |
+| `npm run bookings` | the next calls booked on Start |
+| `npm run mail -- test <address>\|outbox\|retry` | check the mail settings · see or resend the outbox |
 
 ## Layout
 
@@ -135,6 +150,7 @@ src/server/data  queries shaped for pages
 src/server/media image pipeline · picture()
 src/server/notes markdown for notes · code highlighting · RSS
 src/server/og    share images
+src/server/mail  outbox · postman · messages · calendar files
 drizzle/         generated SQL migrations (committed)
 src/client/      browser modules (one entry per page + shared)
 src/shared/      pure logic used by both server and client

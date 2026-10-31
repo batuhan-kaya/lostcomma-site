@@ -17,6 +17,8 @@ export const disciplineEnum = pgEnum('discipline', ['web', 'app', 'identity', 'm
 /** draft: only in the panel · live: public · nda: a locked layer (number · kind · year only). */
 export const projectStatusEnum = pgEnum('project_status', ['draft', 'live', 'nda']);
 export const briefStatusEnum = pgEnum('brief_status', ['new', 'read', 'answered', 'archived']);
+export const bookingStatusEnum = pgEnum('booking_status', ['booked', 'cancelled']);
+export const outboxStatusEnum = pgEnum('outbox_status', ['pending', 'sent', 'failed', 'skipped']);
 
 export type Localized = Partial<Record<'tr' | 'en', string>>;
 
@@ -197,6 +199,58 @@ export const briefs = pgTable(
     status: briefStatusEnum().notNull().default('new'),
   },
   (t) => [index('briefs_created_at').on(t.createdAt)],
+);
+
+/**
+ * Twenty minute calls booked on the Start page. One booked call per slot (a partial unique index ·
+ * a cancelled call frees its slot). The token is the ticket's private address.
+ */
+export const bookings = pgTable(
+  'bookings',
+  {
+    id: uuid().primaryKey(),
+    /** The ticket number people see ("No. 0017"). */
+    no: serial().notNull().unique(),
+    token: text().notNull().unique(),
+    startsAt: timestamp({ withTimezone: true }).notNull(),
+    minutes: smallint().notNull().default(20),
+    lang: langEnum().notNull(),
+    /** The visitor's time zone when they booked (IANA name). */
+    tz: text().notNull(),
+    name: text().notNull(),
+    email: text().notNull(),
+    /** website · app · identity · motion · unsure */
+    about: text().array().notNull().default(sql`'{}'::text[]`),
+    note: text().notNull().default(''),
+    status: bookingStatusEnum().notNull().default('booked'),
+    createdAt: created(),
+  },
+  (t) => [uniqueIndex('bookings_slot').on(t.startsAt).where(sql`${t.status} = 'booked'`), index('bookings_starts_at').on(t.startsAt)],
+);
+
+/**
+ * Mail waiting to go out (src/server/mail): the studio hears about every brief and booking ·
+ * the visitor gets a confirmation with a calendar file. Kept after sending as a log.
+ */
+export const outbox = pgTable(
+  'outbox',
+  {
+    id: serial().primaryKey(),
+    /** brief · booking · booking-guest */
+    kind: text().notNull(),
+    to: text().notNull(),
+    replyTo: text(),
+    subject: text().notNull(),
+    text: text().notNull(),
+    /** A calendar invitation (text/calendar) sent along. */
+    ics: text(),
+    status: outboxStatusEnum().notNull().default('pending'),
+    tries: smallint().notNull().default(0),
+    lastError: text(),
+    createdAt: created(),
+    sentAt: timestamp({ withTimezone: true }),
+  },
+  (t) => [index('outbox_status').on(t.status)],
 );
 
 export const mediaRelations = relations(media, () => ({}));

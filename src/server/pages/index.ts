@@ -8,6 +8,7 @@ import { notesPage } from './notes';
 import { processPage } from './process';
 import { servicePage } from './service';
 import { servicesPage } from './services';
+import { startPage } from './start';
 import { studioPage } from './studio';
 import * as stubs from './stub';
 import { workPage } from './work';
@@ -21,7 +22,7 @@ export const STATIC_PAGES: Partial<Record<RouteId, AnyPage>> = {
   studio: studioPage,
   notes: notesPage,
   lab: labPage,
-  start: stubs.start,
+  start: startPage,
   now: stubs.now,
   uses: stubs.uses,
 };
