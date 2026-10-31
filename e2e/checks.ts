@@ -45,8 +45,10 @@ export function horizontalOverflow(page: Page): Promise<number> {
 
 /** Serious and critical axe violations only. */
 export async function axeProblems(page: Page): Promise<string[]> {
-  // axe ships its own playwright-core types · the runtime object is the same
-  const r = await new AxeBuilder({ page: page as never }).analyze();
+  // axe ships its own playwright-core types · the runtime object is the same.
+  // The cursor layer is decoration (aria-hidden) and fades in and out: contrast checks
+  // would catch tags mid-transition, so it is left out.
+  const r = await new AxeBuilder({ page: page as never }).exclude('.crew').analyze();
   return r.violations
     .filter((v) => v.impact === 'serious' || v.impact === 'critical')
     .map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(' | ')}`);

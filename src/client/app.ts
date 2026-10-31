@@ -1,4 +1,5 @@
-/** Shared behaviour on every page: footer clock · language switch roll · mobile menu. */
+/** Shared behaviour on every page: team cursors · footer clock · language switch roll · mobile menu. */
+import { getCrew } from './lib/crew';
 import { reducedMotion } from './lib/motion';
 
 const LANG_COOKIE = 'lang';
@@ -54,3 +55,6 @@ function menu(): void {
 startClock();
 langSwitch();
 menu();
+
+// Page modules run before DOMContentLoaded and register their scenes first.
+document.addEventListener('DOMContentLoaded', () => getCrew()?.start());

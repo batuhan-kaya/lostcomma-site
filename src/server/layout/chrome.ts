@@ -66,7 +66,7 @@ ${langSwitch(ctx)}
 
 export function nextBand(ctx: Ctx, next: NextBand): Safe {
   return html`<a class="nx nb-${next.tone}" href="${href(ctx.lang, next.to)}" data-sec="next">
-<span class="wrap"><span class="nxl"><span class="mono">${roll(ctx, next.kick)}</span><b>${roll(ctx, next.big)}</b></span><svg class="nxa" viewBox="0 0 48 48" aria-hidden="true"><path d="M6 24h34M28 12l12 12-12 12"></path></svg></span>
+<span class="wrap"><span class="nxl"><span class="mono">${roll(ctx, next.kick)}</span><b>${roll(ctx, next.big)}</b></span><svg class="nxa" viewBox="0 0 48 48" aria-hidden="true" data-rest="host" data-rest-at="0.3 0.55"><path d="M6 24h34M28 12l12 12-12 12"></path></svg></span>
 </a>`;
 }
 

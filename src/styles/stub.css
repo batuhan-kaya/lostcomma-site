@@ -4,3 +4,21 @@
 .stub .kick { margin-bottom: 28px; }
 .stub .cta { margin-top: 40px; }
 .nf { min-height: 100vh; }
+.plan { min-height: 72vh; padding: clamp(80px, 10vw, 140px) 0 clamp(100px, 12vw, 180px); border-top: 1px solid var(--rule); }
+.plan .wrap { padding: 0 var(--gut); }
+.plan .kick { margin-bottom: 36px; font-weight: inherit; }
+.plist { display: grid; gap: 0; max-width: 980px; margin: 0; padding: 0; list-style: none; }
+.plist li {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 12px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--display);
+  font-size: clamp(28px, 3.6vw, 52px);
+  line-height: 1;
+  letter-spacing: -.035em;
+  font-variation-settings: 'wdth' 84, 'wght' 720;
+}
+.plist li > .mono { color: var(--pmu); }

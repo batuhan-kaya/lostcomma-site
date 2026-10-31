@@ -29,9 +29,13 @@ export interface NextBand {
   tone: NextTone;
 }
 
+export type CrewName = 'design' | 'code' | 'motion';
+
 export interface Page {
   id: RouteId | 'notFound';
   theme: ThemeId;
+  /** The cursor that hosts the sections below the hero (sections may override with data-host). */
+  host?: CrewName;
   /** Which header link is active. */
   section?: RouteId;
   title: (t: T) => string;

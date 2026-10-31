@@ -23,6 +23,15 @@ Studio site for Lost Comma (Istanbul creative software studio: web · apps · id
 
 Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Case · Services · ServiceWeb · Process · Studio · Notes · Note · Lab · Start · Now · Uses · NotFound). The homepage is the approved "Live" design.
 
+## Team cursors (src/client/lib/crew.ts)
+
+- Every page section is a `[data-sec]` element. The first one must be `data-sec="hero"`.
+- Hero: all three cursors · born from the header avatars. Below: only the host (`data-host` on the section · else the page's `host`).
+- Touch screens: hero only. Reduced motion: snap · no drift · no scenes.
+- Resting spots are anchors in markup: `data-rest="design"` (or `host`) + `data-rest-at="end 12 -4"` (end of text + offset) or `"0.3 0.55"` (fractions of the box).
+- Scripted moments live in the page's client entry: `getCrew()?.addScenes({ hero: async (crew, signal) => { … } })`. Always pass `signal` to `crew.sleep` and `crew.go` so a section change cancels the scene.
+- Bubble copy goes through `t()` like everything else and keeps the comma rule.
+
 ## i18n
 
 - Source language is Turkish: `t('Türkçe metin')` on the server and in client modules.

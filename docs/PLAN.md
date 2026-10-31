@@ -48,8 +48,8 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 
 | # | Aşama | Çıktı | Durum |
 |---|---|---|---|
-| 0 | Temel | Sunucu · dil sistemi · adresler · fontlar · header ve footer · test altyapısı · Docker · CI | Bitti · onay bekliyor |
-| 1 | Ortak etkileşim katmanı | İmleç motoru (hero'da ekip · aşağıda tek ev sahibi) · roll etiketleri · next band · azaltılmış hareket · dokunmatik davranış | |
+| 0 | Temel | Sunucu · dil sistemi · adresler · fontlar · header ve footer · test altyapısı · Docker · CI | Bitti |
+| 1 | Ortak etkileşim katmanı | İmleç motoru (hero'da ekip · aşağıda tek ev sahibi) · roll etiketleri · next band · azaltılmış hareket · dokunmatik davranış | PR bekliyor |
 | 2 | Ana sayfa | "Live" tasarımı + iletişim bölümü · mobil düzen | |
 | 3 | Veri katmanı | Drizzle şeması · migration · seed · içerik modeli | |
 | 4 | Work + Case | Layers paneli · vaka sayfası sürüm geçmişi | |
