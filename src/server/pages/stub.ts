@@ -29,20 +29,6 @@ function stub(def: Omit<Page, 'body'> & { kick: string; heading: string; phase: 
   };
 }
 
-export const services = stub({
-  id: 'services',
-  plan: [msg('Bir araç seç ve çiz'), msg('Araç kartları ve kombinasyonlar'), msg('Sık sorulanlar')],
-  host: 'design',
-  section: 'services',
-  theme: 'paper',
-  kick: msg('Hizmetler'),
-  heading: msg('Hizmetler.'),
-  phase: 5,
-  title: (t) => t('Hizmetler'),
-  description: (t) => t('Web siteleri · uygulamalar · kimlik ve hareket.'),
-  next: { to: 'process', kick: msg('Sonraki sayfa'), big: msg('Süreç'), tone: 'night' },
-});
-
 export const process = stub({
   id: 'process',
   plan: [msg('Kurgu zaman çizelgesi'), msg('Haftalık ritüeller'), msg('Yayından sonrası')],

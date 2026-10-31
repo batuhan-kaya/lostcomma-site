@@ -53,8 +53,8 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 1 | Ortak etkileşim katmanı | İmleç motoru (hero'da ekip · aşağıda tek ev sahibi) · roll etiketleri · next band · azaltılmış hareket · dokunmatik davranış | Bitti |
 | 2 | Ana sayfa | "Live" tasarımı + iletişim bölümü · mobil düzen | Bitti |
 | 3 | Veri katmanı | Drizzle şeması · migration · seed · içerik modeli · görsel hattı (sharp · AVIF ve WebP · srcset) · briefler veritabanına | Bitti |
-| 4 | Work + Case | Layers paneli · vaka sayfası sürüm geçmişi | PR bekliyor |
-| 5 | Services + Websites | Araç seç ve çiz · yeniden boyutlanan çerçeve | |
+| 4 | Work + Case | Layers paneli · vaka sayfası sürüm geçmişi | Bitti |
+| 5 | Services + hizmet detayları | Araç seç ve çiz · Web siteleri (yeniden boyutlanan çerçeve) · Uygulamalar (başparmak alanı) · Kimlik (favicon'dan reklam panosuna) · Hareket (eğri düzenleyici ve makara) | PR bekliyor |
 | 6 | Process + Studio | Zaman çizelgesi · ayarlar penceresi · İstanbul haritası | |
 | 7 | Notes + Note | Bul ve blame · yay oyun alanı · RSS · OG görselleri | |
 | 8 | Lab | Canlı örnekler · ekran dışında duraklatma · performans bütçesi · hareket vitrini kararı | |
@@ -88,7 +88,7 @@ Gerçek görsel gelmesi gereken her yer `docs/GORSELLER.md` dosyasında tutulur 
 
 - GitHub reposu (0. aşama sonu)
 - Gerçek içerik: projeler · ekip adları · fiyatlar · köşeli parantezli tüm yer tutucular (2. aşamadan itibaren)
-- Apps · Identity · Motion hizmet detayları için tasarım kararı (5. aşama)
+- Hizmet fiyatları ([FİYAT] · 5. aşamadan itibaren sayfalarda yer tutucu)
 - E-posta gönderimi için SMTP sağlayıcısı (9. aşama)
 - Discord uygulaması (client id ve secret) (11. aşama)
 - Sunucudaki mevcut ters vekil düzeni: Caddy ortak mı · ağ adı · port (13. aşama)

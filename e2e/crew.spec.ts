@@ -86,7 +86,7 @@ test.describe('team cursors · desktop', () => {
   });
 
   test('cursors settle next to their anchors', async ({ page }) => {
-    await page.goto('/en/services');
+    await page.goto('/en/studio');
     await page.waitForTimeout(4500);
     const h1 = await page.locator('h1').boundingBox();
     const p = (await positions(page)).design!;
@@ -95,12 +95,12 @@ test.describe('team cursors · desktop', () => {
   });
 
   test('the host says one line in the hero of a stub', async ({ page }) => {
-    await page.goto('/en/services');
+    await page.goto('/en/studio');
     await expect(page.locator('.cur.say .bub')).toHaveText('Still under construction', { timeout: 6000 });
   });
 
   test('the "you" tag follows the mouse in the hero only', async ({ page }) => {
-    await page.goto('/tr/hizmetler');
+    await page.goto('/tr/studyo');
     await page.mouse.move(900, 300);
     await page.mouse.move(920, 320);
     const you = page.locator('[data-you]');
@@ -113,7 +113,7 @@ test.describe('team cursors · desktop', () => {
 
   test('reduced motion: no flying · no drift · no scenes', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/en/services');
+    await page.goto('/en/studio');
     await expect.poll(() => visible(page), { timeout: 3000 }).toEqual(['design', 'code', 'motion']);
     const a = await positions(page);
     await page.waitForTimeout(1200);

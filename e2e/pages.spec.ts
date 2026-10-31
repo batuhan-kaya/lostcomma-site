@@ -1,10 +1,14 @@
 import { expect, test } from '@playwright/test';
+import { SERVICE_KEYS, SERVICE_SLUGS } from '../src/server/content/services';
 import { STATIC_PAGES } from '../src/server/pages';
 import { href, type RouteId } from '../src/server/routes';
 import { axeProblems, fontsReady, horizontalOverflow, visibleCommas, watchErrors } from './checks';
 
 const cases = [
   ...(Object.keys(STATIC_PAGES) as RouteId[]).flatMap((id) => (['tr', 'en'] as const).map((lang) => ({ path: href(lang, id), status: 200 }))),
+  // Service pages in both languages.
+  ...SERVICE_KEYS.flatMap((k) => (['tr', 'en'] as const).map((lang) => ({ path: href(lang, 'service', { slug: SERVICE_SLUGS[k][lang] }), status: 200 }))),
+  { path: '/en/services/nope', status: 404 },
   // Case studies: the full sample in both languages and a short one.
   { path: '/tr/isler/yelken-kulubu', status: 200 },
   { path: '/en/work/sailing-club', status: 200 },

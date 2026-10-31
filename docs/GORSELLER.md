@@ -41,12 +41,25 @@ Her projenin kapağı tek bir görsel: ana sayfa panosu · İşler önizlemesi �
 
 Renk paleti ve yazı karoları görsel istemez: renk kodları ve font adı yeter.
 
+## Hizmetler ve hizmet detayları (5. aşama)
+
+Bu sayfalardaki etkileşimli parçaların çoğu kodla çiziliyor ve öyle kalacak. Gerçek görsel isteyen yerler:
+
+| # | Yer | Ne lazım | Oran · teslim boyutu | Durum |
+|---|---|---|---|---|
+| D1 | Hizmetler · çizim tahtası ve dört araç kartı | Görsel gerekmez | | Gerekmez |
+| D2 | Web siteleri · yeniden boyutlanan çerçeve | Çerçevedeki site kurgusal bir seramik atölyesi ("kil"). İsteğe bağlı: kase fotoğrafları (1 büyük + 4 ürün) koyarsak çizimlerin yerine geçer | Büyük 5:4 · 1400×1120 · ürünler kare · 800×800 | CSS (çizili kaseler) |
+| D3 | Uygulamalar · başparmak alanı | Telefondaki vapur saatleri kodla çiziliyor | | Gerekmez |
+| D4 | Kimlik · favicon'dan reklam panosuna | Kurgusal "fırın" markası SVG ile çiziliyor. İsteğe bağlı: gerçek bir müşterinin logosuyla değiştirilebilir (SVG · altı boyut için sürümleri) | SVG | Gerekmez |
+| D5 | Hareket · makara | Hareket projelerinden sessiz döngü videoları (her proje için bir tane) + poster karesi | 16:10 · 1280×800 · 6 ile 12 sn · MP4 + WebM | CSS (hareketli çizimler) · video hattı 8. aşamada |
+| D6 | Web · Uygulama · Kimlik · "yaptığımız işler" | C1 ile aynı kapak (ayrıca gerekmez) | 16:10'a kırpılır | Hazır |
+
+Fiyatlar görsel değil ama hâlâ yer tutucu: her hizmet sayfasında üç şekil · hizmetler sayfasında dört "başlangıç fiyatı" ([FİYAT] · [PRICE]).
+
 ## Sonraki aşamalarda gelecekler (taslaklardan)
 
 | # | Sayfa | Ne lazım | Not |
 |---|---|---|---|
-| B3 | Hizmet detayı · Web siteleri | Yeniden boyutlanan çerçevedeki örnek site | Şu an "kil" seramik sitesi örneği |
-| B4 | Hizmet detayı · Uygulamalar · Kimlik · Hareket | Tasarımı henüz yok | 5. aşamada karar |
 | B5 | Stüdyo | Ekip portreleri (3 kişi) · stüdyo ve İstanbul fotoğrafları | Portreler aynı ışık ve fonla |
 | B6 | Notes ve Not | Yazı kapakları (isteğe bağlı) · yazı içi görseller | Paylaşım görselleri otomatik üretilir |
 | B7 | Lab | Canlı örnekler kodla çiziliyor | Gerekmez · hareket vitrini kararına bağlı (8. aşama) |
