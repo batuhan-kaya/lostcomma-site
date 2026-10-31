@@ -66,12 +66,21 @@ Fiyatlar görsel değil ama hâlâ yer tutucu: her hizmet sayfasında üç şeki
 
 Görsel olmayan yer tutucular: ekip adları ve rolleri ([Name] · veritabanında) · stüdyo adresi ([ADRES]) · yayın sonrası iki planın fiyatı ([FİYAT]).
 
+## Notes ve Not (7. aşama)
+
+| # | Yer | Ne lazım | Oran · teslim boyutu | Durum |
+|---|---|---|---|---|
+| F1 | Notes · son notun dosya kartı | Notun kendi metninden çizilen küçük harita | | Gerekmez |
+| F2 | Not · yay oyun alanı ve şekil | Kodla çiziliyor | | Gerekmez |
+| F3 | Paylaşım görselleri (OG) · bütün sayfalar | Sunucu kendi fontlarımızla çiziyor | 1200×630 | Hazır · görsel gerekmez |
+| F4 | Not içi görseller | Panel (11. aşama) gelince yazının içine görsel eklenebilecek | 16:10 · 1600×1000 | Şimdilik kapalı |
+
+Örnek notların metinleri bu sitenin gerçekte nasıl yapıldığını anlatıyor ama yer tutucu: panel gelince kendi notlarınla değiştirilecek. Yazar adları hâlâ [Name].
+
 ## Sonraki aşamalarda gelecekler (taslaklardan)
 
 | # | Sayfa | Ne lazım | Not |
 |---|---|---|---|
-| B6 | Notes ve Not | Yazı kapakları (isteğe bağlı) · yazı içi görseller | Paylaşım görselleri otomatik üretilir |
 | B7 | Lab | Canlı örnekler kodla çiziliyor | Gerekmez · hareket vitrini kararına bağlı (8. aşama) |
 | B8 | Araçlar | Donanım fotoğrafları (bilgisayar · kulaklık · monitör) | İsteğe bağlı |
 | B9 | Marka | Son logo · favicon · apple-touch-icon (180) · PWA ikonları (192 · 512) | Şu an geçici imleç ikonu |
-| B10 | Paylaşım (OG) | Her sayfa için 1200×630 | Otomatik üretilecek (7. aşama) · görsel gerekmez |

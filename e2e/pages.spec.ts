@@ -13,6 +13,11 @@ const cases = [
   { path: '/tr/isler/yelken-kulubu', status: 200 },
   { path: '/en/work/sailing-club', status: 200 },
   { path: '/en/work/ferry-timetable', status: 200 },
+  // Notes: one in both languages · one in Turkish only (no English address).
+  { path: '/en/notes/how-our-cursors-move', status: 200 },
+  { path: '/tr/notes/imleclerimiz-nasil-hareket-ediyor', status: 200 },
+  { path: '/tr/notes/turkce-buyuk-harf-sorunu', status: 200 },
+  { path: '/en/notes/turkce-buyuk-harf-sorunu', status: 404 },
   { path: '/tr/yok-boyle-bir-sayfa', status: 404 },
   { path: '/en/no-such-page', status: 404 },
 ];

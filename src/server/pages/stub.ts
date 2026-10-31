@@ -29,20 +29,6 @@ function stub(def: Omit<Page, 'body'> & { kick: string; heading: string; phase: 
   };
 }
 
-export const notes = stub({
-  id: 'notes',
-  plan: [msg('Bul ve vurgula'), msg('Blame sütunlu not listesi'), msg('Bülten ve konular')],
-  host: 'code',
-  section: 'notes',
-  theme: 'milk',
-  kick: msg('Notes'),
-  heading: msg('Notes.'),
-  phase: 7,
-  title: (t) => t('Notes'),
-  description: (t) => t('Tasarım ve kod üzerine yazdıklarımız.'),
-  next: { to: 'lab', kick: msg('Sonraki sayfa'), big: msg('Lab'), tone: 'lab' },
-});
-
 export const lab = stub({
   id: 'lab',
   plan: [msg('İmleçlere tepki veren virgül alanı'), msg('Altı canlı örnek'), msg('Mezun olan deneyler')],

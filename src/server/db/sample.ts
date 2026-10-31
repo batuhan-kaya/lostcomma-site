@@ -5,6 +5,7 @@
  * No commas in any text: the brand rule covers database content too (checked by a test).
  */
 import type { Localized } from './schema';
+import { NOTE_BODIES } from './sample-notes';
 import type { StoryInput } from './story';
 
 type Crew = 'design' | 'code' | 'motion';
@@ -191,7 +192,13 @@ export const SAMPLE_PROJECTS: SampleProject[] = [
   p(1, 'web', 2024, { slug: 'lost-comma', name: 'Lost Comma', kind: 'This website', summary: 'This website. Three cursors and one lost comma.' }, { slug: 'lost-comma', name: 'Lost Comma', kind: 'Bu web sitesi', summary: 'Bu web sitesi. Üç imleç ve kayıp bir virgül.' }, { art: 'lc', story: { team: ['design', 'code', 'motion'], scope: { en: 'Website · Identity', tr: 'Web sitesi · Kimlik' } } }),
 ];
 
-const n = (author: Crew, date: string, tags: string[], text: SampleNote['text']): SampleNote => ({ author, date, tags, text });
+/** Each text gets its body from sample-notes.ts by slug. */
+const n = (author: Crew, date: string, tags: string[], text: SampleNote['text']): SampleNote => ({
+  author,
+  date,
+  tags,
+  text: Object.fromEntries(Object.entries(text).map(([l, x]) => [l, { ...x, body: NOTE_BODIES[x.slug] ?? '' }])),
+});
 
 /** Some notes exist in one language only: the Notes page shows them with a language badge. */
 export const SAMPLE_NOTES: SampleNote[] = [
@@ -200,7 +207,7 @@ export const SAMPLE_NOTES: SampleNote[] = [
     tr: { slug: 'imleclerimiz-nasil-hareket-ediyor', title: 'İmleçlerimiz nasıl hareket ediyor', excerpt: 'Otuz satırlık bir yay ve onu neden yavaşlattık.' },
   }),
   n('design', '2026-10-10', ['type', 'performance'], {
-    en: { slug: 'variable-fonts-on-a-budget', title: 'Variable fonts on a budget', excerpt: 'Anybody ships at 38 kb. Here is how we subset it for Turkish.' },
+    en: { slug: 'variable-fonts-on-a-budget', title: 'Variable fonts on a budget', excerpt: 'Anybody is 57 kb with both axes. Turkish letters cost 46 kb more and only when a page needs them.' },
   }),
   n('code', '2026-09-28', ['i18n', 'code'], {
     tr: { slug: 'turkce-buyuk-harf-sorunu', title: 'Türkçe büyük harf sorunu', excerpt: 'Neden METIN yazıyor ve lang niteliği neden önemli.' },
@@ -210,18 +217,18 @@ export const SAMPLE_NOTES: SampleNote[] = [
     tr: { slug: 'bilerek-sikici-bir-altyapi', title: 'Bilerek sıkıcı bir altyapı', excerpt: 'Fastify ve Postgres ve tek oturuşta okunabilen bir derleme betiği.' },
   }),
   n('motion', '2026-08-30', ['motion'], {
-    en: { slug: 'easing-curves-we-actually-use', title: 'Easing curves we actually use', excerpt: 'Four curves. That is the whole library.' },
+    en: { slug: 'easing-curves-we-actually-use', title: 'Easing curves we actually use', excerpt: 'Two named curves do most of the work. Here they are and why.' },
   }),
   n('code', '2026-08-14', ['code', 'tooling'], {
-    en: { slug: 'forms-from-a-schema', title: 'Forms from a schema', excerpt: 'Our editor writes its own forms. We just describe the content.' },
-    tr: { slug: 'semadan-formlar', title: 'Şemadan formlar', excerpt: 'Editörümüz formlarını kendi yazıyor. Biz sadece içeriği tarif ediyoruz.' },
+    en: { slug: 'forms-from-a-schema', title: 'Forms from a schema', excerpt: 'One schema checks our case studies. The panel will draw its forms from it.' },
+    tr: { slug: 'semadan-formlar', title: 'Şemadan formlar', excerpt: 'Vaka çalışmalarımızı tek bir şema denetliyor. Panel formlarını ondan çizecek.' },
   }),
   n('design', '2026-07-29', ['design'], {
     en: { slug: 'designing-at-real-widths', title: 'Designing at real widths', excerpt: 'Why our first mockup is a link and not a picture.' },
   }),
   n('code', '2026-07-11', ['tooling'], {
-    en: { slug: 'share-images-without-a-design-tool', title: 'Share images without a design tool', excerpt: 'opentype and sharp and one template for every page.' },
-    tr: { slug: 'tasarim-araci-olmadan-paylasim-gorselleri', title: 'Tasarım aracı olmadan paylaşım görselleri', excerpt: 'opentype ve sharp ve her sayfa için tek bir şablon.' },
+    en: { slug: 'share-images-without-a-design-tool', title: 'Share images without a design tool', excerpt: 'fontkit and sharp and one template for every page.' },
+    tr: { slug: 'tasarim-araci-olmadan-paylasim-gorselleri', title: 'Tasarım aracı olmadan paylaşım görselleri', excerpt: 'fontkit ve sharp ve her sayfa için tek bir şablon.' },
   }),
   n('motion', '2026-06-20', ['motion', 'a11y'], {
     tr: { slug: 'hareketi-azaltmak-kapatmak-degil', title: 'Hareketi azaltmak kapatmak değil', excerpt: 'Reduced motion için daha iyi bir varsayılan.' },

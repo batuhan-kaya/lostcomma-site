@@ -1,6 +1,9 @@
 import { html, raw, type Safe } from '../html';
 import { LANGS, type Lang } from '../i18n';
+import { OG_H, OG_W, ogKey } from '../og';
+import { ogPath, ogSpec } from '../og/spec';
 import type { Ctx, Page } from '../page';
+import { href } from '../routes';
 import { THEMES } from '../themes';
 import { footer, header, nextBand } from './chrome';
 
@@ -25,6 +28,8 @@ export function documentHtml<D>(page: Page<D>, ctx: Ctx, data: D): Safe {
     return p ? [html`<link rel="alternate" hreflang="${l}" href="${site + p}">`] : [];
   });
   const xDefault = ctx.alt.en ?? ctx.alt.tr;
+  // Pages kept out of search engines (404) have no share image.
+  const image = page.noindex ? null : `${site}${ogPath(ctx.path)}?v=${ogKey(ogSpec(page, ctx, data))}`;
 
   const fonts = PRELOAD_FONTS.map((f) => assets.font(f)).filter((u): u is string => !!u);
   const css = ['app', ...(page.styles ?? [])].map((n) => assets.css(n)).filter((u): u is string => !!u);
@@ -42,13 +47,22 @@ ${page.noindex
     : html`<link rel="canonical" href="${url}">
 ${alternates}
 ${xDefault ? html`<link rel="alternate" hreflang="x-default" href="${site + xDefault}">` : ''}`}
-<meta property="og:type" content="website">
+<meta property="og:type" content="${page.ogType ?? 'website'}">
 <meta property="og:site_name" content="Lost Comma">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${description}">
 <meta property="og:url" content="${url}">
 <meta property="og:locale" content="${OG_LOCALE[lang]}">
+${image
+    ? html`<meta property="og:image" content="${image}">
+<meta property="og:image:width" content="${OG_W}">
+<meta property="og:image:height" content="${OG_H}">
+<meta property="og:image:alt" content="${name}">
+<meta name="twitter:image" content="${image}">`
+    : ''}
 <meta name="twitter:card" content="summary_large_image">
+<link rel="alternate" type="application/rss+xml" title="Lost Comma · Notes" href="${site + href(lang, 'rss')}">
+${page.head ? page.head(ctx, data) : ''}
 <meta name="theme-color" content="${THEMES[theme]}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 ${fonts.map((f) => html`<link rel="preload" href="${f}" as="font" type="font/woff2" crossorigin>`)}

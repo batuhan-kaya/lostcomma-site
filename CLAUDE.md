@@ -76,6 +76,18 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Studio: paper all the way down. The title is made of selections (one per teammate) · team cards from the `people` table (a portrait replaces the drawn cursor once `npm run media -- portrait <crew> <file>` sets one) · a settings window whose Display switches really change the page (`html.still` · `.st-big` · `.st-hc` · `crew.calm()`) · numbers · a drawn Istanbul where the ferry crosses on Istanbul time (`src/shared/istanbul.ts` · `map.ts`).
 - Copy lives per language in `src/server/content/process.ts` and `studio.ts`.
 
+## Notes and Note (src/server/pages/notes · note · src/client/notes.ts · note.ts)
+
+- A note body is markdown (`note_text.body`) rendered by `src/server/notes/render.ts`. Raw HTML and images are off. Everything that is not prose is a fence: `~~~ts title=spring.ts hl=2 note="…"` (code · numbered · marked lines) · `~~~playground spring` (the spring playground) · `~~~figure host` (rows of `Label | text`). Footnotes `[^1]` become side notes beside their line. h2 make the table of contents. The first paragraph is the lead. Reading minutes come from the text (`readMinutes`).
+- The playground and the cursors run the same `step()` from `src/shared/spring.ts` (`crew-math.ts` re-exports it).
+- Notes list: find with marks (`src/shared/find.ts` forgives Turkish letters unless "Aa" is on) · language and topic filters · line numbers save a note in `localStorage['lc-saved-notes']` · `?q=` in the address · "/" focuses the find box. Tag labels live in `src/server/content/notes.ts`.
+- A note written in one language only has no address in the other. Lists link it to its own language: `hreflang` on the link · `lang` only on its own words (never around upper-case labels: `i` would turn into `İ`). English words in `.mono` labels on Turkish pages get `lang="en"` for the same reason.
+- RSS per language (`/tr/notes/rss.xml` · `/en/notes/rss.xml`) with the full text · the playground becomes a link back.
+
+## Share images (src/server/og)
+
+- Every page links `/og/<page address>.png?v=<hash>` (1200 × 630). The server draws it from our own fonts: woff2 unpacked once with wawoff2 · letters to outlines with fontkit · sharp turns the SVG into a PNG. Cached in `DATA_DIR/og/` by content. A page can set its label · title · cursor with `og()` (notes do). 404 pages have none.
+
 ## Images (src/server/media)
 
 - One upload → AVIF and WebP at 320 · 640 · 960 · 1280 · 1920 · 2560 (never upscaled) in `DATA_DIR/media/<hash>/` served at `/media/` with a one-year immutable cache. The original goes to `DATA_DIR/originals/` and is never served. Variants are rotated upright and carry no camera or GPS data.
@@ -113,6 +125,8 @@ src/server/      Fastify app · html templating · i18n · routes · layout · p
 src/server/db    schema · connection · seed · sample content
 src/server/data  queries shaped for pages
 src/server/media image pipeline · picture()
+src/server/notes markdown for notes · code highlighting · RSS
+src/server/og    share images
 drizzle/         generated SQL migrations (committed)
 src/client/      browser modules (one entry per page + shared)
 src/shared/      pure logic used by both server and client

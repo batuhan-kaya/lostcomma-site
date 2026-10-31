@@ -1,24 +1,11 @@
 /**
  * Pure maths behind the team cursors. No DOM here so it runs under vitest.
- * Numbers come from the approved drafts: calm spring · 24 px per frame cap · ±6 px idle drift.
+ * Numbers come from the approved drafts: calm spring (src/shared/spring.ts) · 24 px per frame cap · ±6 px idle drift.
  */
 export type Name = 'design' | 'code' | 'motion';
 export const TEAM: readonly Name[] = ['design', 'code', 'motion'];
 
-export interface Body {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-}
-
-export const SPRING = {
-  damping: 0.8,
-  pull: 0.026,
-  maxSpeed: 24,
-  arriveDist: 6,
-  arriveSpeed: 1.2,
-};
+export { SPRING, step, type Body } from '../../shared/spring';
 
 /** Fixed 60 Hz step. */
 export const STEP_MS = 1000 / 60;
@@ -26,20 +13,6 @@ export const STEP_MS = 1000 / 60;
 export const HOP_DIST = 720;
 /** Section changes wait this long so a quick scroll past does not wake anyone. */
 export const SECTION_SETTLE_MS = 380;
-
-/** One spring step toward (tx, ty). Returns true once the cursor has settled. */
-export function step(b: Body, tx: number, ty: number, k = SPRING): boolean {
-  b.vx = b.vx * k.damping + (tx - b.x) * k.pull;
-  b.vy = b.vy * k.damping + (ty - b.y) * k.pull;
-  const sp = Math.hypot(b.vx, b.vy);
-  if (sp > k.maxSpeed) {
-    b.vx *= k.maxSpeed / sp;
-    b.vy *= k.maxSpeed / sp;
-  }
-  b.x += b.vx;
-  b.y += b.vy;
-  return Math.hypot(tx - b.x, ty - b.y) < k.arriveDist && sp < k.arriveSpeed;
-}
 
 /** How many fixed steps fit in the time since the last frame. Long pauses are capped. */
 export function stepsFor(acc: number, dt: number): { steps: number; rest: number } {
