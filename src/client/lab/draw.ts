@@ -121,7 +121,9 @@ export function rain(): (f: Fit, t: number, p: Pt | null, v: number, moving: boo
   const drops: Drop[] = [];
   return ({ ctx, w, h }, t, p, v, moving, level) => {
     const n = Math.round(v / (level + 1));
-    while (drops.length < n) drops.push({ x: Math.random() * w, y: Math.random() * h - h, v: 1 + Math.random() * 2.4, a: Math.random() * 0.6 - 0.3, s: 0.7 + Math.random() * 0.8 });
+    // The first drops fill the whole box (so even a still frame shows rain) · later ones start above it.
+    const top = drops.length ? -h : 0;
+    while (drops.length < n) drops.push({ x: Math.random() * w, y: top + Math.random() * h, v: 1 + Math.random() * 2.4, a: Math.random() * 0.6 - 0.3, s: 0.7 + Math.random() * 0.8 });
     if (drops.length > n) drops.length = n;
     ctx.clearRect(0, 0, w, h);
     const base = prep(ctx);
