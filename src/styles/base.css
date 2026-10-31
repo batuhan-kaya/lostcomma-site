@@ -134,3 +134,13 @@ mark { padding: 0 .06em; border-radius: 3px; background: var(--lime); color: var
     scroll-behavior: auto !important;
   }
 }
+
+/* Visually hidden but read by assistive tech. */
+.sr { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* Honeypot field for bots. */
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+/* The shy comma: only shows once a visitor has found it (html.found). */
+.egg[hidden] { display: none; }
+.logo .lgc { display: none; margin-right: .12em; color: var(--coral); }
+.found .logo .lgc { display: inline; }
+.found .logo .caret { display: none; }

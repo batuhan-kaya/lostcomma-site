@@ -1,4 +1,4 @@
-import { html, type Safe } from '../html';
+import { html, raw, type Safe } from '../html';
 import { LANGS, type Lang } from '../i18n';
 import type { Ctx, Page } from '../page';
 import { THEMES } from '../themes';
@@ -6,6 +6,11 @@ import { footer, header, nextBand } from './chrome';
 
 const OG_LOCALE: Record<Lang, string> = { tr: 'tr_TR', en: 'en_US' };
 const PRELOAD_FONTS = ['anybody-latin', 'geist-latin', 'martian-latin'];
+
+/** A JSON data block for the page script. Not executed, so CSP allows it. `<` is escaped so it can never close the tag. */
+export function jsonData(value: unknown): Safe {
+  return raw(`<script type="application/json" id="page-data">${JSON.stringify(value).replace(/</g, '\\u003c')}</script>`);
+}
 
 export function documentHtml(page: Page, ctx: Ctx): Safe {
   const { t, lang, site, assets } = ctx;
@@ -52,12 +57,13 @@ ${js.map((s) => html`<script type="module" src="${s}"></script>`)}
 <body>
 <a class="skip" href="#main">${t('İçeriğe geç')}</a>
 <div class="pg" data-root data-host="${page.host ?? 'design'}">
-${header(ctx, page.section)}
+${header(ctx, page.section, { home: page.home })}
 <main id="main">
 ${page.body(ctx)}
 </main>
 ${!page.bare && page.next ? nextBand(ctx, page.next) : ''}
-${!page.bare ? footer(ctx) : ''}
+${!page.bare ? (page.footer ? page.footer(ctx) : footer(ctx)) : ''}
+${page.data ? jsonData(page.data(ctx)) : ''}
 </div>
 </body>
 </html>`;

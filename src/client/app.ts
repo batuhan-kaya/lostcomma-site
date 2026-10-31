@@ -52,6 +52,16 @@ function menu(): void {
   });
 }
 
+/** The shy comma was found on the homepage once: the logo keeps its comma everywhere. */
+function comma(): void {
+  try {
+    if (localStorage.getItem('lc-comma') === '1') document.documentElement.classList.add('found');
+  } catch {
+    /* storage blocked: no comma */
+  }
+}
+
+comma();
 startClock();
 langSwitch();
 menu();

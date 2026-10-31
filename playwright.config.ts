@@ -16,7 +16,7 @@ export default defineConfig({
     command: 'node dist/server/index.js',
     url: `http://127.0.0.1:${PORT}/healthz`,
     reuseExistingServer: !process.env.CI,
-    env: { PORT: String(PORT), HOST: '127.0.0.1', NODE_ENV: 'production', SITE_URL: `http://127.0.0.1:${PORT}` },
+    env: { PORT: String(PORT), HOST: '127.0.0.1', NODE_ENV: 'production', SITE_URL: `http://127.0.0.1:${PORT}`, DATA_DIR: 'test-results/data', BRIEF_LIMIT: '1000' },
   },
   projects: [
     { name: 'desktop', use: { browserName: 'chromium', viewport: { width: 1440, height: 900 } } },

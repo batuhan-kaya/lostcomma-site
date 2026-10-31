@@ -8,6 +8,7 @@ Studio site for Lost Comma (Istanbul creative software studio: web · apps · id
 - Never change code without his explicit approval. Work phase by phase as in `docs/PLAN.md`. Finish a phase, show results (tests + screenshots in both languages), wait for approval.
 - Every phase after 0 lives on its own branch (`phase-N-name`) and arrives as a pull request. Merging the PR is the approval. Never push to `main` directly.
 - `npm run check` must be green before a phase is handed over.
+- Every place that needs a real image (photo · screenshot · video) goes into `docs/GORSELLER.md` in the phase that creates it. Batuhan gets the full list at the end. The site must not ship imageless.
 - Other Docker-hosted sites run on the same server. Deploy changes must never bind 80/443 or touch other stacks.
 
 ## Brand rules (enforced by tests)
@@ -31,6 +32,15 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Resting spots are anchors in markup: `data-rest="design"` (or `host`) + `data-rest-at="end 12 -4"` (end of text + offset) or `"0.3 0.55"` (fractions of the box).
 - Scripted moments live in the page's client entry: `getCrew()?.addScenes({ hero: async (crew, signal) => { … } })`. Always pass `signal` to `crew.sleep` and `crew.go` so a section change cancels the scene.
 - Bubble copy goes through `t()` like everything else and keeps the comma rule.
+- Below the hero only one cursor is ever visible. A scene that needs a different teammate calls `crew.cast(name)` first (the others fade).
+
+## Homepage (src/server/pages/home · src/client/home)
+
+- Long structured copy (manifesto edits · services · projects · steps · brief choices) lives per language in `src/server/content/home.ts`. Short UI copy stays in `t()`.
+- Client data comes from the `<script type="application/json" id="page-data">` block (`page.data`). Never inline executable scripts or `style=""` (strict CSP).
+- The brief is a real form posting to `/api/brief` (works without JS · redirects to `?brief=sent|error`). With JS it posts JSON. Briefs go to `DATA_DIR/briefs.jsonl` until phase 3. `BRIEF_LIMIT` = briefs per address per 10 minutes.
+- Contact colour: `CONTACT_THEME` in `src/server/pages/home/index.ts` (ink · paper · lime · coral · blue).
+- The shy comma egg sets `localStorage['lc-comma']`; `html.found` then shows the comma in the logo on every page.
 
 ## i18n
 

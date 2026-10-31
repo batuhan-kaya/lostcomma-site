@@ -21,6 +21,8 @@ import { t } from './t';
 export type { Name } from './crew-math';
 
 export interface Target {
+  /** A fixed point in root coordinates (used by the idle gather). */
+  at?: { x: number; y: number };
   el?: Element | null;
   /** Re-queried when el is gone (markup re-rendered). */
   sel?: string;
@@ -51,6 +53,8 @@ interface Cursor {
   phase: number;
   timer: number;
   sayTimer: number;
+  /** Positioned on stage. Until then the loop leaves it alone. */
+  placed: boolean;
 }
 
 /** Fallback spots (fractions of the section box) when a section has no anchors. */
@@ -76,6 +80,9 @@ export class Crew {
   private acc = 0;
   private started = false;
   private pointer: { x: number; y: number } | null = null;
+  private idleOn = false;
+  private idle = false;
+  private lastActive = 0;
 
   constructor(root: HTMLElement, opts: { reduce?: boolean; touch?: boolean } = {}) {
     this.root = root;
@@ -108,6 +115,7 @@ export class Crew {
         phase: i * 1.9 + 0.3,
         timer: 0,
         sayTimer: 0,
+        placed: false,
       };
     };
     this.cursors = { design: make('design', 0), code: make('code', 1), motion: make('motion', 2) };
@@ -133,13 +141,18 @@ export class Crew {
   start(): void {
     if (this.started) return;
     this.started = true;
-    const onScroll = () => this.wake();
+    const onScroll = () => {
+      this.lastActive = performance.now();
+      this.wake();
+    };
     addEventListener('scroll', onScroll, { passive: true });
     addEventListener('resize', onScroll, { passive: true });
     if (!this.touch) {
       addEventListener('pointermove', (e) => {
         if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
         this.pointer = { x: e.clientX, y: e.clientY };
+        this.lastActive = performance.now();
+        if (this.idle) this.wakeFromIdle();
         this.placeYou();
       }, { passive: true });
       document.documentElement.addEventListener('pointerleave', () => {
@@ -160,6 +173,45 @@ export class Crew {
     return (TEAM as readonly string[]).includes(v ?? '') ? (v as Name) : 'design';
   }
 
+  /** The section the crew is in right now. */
+  get current(): string | null {
+    return this.section;
+  }
+
+  /** Whether scenes play in a section (never with reduced motion · only the hero on touch screens). */
+  animates(sec: string): boolean {
+    return !this.reduce && (sec === 'hero' || !this.touch);
+  }
+
+  /**
+   * Below the hero only one cursor shows at a time. Hand the stage to `name`:
+   * the others fade · `name` appears near its spot (or near where go() sends it next).
+   */
+  cast(name: Name): void {
+    const sec = this.section;
+    if (!sec || sec === 'hero' || this.touch) return;
+    for (const n of TEAM) {
+      const c = this.cursors[n];
+      if (n !== name) {
+        if (!c.hidden) this.fade(c);
+        continue;
+      }
+      if (c.hidden) {
+        const tg = this.restTarget(sec, n);
+        if (tg) this.appear(c, tg, 120);
+      }
+    }
+  }
+
+  /**
+   * Homepage only: after 20 s without a move the visible cursors gather around the visitor's
+   * pointer and ask if they are still there. Any move sends them back.
+   */
+  enableIdle(): void {
+    this.idleOn = true;
+    this.lastActive = performance.now();
+  }
+
   q<E extends Element = HTMLElement>(sel: string): E | null {
     return this.root.querySelector<E>(sel);
   }
@@ -174,6 +226,20 @@ export class Crew {
     const t0 = performance.now();
     await this.sleep(80, signal);
     while (!c.arrived && performance.now() - t0 < maxMs) await this.sleep(50, signal);
+  }
+
+  /** Point a cursor somewhere without waiting (typing along a line of text). */
+  aim(name: Name, target: Target): void {
+    const c = this.cursors[name];
+    if (c.hidden) return;
+    c.target = target;
+    c.arrived = false;
+    this.wake();
+  }
+
+  /** Is this cursor on stage right now? */
+  visible(name: Name): boolean {
+    return !this.cursors[name].hidden;
   }
 
   /** Send a cursor back to its resting spot in the current section. */
@@ -256,6 +322,8 @@ export class Crew {
     const ctrl = new AbortController();
     this.ctrl = ctrl;
     this.section = sec;
+    // Lets page CSS adjust cursors per section (a blue cursor on a blue section).
+    this.layer.dataset.sec = sec;
     const team = sec === 'hero';
     const host = this.hostOf(sec);
 
@@ -275,7 +343,7 @@ export class Crew {
     this.placeYou();
 
     const scene = this.scenes.get(sec);
-    if (scene && !this.reduce) {
+    if (scene && this.animates(sec)) {
       scene(this, ctrl.signal).catch((e: unknown) => {
         if (!(e instanceof DOMException && e.name === 'AbortError')) console.error('[crew]', e);
       });
@@ -289,7 +357,8 @@ export class Crew {
     const isHost = sec !== 'hero' && name === this.hostOf(sec);
     const anchor = S.querySelector(`[data-rest~="${name}"]`) ?? (isHost ? S.querySelector('[data-rest~="host"]') : null);
     if (anchor) {
-      const at = parseRestAt(anchor.getAttribute('data-rest-at'));
+      const narrow = this.root.clientWidth < 700 && anchor.getAttribute('data-rest-at-m');
+      const at = parseRestAt(narrow || anchor.getAttribute('data-rest-at'));
       return at.end ? { el: anchor, end: true, dx: at.dx, dy: at.dy, rest: true } : { el: anchor, fx: at.fx, fy: at.fy, dx: at.dx, dy: at.dy, rest: true };
     }
     const [fx, fy] = sec === 'hero' ? HERO_SPOTS[name] : HOST_SPOT;
@@ -300,6 +369,7 @@ export class Crew {
 
   private fade(c: Cursor): void {
     c.hidden = true;
+    c.placed = false;
     c.target = null;
     clearTimeout(c.timer);
     c.el.classList.add('zz');
@@ -308,11 +378,14 @@ export class Crew {
 
   private appear(c: Cursor, target: Target, delay: number): void {
     c.hidden = false;
+    c.placed = false;
     c.target = null;
     clearTimeout(c.timer);
     c.timer = window.setTimeout(() => {
       if (c.hidden) return;
-      const p = this.point(target);
+      // A scene may already have sent it somewhere (cast then go): start near there.
+      const tg = c.target ?? target;
+      const p = this.point(tg);
       if (!p) return;
       let sx = p.x - 60;
       let sy = p.y - 40;
@@ -330,7 +403,7 @@ export class Crew {
         sx = p.x;
         sy = p.y;
       }
-      Object.assign(c, { x: sx, y: sy, vx: 0, vy: 0, target, arrived: false });
+      Object.assign(c, { x: sx, y: sy, vx: 0, vy: 0, target: tg, arrived: false, placed: true });
       this.render(c, 0);
       c.el.classList.remove('zz');
       this.wake();
@@ -346,7 +419,7 @@ export class Crew {
       if (c.hidden) return;
       const p = this.point(target);
       if (!p) return;
-      Object.assign(c, { x: p.x - 50, y: p.y - 34, vx: 0, vy: 0, target, arrived: false });
+      Object.assign(c, { x: p.x - 50, y: p.y - 34, vx: 0, vy: 0, target, arrived: false, placed: true });
       this.render(c, 0);
       c.el.classList.remove('zz');
       this.wake();
@@ -357,6 +430,7 @@ export class Crew {
 
   /** Target position in root coordinates. */
   private point(tg: Target): { x: number; y: number } | null {
+    if (tg.at) return clampPoint(tg.at.x, tg.at.y, this.root.clientWidth);
     let el = tg.el;
     if ((!el || !el.isConnected) && tg.sel) el = tg.el = this.root.querySelector(tg.sel);
     if (!el || !el.isConnected) return null;
@@ -393,6 +467,35 @@ export class Crew {
     this.you.classList.toggle('on', inHero);
   }
 
+  /* ---------------- idle gather ---------------- */
+
+  private goIdle(): void {
+    if (!this.pointer) return;
+    this.idle = true;
+    this.ctrl?.abort(new DOMException('idle', 'AbortError'));
+    const rr = this.root.getBoundingClientRect();
+    const m = { x: this.pointer.x - rr.left, y: this.pointer.y - rr.top };
+    const off: Record<Name, [number, number]> = { design: [-120, -90], code: [80, -70], motion: [-50, 96] };
+    const visible = TEAM.filter((n) => !this.cursors[n].hidden);
+    for (const n of visible) {
+      const c = this.cursors[n];
+      c.target = { at: { x: m.x + off[n][0], y: m.y + off[n][1] } };
+      c.arrived = false;
+    }
+    const first = visible[0];
+    if (first) window.setTimeout(() => this.idle && this.say(first, t('hâlâ burada mısın?'), 3200), 1400);
+  }
+
+  private wakeFromIdle(): void {
+    this.idle = false;
+    const sec = this.section;
+    if (!sec) return;
+    this.section = null;
+    this.run(sec);
+    const first = TEAM.find((n) => !this.cursors[n].hidden);
+    if (first) this.say(first, t('a selam'), 1400);
+  }
+
   /* ---------------- loop ---------------- */
 
   private wake(): void {
@@ -412,7 +515,7 @@ export class Crew {
     let moving = false;
     for (const name of TEAM) {
       const c = this.cursors[name];
-      if (c.hidden || !c.target) continue;
+      if (c.hidden || !c.placed || !c.target) continue;
       const p = this.point(c.target);
       if (!p) continue;
       if (this.reduce) {
@@ -426,6 +529,7 @@ export class Crew {
       this.render(c, now);
     }
     if (this.pointer) this.placeYou();
+    if (this.idleOn && !this.idle && this.pointer && now - this.lastActive > 20_000) this.goIdle();
     // Keep ticking while anyone is on stage (the idle drift) or a section change is pending.
     // With reduced motion everything is still: scroll and resize wake the loop again.
     const pending = this.candidate !== this.section;

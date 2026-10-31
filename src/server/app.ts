@@ -1,12 +1,16 @@
 import { resolve } from 'node:path';
+import formbody from '@fastify/formbody';
 import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
+import { registerBrief } from './api/brief';
+import { FileInbox, type Inbox } from './api/inbox';
+import { RateLimit } from './api/rate';
 import { Assets } from './assets';
 import type { Config } from './config';
 import { isLang, LANGS, negotiate, translator, type Lang } from './i18n';
 import { documentHtml } from './layout/document';
 import type { Ctx, Page } from './page';
-import { notFound, STATIC_PAGES } from './pages';
+import { homePage, notFound, STATIC_PAGES } from './pages';
 import { href, type RouteId } from './routes';
 import { securityHeaders } from './security';
 import { robotsTxt, sitemapXml } from './seo';
@@ -15,6 +19,8 @@ export interface AppOptions {
   config: Config;
   /** Injected clock for tests. */
   now?: () => Date;
+  /** Where briefs go. Defaults to a JSON lines file in DATA_DIR. */
+  inbox?: Inbox;
 }
 
 export const LANG_COOKIE = 'lang';
@@ -28,7 +34,7 @@ export function readCookie(header: string | undefined, name: string): string | u
   return undefined;
 }
 
-export async function buildApp({ config, now = () => new Date() }: AppOptions) {
+export async function buildApp({ config, now = () => new Date(), inbox }: AppOptions) {
   const app = Fastify({
     logger: config.NODE_ENV === 'test' ? false : { level: config.NODE_ENV === 'production' ? 'info' : 'debug' },
     trustProxy: true,
@@ -48,6 +54,14 @@ export async function buildApp({ config, now = () => new Date() }: AppOptions) {
   app.addHook('onSend', async (_req, reply, payload) => {
     securityHeaders(reply, config.SITE_URL.startsWith('https://'));
     return payload;
+  });
+
+  await app.register(formbody, { bodyLimit: 16_384 });
+  registerBrief(app, {
+    inbox: inbox ?? new FileInbox(resolve(config.DATA_DIR, 'briefs.jsonl')),
+    siteUrl: config.SITE_URL,
+    now,
+    limit: new RateLimit(config.BRIEF_LIMIT, 10 * 60_000),
   });
 
   await app.register(fastifyStatic, {
@@ -87,7 +101,12 @@ export async function buildApp({ config, now = () => new Date() }: AppOptions) {
   for (const [id, page] of Object.entries(STATIC_PAGES) as [RouteId, Page][]) {
     const alt = { tr: href('tr', id), en: href('en', id) };
     for (const lang of LANGS) {
-      app.get(alt[lang], (_req, reply) => send(reply, page, ctxFor(lang, alt[lang], alt)));
+      app.get(alt[lang], (req, reply) => {
+        // The homepage shows the brief result after a post without JS.
+        const state = id === 'home' ? (req.query as Record<string, string>).brief : undefined;
+        const p = state === 'sent' || state === 'error' ? homePage({ sent: state === 'sent', error: state === 'error' }) : page;
+        return send(reply, p, ctxFor(lang, alt[lang], alt));
+      });
     }
   }
 

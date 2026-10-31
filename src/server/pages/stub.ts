@@ -29,19 +29,6 @@ function stub(def: Omit<Page, 'body'> & { kick: string; heading: string; phase: 
   };
 }
 
-export const home = stub({
-  id: 'home',
-  plan: [msg('Hero’da canlı ekip imleçleri'), msg('Seçili işler'), msg('Brief kartıyla iletişim')],
-  host: 'design',
-  theme: 'paper',
-  kick: msg('Ana sayfa'),
-  heading: msg('Akılda kalan web siteleri ve uygulamalar tasarlıyor ve kodluyoruz.'),
-  phase: 2,
-  title: (t) => t('Yaratıcı yazılım stüdyosu'),
-  description: (t) => t('İstanbul’da web siteleri ve uygulamalar tasarlayıp kodlayan bir ekip.'),
-  next: { to: 'work', kick: msg('Sonraki sayfa'), big: msg('İşler'), tone: 'ink' },
-});
-
 export const work = stub({
   id: 'work',
   plan: [msg('Katmanlar paneli ve proje önizlemesi'), msg('Görünürlük gözleriyle filtre'), msg('Kilitli NDA katmanları')],

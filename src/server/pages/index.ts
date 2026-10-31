@@ -1,10 +1,11 @@
 import type { Page } from '../page';
 import type { RouteId } from '../routes';
+import { homePage } from './home';
 import * as stubs from './stub';
 
 /** Static pages served straight from the route table. Param routes register their own handlers. */
 export const STATIC_PAGES: Partial<Record<RouteId, Page>> = {
-  home: stubs.home,
+  home: homePage(),
   work: stubs.work,
   services: stubs.services,
   process: stubs.process,
@@ -17,3 +18,4 @@ export const STATIC_PAGES: Partial<Record<RouteId, Page>> = {
 };
 
 export { notFound } from './notFound';
+export { homePage } from './home';
