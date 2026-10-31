@@ -1,3 +1,4 @@
+import { planKey } from '../../data/settings';
 import { PROCESS, type ProcessCopy } from '../../content/process';
 import { html, raw, type Safe } from '../../html';
 import { footer, nextBand } from '../../layout/chrome';
@@ -147,7 +148,7 @@ function after(ctx: Ctx, copy: ProcessCopy): Safe {
 <p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Yayından sonra')}</p>
 <h2 class="h2">${t('On birinci hafta')}<br>${t('ve sonrası.')}</h2>
 <div class="plans">${copy.plans.map(
-    (p, i) => html`<div class="plan${i === 1 ? ' hot' : ''}"${i === 1 ? html` data-rest="host" data-rest-at="0.86 0.1"` : ''}><h3>${p.n}</h3><p>${p.p}</p><ul>${p.items.map((x) => html`<li>${x}</li>`)}</ul><p class="amt">${i < 2 ? t('[FİYAT]') : t('İş başına')} <small class="mono">${p.per}</small></p></div>`,
+    (p, i) => html`<div class="plan${i === 1 ? ' hot' : ''}"${i === 1 ? html` data-rest="host" data-rest-at="0.86 0.1"` : ''}><h3>${p.n}</h3><p>${p.p}</p><ul>${p.items.map((x) => html`<li>${x}</li>`)}</ul><p class="amt">${i < 2 ? (ctx.settings.text(planKey(i), ctx.lang) ?? t('[FİYAT]')) : t('İş başına')} <small class="mono">${p.per}</small></p></div>`,
   )}</div>
 <p class="pnote mono"><span>${t('Hiçbiri zorunlu değil. Bir ay sonra plan değiştirmek de serbest.')}</span><a href="${href(ctx.lang, 'start')}">${t('Bir proje konuşalım')} <span aria-hidden="true">↗</span></a></p>
 </div></section>`;

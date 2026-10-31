@@ -13,7 +13,7 @@ import type { Db } from '../db';
 import { outbox } from '../db/schema';
 
 export interface Mail {
-  kind: 'brief' | 'booking' | 'booking-guest' | 'test';
+  kind: 'brief' | 'booking' | 'booking-guest' | 'booking-cancel' | 'test';
   to: string;
   replyTo?: string | null;
   subject: string;
@@ -50,7 +50,7 @@ export function createMailer(url: string | undefined, log: (msg: string) => void
         replyTo: m.replyTo ?? undefined,
         subject: m.subject,
         text: m.text,
-        icalEvent: m.ics ? { filename: 'invite.ics', method: 'PUBLISH', content: m.ics } : undefined,
+        icalEvent: m.ics ? { filename: 'invite.ics', method: m.ics.includes('METHOD:CANCEL') ? 'CANCEL' : 'PUBLISH', content: m.ics } : undefined,
       });
     },
   };

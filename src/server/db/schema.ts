@@ -7,7 +7,7 @@
  * The test suite fails when the schema and the migrations drift apart.
  */
 import { relations, sql } from 'drizzle-orm';
-import { check, index, integer, jsonb, pgEnum, pgTable, primaryKey, serial, smallint, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { bigint, check, date, index, integer, jsonb, pgEnum, pgTable, primaryKey, serial, smallint, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import type { StoryInput } from './story';
 
 export const langEnum = pgEnum('lang', ['tr', 'en']);
@@ -197,6 +197,8 @@ export const briefs = pgTable(
     email: text().notNull(),
     message: text().notNull(),
     status: briefStatusEnum().notNull().default('new'),
+    /** Our own note (panel). */
+    note: text().notNull().default(''),
   },
   (t) => [index('briefs_created_at').on(t.createdAt)],
 );
@@ -223,6 +225,9 @@ export const bookings = pgTable(
     about: text().array().notNull().default(sql`'{}'::text[]`),
     note: text().notNull().default(''),
     status: bookingStatusEnum().notNull().default('booked'),
+    /** Our own note (panel) · the visitor never sees it. */
+    staffNote: text().notNull().default(''),
+    cancelledAt: timestamp({ withTimezone: true }),
     createdAt: created(),
   },
   (t) => [uniqueIndex('bookings_slot').on(t.startsAt).where(sql`${t.status} = 'booked'`), index('bookings_starts_at').on(t.startsAt)],
@@ -252,6 +257,93 @@ export const outbox = pgTable(
   },
   (t) => [index('outbox_status').on(t.status)],
 );
+
+/* ---------------- the panel (src/server/panel · docs/PANEL.md) ---------------- */
+
+/** The one person who can sign in. Always row 1. */
+export const panelUser = pgTable(
+  'panel_user',
+  {
+    id: smallint().primaryKey().default(1),
+    /** scrypt$N$r$p$salt$hash (src/server/panel/auth.ts). */
+    passwordHash: text().notNull(),
+    /** Base32 TOTP secret · empty = two-step sign in is off. */
+    totpSecret: text(),
+    /** The last time step a code was accepted for (a code works once). */
+    totpLastStep: bigint({ mode: 'number' }),
+    /** A secret being set up · it becomes totpSecret once a code from it is confirmed. */
+    totpPending: text(),
+    updatedAt: updated(),
+  },
+  (t) => [check('panel_user_one', sql`${t.id} = 1`)],
+);
+
+/** Signed-in browsers. The cookie holds a random token · the row keeps only its sha256. */
+export const panelSessions = pgTable(
+  'panel_sessions',
+  {
+    id: text().primaryKey(),
+    /** Sent back in every form (CSRF). */
+    csrf: text().notNull(),
+    ip: text().notNull().default(''),
+    agent: text().notNull().default(''),
+    createdAt: created(),
+    seenAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp({ withTimezone: true }).notNull(),
+  },
+  (t) => [index('panel_sessions_expires').on(t.expiresAt)],
+);
+
+/** Everything done in the panel. Content changes keep the before and after state (restore). */
+export const audit = pgTable(
+  'audit',
+  {
+    id: serial().primaryKey(),
+    at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    /** create · update · delete · restore · status · upload · cancel · signin · signin-failed · signout · … */
+    action: text().notNull(),
+    /** project · note · person · media · video · brief · booking · closure · outbox · settings · redirect · account */
+    entity: text().notNull(),
+    entityId: text(),
+    summary: text().notNull().default(''),
+    before: jsonb(),
+    after: jsonb(),
+    ip: text().notNull().default(''),
+  },
+  (t) => [index('audit_at').on(t.at), index('audit_entity').on(t.entity, t.entityId)],
+);
+
+/** Values filled from the panel (prices · the next free month · address · phone). */
+export const settings = pgTable('settings', {
+  key: text().primaryKey(),
+  value: jsonb().notNull(),
+  updatedAt: updated(),
+});
+
+/** Days and hours we are not taking calls (Start). No times = the whole day. Minutes after midnight in Istanbul. */
+export const closures = pgTable(
+  'closures',
+  {
+    id: serial().primaryKey(),
+    day: date({ mode: 'string' }).notNull(),
+    fromMin: smallint(),
+    toMin: smallint(),
+    reason: text().notNull().default(''),
+    createdAt: created(),
+  },
+  (t) => [
+    index('closures_day').on(t.day),
+    check('closures_times', sql`(${t.fromMin} is null and ${t.toMin} is null) or (${t.fromMin} >= 0 and ${t.toMin} <= 1440 and ${t.fromMin} < ${t.toMin})`),
+  ],
+);
+
+/** Old addresses that moved (a slug changed in the panel). Looked at before a 404. */
+export const redirects = pgTable('redirects', {
+  from: text().primaryKey(),
+  to: text().notNull(),
+  hits: integer().notNull().default(0),
+  createdAt: created(),
+});
 
 export const mediaRelations = relations(media, () => ({}));
 

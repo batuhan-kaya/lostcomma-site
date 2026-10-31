@@ -26,6 +26,8 @@ export interface CallEvent {
   /** The video link · when there is one. */
   url?: string | null;
   now: Date;
+  /** A cancellation: calendars remove the event with this uid. */
+  cancel?: boolean;
 }
 
 export function ics(e: CallEvent): string {
@@ -35,12 +37,13 @@ export function ics(e: CallEvent): string {
     'VERSION:2.0',
     'PRODID:-//Lost Comma//Start//EN',
     'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
+    e.cancel ? 'METHOD:CANCEL' : 'METHOD:PUBLISH',
     'BEGIN:VEVENT',
     `UID:${e.uid}`,
     `DTSTAMP:${stamp(e.now)}`,
     `DTSTART:${stamp(e.start)}`,
     `DTEND:${stamp(end)}`,
+    ...(e.cancel ? ['STATUS:CANCELLED', 'SEQUENCE:1'] : []),
     `SUMMARY:${esc(e.title)}`,
     `DESCRIPTION:${esc(e.description)}`,
     ...(e.url ? [`URL:${e.url}`, `LOCATION:${esc(e.url)}`] : []),

@@ -15,6 +15,9 @@
  *   mail test <address>                           send one message through MAIL_URL now
  *   mail outbox                                   the last messages and whether they went out
  *   mail retry                                    send what is still waiting in the outbox now
+ *   panel password                                set the panel password (asks for it · or reads stdin)
+ *   panel totp off                                turn two-step sign in off (lost phone)
+ *   panel signout                                 sign every browser out of the panel
  */
 import { readFile } from 'node:fs/promises';
 import { basename } from 'node:path';
@@ -27,6 +30,8 @@ import { openDatabase, safeUrl } from './db';
 import { media, outbox, people, projects } from './db/schema';
 import { seed } from './db/seed';
 import { createMailer, Postman } from './mail';
+import { endAllSessions, passwordProblem, setPassword } from './panel/auth';
+import { panelUser, audit } from './db/schema';
 import { when } from './mail/messages';
 import { cityOf, localHm } from '../shared/booking';
 import { addDemoCover, addDemoLoop } from './media/demo';
@@ -44,7 +49,10 @@ const USAGE = `usage:
   bookings
   mail test <address>
   mail outbox
-  mail retry`;
+  mail retry
+  panel password
+  panel totp off
+  panel signout`;
 
 const { values: flags, positionals } = parseArgs({
   allowPositionals: true,
@@ -67,6 +75,33 @@ async function add(file: string) {
   const image = await ingestImage(db, dirs, await readFile(file), { alt: alt(), source: basename(file) });
   console.log(`${image.key}  ${image.width}×${image.height}  widths ${image.widths.join(' ')}  ${image.color}`);
   return image;
+}
+
+/** Asks twice without echo on a terminal · reads the first line of stdin otherwise. */
+async function askPassword(): Promise<string> {
+  const { createInterface } = await import('node:readline');
+  if (!process.stdin.isTTY) {
+    const rl = createInterface({ input: process.stdin });
+    for await (const line of rl) return line;
+    return '';
+  }
+  const ask = (q: string) =>
+    new Promise<string>((resolve) => {
+      const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
+      const out = rl as unknown as { _writeToOutput: (s: string) => void; output: NodeJS.WriteStream };
+      out._writeToOutput = (s: string) => {
+        if (s.includes(q)) out.output.write(s);
+      };
+      rl.question(q, (a) => {
+        rl.close();
+        process.stdout.write('\n');
+        resolve(a);
+      });
+    });
+  const a = await ask('New panel password: ');
+  const b = await ask('Once more: ');
+  if (a !== b) throw new MediaError('the two passwords are not the same');
+  return a;
 }
 
 try {
@@ -147,6 +182,28 @@ try {
       } else if (sub === 'retry') {
         await new Postman(db, createMailer(config.MAIL_URL), config.MAIL_FROM).kick(true);
         console.log('outbox retried');
+      } else {
+        console.log(USAGE);
+        process.exitCode = 1;
+      }
+      break;
+    }
+    case 'panel': {
+      if (sub === 'password') {
+        const pw = await askPassword();
+        const problem = passwordProblem(pw);
+        if (problem) throw new MediaError(problem);
+        await setPassword(db, pw);
+        await endAllSessions(db);
+        await db.insert(audit).values({ action: 'password', entity: 'account', summary: 'Şifre komut satırından değişti' });
+        console.log('panel password set · every browser was signed out');
+      } else if (sub === 'totp' && rest[0] === 'off') {
+        await db.update(panelUser).set({ totpSecret: null, totpPending: null, totpLastStep: null });
+        await db.insert(audit).values({ action: 'totp-off', entity: 'account', summary: 'İki adımlı doğrulama komut satırından kapandı' });
+        console.log('two-step sign in is off');
+      } else if (sub === 'signout') {
+        await endAllSessions(db);
+        console.log('every browser was signed out of the panel');
       } else {
         console.log(USAGE);
         process.exitCode = 1;

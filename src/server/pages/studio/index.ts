@@ -156,7 +156,7 @@ function city(ctx: Ctx): Safe {
 <span class="pin p-lc"><span>Lost Comma<small>${t('çaya gel')}</small></span><i></i><em></em></span>
 </div>
 </div>
-<div class="addr" data-rest="host" data-rest-at="0.95 0.2"><b>${t('[ADRES]')}</b><span>Kadıköy · 34710 ${t('İstanbul')}</span><span>${t('Vapur iskelesine beş dakika')}</span><a href="${href(lang, 'start')}">${t('Ziyaret ayarla')} <span aria-hidden="true">→</span></a></div>
+<div class="addr" data-rest="host" data-rest-at="0.95 0.2"><b>${ctx.settings.text('studio.address', lang) ?? t('[ADRES]')}</b><span>Kadıköy · 34710 ${t('İstanbul')}</span><span>${t('Vapur iskelesine beş dakika')}</span><a href="${href(lang, 'start')}">${t('Ziyaret ayarla')} <span aria-hidden="true">→</span></a></div>
 </div>
 <p class="fery mono" data-fery>${ferryLine(ctx, f)}</p>
 </div></section>`;

@@ -104,6 +104,15 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Closeness is counted in letters (edit distance with swaps · Turkish letters and accents forgiven · either language's address). Nothing close: the comma stands outside the edge and the way leads home. `placeYou` picks the free side so the comma never covers a label.
 - Every star is a link. Hover or focus draws the way there on the cursor spring and the box says how many letters away it is. ⌘Z / Ctrl+Z: the team cannot undo it. Without JS the way to the closest page is already drawn.
 
+## Panel (src/server/panel · src/client/panel.ts · panel/story.ts · docs/PANEL.md)
+
+- One Fastify plugin under `/panel` (Turkish only · noindex · no-store · same CSP). One user: the password is scrypt in `panel_user` (set with `npm run panel -- password` or `PANEL_PASSWORD` on first boot). Optional TOTP (QR from `qrcode`). Sessions keep only the sha256 of the cookie token · 24 h idle · 14 days max · cookie `Path=/panel` HttpOnly SameSite=Strict. Every post needs the session's CSRF token (`_csrf` or `x-csrf`) and our Origin. `PANEL_SIGNIN_LIMIT` = sign-in attempts per address per 15 minutes.
+- Sections in `src/server/panel/views/`: Pano (launch checklist in `checklist.ts`) · İşler (case study editor) · Notlar (live preview through the site's renderer) · Görseller (images and loops · multipart only here) · Ekip · Gelen kutusu · Görüşmeler (cancel with a calendar cancellation · closed days and hours) · E-postalar · Site ayarları · Yönlendirmeler · Kayıt · Hesap.
+- Every change goes to the `audit` table · content keeps before and after snapshots (`snapshot.ts`) and "Bu hale dön" restores them (a deleted project or note comes back with its id). Saves use the row's `updated_at` as an optimistic lock.
+- The comma rule holds in the panel: visible copy with a comma is refused (code fences in notes are free).
+- Site settings (`src/server/data/settings.ts`): prices · the next free month · address · phone. Pages read them through `ctx.settings` · an empty value keeps the placeholder. Closures (`data/closures.ts`) drop closed days from Start and block closed hours in the API. A changed slug of a live page adds a redirect (`data/redirects.ts`) · the 404 handler looks there first.
+- Panel classes start with `p-` (app.css loads too). Previews render the site's own pages with draft data (`projectBySlug(…, preview)` · `noteBySlug(…, preview)`).
+
 ## Mail (src/server/mail)
 
 - Every message goes into the `outbox` table first. The `Postman` sends what is pending through `MAIL_URL` (any SMTP · `log://` prints) · retries failures every five minutes · gives up after five tries · skips anything older than two days. Without `MAIL_URL` nothing is sent and nothing is lost.
@@ -146,6 +155,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 | `npm run media -- add\|cover\|list` | run images through the pipeline |
 | `npm run bookings` | the next calls booked on Start |
 | `npm run mail -- test <address>\|outbox\|retry` | check the mail settings · see or resend the outbox |
+| `npm run panel -- password\|totp off\|signout` | set the panel password · turn two-step off · sign every browser out |
 
 ## Layout
 
@@ -157,6 +167,7 @@ src/server/media image pipeline · picture()
 src/server/notes markdown for notes · code highlighting · RSS
 src/server/og    share images
 src/server/mail  outbox · postman · messages · calendar files
+src/server/panel the panel: sign in · sections · audit · snapshots
 drizzle/         generated SQL migrations (committed)
 src/client/      browser modules (one entry per page + shared)
 src/shared/      pure logic used by both server and client

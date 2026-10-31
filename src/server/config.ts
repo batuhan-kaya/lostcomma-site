@@ -35,6 +35,13 @@ const Env = z.object({
   MAIL_TO: z.string().default('hello@lostcomma.co'),
   /** The video link for a call · {ticket} becomes the booking's token (https://meet.jit.si/lostcomma-{ticket}). Empty = we send links by hand. */
   MEET_URL: z.string().optional(),
+  /**
+   * The panel password on first boot only (docs/PANEL.md): used when no password is set yet ·
+   * remove it afterwards. `npm run panel -- password` does the same without the environment.
+   */
+  PANEL_PASSWORD: z.string().optional(),
+  /** Panel sign-in attempts one address may make per 15 minutes. */
+  PANEL_SIGNIN_LIMIT: z.coerce.number().int().min(1).default(5),
 });
 
 type Parsed = z.infer<typeof Env>;

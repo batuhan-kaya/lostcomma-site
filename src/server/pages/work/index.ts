@@ -5,6 +5,9 @@ import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
 import { coverOrArt, FRAME_SIZE, GROUP_CLASS } from './art';
 
+/** Fills [AY] · [MONTH] with the month from the panel (Site ayarları). */
+const withMonth = (line: string, month: string | null) => (month ? line.replace(/\[(AY|MONTH)\]/, month) : line);
+
 /**
  * Work · the Layers panel. Every project is a layer in one file: groups can be hidden with their eye ·
  * hovering a layer pulls its frame along with the pointer · the canvas view shows them all at once.
@@ -100,7 +103,7 @@ function ask(ctx: Ctx, d: WorkData): Safe {
   const { t, lang } = ctx;
   return html`<section class="ask" data-sec="ask" data-host="design"><div class="wrap">
 <h2 class="askt">${t('Senin projen')}<br>${slot(t('{n} numaralı katman olabilir.', { n: '\u0000' }), html`<span class="badge" data-rest="host" data-rest-at="1 0.9 14 0">${pad(d.next)}</span>`)}</h2>
-<div class="askr"><p>${t('Aynı anda az sayıda proje alıyoruz ki her biri bütün ekibi alsın. Bir sonraki boş yer [AY] ayında açılıyor.')}</p><div><a class="btn f" href="${href(lang, 'start')}">${t('Proje başlat')} <span aria-hidden="true">↗</span></a><a class="btn g" href="${href(lang, 'process')}">${t('Nasıl çalışıyoruz')}</a></div></div>
+<div class="askr"><p>${withMonth(t('Aynı anda az sayıda proje alıyoruz ki her biri bütün ekibi alsın. Bir sonraki boş yer [AY] ayında açılıyor.'), ctx.settings.month('work.nextMonth', lang))}</p><div><a class="btn f" href="${href(lang, 'start')}">${t('Proje başlat')} <span aria-hidden="true">↗</span></a><a class="btn g" href="${href(lang, 'process')}">${t('Nasıl çalışıyoruz')}</a></div></div>
 </div></section>`;
 }
 
