@@ -81,6 +81,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 | `npm run dev` | build in watch mode + restart server on :3000 |
 | `npm run build` | bundle client JS and CSS with hashes · copy fonts · compile server to `dist/` |
 | `npm start` | run `dist/server/index.js` |
+| `npm run preview` | build + run with fresh sample content (GitHub Codespaces · `docs/ONIZLEME.md`) |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm test` | vitest unit + Fastify inject tests |
 | `npm run test:e2e` | Playwright against the built server (console errors · axe · comma rule · overflow) |
