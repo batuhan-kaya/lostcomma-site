@@ -7,6 +7,7 @@
  *   seed [--demo]                                 load the sample content (overwrites sample rows · keeps covers)
  *   media add <file> [--alt-tr ..] [--alt-en ..]  run an image through the pipeline
  *   media cover <project no> <file> [--alt-..]    … and make it that project's cover
+ *   media portrait <design|code|motion> <file>    … and make it that teammate's portrait (Studio)
  *   media list                                    every image with its key and size
  */
 import { readFile } from 'node:fs/promises';
@@ -16,7 +17,7 @@ import { desc, eq } from 'drizzle-orm';
 import { prepareDatabase } from './app';
 import { loadConfig } from './config';
 import { openDatabase, safeUrl } from './db';
-import { media, projects } from './db/schema';
+import { media, people, projects } from './db/schema';
 import { seed } from './db/seed';
 import { addDemoCover } from './media/demo';
 import { ingestImage, MediaError, mediaDirs } from './media/ingest';
@@ -26,6 +27,7 @@ const USAGE = `usage:
   seed [--demo]
   media add <file> [--alt-tr "…"] [--alt-en "…"]
   media cover <project no> <file> [--alt-tr "…"] [--alt-en "…"]
+  media portrait <design|code|motion> <file> [--alt-tr "…"] [--alt-en "…"]
   media list`;
 
 const { values: flags, positionals } = parseArgs({
@@ -72,6 +74,14 @@ try {
         const image = await add(rest[1]);
         await db.update(projects).set({ coverId: image.id }).where(eq(projects.id, project.id));
         console.log(`cover of project ${String(no).padStart(3, '0')}`);
+      } else if (sub === 'portrait' && rest[0] && rest[1]) {
+        const crew = rest[0];
+        if (crew !== 'design' && crew !== 'code' && crew !== 'motion') throw new MediaError('portrait needs design · code or motion');
+        const [person] = await db.select({ id: people.id }).from(people).where(eq(people.crew, crew));
+        if (!person) throw new MediaError(`no teammate for ${crew}`);
+        const image = await add(rest[1]);
+        await db.update(people).set({ portraitId: image.id }).where(eq(people.id, person.id));
+        console.log(`portrait of ${crew}`);
       } else if (sub === 'list') {
         for (const m of await db.select().from(media).orderBy(desc(media.createdAt))) {
           console.log(`${m.id}\t${m.key}\t${m.width}×${m.height}\t${m.source}\t${m.alt.tr ?? ''} / ${m.alt.en ?? ''}`);

@@ -19,6 +19,7 @@ Studio site for Lost Comma (Istanbul creative software studio: web · apps · id
 - Blog is called "Notes" in both languages.
 - Every page has its own signature interaction. Never reuse the homepage animation on an inner page.
 - Cursor rule: all three team cursors appear only in the hero. Below the hero one calm host cursor per page.
+- Calm pages (Batuhan · phase 6): never tiring. Neutral grounds (paper · milk · night) · one accent per page · team colours only as small marks (a dot · a 3 px edge · a cursor) never as big filled blocks · one focal interaction per section · rich through craft and detail rather than quantity. A colour pass over every page comes later.
 
 ## Design source
 
@@ -68,6 +69,12 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Each hero renders its first state on the server and `src/client/service/<key>.ts` brings it to life. Logic both sides need lives in `src/shared/` (checklist verdict · thumb geometry · bezier curve · contrast). CSS keeps a few first-state numbers (act boxes · handle spots) and a unit test keeps them equal to `src/shared`.
 - Work below a service comes from the database by discipline (`projectsOf`). Motion shows it as a reel of loops that pause off screen.
 - Every service page has the same beats: hero · get (twelve things) · hood (a working mock) · price · rel or reel · next tool.
+
+## Process and Studio (src/server/pages/process · studio · src/client/process.ts · studio.ts)
+
+- Process: an edit suite on night (monitor · inspector · transport · four tracks) then calm paper below (`.below.th-paper`): the weekly rhythm (today is marked) · six house rules · after launch. Positions on the ten weeks live in `src/shared/timeline.ts` and the CSS keeps the same numbers (a unit test checks them). The ruler is a slider: arrows a day · page keys a week · Home and End.
+- Studio: paper all the way down. The title is made of selections (one per teammate) · team cards from the `people` table (a portrait replaces the drawn cursor once `npm run media -- portrait <crew> <file>` sets one) · a settings window whose Display switches really change the page (`html.still` · `.st-big` · `.st-hc` · `crew.calm()`) · numbers · a drawn Istanbul where the ferry crosses on Istanbul time (`src/shared/istanbul.ts` · `map.ts`).
+- Copy lives per language in `src/server/content/process.ts` and `studio.ts`.
 
 ## Images (src/server/media)
 

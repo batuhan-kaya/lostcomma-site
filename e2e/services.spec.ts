@@ -176,12 +176,17 @@ test.describe('Service pages · desktop', () => {
     await expect(page.locator('[data-reach]')).toHaveClass(/hard/);
     await expect(page.locator('[data-reach] b')).toHaveText('Hard to reach');
 
-    // Drag the thumb onto "Buy ticket" and let go: it taps.
+    // Drag the thumb onto "Buy ticket" and let go: it taps. First bring it back to the middle of the
+    // screen and the whole phone into view so the drag starts on the thumb wherever the page scrolled.
     await page.locator('[data-hand="r"]').click();
+    await thumb.focus();
+    for (let i = 0; i < 9; i++) await page.keyboard.press('Shift+ArrowDown');
+    await page.locator('[data-phone]').scrollIntoViewIfNeeded();
     const buy = (await page.locator('[data-act="0"]').boundingBox())!;
     const tb = (await thumb.boundingBox())!;
     await drag(page, { x: tb.x + tb.width / 2, y: tb.y + tb.height / 2 }, { x: buy.x + buy.width / 2, y: buy.y + buy.height / 2 });
-    await expect(page.locator('[data-toast]')).toHaveText('Tapped Buy ticket · easy reach');
+    // The toast fades after a moment · the live region for screen readers keeps the line.
+    await expect(page.locator('[data-tapsr]')).toHaveText('Tapped Buy ticket · easy reach');
     expect(errors).toEqual([]);
   });
 

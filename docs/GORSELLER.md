@@ -56,11 +56,20 @@ Bu sayfalardaki etkileşimli parçaların çoğu kodla çiziliyor ve öyle kalac
 
 Fiyatlar görsel değil ama hâlâ yer tutucu: her hizmet sayfasında üç şekil · hizmetler sayfasında dört "başlangıç fiyatı" ([FİYAT] · [PRICE]).
 
+## Süreç ve Stüdyo (6. aşama)
+
+| # | Yer | Ne lazım | Oran · teslim boyutu | Durum |
+|---|---|---|---|---|
+| E1 | Stüdyo · ekip kartları | Üç portre (tasarım · kod · hareket). Aynı ışık ve aynı fon · omuz hizasından · doğal | 4:3 · 1200×900 | Hazır: portre gelene kadar kartta imleç çizimi duruyor · `npm run media -- portrait design dosya.jpg --alt-tr "…" --alt-en "…"` |
+| E2 | Süreç · kurgu masasındaki ekran | Yedi hafta sahnesi kodla çiziliyor | | Gerekmez |
+| E3 | Stüdyo · İstanbul haritası ve vapur | SVG ile çiziliyor · vapur İstanbul saatine göre geçiyor | | Gerekmez |
+
+Görsel olmayan yer tutucular: ekip adları ve rolleri ([Name] · veritabanında) · stüdyo adresi ([ADRES]) · yayın sonrası iki planın fiyatı ([FİYAT]).
+
 ## Sonraki aşamalarda gelecekler (taslaklardan)
 
 | # | Sayfa | Ne lazım | Not |
 |---|---|---|---|
-| B5 | Stüdyo | Ekip portreleri (3 kişi) · stüdyo ve İstanbul fotoğrafları | Portreler aynı ışık ve fonla |
 | B6 | Notes ve Not | Yazı kapakları (isteğe bağlı) · yazı içi görseller | Paylaşım görselleri otomatik üretilir |
 | B7 | Lab | Canlı örnekler kodla çiziliyor | Gerekmez · hareket vitrini kararına bağlı (8. aşama) |
 | B8 | Araçlar | Donanım fotoğrafları (bilgisayar · kulaklık · monitör) | İsteğe bağlı |

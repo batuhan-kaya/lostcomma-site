@@ -6,7 +6,6 @@
 @import './_art.css';
 
 [data-page="service"] .wrap { padding: 0 var(--gut); }
-.below { background: var(--pbg); color: var(--pfg); }
 
 /* ================= hero · shared ================= */
 .vhero { position: relative; padding: calc(var(--head) + 30px) 0 90px; overflow: hidden; }

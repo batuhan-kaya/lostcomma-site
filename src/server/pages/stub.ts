@@ -29,34 +29,6 @@ function stub(def: Omit<Page, 'body'> & { kick: string; heading: string; phase: 
   };
 }
 
-export const process = stub({
-  id: 'process',
-  plan: [msg('Kurgu zaman çizelgesi'), msg('Haftalık ritüeller'), msg('Yayından sonrası')],
-  host: 'motion',
-  section: 'services',
-  theme: 'night',
-  kick: msg('Süreç'),
-  heading: msg('Süreç.'),
-  phase: 6,
-  title: (t) => t('Süreç'),
-  description: (t) => t('Bir projenin ilk görüşmeden yayına kadar nasıl ilerlediği.'),
-  next: { to: 'studio', kick: msg('Sonraki sayfa'), big: msg('Stüdyo'), tone: 'pink' },
-});
-
-export const studio = stub({
-  id: 'studio',
-  plan: [msg('Seçimlerden oluşan başlık'), msg('Ayarlar penceresi'), msg('Vapurlu İstanbul haritası')],
-  host: 'design',
-  section: 'studio',
-  theme: 'pink',
-  kick: msg('Stüdyo'),
-  heading: msg('İmleçler biziz.'),
-  phase: 6,
-  title: (t) => t('Stüdyo'),
-  description: (t) => t('Lost Comma’nın arkasındaki ekip.'),
-  next: { to: 'notes', kick: msg('Sonraki sayfa'), big: msg('Notes'), tone: 'milk' },
-});
-
 export const notes = stub({
   id: 'notes',
   plan: [msg('Bul ve vurgula'), msg('Blame sütunlu not listesi'), msg('Bülten ve konular')],
