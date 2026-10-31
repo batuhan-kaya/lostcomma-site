@@ -49,7 +49,16 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Migrations run on every boot. `SEED` fills an empty database: `sample` (default outside production · the design board content in `db/sample.ts`) · `demo` (sample plus a generated cover on board frame 0 · e2e) · `none` (production). Seeding never overwrites existing content on boot. `npm run db:seed` overwrites the sample rows on purpose.
 - Language text lives in `*_text` tables (one row per language). Pages read through `src/server/data/content.ts`, which falls back to the other language and says so (`textLang`). Slugs are per language.
 - Database content follows the comma rule too (a test checks the sample).
-- Pages with data declare `load(ctx)`. Its result is the second argument of `body` · `footer` · `data`. `ctx.db` is the database.
+- Pages with data declare `load(ctx, params)`. Its result is the second argument of `body` · `footer` · `data` · `title` · `description` (and `theme` may be a function of it). `ctx.db` is the database.
+- Pages on a route with params live in `PARAM_PAGES` (`src/server/pages/index.ts`). `load()` returns null for a 404 · `paths(data)` gives the address in each language (language switch · hreflang · canonical · sitemap).
+- A case study is `projects.story` (jsonb · `src/server/db/story.ts`): one zod-validated document with `{ tr, en }` inline. Every section is optional · a broken story falls back to the short case page. Images inside it are media ids.
+
+## Work and Case (src/server/pages/work · case · src/client/work.ts · case.ts)
+
+- Work: groups · view · sort run on the client from markup (`data-g` · `data-i`). Without JS it is a plain list of links. The preview frame follows the pointer on a spring (`hover: hover` only).
+- Drawn covers (`pages/work/art.ts` · `styles/pages/_art.css`) stand in until `projects.cover_id` is set. Case history frames: version image · else the drawn site (`story.history.mock`) · else the cover.
+- Case colours come from `story.theme`. `--acc` is the accent · `--sunk` and `--raise` derive from the theme (exact values for navy).
+- The history section is hosted by the teammate who made the current version (`data-host` follows the version).
 
 ## Images (src/server/media)
 

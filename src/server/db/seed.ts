@@ -6,6 +6,7 @@
 import { and, count, eq, inArray, or } from 'drizzle-orm';
 import type { Db } from './index';
 import { SAMPLE, type SampleContent } from './sample';
+import { StorySchema } from './story';
 import { notes, noteText, people, peopleText, projects, projectText } from './schema';
 
 export async function seed(db: Db, content: SampleContent = SAMPLE): Promise<void> {
@@ -39,6 +40,8 @@ export async function seed(db: Db, content: SampleContent = SAMPLE): Promise<voi
         status: project.status,
         boardSlot: project.boardSlot ?? null,
         art: project.art ?? null,
+        // Parsed so a broken story fails the seed instead of a page.
+        story: project.story ? StorySchema.parse(project.story) : null,
       };
       const [saved] = await tx.insert(projects).values(row).onConflictDoUpdate({ target: projects.no, set: row }).returning({ id: projects.id });
       for (const lang of ['tr', 'en'] as const) {

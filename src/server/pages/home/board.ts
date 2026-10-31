@@ -14,6 +14,8 @@ const SIZES = '(max-width: 760px) 92vw, 600px';
 
 interface Frame {
   slot: number;
+  /** Where "Read the case" goes: the project's case study (the Lab frame opens the Lab). */
+  href: string;
   no: string;
   name: string;
   what: string;
@@ -25,12 +27,13 @@ function frames(ctx: Ctx, projects: BoardProject[]): Frame[] {
   return [
     ...projects.map((p) => ({
       slot: p.slot,
+      href: href(ctx.lang, 'case', { slug: p.slug }),
       no: `No. ${p.number}`,
       name: p.name,
       what: `${p.kind} · ${p.year}`,
       art: p.cover ? picture(p.cover, { lang: ctx.lang, sizes: SIZES, alt: '' }) : (BOARD_ART[p.art ?? ''] ?? html`<span class="ar ar-none"></span>`),
     })),
-    { slot: LAB_FRAME, no: 'Lab', name: lab.name, what: lab.what, art: BOARD_ART.lab! },
+    { slot: LAB_FRAME, href: href(ctx.lang, 'lab'), no: 'Lab', name: lab.name, what: lab.what, art: BOARD_ART.lab! },
   ];
 }
 
@@ -50,7 +53,7 @@ export function board(ctx: Ctx, projects: BoardProject[]): Safe {
 </div>
 <div class="board" data-board>
 <div class="bwrap" data-bwrap>${list.map(
-    (f) => html`<div class="bf b${f.slot}" data-bf="${f.slot}" role="button" tabindex="0" data-no="${f.no}" data-name="${f.name}" data-what="${f.what}">
+    (f) => html`<div class="bf b${f.slot}" data-bf="${f.slot}" role="button" tabindex="0" data-no="${f.no}" data-name="${f.name}" data-what="${f.what}" data-href="${f.href}">
 <span class="bl mono">${f.no} · ${f.name}</span><span class="sr"> · ${f.what}</span><span class="ba" aria-hidden="true">${f.art}</span><span class="pin" aria-hidden="true"><i>D</i><b></b></span>
 </div>`,
   )}</div>
@@ -58,7 +61,7 @@ export function board(ctx: Ctx, projects: BoardProject[]): Safe {
 <button type="button" class="ovb" data-close aria-label="${t('Kapat')}"></button>
 <div class="ovc" role="dialog" aria-modal="true" aria-labelledby="ov-name">
 <span class="ba" data-ovart aria-hidden="true"></span>
-<div><p class="mono"><span data-ovno></span> · ${t('örnek proje')}</p><h3 id="ov-name" data-ovname></h3><p data-ovwhat></p><div class="ovr"><a class="btn f" href="${href(lang, 'work')}">${t('Vakayı oku')} <span aria-hidden="true">↗</span></a><button type="button" class="btn g" data-close>${t('Panoya dön')}</button></div></div>
+<div><p class="mono"><span data-ovno></span> · ${t('örnek proje')}</p><h3 id="ov-name" data-ovname></h3><p data-ovwhat></p><div class="ovr"><a class="btn f" href="${href(lang, 'work')}" data-ovlink>${t('Vakayı oku')} <span aria-hidden="true">↗</span></a><button type="button" class="btn g" data-close>${t('Panoya dön')}</button></div></div>
 </div>
 </div>
 </div>

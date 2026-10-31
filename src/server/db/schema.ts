@@ -8,6 +8,7 @@
  */
 import { relations, sql } from 'drizzle-orm';
 import { check, index, integer, jsonb, pgEnum, pgTable, primaryKey, serial, smallint, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import type { StoryInput } from './story';
 
 export const langEnum = pgEnum('lang', ['tr', 'en']);
 export const crewEnum = pgEnum('crew', ['design', 'code', 'motion']);
@@ -97,6 +98,8 @@ export const projects = pgTable(
     art: text(),
     coverId: integer().references(() => media.id, { onDelete: 'set null' }),
     siteUrl: text(),
+    /** The case study (src/server/db/story.ts · validated with zod). Empty = a short case page. */
+    story: jsonb().$type<StoryInput>(),
     createdAt: created(),
     updatedAt: updated(),
   },

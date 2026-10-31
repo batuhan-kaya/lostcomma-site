@@ -8,6 +8,7 @@ import { registerBrief } from './api/brief';
 import { RateLimit } from './api/rate';
 import { Assets } from './assets';
 import type { Config } from './config';
+import { caseSlugs } from './data/content';
 import { openDatabase, safeUrl, type Database, type Db } from './db';
 import { seedIfEmpty } from './db/seed';
 import { isLang, LANGS, negotiate, translator, type Lang } from './i18n';
@@ -15,8 +16,8 @@ import { documentHtml } from './layout/document';
 import { addDemoCover } from './media/demo';
 import { mediaDirs } from './media/ingest';
 import type { AnyPage, Ctx } from './page';
-import { homePage, notFound, STATIC_PAGES } from './pages';
-import { href, type RouteId } from './routes';
+import { homePage, notFound, PARAM_PAGES, STATIC_PAGES } from './pages';
+import { href, ROUTES, type RouteId } from './routes';
 import { securityHeaders } from './security';
 import { robotsTxt, sitemapXml } from './seo';
 
@@ -138,8 +139,9 @@ export async function buildApp({ config, now = () => new Date(), database }: App
     };
   }
 
-  async function send(reply: FastifyReply, page: AnyPage, ctx: Ctx, status = 200) {
-    const data = page.load ? await page.load(ctx) : undefined;
+  /** Renders a page. `loaded` skips load() when the route already fetched the data. */
+  async function send(reply: FastifyReply, page: AnyPage, ctx: Ctx, status = 200, loaded?: { data: unknown }) {
+    const data = loaded ? loaded.data : page.load ? await page.load(ctx, {}) : undefined;
     return reply
       .status(status)
       .type('text/html; charset=utf-8')
@@ -155,6 +157,20 @@ export async function buildApp({ config, now = () => new Date(), database }: App
         const state = id === 'home' ? (req.query as Record<string, string>).brief : undefined;
         const p = state === 'sent' || state === 'error' ? homePage({ sent: state === 'sent', error: state === 'error' }) : page;
         return send(reply, p, ctxFor(lang, alt[lang], alt));
+      });
+    }
+  }
+
+  // Pages on a route with params (a case study · a note): load() finds the content or it is a 404.
+  for (const [id, page] of Object.entries(PARAM_PAGES) as [RouteId, AnyPage][]) {
+    for (const lang of LANGS) {
+      app.get(ROUTES[id][lang], async (req, reply) => {
+        const ctx = ctxFor(lang, req.url.split('?')[0] ?? '/', { tr: null, en: null });
+        const data = await page.load?.(ctx, req.params as Record<string, string>);
+        if (data == null) return notFoundPage(req, reply);
+        ctx.alt = page.paths?.(data) ?? ctx.alt;
+        ctx.path = ctx.alt[lang] ?? ctx.path;
+        return send(reply, page, ctx, 200, { data });
       });
     }
   }
@@ -179,16 +195,19 @@ export async function buildApp({ config, now = () => new Date(), database }: App
 
   app.get('/robots.txt', (_req, reply) => reply.type('text/plain; charset=utf-8').send(robotsTxt(config.SITE_URL)));
 
-  app.get('/sitemap.xml', (_req, reply) =>
-    reply.type('application/xml; charset=utf-8').send(sitemapXml(config.SITE_URL, Object.keys(STATIC_PAGES) as RouteId[])),
-  );
+  app.get('/sitemap.xml', async (_req, reply) => {
+    const cases = (await caseSlugs(db)).map((slugs) => Object.fromEntries(LANGS.flatMap((l) => (slugs[l] ? [[l, href(l, 'case', { slug: slugs[l] })]] : []))));
+    return reply.type('application/xml; charset=utf-8').send(sitemapXml(config.SITE_URL, Object.keys(STATIC_PAGES) as RouteId[], cases));
+  });
 
-  app.setNotFoundHandler((req, reply) => {
+  function notFoundPage(req: FastifyRequest, reply: FastifyReply) {
     const path = req.url.split('?')[0] ?? '/';
     const prefix = path.split('/')[1];
     const lang = isLang(prefix) ? prefix : negotiate(readCookie(req.headers.cookie, LANG_COOKIE), req.headers['accept-language']);
     return send(reply, notFound, ctxFor(lang, path, { tr: null, en: null }), 404);
-  });
+  }
+
+  app.setNotFoundHandler(notFoundPage);
 
   app.setErrorHandler((err: Error & { statusCode?: number }, req, reply) => {
     const status = err.statusCode && err.statusCode >= 400 ? err.statusCode : 500;

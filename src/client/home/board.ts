@@ -121,6 +121,8 @@ export class Board {
     $('[data-ovno]')!.textContent = f.dataset.no ?? '';
     $('[data-ovname]')!.textContent = f.dataset.name ?? '';
     $('[data-ovwhat]')!.textContent = f.dataset.what ?? '';
+    const link = $<HTMLAnchorElement>('[data-ovlink]');
+    if (link && f.dataset.href) link.href = f.dataset.href;
     const art = $('[data-ovart]')!;
     art.replaceChildren(...[...(f.querySelector('.ba')?.childNodes ?? [])].map((n) => n.cloneNode(true)));
     this.ov.hidden = false;
