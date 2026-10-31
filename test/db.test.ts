@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { count, eq } from 'drizzle-orm';
 import type { PgTable } from 'drizzle-orm/pg-core';
@@ -24,6 +24,7 @@ const total = async (table: PgTable) => (await db.select({ n: count() }).from(ta
 describe('migrations', () => {
   it('match the schema (run npm run db:generate after changing schema.ts)', () => {
     // drizzle-kit only takes relative paths: work in a copy inside node_modules/.cache.
+    mkdirSync(join('node_modules', '.cache'), { recursive: true });
     const tmp = mkdtempSync(join('node_modules', '.cache', 'drift-'));
     try {
       cpSync('drizzle', join(tmp, 'drizzle'), { recursive: true });
