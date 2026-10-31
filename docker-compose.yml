@@ -14,5 +14,11 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+    volumes:
+      # Briefs land here until the database arrives (phase 3).
+      - lostcomma-data:/app/data
     security_opt:
       - no-new-privileges:true
+
+volumes:
+  lostcomma-data:

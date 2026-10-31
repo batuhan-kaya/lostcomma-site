@@ -50,4 +50,10 @@ export interface Page {
   bare?: boolean;
   /** Keep out of search engines (404 · panel). Drops canonical and hreflang. */
   noindex?: boolean;
+  /** The homepage: interactive presence avatars in the header. */
+  home?: boolean;
+  /** Replaces the shared footer (the homepage has its big wordmark footer). */
+  footer?: (ctx: Ctx) => Safe;
+  /** Extra JSON handed to the page's client module (rendered as a non-executable data block). */
+  data?: (ctx: Ctx) => unknown;
 }

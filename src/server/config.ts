@@ -7,6 +7,10 @@ const Env = z.object({
   SITE_URL: z.string().url().default('http://localhost:3000'),
   /** Where the built assets and manifest live. */
   PUBLIC_DIR: z.string().default('dist/public'),
+  /** Writable data (briefs until the database arrives). A Docker volume in production. */
+  DATA_DIR: z.string().default('data'),
+  /** Briefs one address may send per 10 minutes. */
+  BRIEF_LIMIT: z.coerce.number().int().min(1).default(5),
 });
 
 export type Config = z.infer<typeof Env>;

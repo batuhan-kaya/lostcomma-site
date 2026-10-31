@@ -38,7 +38,21 @@ function langSwitch(ctx: Ctx): Safe {
   return html`<nav class="lang mono" aria-label="${ctx.t('Dil')}">${items}</nav>`;
 }
 
-export function header(ctx: Ctx, section?: RouteId): Safe {
+/** The "Live" presence: a status dot · the team avatars · on the homepage they are buttons with popovers. */
+function presence(ctx: Ctx, home: boolean): Safe {
+  const { t } = ctx;
+  if (!home) {
+    return html`<span class="pres mono" aria-hidden="true"><i></i>${roll(ctx, msg('Canlı'))}<span class="avs">${TEAM.map(([n, l]) => html`<span class="av c-${n}" data-av="${n}">${l}</span>`)}<span class="av c-you">${t('S')}</span></span></span>`;
+  }
+  return html`<div class="pres mono" data-pres>
+<i></i>${roll(ctx, msg('Canlı'))}<span class="avs">${TEAM.map(
+    ([n, l]) => html`<button type="button" class="av c-${n}" data-av="${n}" data-pop="${n}" aria-label="${t('{name} burada', { name: n })}">${l}</button>`,
+  )}<button type="button" class="av c-comma egg" data-av="comma" data-pop="comma" aria-label="${t('virgül burada')}" hidden>,</button><button type="button" class="av ghost" data-pop="ghost" aria-label="${t('Biri dosyadan çıktı')}">?</button><button type="button" class="av c-you" data-pop="you" aria-label="${t('Sen')}">${t('S')}</button></span>
+<div class="popv" data-popv role="status" hidden><b></b><span></span></div>
+</div>`;
+}
+
+export function header(ctx: Ctx, section?: RouteId, opts: { home?: boolean } = {}): Safe {
   const { t, lang } = ctx;
   const links = NAV.map(([id, label], i) => {
     const on = id === section;
@@ -48,8 +62,8 @@ export function header(ctx: Ctx, section?: RouteId): Safe {
   return html`<header class="hd">
 <div class="wrap">
 <div class="hl2">
-<a href="${href(lang, 'home')}" class="logo"><span>lost</span><span class="caret"> </span><span>comma</span></a>
-<span class="pres mono" aria-hidden="true"><i></i>${roll(ctx, msg('Canlı'))}<span class="avs">${TEAM.map(([n, l]) => html`<span class="av c-${n}" data-av="${n}">${l}</span>`)}<span class="av c-you">${t('S')}</span></span></span>
+<a href="${href(lang, 'home')}" class="logo"><span>lost</span><b class="lgc egg" aria-hidden="true">,</b><span class="caret"> </span><span>comma</span></a>
+${presence(ctx, !!opts.home)}
 </div>
 <nav class="links mono" aria-label="${t('Ana menü')}">${links}</nav>
 <div class="hr">

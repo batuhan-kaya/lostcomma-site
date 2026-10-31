@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { MemoryInbox } from '../src/server/api/inbox';
 import { buildApp } from '../src/server/app';
 import { loadConfig } from '../src/server/config';
 import { STATIC_PAGES } from '../src/server/pages';
@@ -9,6 +10,7 @@ let app: Awaited<ReturnType<typeof buildApp>>;
 
 beforeAll(async () => {
   app = await buildApp({
+    inbox: new MemoryInbox(),
     config: loadConfig({ NODE_ENV: 'test', SITE_URL: SITE }),
     now: () => new Date('2026-10-31T09:41:00+03:00'),
   });
@@ -18,10 +20,13 @@ afterAll(() => app.close());
 const ids = Object.keys(STATIC_PAGES) as RouteId[];
 const get = (url: string, headers: Record<string, string> = {}) => app.inject({ method: 'GET', url, headers });
 
-/** Visible body text: tags stripped. Used for the comma rule. */
+/** Visible body text: data blocks and the comma egg removed · tags stripped. Used for the comma rule. */
 function bodyText(doc: string): string {
   const body = doc.split('<body>')[1]?.split('</body>')[0] ?? '';
-  return body.replace(/<[^>]+>/g, ' ');
+  return body
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    .replace(/<(b|button)\b[^>]*class="[^"]*\begg\b[^"]*"[^>]*>,<\/\1>/g, ' ')
+    .replace(/<[^>]+>/g, ' ');
 }
 
 describe('pages', () => {
