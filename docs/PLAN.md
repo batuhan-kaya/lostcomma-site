@@ -55,7 +55,7 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 3 | Veri katmanı | Drizzle şeması · migration · seed · içerik modeli · görsel hattı (sharp · AVIF ve WebP · srcset) · briefler veritabanına | Bitti |
 | 4 | Work + Case | Layers paneli · vaka sayfası sürüm geçmişi | Bitti |
 | 5 | Services + hizmet detayları | Araç seç ve çiz · Web siteleri (yeniden boyutlanan çerçeve) · Uygulamalar (başparmak alanı) · Kimlik (favicon'dan reklam panosuna) · Hareket (eğri düzenleyici ve makara) | PR bekliyor |
-| 6 | Process + Studio | Zaman çizelgesi · ayarlar penceresi · İstanbul haritası | |
+| 6 | Process + Studio | Kurgu masası zaman çizelgesi · haftalık ritim · ayarlar penceresi · vapurlu İstanbul haritası · sakin renk ve yoğunluk | PR bekliyor |
 | 7 | Notes + Note | Bul ve blame · yay oyun alanı · RSS · OG görselleri | |
 | 8 | Lab | Canlı örnekler · ekran dışında duraklatma · performans bütçesi · hareket vitrini kararı | |
 | 9 | Start | Ofis saatleri · saat dilimi · randevu · form · bildirim | |
@@ -88,7 +88,9 @@ Gerçek görsel gelmesi gereken her yer `docs/GORSELLER.md` dosyasında tutulur 
 
 - GitHub reposu (0. aşama sonu)
 - Gerçek içerik: projeler · ekip adları · fiyatlar · köşeli parantezli tüm yer tutucular (2. aşamadan itibaren)
-- Hizmet fiyatları ([FİYAT] · 5. aşamadan itibaren sayfalarda yer tutucu)
+- Hizmet ve bakım planı fiyatları ([FİYAT] · 5. aşamadan itibaren sayfalarda yer tutucu)
+- Ekip adları · rolleri · portreler ve stüdyo adresi (6. aşamadan itibaren Stüdyo'da yer tutucu)
+- Bütün sayfalar için renk turu (Batuhan'ın isteğiyle sonraya bırakıldı)
 - E-posta gönderimi için SMTP sağlayıcısı (9. aşama)
 - Discord uygulaması (client id ve secret) (11. aşama)
 - Sunucudaki mevcut ters vekil düzeni: Caddy ortak mı · ağ adı · port (13. aşama)

@@ -64,7 +64,10 @@ const ARROW = 'M3 2 L3 19.5 L7.8 15.2 L11 22 L14.2 20.6 L11.1 13.9 L17.6 13.7 Z'
 
 export class Crew {
   readonly root: HTMLElement;
-  readonly reduce: boolean;
+  /** The visitor's OS asked for less motion. */
+  private readonly osReduce: boolean;
+  /** A page switch asked for less motion (Studio · Display · Reduce motion). */
+  private calmOn = false;
   readonly touch: boolean;
   private readonly layer: HTMLElement;
   private readonly you: HTMLElement;
@@ -86,7 +89,7 @@ export class Crew {
 
   constructor(root: HTMLElement, opts: { reduce?: boolean; touch?: boolean } = {}) {
     this.root = root;
-    this.reduce = opts.reduce ?? reducedMotion();
+    this.osReduce = opts.reduce ?? reducedMotion();
     this.touch = opts.touch ?? matchMedia('(hover: none), (pointer: coarse)').matches;
 
     this.layer = document.createElement('div');
@@ -164,6 +167,23 @@ export class Crew {
       if (!document.hidden) this.wake();
     });
     this.pickNow(true);
+    this.wake();
+  }
+
+  /** Less motion: from the OS or from a page switch. Cursors snap · no drift · no scenes. */
+  get reduce(): boolean {
+    return this.osReduce || this.calmOn;
+  }
+
+  /** Turn the page switch on or off. On stops the running scene and closes the bubbles. */
+  calm(on: boolean): void {
+    if (on === this.calmOn) return;
+    this.calmOn = on;
+    if (on) {
+      this.ctrl?.abort(new DOMException('calm', 'AbortError'));
+      for (const n of TEAM) this.cursors[n].el.classList.remove('say');
+      document.documentElement.classList.add('still');
+    } else document.documentElement.classList.remove('still');
     this.wake();
   }
 

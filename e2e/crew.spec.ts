@@ -41,14 +41,14 @@ test.describe('team cursors · desktop', () => {
 
   test('the whole team is in the hero · one host below it · team again on the way back', async ({ page }) => {
     const errors = watchErrors(page);
-    await page.goto('/en/process');
+    await page.goto('/en/lab');
     await expect.poll(() => visible(page), { timeout: 5000 }).toEqual(['design', 'code', 'motion']);
     const hero = await band(page, 'hero');
     for (const p of Object.values(await positions(page))) expect(p.y).toBeLessThan(hero.bottom);
     await expect(page.locator('[data-cur] .tag')).toHaveText(['design', 'code', 'motion']);
 
     await scrollTo(page, 'plan');
-    // Process is hosted by motion.
+    // Lab is hosted by motion.
     await expect.poll(() => visible(page), { timeout: 5000 }).toEqual(['motion']);
     const plan = await band(page, 'plan');
     await expect
@@ -78,7 +78,7 @@ test.describe('team cursors · desktop', () => {
         }
       }).observe(document, { subtree: true, attributes: true, attributeFilter: ['class'] });
     });
-    await page.goto('/en/studio');
+    await page.goto('/en/uses');
     const av = await page.locator('[data-av="design"]').boundingBox();
     const born = await page.waitForFunction(() => (window as unknown as { __born?: { x: number; y: number } }).__born, null, { timeout: 4000 });
     const p = (await born.jsonValue()) as { x: number; y: number };
@@ -86,7 +86,7 @@ test.describe('team cursors · desktop', () => {
   });
 
   test('cursors settle next to their anchors', async ({ page }) => {
-    await page.goto('/en/studio');
+    await page.goto('/en/uses');
     await page.waitForTimeout(4500);
     const h1 = await page.locator('h1').boundingBox();
     const p = (await positions(page)).design!;
@@ -95,12 +95,12 @@ test.describe('team cursors · desktop', () => {
   });
 
   test('the host says one line in the hero of a stub', async ({ page }) => {
-    await page.goto('/en/studio');
+    await page.goto('/en/uses');
     await expect(page.locator('.cur.say .bub')).toHaveText('Still under construction', { timeout: 6000 });
   });
 
   test('the "you" tag follows the mouse in the hero only', async ({ page }) => {
-    await page.goto('/tr/studyo');
+    await page.goto('/tr/araclar');
     await page.mouse.move(900, 300);
     await page.mouse.move(920, 320);
     const you = page.locator('[data-you]');
@@ -113,7 +113,7 @@ test.describe('team cursors · desktop', () => {
 
   test('reduced motion: no flying · no drift · no scenes', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/en/studio');
+    await page.goto('/en/uses');
     await expect.poll(() => visible(page), { timeout: 3000 }).toEqual(['design', 'code', 'motion']);
     const a = await positions(page);
     await page.waitForTimeout(1200);

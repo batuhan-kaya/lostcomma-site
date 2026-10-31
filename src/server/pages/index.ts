@@ -2,8 +2,10 @@ import type { AnyPage } from '../page';
 import type { RouteId } from '../routes';
 import { casePage } from './case';
 import { homePage } from './home';
+import { processPage } from './process';
 import { servicePage } from './service';
 import { servicesPage } from './services';
+import { studioPage } from './studio';
 import * as stubs from './stub';
 import { workPage } from './work';
 
@@ -12,8 +14,8 @@ export const STATIC_PAGES: Partial<Record<RouteId, AnyPage>> = {
   home: homePage(),
   work: workPage,
   services: servicesPage,
-  process: stubs.process,
-  studio: stubs.studio,
+  process: processPage,
+  studio: studioPage,
   notes: stubs.notes,
   lab: stubs.lab,
   start: stubs.start,
