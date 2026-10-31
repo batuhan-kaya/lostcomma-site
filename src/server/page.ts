@@ -71,6 +71,15 @@ export interface Page<D = undefined> {
   footer?: (ctx: Ctx, data: D) => Safe;
   /** Extra JSON handed to the page's client module (rendered as a non-executable data block). */
   data?: (ctx: Ctx, data: D) => unknown;
+  /**
+   * The share image (src/server/og): the small label · the title · whose cursor rests at its end.
+   * Defaults: the page address · the page title · the page host.
+   */
+  og?: (ctx: Ctx, data: D) => { kick?: string; title?: string; who?: CrewName };
+  /** og:type. Notes are articles. */
+  ogType?: 'website' | 'article';
+  /** Extra tags for <head> (article dates · structured data). Data blocks only: CSP runs no inline script. */
+  head?: (ctx: Ctx, data: D) => Safe;
 }
 
 /** The route table holds pages with different data. */

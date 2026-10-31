@@ -1,5 +1,5 @@
 import { mkdirSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import formbody from '@fastify/formbody';
 import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
@@ -9,13 +9,16 @@ import { RateLimit } from './api/rate';
 import { Assets } from './assets';
 import type { Config } from './config';
 import { SERVICE_KEYS, SERVICE_SLUGS } from './content/services';
-import { caseSlugs } from './data/content';
+import { caseSlugs, noteSlugs, notesIn } from './data/content';
 import { openDatabase, safeUrl, type Database, type Db } from './db';
 import { seedIfEmpty } from './db/seed';
 import { isLang, LANGS, negotiate, translator, type Lang } from './i18n';
 import { documentHtml } from './layout/document';
 import { addDemoCover } from './media/demo';
 import { mediaDirs } from './media/ingest';
+import { rssXml } from './notes/rss';
+import { OgImages } from './og';
+import { ogSpec } from './og/spec';
 import type { AnyPage, Ctx } from './page';
 import { homePage, notFound, PARAM_PAGES, STATIC_PAGES } from './pages';
 import { href, ROUTES, type RouteId } from './routes';
@@ -194,12 +197,71 @@ export async function buildApp({ config, now = () => new Date(), database }: App
     }
   });
 
+  // One feed per language with the notes written in it.
+  for (const lang of LANGS) {
+    app.get(href(lang, 'rss'), async (_req, reply) => {
+      const at = now();
+      const list = await notesIn(db, lang, at);
+      return reply
+        .type('application/rss+xml; charset=utf-8')
+        .header('cache-control', 'public, max-age=600')
+        .send(rssXml(config.SITE_URL, lang, translator(lang), list, at));
+    });
+  }
+
+  // Share images: /og + the page address + .png. Drawn once per content (src/server/og).
+  const og = new OgImages(join(config.DATA_DIR, 'og'), {
+    built: (key) => {
+      const url = assets.font(key);
+      return url ? join(publicDir, url) : null;
+    },
+  });
+  const ogRoutes = [
+    ...(Object.entries(STATIC_PAGES) as [RouteId, AnyPage][]).flatMap(([id, page]) =>
+      LANGS.map((lang) => ({ page, lang, re: new RegExp(`^${href(lang, id)}$`), keys: [] as string[] })),
+    ),
+    ...(Object.entries(PARAM_PAGES) as [RouteId, AnyPage][]).flatMap(([id, page]) =>
+      LANGS.map((lang) => ({
+        page,
+        lang,
+        re: new RegExp(`^${ROUTES[id][lang].replace(/:\w+/g, '([^/]+)')}$`),
+        keys: [...ROUTES[id][lang].matchAll(/:(\w+)/g)].map((m) => m[1]!),
+      })),
+    ),
+  ];
+  app.get('/og/*', async (req, reply) => {
+    const m = /^(\/.*)\.png$/.exec('/' + (req.params as { '*': string })['*']);
+    const path = m?.[1] ?? '';
+    for (const r of ogRoutes) {
+      const hit = r.re.exec(path);
+      if (!hit) continue;
+      let params: Record<string, string>;
+      try {
+        params = Object.fromEntries(r.keys.map((k, i) => [k, decodeURIComponent(hit[i + 1]!)]));
+      } catch {
+        break;
+      }
+      const ctx = ctxFor(r.lang, path, { tr: null, en: null });
+      const data = r.page.load ? await r.page.load(ctx, params) : undefined;
+      if (r.page.load && data == null) break;
+      if (r.page.paths) ctx.path = r.page.paths(data)[r.lang] ?? path;
+      const { key, png } = await og.png(ogSpec(r.page, ctx, data));
+      const fresh = (req.query as Record<string, string>).v === key;
+      return reply
+        .type('image/png')
+        .header('cache-control', fresh ? 'public, max-age=31536000, immutable' : 'public, max-age=3600')
+        .send(png);
+    }
+    return reply.status(404).type('text/plain; charset=utf-8').send('Not found');
+  });
+
   app.get('/robots.txt', (_req, reply) => reply.type('text/plain; charset=utf-8').send(robotsTxt(config.SITE_URL)));
 
   app.get('/sitemap.xml', async (_req, reply) => {
     const cases = (await caseSlugs(db)).map((slugs) => Object.fromEntries(LANGS.flatMap((l) => (slugs[l] ? [[l, href(l, 'case', { slug: slugs[l] })]] : []))));
     const services = SERVICE_KEYS.map((k) => Object.fromEntries(LANGS.map((l) => [l, href(l, 'service', { slug: SERVICE_SLUGS[k][l] })])));
-    return reply.type('application/xml; charset=utf-8').send(sitemapXml(config.SITE_URL, Object.keys(STATIC_PAGES) as RouteId[], [...services, ...cases]));
+    const notes = (await noteSlugs(db, now())).map((slugs) => Object.fromEntries(LANGS.flatMap((l) => (slugs[l] ? [[l, href(l, 'note', { slug: slugs[l] })]] : []))));
+    return reply.type('application/xml; charset=utf-8').send(sitemapXml(config.SITE_URL, Object.keys(STATIC_PAGES) as RouteId[], [...services, ...cases, ...notes]));
   });
 
   function notFoundPage(req: FastifyRequest, reply: FastifyReply) {

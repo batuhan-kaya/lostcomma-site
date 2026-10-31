@@ -5,10 +5,11 @@
  */
 import { and, asc, desc, eq, inArray, isNotNull, lte, max } from 'drizzle-orm';
 import type { Db } from '../db';
-import { media, notes, noteText, people, projects, projectText } from '../db/schema';
+import { media, notes, noteText, people, peopleText, projects, projectText } from '../db/schema';
 import { StorySchema, storyMedia, type Story } from '../db/story';
 import type { Lang } from '../i18n';
 import type { MediaRef } from '../media/picture';
+import { readMinutes } from '../notes/render';
 
 type Crew = 'design' | 'code' | 'motion';
 type Discipline = 'web' | 'app' | 'identity' | 'motion';
@@ -174,16 +175,28 @@ export interface NoteCard {
   author: { crew: Crew; name: string };
   tags: string[];
   publishedAt: Date;
+  /** Minutes to read the text shown (src/server/notes/render.ts). */
+  minutes: number;
 }
 
 export interface NotePage extends NoteCard {
   body: string;
   slugs: Partial<Record<Lang, string>>;
+  /** The author's card at the end of the note (role and what they usually do · from the people table). */
+  about: { role: string; usually: string } | null;
+  /** The next note back in time and the next one forward. Either may be in the other language only. */
+  older: NoteCard | null;
+  newer: NoteCard | null;
 }
 
-const noteWith = { texts: true, author: { columns: { crew: true, name: true } } } as const;
+const noteWith = { texts: true, author: { columns: { crew: true, name: true }, with: { texts: true } } } as const;
 
-type NoteRow = typeof notes.$inferSelect & { texts: (typeof noteText.$inferSelect)[]; author: { crew: Crew; name: string } };
+type NoteRow = typeof notes.$inferSelect & {
+  texts: (typeof noteText.$inferSelect)[];
+  author: { crew: Crew; name: string; texts: (typeof peopleText.$inferSelect)[] };
+};
+
+const published = (now: Date) => and(isNotNull(notes.publishedAt), lte(notes.publishedAt, now));
 
 function noteCard(row: NoteRow, lang: Lang): NoteCard {
   const t = pickText(row.texts, lang);
@@ -195,17 +208,18 @@ function noteCard(row: NoteRow, lang: Lang): NoteCard {
     excerpt: t.excerpt,
     textLang: t.lang,
     langs: (['tr', 'en'] as const).filter((l) => row.texts.some((x) => x.lang === l)),
-    author: row.author,
+    author: { crew: row.author.crew, name: row.author.name },
     tags: row.tags,
     publishedAt: row.publishedAt!,
+    minutes: readMinutes(t.body),
   };
 }
 
 /** Published notes (scheduled ones appear once their date passes), newest first. */
 export async function listNotes(db: Db, lang: Lang, now: Date, limit?: number): Promise<NoteCard[]> {
   const rows = await db.query.notes.findMany({
-    where: and(isNotNull(notes.publishedAt), lte(notes.publishedAt, now)),
-    orderBy: desc(notes.publishedAt),
+    where: published(now),
+    orderBy: [desc(notes.publishedAt), desc(notes.id)],
     with: noteWith,
     limit,
   });
@@ -216,12 +230,36 @@ export async function listNotes(db: Db, lang: Lang, now: Date, limit?: number): 
 export async function noteBySlug(db: Db, lang: Lang, slug: string, now: Date): Promise<NotePage | null> {
   const hit = await db.query.noteText.findFirst({ where: and(eq(noteText.lang, lang), eq(noteText.slug, slug)) });
   if (!hit) return null;
-  const row = await db.query.notes.findFirst({
-    where: and(eq(notes.id, hit.noteId), isNotNull(notes.publishedAt), lte(notes.publishedAt, now)),
-    with: noteWith,
-  });
+  const row = await db.query.notes.findFirst({ where: and(eq(notes.id, hit.noteId), published(now)), with: noteWith });
   if (!row) return null;
-  return { ...noteCard(row, lang), body: hit.body, slugs: Object.fromEntries(row.texts.map((x) => [x.lang, x.slug])) };
+  const all = await listNotes(db, lang, now);
+  const at = all.findIndex((n) => n.id === row.id);
+  const person = pickText(row.author.texts, lang);
+  return {
+    ...noteCard(row, lang),
+    body: hit.body,
+    slugs: Object.fromEntries(row.texts.map((x) => [x.lang, x.slug])),
+    about: person ? { role: person.role, usually: person.usually } : null,
+    older: all[at + 1] ?? null,
+    newer: at > 0 ? (all[at - 1] ?? null) : null,
+  };
+}
+
+/** Notes written in this language with their bodies · newest first (the RSS feed of that language). */
+export async function notesIn(db: Db, lang: Lang, now: Date, limit = 30): Promise<(NoteCard & { body: string })[]> {
+  const rows = await db.query.notes.findMany({ where: published(now), orderBy: [desc(notes.publishedAt), desc(notes.id)], with: noteWith });
+  return rows
+    .flatMap((r) => {
+      const t = r.texts.find((x) => x.lang === lang);
+      return t ? [{ ...noteCard(r, lang), body: t.body }] : [];
+    })
+    .slice(0, limit);
+}
+
+/** Every published note in the languages it is written in (sitemap). */
+export async function noteSlugs(db: Db, now: Date): Promise<Partial<Record<Lang, string>>[]> {
+  const rows = await db.query.notes.findMany({ where: published(now), orderBy: desc(notes.publishedAt), with: { texts: true } });
+  return rows.map((r) => Object.fromEntries(r.texts.map((x) => [x.lang, x.slug])));
 }
 
 export interface Person {

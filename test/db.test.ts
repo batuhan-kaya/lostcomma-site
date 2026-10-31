@@ -67,10 +67,11 @@ describe('seed', () => {
     expect(await seedIfEmpty(db)).toBe(false);
   });
 
-  it('keeps the comma rule: no comma in any text', () => {
+  it('keeps the comma rule: no comma in any text (code in notes is exempt)', () => {
     const strings: string[] = [];
+    const prose = (s: string) => s.replace(/^~~~[^\n]*\n[\s\S]*?^~~~$/gm, '').replace(/`[^`\n]*`/g, '');
     const walk = (v: unknown) => {
-      if (typeof v === 'string') strings.push(v);
+      if (typeof v === 'string') strings.push(prose(v));
       else if (v && typeof v === 'object') Object.values(v).forEach(walk);
     };
     walk(SAMPLE);

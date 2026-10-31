@@ -2,6 +2,8 @@ import type { AnyPage } from '../page';
 import type { RouteId } from '../routes';
 import { casePage } from './case';
 import { homePage } from './home';
+import { notePage } from './note';
+import { notesPage } from './notes';
 import { processPage } from './process';
 import { servicePage } from './service';
 import { servicesPage } from './services';
@@ -16,7 +18,7 @@ export const STATIC_PAGES: Partial<Record<RouteId, AnyPage>> = {
   services: servicesPage,
   process: processPage,
   studio: studioPage,
-  notes: stubs.notes,
+  notes: notesPage,
   lab: stubs.lab,
   start: stubs.start,
   now: stubs.now,
@@ -27,6 +29,7 @@ export const STATIC_PAGES: Partial<Record<RouteId, AnyPage>> = {
 export const PARAM_PAGES: Partial<Record<RouteId, AnyPage>> = {
   case: casePage,
   service: servicePage,
+  note: notePage,
 };
 
 export { notFound } from './notFound';

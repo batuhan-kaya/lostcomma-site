@@ -15,7 +15,7 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | İstemci | Sayfa başına küçük TS modülleri · esbuild ile paketlenir · hash'li dosya adları |
 | Dil | Türkçe kaynak metin `t('…')` · İngilizce katalog `i18n/en.json` · acorn ile çıkarma ve kontrol |
 | Veri | PostgreSQL 18 · Drizzle · testlerde ve Docker'sız geliştirmede PGlite (WebAssembly'ye derlenmiş gerçek Postgres) |
-| İçerik | markdown-it (Notes) · sharp + opentype.js (OG görselleri) |
+| İçerik | markdown-it (Notes) · sharp + fontkit + wawoff2 (OG görselleri kendi fontlarımızla) |
 | Görsel | sharp · her görsel AVIF ve WebP olarak 320 ile 2560 px arası altı genişlikte · içerik hash'li adres · bir yıl önbellek |
 | Formlar | zod şemaları · sunucu ve istemci aynı şemayı kullanır |
 | Panel | Tek kullanıcı (Batuhan) · klasik şifre · şifre hash'lenerek saklanır · oturum çerezi · deneme sınırı |
