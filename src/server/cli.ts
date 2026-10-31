@@ -8,6 +8,8 @@
  *   media add <file> [--alt-tr ..] [--alt-en ..]  run an image through the pipeline
  *   media cover <project no> <file> [--alt-..]    … and make it that project's cover
  *   media portrait <design|code|motion> <file>    … and make it that teammate's portrait (Studio)
+ *   media loop <project no> <mp4> --poster <image> [--webm <file>] [--alt-..]
+ *                                                 a ready-made loop (motion work · docs/GORSELLER.md)
  *   media list                                    every image with its key and size
  */
 import { readFile } from 'node:fs/promises';
@@ -19,8 +21,9 @@ import { loadConfig } from './config';
 import { openDatabase, safeUrl } from './db';
 import { media, people, projects } from './db/schema';
 import { seed } from './db/seed';
-import { addDemoCover } from './media/demo';
+import { addDemoCover, addDemoLoop } from './media/demo';
 import { ingestImage, MediaError, mediaDirs } from './media/ingest';
+import { ingestLoop } from './media/video';
 
 const USAGE = `usage:
   migrate
@@ -28,11 +31,12 @@ const USAGE = `usage:
   media add <file> [--alt-tr "…"] [--alt-en "…"]
   media cover <project no> <file> [--alt-tr "…"] [--alt-en "…"]
   media portrait <design|code|motion> <file> [--alt-tr "…"] [--alt-en "…"]
+  media loop <project no> <file.mp4> --poster <image> [--webm <file.webm>] [--alt-tr "…"] [--alt-en "…"]
   media list`;
 
 const { values: flags, positionals } = parseArgs({
   allowPositionals: true,
-  options: { demo: { type: 'boolean' }, 'alt-tr': { type: 'string' }, 'alt-en': { type: 'string' }, help: { type: 'boolean', short: 'h' } },
+  options: { demo: { type: 'boolean' }, 'alt-tr': { type: 'string' }, 'alt-en': { type: 'string' }, poster: { type: 'string' }, webm: { type: 'string' }, help: { type: 'boolean', short: 'h' } },
 });
 
 const [command, sub, ...rest] = positionals;
@@ -62,7 +66,8 @@ try {
     case 'seed':
       await seed(db);
       if (flags.demo) await addDemoCover(db, dirs);
-      console.log('seeded sample content' + (flags.demo ? ' and the demo cover' : ''));
+      if (flags.demo) await addDemoLoop(db, dirs);
+      console.log('seeded sample content' + (flags.demo ? ' and the demo cover and loop' : ''));
       break;
     case 'media': {
       if (sub === 'add' && rest[0]) {
@@ -82,6 +87,22 @@ try {
         const image = await add(rest[1]);
         await db.update(people).set({ portraitId: image.id }).where(eq(people.id, person.id));
         console.log(`portrait of ${crew}`);
+      } else if (sub === 'loop' && rest[0] && rest[1]) {
+        const no = Number(rest[0]);
+        const [project] = await db.select({ id: projects.id }).from(projects).where(eq(projects.no, no));
+        if (!project) throw new MediaError(`no project with number ${rest[0]}`);
+        if (!flags.poster) throw new MediaError('a loop needs a poster: --poster first-frame.jpg');
+        const { video, warnings } = await ingestLoop(db, dirs, {
+          mp4: await readFile(rest[1]),
+          webm: flags.webm ? await readFile(flags.webm) : undefined,
+          poster: await readFile(flags.poster),
+          alt: alt(),
+          source: basename(rest[1]),
+        });
+        await db.update(projects).set({ loopId: video.id }).where(eq(projects.id, project.id));
+        console.log(`${video.key}  ${video.width}×${video.height}  ${(video.durationMs / 1000).toFixed(1)} s${video.webm ? '  + webm' : ''}`);
+        for (const w of warnings) console.log(`warning: ${w}`);
+        console.log(`loop of project ${String(no).padStart(3, '0')}`);
       } else if (sub === 'list') {
         for (const m of await db.select().from(media).orderBy(desc(media.createdAt))) {
           console.log(`${m.id}\t${m.key}\t${m.width}×${m.height}\t${m.source}\t${m.alt.tr ?? ''} / ${m.alt.en ?? ''}`);

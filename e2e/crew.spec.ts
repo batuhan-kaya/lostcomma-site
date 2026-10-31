@@ -41,19 +41,19 @@ test.describe('team cursors · desktop', () => {
 
   test('the whole team is in the hero · one host below it · team again on the way back', async ({ page }) => {
     const errors = watchErrors(page);
-    await page.goto('/en/lab');
+    await page.goto('/en/uses');
     await expect.poll(() => visible(page), { timeout: 5000 }).toEqual(['design', 'code', 'motion']);
     const hero = await band(page, 'hero');
     for (const p of Object.values(await positions(page))) expect(p.y).toBeLessThan(hero.bottom);
     await expect(page.locator('[data-cur] .tag')).toHaveText(['design', 'code', 'motion']);
 
     await scrollTo(page, 'plan');
-    // Lab is hosted by motion.
-    await expect.poll(() => visible(page), { timeout: 5000 }).toEqual(['motion']);
+    // Uses is hosted by code.
+    await expect.poll(() => visible(page), { timeout: 5000 }).toEqual(['code']);
     const plan = await band(page, 'plan');
     await expect
       .poll(async () => {
-        const p = (await positions(page)).motion;
+        const p = (await positions(page)).code;
         return !!p && p.y > plan.top && p.y < plan.bottom;
       }, { timeout: 5000 })
       .toBe(true);
@@ -135,7 +135,7 @@ test.describe('team cursors · touch', () => {
 
   test('team in the hero · nobody below it · no "you" tag', async ({ page }) => {
     const errors = watchErrors(page);
-    await page.goto('/en/lab');
+    await page.goto('/en/uses');
     await expect.poll(() => visible(page), { timeout: 5000 }).toEqual(['design', 'code', 'motion']);
     await expect(page.locator('.crew')).toHaveClass(/touch/);
     await scrollTo(page, 'plan');

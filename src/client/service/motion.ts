@@ -10,6 +10,7 @@ import { t } from '../lib/t';
 import { cssCurve, ease, PRESETS, plotPath, X, Y, type Curve } from '../../shared/curve';
 import type { ServiceData } from './types';
 import { $, $$, press, reduce, stopTween, text, tween } from './util';
+import { Loop, prefersStill } from '../lib/loops';
 
 const HOLD = 380;
 
@@ -302,10 +303,18 @@ function reel(): void {
   });
   for (const b of loops) {
     io.observe(b);
+    // A real loop (a project with a video) plays and pauses with its button.
+    const v = $<HTMLVideoElement>('video[data-loopv]', b);
+    const loop = v ? new Loop(v) : null;
+    if (loop && prefersStill) {
+      b.classList.add('off');
+      text($('[data-lps]', b), t('Duraklatıldı'));
+    }
     b.addEventListener('click', () => {
       const off = !b.classList.contains('off');
       b.classList.toggle('off', off);
       text($('[data-lps]', b), off ? t('Duraklatıldı') : t('Oynuyor · sessiz'));
+      loop?.set(!off, true);
     });
   }
   getCrew()?.addScenes({

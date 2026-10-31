@@ -14,7 +14,7 @@ import { openDatabase, safeUrl, type Database, type Db } from './db';
 import { seedIfEmpty } from './db/seed';
 import { isLang, LANGS, negotiate, translator, type Lang } from './i18n';
 import { documentHtml } from './layout/document';
-import { addDemoCover } from './media/demo';
+import { addDemoCover, addDemoLoop } from './media/demo';
 import { mediaDirs } from './media/ingest';
 import { rssXml } from './notes/rss';
 import { OgImages } from './og';
@@ -47,7 +47,10 @@ export async function prepareDatabase(database: Database, config: Config): Promi
   await database.migrate();
   if (config.SEED === 'none') return;
   await seedIfEmpty(database.db);
-  if (config.SEED === 'demo') await addDemoCover(database.db, mediaDirs(config.DATA_DIR));
+  if (config.SEED === 'demo') {
+    await addDemoCover(database.db, mediaDirs(config.DATA_DIR));
+    await addDemoLoop(database.db, mediaDirs(config.DATA_DIR));
+  }
 }
 
 export const LANG_COOKIE = 'lang';
@@ -109,7 +112,8 @@ export async function buildApp({ config, now = () => new Date(), database }: App
     maxAge: '365d',
   });
 
-  // Image variants from the pipeline. Content-hashed names · cached for a year · originals are never served.
+  // Image variants and loops from the pipeline. Content-hashed names · cached for a year · range requests
+  // for video · originals are never served.
   const media = mediaDirs(config.DATA_DIR);
   mkdirSync(media.public, { recursive: true });
   await app.register(fastifyStatic, {
@@ -121,7 +125,7 @@ export async function buildApp({ config, now = () => new Date(), database }: App
     dotfiles: 'deny',
     immutable: true,
     maxAge: '365d',
-    allowedPath: (path) => /^\/[0-9a-f]{16}\/\d{2,4}\.(avif|webp)$/.test(path),
+    allowedPath: (path) => /^\/[0-9a-f]{16}\/(\d{2,4}\.(avif|webp)|loop\.(mp4|webm))$/.test(path),
   });
 
   app.get('/favicon.svg', (_req, reply) => {

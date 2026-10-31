@@ -10,7 +10,7 @@ Görsel hattı 3. aşamada kuruldu: her görsel sunucuda AVIF ve WebP'ye çevril
 - Her görsel için iki kısa açıklama (alt metin): Türkçe ve İngilizce · virgülsüz. Görme engelli ziyaretçiler ekran okuyucuda bunu duyar.
 - Dosya adı önemli değil · hangi yere gittiğini bu listedeki numarayla söylemen yeterli (A1 · No. 014 gibi).
 - Panel gelene kadar (11. aşama) görselleri ben eklerim: `npm run media -- cover 14 dosya.jpg --alt-tr "…" --alt-en "…"`.
-- Video (A6 ve hareket işleri) için ayrı bir hat gerekecek: MP4 ve WebM · poster karesi · sessiz döngü. Hareket vitrini kararıyla birlikte (8. aşama) kurulur.
+- Video (A6 ve hareket işleri): hazır dosya olarak teslim edilir (karar · 8. aşama). Sunucu dosyayı yeniden kodlamaz, sadece kontrol eder ve sunar. Nasıl hazırlanacağı aşağıda: **Döngü videoları nasıl hazırlanır**.
 
 Durum sütunu: **Hazır** = yer görsel almaya hazır · görsel gelene kadar çizim duruyor · **CSS** = şu an kodla çizilmiş bir illüstrasyon duruyor ve görseli alacak kod henüz yok · **Boş** = henüz yer tutucu · **Gerekmez** = kodla yapılan ve öyle kalacak bir şey.
 
@@ -25,7 +25,7 @@ Panodaki çerçevelerin şekli farklı (yatay ve dikey). Kapak çerçeveye göre
 | A3 | Hizmetler çerçevesi · Web sitesi | Gerçek bir sitenin masaüstü ekranı | 780×488 → 1560×976 | CSS (LODOS örneği) |
 | A4 | Hizmetler çerçevesi · Uygulama | Gerçek bir uygulama ekranı | 282×610 → 564×1220 | CSS |
 | A5 | Hizmetler çerçevesi · Kimlik | Logo · yazı · renk sayfası | 520×520 → 1040×1040 | CSS |
-| A6 | Hizmetler çerçevesi · Hareket | Kısa döngü video (sessiz · 6 ile 12 sn) + poster | 820×350 → 1640×700 · MP4 + WebM | CSS |
+| A6 | Hizmetler çerçevesi · Hareket | D5'teki döngülerden en yenisi otomatik oynar (ayrıca gerekmez) | Ortadaki geniş şerit görünür: önemli kısım ortada kalsın | Hazır: döngüsü olan bir hareket projesi yoksa çizim kalır |
 | A7 | Süreç · 5 ekran | İsteğe bağlı: atölye · eskiz · prototip · kod · yayın fotoğrafları | 156×212 → 624×848 | CSS |
 
 ## İşler ve vaka sayfaları (4. aşama)
@@ -51,7 +51,7 @@ Bu sayfalardaki etkileşimli parçaların çoğu kodla çiziliyor ve öyle kalac
 | D2 | Web siteleri · yeniden boyutlanan çerçeve | Çerçevedeki site kurgusal bir seramik atölyesi ("kil"). İsteğe bağlı: kase fotoğrafları (1 büyük + 4 ürün) koyarsak çizimlerin yerine geçer | Büyük 5:4 · 1400×1120 · ürünler kare · 800×800 | CSS (çizili kaseler) |
 | D3 | Uygulamalar · başparmak alanı | Telefondaki vapur saatleri kodla çiziliyor | | Gerekmez |
 | D4 | Kimlik · favicon'dan reklam panosuna | Kurgusal "fırın" markası SVG ile çiziliyor. İsteğe bağlı: gerçek bir müşterinin logosuyla değiştirilebilir (SVG · altı boyut için sürümleri) | SVG | Gerekmez |
-| D5 | Hareket · makara | Hareket projelerinden sessiz döngü videoları (her proje için bir tane) + poster karesi | 16:10 · 1280×800 · 6 ile 12 sn · MP4 + WebM | CSS (hareketli çizimler) · video hattı 8. aşamada |
+| D5 | Hareket · makara | Hareket projelerinden sessiz döngü videoları (her proje için bir tane) + poster karesi | 16:10 · 1280×800 · 6 ile 12 sn · MP4 (+ WebM) | Hazır: `npm run media -- loop <proje no> dosya.mp4 --webm dosya.webm --poster ilk-kare.jpg` · döngüsü olmayan proje çizimini gösterir |
 | D6 | Web · Uygulama · Kimlik · "yaptığımız işler" | C1 ile aynı kapak (ayrıca gerekmez) | 16:10'a kırpılır | Hazır |
 
 Fiyatlar görsel değil ama hâlâ yer tutucu: her hizmet sayfasında üç şekil · hizmetler sayfasında dört "başlangıç fiyatı" ([FİYAT] · [PRICE]).
@@ -77,10 +77,35 @@ Görsel olmayan yer tutucular: ekip adları ve rolleri ([Name] · veritabanında
 
 Örnek notların metinleri bu sitenin gerçekte nasıl yapıldığını anlatıyor ama yer tutucu: panel gelince kendi notlarınla değiştirilecek. Yazar adları hâlâ [Name].
 
+## Lab (8. aşama)
+
+| # | Yer | Ne lazım | Oran · teslim boyutu | Durum |
+|---|---|---|---|---|
+| G1 | Lab · virgül alanı ve altı deney | Hepsi tarayıcıda kodla çiziliyor | | Gerekmez |
+
+## Döngü videoları nasıl hazırlanır (D5 · A6)
+
+Her hareket projesi için bir döngü: sessiz · kendi içinde dönen · 6 ile 12 saniye. Sayfada ses olmadan ve ekrandayken oynar. Azaltılmış hareket isteyen ziyaretçi önce posteri görür.
+
+1. **Kurgu:** son kare ilk kareye yumuşakça bağlansın (döngü dikiş yeri belli olmasın). Önemli kısım ortada dursun: ana sayfadaki çerçeve videonun ortasındaki geniş şeridi gösterir.
+2. **MP4 (zorunlu):** 1280×800 (16:10) · H.264 · 24 ya da 30 kare · ses kanalı yok · yaklaşık 2–2.5 Mbps · "web için optimize" (fast start) açık. Hedef: 3 MB altı.
+3. **WebM (isteğe bağlı ama önerilir):** aynı boyut · VP9 · ses yok. Genelde MP4'ten küçük olur ve destekleyen tarayıcı onu seçer. Hedef: 3 MB altı.
+4. **Poster:** videonun ilk karesi · aynı oranda · 2560×1600 (en az 1280×800) · JPEG ya da PNG.
+5. **Alt metin:** Türkçe ve İngilizce birer cümle · virgülsüz. Ne hareket ettiğini anlatsın.
+
+Ücretsiz yol: HandBrake. MP4 için "H.264" ve "Web Optimized" işaretli · ses sekmesinde parçayı kaldır. WebM için kapsayıcıyı WebM ve kodlayıcıyı VP9 seç. Komut satırı tercih edilirse:
+
+```
+ffmpeg -i kurgu.mov -vf scale=1280:800 -c:v libx264 -profile:v high -pix_fmt yuv420p -b:v 2.2M -movflags +faststart -an dongu.mp4
+ffmpeg -i kurgu.mov -vf scale=1280:800 -c:v libvpx-vp9 -b:v 1.6M -an dongu.webm
+ffmpeg -i kurgu.mov -frames:v 1 -vf scale=2560:1600 poster.png
+```
+
+Teslim: üç dosyayı ve iki alt metni gönder. Ekleme komutu dosyaları kontrol eder ve düzeltilmesi gereken bir şey varsa söyler: ses kanalı var · fast start kapalı · dosya 3 MB'den büyük · süre 6–12 sn dışında · posterin oranı videoyla aynı değil. 20 MB üstü ya da H.264 olmayan MP4 kabul edilmez.
+
 ## Sonraki aşamalarda gelecekler (taslaklardan)
 
 | # | Sayfa | Ne lazım | Not |
 |---|---|---|---|
-| B7 | Lab | Canlı örnekler kodla çiziliyor | Gerekmez · hareket vitrini kararına bağlı (8. aşama) |
 | B8 | Araçlar | Donanım fotoğrafları (bilgisayar · kulaklık · monitör) | İsteğe bağlı |
 | B9 | Marka | Son logo · favicon · apple-touch-icon (180) · PWA ikonları (192 · 512) | Şu an geçici imleç ikonu |

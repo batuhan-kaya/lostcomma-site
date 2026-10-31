@@ -29,20 +29,6 @@ function stub(def: Omit<Page, 'body'> & { kick: string; heading: string; phase: 
   };
 }
 
-export const lab = stub({
-  id: 'lab',
-  plan: [msg('İmleçlere tepki veren virgül alanı'), msg('Altı canlı örnek'), msg('Mezun olan deneyler')],
-  host: 'motion',
-  section: 'lab',
-  theme: 'lab',
-  kick: msg('Lab'),
-  heading: msg('Lab.'),
-  phase: 8,
-  title: (t) => t('Lab'),
-  description: (t) => t('Küçük deneyler ve canlı örnekler.'),
-  next: { to: 'start', kick: msg('Tuhaf bir fikrin mi var?'), big: msg('Başlayalım'), tone: 'lime' },
-});
-
 export const start = stub({
   id: 'start',
   plan: [msg('İki saat dilimli ofis saatleri'), msg('Randevu formu'), msg('Bilet şeklinde onay')],

@@ -216,6 +216,8 @@
 .fc { position: absolute; inset: 0; opacity: 0; transition: opacity .4s; }
 .fc.on { opacity: 1; transition: opacity .5s .5s; }
 .fc > div { position: absolute; inset: 0; }
+.fc-vid { background: #0E0E0F; }
+.fc-vid video { display: block; width: 100%; height: 100%; object-fit: cover; }
 .code { position: absolute; left: 16px; bottom: 16px; z-index: 4; margin: 0; padding: 16px 20px; border-radius: 12px; background: rgba(14,14,15,.94); color: #D8D6E4; font-family: var(--mono); font-size: 13px; line-height: 1.7; white-space: pre; animation: rise .35s both; }
 .code[hidden] { display: none; }
 /* website */

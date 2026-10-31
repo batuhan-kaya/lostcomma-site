@@ -84,6 +84,13 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - A note written in one language only has no address in the other. Lists link it to its own language: `hreflang` on the link · `lang` only on its own words (never around upper-case labels: `i` would turn into `İ`). English words in `.mono` labels on Turkish pages get `lang="en"` for the same reason.
 - RSS per language (`/tr/notes/rss.xml` · `/en/notes/rss.xml`) with the full text · the playground becomes a link back.
 
+## Lab (src/server/pages/lab · src/client/lab.ts · lab/draw.ts)
+
+- Hero: a canvas field of commas that turn toward every cursor on the page (the visitor in lime · the team in their colours · softly). Six specimens below (copy per language in `src/server/content/lab.ts` · drawings in `src/client/lab/draw.ts`) and where they went.
+- One frame loop draws only what is on screen (IntersectionObserver): the field while the hero shows · each tile while it shows (off-screen tiles keep one still frame). Each tile says running · paused · off screen.
+- Performance budget (`src/shared/lab.ts`): every drawing is timed · a `Meter` steps its quality down after it stays over budget (fewer pixels · fewer marks) and back up when there is room. The hero shows the cost of a frame. An e2e test keeps the page's JS under 64 kb.
+- Pause all · reduced motion starts paused. A teammate's cursor can stand in for the pointer (motion plays with the spring chain).
+
 ## Share images (src/server/og)
 
 - Every page links `/og/<page address>.png?v=<hash>` (1200 × 630). The server draws it from our own fonts: woff2 unpacked once with wawoff2 · letters to outlines with fontkit · sharp turns the SVG into a PNG. Cached in `DATA_DIR/og/` by content. A page can set its label · title · cursor with `og()` (notes do). 404 pages have none.
@@ -93,6 +100,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - One upload → AVIF and WebP at 320 · 640 · 960 · 1280 · 1920 · 2560 (never upscaled) in `DATA_DIR/media/<hash>/` served at `/media/` with a one-year immutable cache. The original goes to `DATA_DIR/originals/` and is never served. Variants are rotated upright and carry no camera or GPS data.
 - Render with `picture(media, { lang, sizes })`. Always give a real `sizes`. `priority: true` only above the fold. Alt text comes from the media row per language · pass `alt: ''` when nearby text already names the thing.
 - Until the panel exists: `npm run media -- cover <project no> <file> --alt-tr "…" --alt-en "…"` (or `node dist/server/cli.js media …` in the container).
+- Loops (motion work · `src/server/media/video.ts`): delivered ready made (MP4 H.264 · optional WebM · a poster) · the server checks them (no ffmpeg in the container) and serves `/media/<key>/loop.mp4|webm` with range requests. `npm run media -- loop <project no> <file.mp4> --webm <file> --poster <image> --alt-tr "…" --alt-en "…"`. Export settings: `docs/GORSELLER.md`. `loopVideo()` renders a muted `<video>` that never autoplays from markup: `src/client/lib/loops.ts` plays it while it is on screen and wanted · reduced motion waits for a tap. The Motion reel and the homepage motion frame use them. `SEED=demo` gives one motion project the demo loop from `test/fixtures/loop`.
 
 ## i18n
 

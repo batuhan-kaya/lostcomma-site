@@ -5,10 +5,11 @@
  */
 import { and, asc, desc, eq, inArray, isNotNull, lte, max } from 'drizzle-orm';
 import type { Db } from '../db';
-import { media, notes, noteText, people, peopleText, projects, projectText } from '../db/schema';
+import { media, notes, noteText, people, peopleText, projects, projectText, videos } from '../db/schema';
 import { StorySchema, storyMedia, type Story } from '../db/story';
 import type { Lang } from '../i18n';
 import type { MediaRef } from '../media/picture';
+import type { VideoRef } from '../media/video';
 import { readMinutes } from '../notes/render';
 
 type Crew = 'design' | 'code' | 'motion';
@@ -36,6 +37,8 @@ export interface ProjectCard {
   status: 'draft' | 'live' | 'nda';
   art: string | null;
   cover: MediaRef | null;
+  /** A short silent loop of the work (motion projects · src/server/media/video.ts). */
+  loop: VideoRef | null;
   textLang: Lang;
   /** This website (the "You are here" layer). */
   here: boolean;
@@ -62,12 +65,19 @@ export interface ProjectPage extends ProjectCard {
   next: ProjectCard | null;
 }
 
-const projectWith = { texts: true, cover: true } as const;
+const projectWith = { texts: true, cover: true, loop: { with: { poster: true } } } as const;
+
+type VideoRow = typeof videos.$inferSelect & { poster: NonNullable<Parameters<typeof mediaRef>[0]> };
 
 type ProjectRow = typeof projects.$inferSelect & {
   texts: (typeof projectText.$inferSelect)[];
   cover: Parameters<typeof mediaRef>[0];
+  loop: VideoRow | null;
 };
+
+function videoRef(v: VideoRow | null): VideoRef | null {
+  return v ? { key: v.key, width: v.width, height: v.height, durationMs: v.durationMs, webm: v.webmBytes != null, poster: mediaRef(v.poster)!, alt: v.alt } : null;
+}
 
 function card(row: ProjectRow, lang: Lang): ProjectCard {
   const t = pickText(row.texts, lang);
@@ -84,6 +94,7 @@ function card(row: ProjectRow, lang: Lang): ProjectCard {
     status: row.status,
     art: row.art,
     cover: mediaRef(row.cover),
+    loop: videoRef(row.loop),
     textLang: t.lang,
     here: row.texts.some((x) => x.slug === HERE_SLUG),
   };
@@ -150,6 +161,13 @@ export async function projectBySlug(db: Db, lang: Lang, slug: string): Promise<P
     media: Object.fromEntries(images.map((m) => [m.id, mediaRef(m)!])),
     next: after?.texts.length ? card(after, lang) : null,
   };
+}
+
+/** The homepage motion frame: the newest live project with a loop. */
+export async function newestLoop(db: Db, lang: Lang): Promise<ProjectCard | null> {
+  const rows = await db.query.projects.findMany({ where: and(eq(projects.status, 'live'), isNotNull(projects.loopId)), orderBy: desc(projects.no), with: projectWith, limit: 1 });
+  const row = rows.find((r) => r.texts.length);
+  return row ? card(row, lang) : null;
 }
 
 /** The number the next project will get ("Your project could be layer 017"). */
