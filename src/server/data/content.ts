@@ -280,6 +280,24 @@ export async function noteSlugs(db: Db, now: Date): Promise<Partial<Record<Lang,
   return rows.map((r) => Object.fromEntries(r.texts.map((x) => [x.lang, x.slug])));
 }
 
+/** A page of the site in both languages (the 404 map): its addresses and its name per language. */
+export interface MapEntry {
+  slugs: Partial<Record<Lang, string>>;
+  names: Partial<Record<Lang, string>>;
+}
+
+/** Live case studies and published notes, newest first (the 404 map measures against all of them). */
+export async function mapEntries(db: Db, now: Date): Promise<{ cases: MapEntry[]; notes: MapEntry[] }> {
+  const [cases, list] = await Promise.all([
+    db.query.projects.findMany({ where: eq(projects.status, 'live'), orderBy: desc(projects.no), with: { texts: true } }),
+    db.query.notes.findMany({ where: published(now), orderBy: desc(notes.publishedAt), with: { texts: true } }),
+  ]);
+  return {
+    cases: cases.filter((r) => r.texts.length).map((r) => ({ slugs: Object.fromEntries(r.texts.map((x) => [x.lang, x.slug])), names: Object.fromEntries(r.texts.map((x) => [x.lang, x.name])) })),
+    notes: list.filter((r) => r.texts.length).map((r) => ({ slugs: Object.fromEntries(r.texts.map((x) => [x.lang, x.slug])), names: Object.fromEntries(r.texts.map((x) => [x.lang, x.title])) })),
+  };
+}
+
 export interface Person {
   crew: Crew;
   name: string;
