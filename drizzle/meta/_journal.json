@@ -15,6 +15,13 @@
       "when": 1793434190379,
       "tag": "0001_case_story",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793464935941,
+      "tag": "0002_loops",
+      "breakpoints": true
     }
   ]
 }

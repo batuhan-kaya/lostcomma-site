@@ -1,4 +1,4 @@
-import { boardProjects, type BoardProject } from '../../data/content';
+import { boardProjects, newestLoop, type BoardProject, type ProjectCard } from '../../data/content';
 import { html, type Safe } from '../../html';
 import { istanbulTime } from '../../layout/chrome';
 import type { Ctx, Page } from '../../page';
@@ -48,6 +48,8 @@ export interface HomeOptions {
 /** What the homepage reads from the database. */
 export interface HomeData {
   board: BoardProject[];
+  /** The newest live project with a loop: the motion frame plays it. */
+  loop: ProjectCard | null;
 }
 
 export function homePage(opts: HomeOptions = {}): Page<HomeData> {
@@ -60,10 +62,10 @@ export function homePage(opts: HomeOptions = {}): Page<HomeData> {
     styles: ['home'],
     title: (t) => t('Yaratıcı yazılım stüdyosu'),
     description: (t) => t('İstanbul’da web siteleri ve uygulamalar tasarlayıp kodlayan bir ekip.'),
-    load: async (ctx) => ({ board: await boardProjects(ctx.db, ctx.lang) }),
+    load: async (ctx) => ({ board: await boardProjects(ctx.db, ctx.lang), loop: await newestLoop(ctx.db, ctx.lang) }),
     body: (ctx, d) => html`${hero(ctx)}
 ${manifesto(ctx)}
-${services(ctx)}
+${services(ctx, d.loop)}
 ${board(ctx, d.board)}
 ${process(ctx)}
 ${brief(ctx, { theme: CONTACT_THEME, sent: !!opts.sent, error: !!opts.error })}`,

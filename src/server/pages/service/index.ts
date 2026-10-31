@@ -9,6 +9,7 @@ import type { NextTone, ThemeId } from '../../themes';
 import { tierOf } from '../../../shared/checklist';
 import { coverOrArt } from '../work/art';
 import { appHero, appHood, identityHero, identityHood, motionHero, motionHood, webHero, webHood } from './heroes';
+import { loopVideo } from '../../media/video';
 
 /**
  * A service in detail (Websites · Apps · Identity · Motion). Each one has its own signature hero:
@@ -117,7 +118,7 @@ function reel(ctx: Ctx, work: ProjectCard[], host: CrewName): Safe {
   return html`<section class="reel" data-sec="reel" data-host="${host}"><div class="wrap">
 <div class="rlh"><div><p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Yaptığımız hareket işleri · makara')}</p><h2 class="h2">${t('Döngüler.')}<br>${t('Ses gerekmez.')}</h2></div><p>${t('Gerçek projelerden kısa döngüler. Sessiz oynar ve ekrandan çıkınca durur. Durdurmak için birine dokun.')}</p></div>
 <ul class="rgrid2">${work.map(
-    (p, i) => html`<li><button type="button" class="lp" data-loop${i === 0 ? html` data-rest="host" data-rest-at="0.86 0.14"` : ''}>${coverOrArt(p, lang, '(max-width: 640px) 92vw, 560px', { on: true })}<span class="lpb mono"><i aria-hidden="true"></i><span class="sr">${p.name} · </span><span data-lps>${t('Oynuyor · sessiz')}</span></span></button><p class="rcap"><a href="${href(lang, 'case', { slug: p.slug })}"${p.textLang !== lang ? html` lang="${p.textLang}"` : ''}>${p.name}</a><span class="mono">${p.kind}</span></p></li>`,
+    (p, i) => html`<li><button type="button" class="lp" data-loop${i === 0 ? html` data-rest="host" data-rest-at="0.86 0.14"` : ''}>${p.loop ? loopVideo(p.loop, { lang, posterWidth: 960 }) : coverOrArt(p, lang, '(max-width: 640px) 92vw, 560px', { on: true })}<span class="lpb mono"><i aria-hidden="true"></i><span class="sr">${p.name} · </span><span data-lps>${t('Oynuyor · sessiz')}</span></span></button><p class="rcap"><a href="${href(lang, 'case', { slug: p.slug })}"${p.textLang !== lang ? html` lang="${p.textLang}"` : ''}>${p.name}</a><span class="mono">${p.kind}</span></p></li>`,
   )}</ul>
 <a class="lab2 mono" href="${href(lang, 'lab')}">${t('Lab’de daha fazla deney')} <span aria-hidden="true">→</span></a>
 </div></section>`;

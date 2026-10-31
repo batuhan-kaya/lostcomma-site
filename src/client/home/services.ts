@@ -1,5 +1,6 @@
 /** 03 · Services: one frame that changes shape · an inspector that shows its CSS. */
 import type { Crew } from '../lib/crew';
+import { Loop } from '../lib/loops';
 import { t } from '../lib/t';
 import { $, $$, doing, type HomeData } from './shared';
 
@@ -12,6 +13,11 @@ export class Services {
   private readonly scaler = $('[data-sscale]');
   private v = 0;
   private manualAt = 0;
+  /** The motion frame's real loop (when a project has one): plays only while motion is picked. */
+  private readonly loop = (() => {
+    const v = $<HTMLVideoElement>('.fc-vid video');
+    return v ? new Loop(v, false) : null;
+  })();
 
   constructor(private readonly data: HomeData) {
     this.opts.forEach((o, i) =>
@@ -68,6 +74,7 @@ export class Services {
     });
     this.frm.className = 'frm v' + i;
     $$('[data-fc]').forEach((f, j) => f.classList.toggle('on', j === i));
+    this.loop?.set(i === 3);
     const lab = $('[data-frmlab]');
     if (lab) lab.textContent = sv.lab;
     const size = $('[data-frmsize]');

@@ -56,8 +56,8 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 4 | Work + Case | Layers paneli · vaka sayfası sürüm geçmişi | Bitti |
 | 5 | Services + hizmet detayları | Araç seç ve çiz · Web siteleri (yeniden boyutlanan çerçeve) · Uygulamalar (başparmak alanı) · Kimlik (favicon'dan reklam panosuna) · Hareket (eğri düzenleyici ve makara) | Bitti |
 | 6 | Process + Studio | Kurgu masası zaman çizelgesi · haftalık ritim · ayarlar penceresi · vapurlu İstanbul haritası · sakin renk ve yoğunluk | Bitti |
-| 7 | Notes + Note | Bul ve blame · yay oyun alanı · RSS · OG görselleri | |
-| 8 | Lab | Canlı örnekler · ekran dışında duraklatma · performans bütçesi · hareket vitrini kararı | |
+| 7 | Notes + Note | Bul ve blame · yay oyun alanı · RSS · OG görselleri | Bitti |
+| 8 | Lab | Canlı örnekler · ekran dışında duraklatma · performans bütçesi · döngü videoları (karar: hazır dosya · sunucu kontrol eder ve sunar) | |
 | 9 | Start | Ofis saatleri · saat dilimi · randevu · form · bildirim | |
 | 10 | Now + Uses + 404 | Duvar takvimi · klavye · geri al | |
 | 11 | Panel | Şifreyle giriş (tek kullanıcı) · içerik ve görsel yönetimi · denetim kaydı | |

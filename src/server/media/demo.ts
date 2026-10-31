@@ -1,13 +1,22 @@
 /**
- * SEED=demo: one generated cover so e2e tests and screenshots exercise the whole image path
- * (pipeline → /media → <picture> on the board) before real images arrive. Never used in production.
+ * SEED=demo: one generated cover and one small loop so e2e tests and screenshots exercise the
+ * whole image and video paths (pipeline → /media → <picture> · <video>) before real ones arrive.
+ * Never used in production.
  */
-import { and, eq, isNull } from 'drizzle-orm';
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { and, asc, eq, isNull } from 'drizzle-orm';
 import sharp from 'sharp';
 import type { Db } from '../db';
 import { DEMO_ALT } from '../db/sample';
 import { projects } from '../db/schema';
 import { ingestImage, type MediaDirs } from './ingest';
+import { ingestLoop } from './video';
+
+/** The demo loop lives with the test fixtures (a lime dot crossing the night · 4 s · 15 kb). */
+const LOOP_DIR = join(process.cwd(), 'test/fixtures/loop');
+export const DEMO_LOOP_ALT = { en: 'Demo loop: a lime dot crossing a dark grid', tr: 'Deneme döngüsü: koyu bir ızgarada ilerleyen yeşil bir nokta' };
 
 /** An evening sea with two sails · shapes only (no text so it renders without fonts). */
 export function demoSvg(w = 1600, h = 1046): string {
@@ -34,4 +43,19 @@ export async function addDemoCover(db: Db, dirs: MediaDirs): Promise<void> {
   if (!target) return;
   const image = await ingestImage(db, dirs, await demoCoverPng(), { alt: DEMO_ALT, source: 'demo-cover.png' });
   await db.update(projects).set({ coverId: image.id }).where(eq(projects.id, target.id));
+}
+
+/** Gives the oldest live motion project the demo loop, unless one already has a loop. Skipped without the fixtures. */
+export async function addDemoLoop(db: Db, dirs: MediaDirs): Promise<void> {
+  if (!existsSync(join(LOOP_DIR, 'demo-loop.mp4'))) return;
+  const motion = await db.query.projects.findMany({ where: and(eq(projects.discipline, 'motion'), eq(projects.status, 'live')), orderBy: asc(projects.no) });
+  if (!motion.length || motion.some((p) => p.loopId != null)) return;
+  const { video } = await ingestLoop(db, dirs, {
+    mp4: await readFile(join(LOOP_DIR, 'demo-loop.mp4')),
+    webm: await readFile(join(LOOP_DIR, 'demo-loop.webm')),
+    poster: await readFile(join(LOOP_DIR, 'demo-poster.png')),
+    alt: DEMO_LOOP_ALT,
+    source: 'demo-loop.mp4',
+  });
+  await db.update(projects).set({ loopId: video.id }).where(eq(projects.id, motion[0]!.id));
 }

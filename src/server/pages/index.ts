@@ -2,6 +2,7 @@ import type { AnyPage } from '../page';
 import type { RouteId } from '../routes';
 import { casePage } from './case';
 import { homePage } from './home';
+import { labPage } from './lab';
 import { notePage } from './note';
 import { notesPage } from './notes';
 import { processPage } from './process';
@@ -19,7 +20,7 @@ export const STATIC_PAGES: Partial<Record<RouteId, AnyPage>> = {
   process: processPage,
   studio: studioPage,
   notes: notesPage,
-  lab: stubs.lab,
+  lab: labPage,
   start: stubs.start,
   now: stubs.now,
   uses: stubs.uses,

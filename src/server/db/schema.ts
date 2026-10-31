@@ -83,6 +83,28 @@ export const peopleText = pgTable(
   (t) => [primaryKey({ columns: [t.personId, t.lang] })],
 );
 
+/**
+ * Short silent loops (motion work). Delivered ready made (MP4 · H.264 · optional WebM) with a poster
+ * image that goes through the image pipeline. Files live in DATA_DIR/media/<key>/loop.mp4 · loop.webm.
+ */
+export const videos = pgTable('videos', {
+  id: serial().primaryKey(),
+  /** Hash of the MP4: the same loop is stored once and its URLs never change. */
+  key: text().notNull().unique(),
+  width: integer().notNull(),
+  height: integer().notNull(),
+  durationMs: integer().notNull(),
+  mp4Bytes: integer().notNull(),
+  /** Empty = no WebM was given (the MP4 plays everywhere). */
+  webmBytes: integer(),
+  posterId: integer()
+    .notNull()
+    .references(() => media.id, { onDelete: 'restrict' }),
+  alt: jsonb().$type<Localized>().notNull().default({}),
+  source: text().notNull(),
+  createdAt: created(),
+});
+
 export const projects = pgTable(
   'projects',
   {
@@ -97,6 +119,8 @@ export const projects = pgTable(
     /** The drawn illustration shown until a cover image arrives. */
     art: text(),
     coverId: integer().references(() => media.id, { onDelete: 'set null' }),
+    /** A short silent loop (motion work): shown on the Motion reel and in the homepage motion frame. */
+    loopId: integer().references(() => videos.id, { onDelete: 'set null' }),
     siteUrl: text(),
     /** The case study (src/server/db/story.ts · validated with zod). Empty = a short case page. */
     story: jsonb().$type<StoryInput>(),
@@ -189,6 +213,11 @@ export const peopleTextRelations = relations(peopleText, ({ one }) => ({
 export const projectsRelations = relations(projects, ({ many, one }) => ({
   texts: many(projectText),
   cover: one(media, { fields: [projects.coverId], references: [media.id] }),
+  loop: one(videos, { fields: [projects.loopId], references: [videos.id] }),
+}));
+
+export const videosRelations = relations(videos, ({ one }) => ({
+  poster: one(media, { fields: [videos.posterId], references: [media.id] }),
 }));
 
 export const projectTextRelations = relations(projectText, ({ one }) => ({
