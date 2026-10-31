@@ -1,0 +1,71 @@
+/* ================= team cursors ================= */
+.crew { position: absolute; inset: 0; z-index: 60; overflow: clip; pointer-events: none; transition: opacity .3s; }
+.pg:has(details.menu[open]) .crew { opacity: 0; }
+
+.cur { position: absolute; left: 0; top: 0; display: block; transform: translate3d(-300px,-300px,0); transition: opacity .45s; will-change: transform; }
+.cur.zz { opacity: 0; }
+.cur .arw {
+  display: block;
+  width: 24px;
+  height: 24px;
+  overflow: visible;
+  filter: drop-shadow(0 3px 5px rgba(14,14,15,.28));
+  transform-origin: 3px 2px;
+  transition: transform .14s cubic-bezier(.3,1.6,.4,1);
+}
+.cur .arw path { fill: var(--c); stroke: #FFFFFF; stroke-width: 1.6; stroke-linejoin: round; }
+.cur.pr .arw { transform: scale(.8); }
+.cur .tag {
+  position: absolute;
+  left: 18px;
+  top: 21px;
+  padding: 4px 9px 5px;
+  border-radius: 3px 11px 11px 11px;
+  background: var(--c);
+  color: var(--on);
+  font: 500 12px/1 var(--sans);
+  white-space: nowrap;
+  width: max-content;
+}
+.cur .bub {
+  position: absolute;
+  left: 18px;
+  top: 44px;
+  padding: 9px 13px 10px;
+  border-radius: 3px 16px 16px 16px;
+  background: var(--c);
+  color: var(--on);
+  font: 500 15px/1.2 var(--sans);
+  white-space: nowrap;
+  width: max-content;
+  max-width: min(320px, 70vw);
+  opacity: 0;
+  transform: translateY(-6px) scale(.85);
+  transform-origin: 0 0;
+  transition: opacity .25s, transform .45s var(--ease-pop);
+}
+.cur.say .bub { opacity: 1; transform: none; }
+.cur.flip .tag { left: auto; right: 4px; border-radius: 11px 3px 11px 11px; }
+.cur.flip .bub { left: auto; right: 4px; border-radius: 16px 3px 16px 16px; transform-origin: 100% 0; }
+
+.you { position: absolute; left: 0; top: 0; opacity: 0; transition: opacity .3s; }
+.you.on { opacity: 1; }
+.you > span {
+  display: block;
+  padding: 4px 9px 5px;
+  border-radius: 3px 11px 11px 11px;
+  background: var(--c);
+  color: var(--on);
+  font: 600 12px/1 var(--sans);
+  white-space: nowrap;
+}
+
+/* A cursor on a page of its own colour gets an ink ring so it does not vanish. */
+.th-pink .c-motion .arw path, .th-blue .c-design .arw path, .th-lime .c-you .arw path { stroke: var(--ink); }
+.th-pink .c-motion :is(.tag, .bub), .th-blue .c-design :is(.tag, .bub), .th-lime .you > span { box-shadow: inset 0 0 0 1.5px var(--ink); }
+
+/* Touch screens: a little smaller · hero only (enforced in crew.ts). */
+.crew.touch .cur .arw { width: 20px; height: 20px; }
+.crew.touch .cur .tag { top: 18px; left: 15px; font-size: 11px; }
+.crew.touch .cur .bub { top: 38px; left: 15px; font-size: 14px; white-space: normal; max-width: min(220px, 56vw); }
+.crew.touch .cur.flip :is(.tag, .bub) { left: auto; right: 4px; }

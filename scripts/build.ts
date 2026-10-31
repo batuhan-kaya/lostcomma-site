@@ -98,7 +98,7 @@ const jsOptions = (lang: Lang): esbuild.BuildOptions => ({
   bundle: true,
   splitting: true,
   format: 'esm',
-  target: ['es2020', 'safari14'],
+  target: ['es2020', 'safari15'],
   minify: !watch,
   sourcemap: watch ? 'inline' : false,
   metafile: true,

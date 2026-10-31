@@ -51,7 +51,7 @@ ${js.map((s) => html`<script type="module" src="${s}"></script>`)}
 </head>
 <body>
 <a class="skip" href="#main">${t('İçeriğe geç')}</a>
-<div class="pg" data-root>
+<div class="pg" data-root data-host="${page.host ?? 'design'}">
 ${header(ctx, page.section)}
 <main id="main">
 ${page.body(ctx)}
