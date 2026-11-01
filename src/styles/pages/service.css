@@ -45,7 +45,7 @@
 .vh-web .pre:hover { border-color: var(--pfg); }
 .vh-web .pre.on { border-color: var(--lime); background: var(--lime); color: var(--ink); }
 .wlab { display: flex; align-items: baseline; gap: 10px; margin: 0; color: var(--pmu); }
-.wlab b { min-width: 4ch; font-variant-numeric: tabular-nums; font-family: var(--display); font-size: 34px; font-weight: 400; line-height: 1; color: var(--pfg); font-variation-settings: 'wdth' 80, 'wght' 760; text-align: right; }
+.wlab b { min-width: 4.5ch; font-variant-numeric: tabular-nums; font-family: var(--display); font-size: 34px; font-weight: 400; line-height: 1; color: var(--pfg); font-variation-settings: 'wdth' 80, 'wght' 760; text-align: right; }
 .ruler {
   position: relative; height: 34px; margin-top: 14px; border-bottom: 1px solid var(--rule); overflow: hidden;
   background-image: linear-gradient(90deg, rgba(242,241,236,.35) 1px, transparent 1px); background-size: calc(50px * var(--k)) 8px; background-repeat: repeat-x; background-position: 0 100%;

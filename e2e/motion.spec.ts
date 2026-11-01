@@ -135,6 +135,19 @@ test.describe('nothing jumps while a page loads', () => {
     });
   }
 
+  test('the Websites width readout keeps its width (the presets never jump a row)', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 1180 });
+    await page.goto('/en/services/websites');
+    const widths = await page.evaluate(() => {
+      const b = document.querySelector<HTMLElement>('[data-wv]')!;
+      return ['1360', '1280', '999', '390'].map((v) => {
+        b.textContent = v;
+        return document.querySelector<HTMLElement>('.wlab')!.offsetWidth;
+      });
+    });
+    expect(new Set(widths).size).toBe(1);
+  });
+
   test('a scaled down frame keeps its tools at a size a thumb can use', async ({ page }) => {
     await page.goto('/en');
     const b = await page.locator('[data-inspb]').boundingBox();

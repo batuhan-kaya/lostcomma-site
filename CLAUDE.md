@@ -45,7 +45,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 
 - No endless requestAnimationFrame. A loop stops when nothing moves and waits off screen (IntersectionObserver). A page at rest runs no JavaScript frames (the Lab field · the Motion curve demo · the homepage scene are the deliberate exceptions while on screen).
 - Endless CSS loops animate transform and opacity only. A live dot's ring is `ping` on the dot's `::after` (base.css). Sections off screen get `data-off` from `app.ts` and their CSS animations pause.
-- Layout that changes with scene content keeps its tallest size: the Process inspector's hidden `.room` copy · the homepage headline (`hold()` in `home/hero.ts`) · the Websites width readout (4ch).
+- Layout that changes with scene content keeps its tallest size: the Process inspector's hidden `.room` copy · the homepage headline (`hold()` in `home/hero.ts`) · the Websites width readout (4.5ch: four digits).
 - The server's first state equals the client's first state (the Websites frame: `src/shared/frame.ts` · a unit test checks the CSS). Animated reflow on purpose (the frame being dragged) is the only layout shift allowed.
 - A scaled-down mock keeps its tools at reading size: `scale: calc(1 / var(--k))` on labels and buttons (home services `--k` · process flow `--pk` · board `--bk`).
 - Tap targets are at least 24 px (an invisible `::before` pad where the drawing must stay small). Text on screen is at least 10.5 px (decorative miniatures with `role="img"` or `aria-hidden` excepted).
