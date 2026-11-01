@@ -18,7 +18,7 @@
 
 /* ---------- hero ---------- */
 .chero { position: relative; padding: calc(var(--head) + 30px) 0 70px; }
-.chero .kick a { text-decoration: none; transition: color .25s; }
+.chero .kick a { padding-block: 4px; text-decoration: none; transition: color .25s; }
 .chero .kick a:hover { color: var(--pfg); }
 .ttl {
   margin: 22px 0 0 -10px; font-family: var(--display); font-size: clamp(60px, 13.6vw, 196px); font-weight: 400; line-height: .98;

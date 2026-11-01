@@ -61,7 +61,7 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 9 | Start | Ofis saatleri · saat dilimi · randevu · form · bildirim (outbox · SMTP · takvim daveti) | Onay bekliyor |
 | 10 | 404 (Now + Uses kararı bekliyor) | Site haritası olarak 404: en yakın sayfa harf farkıyla · ⌘Z şakası | Onay bekliyor |
 | 11 | Panel | Şifreyle giriş (tek kullanıcı · iki adımlı doğrulama) · içerik ve görsel yönetimi · gelen kutusu · görüşmeler · e-postalar · site ayarları · yönlendirmeler · denetim kaydı ve geri alma | Onay bekliyor |
-| 12 | Sertleştirme | SEO · performans · erişilebilirlik · çapraz tarayıcı | |
+| 12 | Sertleştirme | **12a:** imleç motoru · animasyonlar · bütün ekran genişlikleri · dokunma hedefleri · yazı boyları · yüklenirken kayma (300 ölçüm · kalıcı testler) · **12b:** SEO · erişilebilirlik turu · çapraz tarayıcı | 12a onay bekliyor |
 | 13 | Yayın | Staging · Compose + Caddy · yedekleme · izleme | |
 
 Taslaklar sadece 1440 px masaüstü. Her sayfa aşamasında 1024 · 768 · 390 px düzenleri de önerilir ve ekran görüntüsüyle onaya sunulur.

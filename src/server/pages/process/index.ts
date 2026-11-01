@@ -63,6 +63,15 @@ const ICON = {
   next: raw('<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M13 4h2v12h-2zM4 4v12l8-6z"></path></svg>'),
 };
 
+/**
+ * The inspector's rows change with every phase. An invisible copy of the longest text holds
+ * the row at its tallest so the transport and the tracks below never jump.
+ */
+function room(copy: ProcessCopy, key: 'hap' | 'you' | 'get'): Safe {
+  const longest = copy.phases.map((p) => p[key]).reduce((a, b) => (b.length > a.length ? b : a), '');
+  return html`<span class="room" aria-hidden="true">${longest}</span>`;
+}
+
 function hero(ctx: Ctx, copy: ProcessCopy): Safe {
   const { t } = ctx;
   const p = START;
@@ -83,9 +92,9 @@ function hero(ctx: Ctx, copy: ProcessCopy): Safe {
 <p class="iw mono"><span>${t('Denetçi')}</span><b data-iw>${ph.w}</b></p>
 <p class="iph" data-in>${ph.n}</p>
 <dl class="irows">
-<div class="ir"><dt class="mono">${t('Ne oluyor')}</dt><dd data-ihap>${ph.hap}</dd></div>
-<div class="ir"><dt class="mono">${t('Sen ne yapıyorsun')}</dt><dd data-iyou>${ph.you}</dd></div>
-<div class="ir"><dt class="mono">${t('Eline ne geçiyor')}</dt><dd data-iget>${ph.get}</dd></div>
+<div class="ir"><dt class="mono">${t('Ne oluyor')}</dt><dd><span data-ihap>${ph.hap}</span>${room(copy, 'hap')}</dd></div>
+<div class="ir"><dt class="mono">${t('Sen ne yapıyorsun')}</dt><dd><span data-iyou>${ph.you}</span>${room(copy, 'you')}</dd></div>
+<div class="ir"><dt class="mono">${t('Eline ne geçiyor')}</dt><dd><span data-iget>${ph.get}</span>${room(copy, 'get')}</dd></div>
 </dl>
 <p class="iwho mono"><span>${t('Bunun üstünde')}</span><span class="avs" data-iwho>${avatars(PHASE_WHO[i]!)}</span></p>
 </div>

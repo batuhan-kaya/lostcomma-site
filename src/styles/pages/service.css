@@ -45,7 +45,7 @@
 .vh-web .pre:hover { border-color: var(--pfg); }
 .vh-web .pre.on { border-color: var(--lime); background: var(--lime); color: var(--ink); }
 .wlab { display: flex; align-items: baseline; gap: 10px; margin: 0; color: var(--pmu); }
-.wlab b { min-width: 3.2ch; font-family: var(--display); font-size: 34px; font-weight: 400; line-height: 1; color: var(--pfg); font-variation-settings: 'wdth' 80, 'wght' 760; text-align: right; }
+.wlab b { min-width: 4ch; font-variant-numeric: tabular-nums; font-family: var(--display); font-size: 34px; font-weight: 400; line-height: 1; color: var(--pfg); font-variation-settings: 'wdth' 80, 'wght' 760; text-align: right; }
 .ruler {
   position: relative; height: 34px; margin-top: 14px; border-bottom: 1px solid var(--rule); overflow: hidden;
   background-image: linear-gradient(90deg, rgba(242,241,236,.35) 1px, transparent 1px); background-size: calc(50px * var(--k)) 8px; background-repeat: repeat-x; background-position: 0 100%;
@@ -54,8 +54,14 @@
 .bp > span { white-space: nowrap; }
 .bp i { display: block; width: 2px; height: 14px; background: currentColor; }
 .bp.on { color: var(--lime); }
-.fill { position: absolute; left: 0; bottom: -1px; width: 100%; height: 3px; background: var(--lime); }
-.frame { position: relative; width: 100%; height: 640px; margin-top: 18px; border-radius: 14px; background: #fff; color: var(--ink); box-shadow: 0 60px 100px -50px rgba(0,0,0,.6); }
+.fill { position: absolute; left: 0; bottom: -1px; width: min(1280px, calc(100% * 1280 / 1360)); height: 3px; background: var(--lime); }
+/* The marks' first spots (web.ts keeps them there and scales them with the room). */
+.bp[data-bp="390"] { left: min(390px, calc(100% * 390 / 1360)); }
+.bp[data-bp="768"] { left: min(768px, calc(100% * 768 / 1360)); }
+.bp[data-bp="1024"] { left: min(1024px, calc(100% * 1024 / 1360)); }
+.bp[data-bp="1280"] { left: min(1280px, calc(100% * 1280 / 1360)); }
+/* First state = the client's first state (1280 of 1360 · scaled by k) so nothing jumps when JS arrives. */
+.frame { position: relative; width: min(1280px, calc(100% * 1280 / 1360)); height: 640px; margin-top: 18px; border-radius: 14px; background: #fff; color: var(--ink); box-shadow: 0 60px 100px -50px rgba(0,0,0,.6); }
 .fchrome { display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-bottom: 1px solid #E4E2DC; border-radius: 14px 14px 0 0; background: #F2F1EC; }
 .fchrome > i { flex: none; display: block; width: 10px; height: 10px; border-radius: 50%; background: #D5D3CC; }
 .furl { flex: 1; min-width: 0; max-width: 420px; margin: 0 auto; padding: 6px 12px; border-radius: 8px; background: #fff; color: var(--grey); font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -65,6 +71,12 @@
   background: #F7F1E8; color: #3B2418; transform-origin: 0 0;
 }
 .js-rz .site { width: calc(100% / var(--k)); height: calc(100% / var(--k)); transform: scale(var(--k)); }
+/*
+ * The little site is laid out at its scaled width only once web.ts knows the room (k). Until then
+ * it waits unseen (a site that appears is not a layout shift · one that reflows is). Without
+ * JS it shows straight away at its natural width.
+ */
+@media (scripting: enabled) { .rz:not(.js-rz) .site { visibility: hidden; } }
 .handle {
   position: absolute; right: -26px; top: 50%; z-index: 5; display: grid; place-items: center; width: 44px; height: 88px; margin-top: -44px;
   border-radius: 22px; background: var(--lime); color: var(--ink); cursor: ew-resize; touch-action: none; box-shadow: 0 12px 26px -10px rgba(0,0,0,.5);
@@ -457,7 +469,9 @@ textarea.inp { min-height: 80px; resize: none; line-height: 1.4; }
 .st:last-child { border-bottom: 0; }
 .st > i { width: 22px; height: 22px; border: 2px solid #C9C7C0; border-radius: 50%; transition: background-color .3s, border-color .3s; }
 .st.done > i { border-color: var(--mint); background: var(--mint); }
-.st.now > i { border-color: var(--ink); animation: ping 1.2s ease-out infinite; }
+.st > i { position: relative; }
+.st.now > i { border-color: var(--ink); }
+.st.now > i::after { content: ''; position: absolute; inset: -2px; border: 2px solid var(--mint); border-radius: 50%; opacity: 0; animation: ping 1.2s ease-out infinite; --ping-to: 1.9; }
 .st b { display: block; font-weight: 600; }
 .st small { display: block; margin-top: 3px; color: var(--grey); font-size: 14px; }
 .roll { display: block; height: 8px; margin-top: 8px; overflow: hidden; border-radius: 4px; background: #E2E0D9; }
@@ -569,6 +583,7 @@ textarea.inp { min-height: 80px; resize: none; line-height: 1.4; }
 /* Without JS the heroes are pictures of their first state. */
 @media (scripting: none) {
   .presets, .ruler, .handle, .dims, .thumb, .vh-app .segs, .vh-app .tgl, .tgs, .scale, .hdl, .cps, .ctl, .cp, .ltabs, .pub, .ship, .tlf { display: none; }
+  .frame { width: 100%; }
 }
 
 /* ================= 1024 ================= */

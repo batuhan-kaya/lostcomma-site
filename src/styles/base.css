@@ -124,10 +124,19 @@ mark { padding: 0 .06em; border-radius: 3px; background: var(--lime); color: var
 .rl.d5 > span { transition-delay: .2s; }
 
 @keyframes blink { 50% { opacity: 0; } }
+/*
+ * A live dot's ring: a pseudo element behind the dot grows and fades. Transform and opacity
+ * only so it runs on the compositor (a box-shadow ring repainted every frame). Each dot sets
+ * its own ::after: content · position absolute · inset 0 · border-radius 50% · background ·
+ * opacity 0 · animation ping · --ping-to (the ring's size against the dot).
+ */
 @keyframes ping {
-  0% { box-shadow: 0 0 0 0 rgba(62,224,168,.6); }
-  100% { box-shadow: 0 0 0 10px rgba(62,224,168,0); }
+  0% { transform: scale(1); opacity: .6; }
+  100% { transform: scale(var(--ping-to, 3.5)); opacity: 0; }
 }
+
+/* A section off screen (app.ts): its endless loops wait where they are. */
+[data-off] *, [data-off] *::before, [data-off] *::after { animation-play-state: paused !important; }
 
 /* html.still: a page switch asked for less motion (Studio · Display). Same rules as the OS setting. */
 html.still *, html.still *::before, html.still *::after {

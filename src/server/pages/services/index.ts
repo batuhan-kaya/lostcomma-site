@@ -46,7 +46,7 @@ function hero(ctx: Ctx): Safe {
 <p class="kick mono"><i class="fi" aria-hidden="true"></i><span>${t('Hizmetler')}</span><span aria-hidden="true">·</span><span class="url">lostcomma.co${ctx.path}</span></p>
 <h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">${o.title}</h1>
 <p class="lede">${o.lede} <b>${o.try}</b> ${o.after}</p>
-<div class="board" data-board data-rest="motion" data-rest-at="0.07 0.88">
+<div class="board" data-board data-rest="motion" data-rest-at="0.07 0.88" data-rest-at-m="0.06 0 0 296">
 <div class="stage t-web" data-stage role="img" aria-label="${t('Çizim tahtası')}">
 <p class="empty" data-empty aria-hidden="true">${t('Buraya çiz')}</p>
 </div>

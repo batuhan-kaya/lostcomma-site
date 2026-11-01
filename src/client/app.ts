@@ -75,7 +75,25 @@ function placeholders(): void {
   }
 }
 
+/**
+ * Endless CSS loops (live dots · drawn art · the board's frames) only play in sections on screen.
+ * A section out of view gets data-off: its animations pause where they are and pick up again
+ * when it comes back (base.css). Nothing changes for the visitor · the page stops working
+ * on things nobody sees.
+ */
+function offscreen(): void {
+  if (!('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) (e.target as HTMLElement).toggleAttribute('data-off', !e.isIntersecting);
+    },
+    { rootMargin: '160px 0px' },
+  );
+  for (const el of document.querySelectorAll('[data-sec]')) io.observe(el);
+}
+
 comma();
+offscreen();
 startClock();
 langSwitch();
 menu();

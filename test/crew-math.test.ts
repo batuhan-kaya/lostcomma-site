@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clampPoint, drift, parseRestAt, pickSection, probeLine, shouldFlip, SPRING, step, STEP_MS, stepsFor, type Body } from '../src/client/lib/crew-math';
+import { clampPoint, clearSpot, fitShift, NUDGES, overlap, parseRestAt, pickSection, probeLine, settled, shouldFlip, SPRING, step, STEP_MS, stepsFor, type Body, type Box } from '../src/client/lib/crew-math';
 
 describe('spring step', () => {
   it('settles on the target without running away', () => {
@@ -44,13 +44,20 @@ describe('fixed timestep', () => {
   });
 });
 
-describe('drift', () => {
-  it('stays within ±6 px', () => {
-    for (let t = 0; t < 60000; t += 977) {
-      const d = drift(t, 1.3);
-      expect(Math.abs(d.dx)).toBeLessThanOrEqual(6);
-      expect(Math.abs(d.dy)).toBeLessThanOrEqual(6);
+describe('settling', () => {
+  it('a cursor that has arrived settles soon after · then the loop can stop', () => {
+    const b: Body = { x: 0, y: 0, vx: 0, vy: 0 };
+    let frames = 0;
+    while (!settled(b, 400, 120) && frames < 600) {
+      step(b, 400, 120);
+      frames++;
     }
+    // About two seconds of flight at 60 fps · never an endless tail.
+    expect(frames).toBeGreaterThan(20);
+    expect(frames).toBeLessThan(200);
+  });
+  it('a moving cursor is never settled even when it passes through the spot', () => {
+    expect(settled({ x: 400, y: 120, vx: 3, vy: 0 }, 400, 120)).toBe(false);
   });
 });
 
@@ -108,5 +115,54 @@ describe('rest anchors', () => {
     expect(shouldFlip(800, 1440)).toBe(false);
     expect(shouldFlip(170, 390)).toBe(false);
     expect(shouldFlip(290, 390)).toBe(true);
+  });
+  it('with a width the side that fits wins', () => {
+    // A long bubble on a phone: no room on the right · more on the left.
+    expect(shouldFlip(190, 390, 220)).toBe(true);
+    // Near the left edge a long bubble keeps to the right where it fits.
+    expect(shouldFlip(40, 390, 300)).toBe(false);
+    // A short tag in the middle of a desktop stays to the right.
+    expect(shouldFlip(800, 1440, 60)).toBe(false);
+  });
+  it('slides a bubble back onto the page', () => {
+    expect(fitShift(100, 200, 390)).toBe(0);
+    expect(fitShift(300, 200, 390)).toBe(390 - 8 - 500);
+    expect(fitShift(-20, 120, 390)).toBe(28);
+    // Wider than the page: pinned to the left edge.
+    expect(fitShift(40, 400, 390)).toBe(-32);
+  });
+});
+
+describe('keeping text readable', () => {
+  const at = (x: number, y: number) => (dx: number, dy: number): Box[] => [{ left: x + dx, top: y + dy, right: x + dx + 60, bottom: y + dy + 20 }];
+  it('measures overlap', () => {
+    expect(overlap({ left: 0, top: 0, right: 10, bottom: 10 }, { left: 5, top: 5, right: 20, bottom: 20 })).toBe(25);
+    expect(overlap({ left: 0, top: 0, right: 10, bottom: 10 }, { left: 10, top: 0, right: 20, bottom: 10 })).toBe(0);
+  });
+  it('tries the nearest spots first', () => {
+    expect(NUDGES[0]).toEqual([0, 0]);
+    const d = NUDGES.map(([x, y]) => Math.hypot(x, y));
+    for (let i = 1; i < d.length; i++) expect(d[i]! + 0.001).toBeGreaterThanOrEqual(Math.floor(d[i - 1]! / 1.5));
+  });
+  it('stays put when nothing is covered', () => {
+    expect(clearSpot(at(100, 100), [{ left: 0, top: 0, right: 400, bottom: 40 }], 1440)).toEqual([0, 0]);
+  });
+  it('steps off a line of text by the smallest move', () => {
+    const line = { left: 0, top: 100, right: 400, bottom: 118 };
+    const [dx, dy] = clearSpot(at(100, 95), [line], 1440);
+    expect(overlap({ left: 100 + dx, top: 95 + dy, right: 160 + dx, bottom: 115 + dy }, line)).toBe(0);
+    expect(Math.hypot(dx, dy)).toBeLessThanOrEqual(32);
+  });
+  it('the arrow may point into a headline · the tag keeps off it', () => {
+    const head: Box = { left: 0, top: 100, right: 400, bottom: 160, big: true };
+    const arrow = (dx: number, dy: number): Box[] => [{ left: 380 + dx, top: 120 + dy, right: 400 + dx, bottom: 140 + dy }];
+    expect(clearSpot(arrow, [head], 1440)).toEqual([0, 0]);
+    const tag = (dx: number, dy: number): Box[] => [{ left: 380 + dx, top: 120 + dy, right: 440 + dx, bottom: 140 + dy, strict: true }];
+    expect(clearSpot(tag, [head], 1440)).not.toEqual([0, 0]);
+  });
+  it('never leaves the page to do it', () => {
+    const wall = { left: 0, top: 0, right: 1440, bottom: 2000 };
+    const [dx] = clearSpot(at(1370, 100), [wall], 1440);
+    expect(1370 + dx + 60).toBeLessThanOrEqual(1440);
   });
 });

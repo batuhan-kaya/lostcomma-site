@@ -5,6 +5,7 @@ import type { Ctx } from '../../page';
 import { contrast, PALETTE } from '../../../shared/contrast';
 import { cssCurve, PRESETS, plotPath, X, Y } from '../../../shared/curve';
 import { ACTIONS, easyCount, zoneAt, zoneOf } from '../../../shared/thumb';
+import { FRAME } from '../../../shared/frame';
 
 /**
  * The four signature heroes and the mock under each hood. Every one renders its first state on the
@@ -40,7 +41,7 @@ function kil(ctx: Ctx): Safe {
 
 export function webHero(ctx: Ctx): Safe {
   const { t } = ctx;
-  const start = WIDTHS[WIDTHS.length - 1]!.w;
+  const start = FRAME.start;
   return html`<div class="rz" data-rz>
 <div class="rhead">
 <div class="presets mono" role="group" aria-label="${t('Ekran genişliği')}">${WIDTHS.map(
@@ -52,7 +53,7 @@ export function webHero(ctx: Ctx): Safe {
 <div class="frame" data-frame>
 <div class="fchrome" aria-hidden="true"><i></i><i></i><i></i><span class="furl">kil.studio · ${t('Kadıköy’de bir seramik atölyesi')}</span></div>
 <div class="view" data-view>${kil(ctx)}</div>
-<div class="handle" data-handle role="slider" tabindex="0" aria-label="${t('Önizlemenin genişliği')}" aria-orientation="horizontal" aria-valuemin="340" aria-valuemax="1360" aria-valuenow="${start}" aria-valuetext="${start} px" data-rest="code" data-rest-at="0.5 1.2 -6 0"><i></i></div>
+<div class="handle" data-handle role="slider" tabindex="0" aria-label="${t('Önizlemenin genişliği')}" aria-orientation="horizontal" aria-valuemin="${FRAME.min}" aria-valuemax="${FRAME.max}" aria-valuenow="${start}" aria-valuetext="${start} px" data-rest="code" data-rest-at="0.5 1.2 -6 0"><i></i></div>
 <span class="dims mono" data-dims aria-hidden="true">${start} px</span>
 </div>
 </div>`;

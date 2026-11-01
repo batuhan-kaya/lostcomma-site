@@ -34,6 +34,21 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Scripted moments live in the page's client entry: `getCrew()?.addScenes({ hero: async (crew, signal) => { … } })`. Always pass `signal` to `crew.sleep` and `crew.go` so a section change cancels the scene.
 - Bubble copy goes through `t()` like everything else and keeps the comma rule.
 - Below the hero only one cursor is ever visible. A scene that needs a different teammate calls `crew.cast(name)` first (the others fade).
+- `data-rest-at-m` is the spot below 700 px. Rest spots are picked again after a resize (and when late fonts arrive).
+- The spring runs in requestAnimationFrame only while a cursor moves. A settled cursor gets `.drifting`: the ±6 px drift is CSS (`cur-dx` · `cur-dy` in `crew.css`) and leaving it folds the drifted offset into the position (no jump). Scroll · resize · a 700 ms watch (a page that moved under a resting cursor) wake the loop. `crew.state().running` tells.
+- A resting spot is nudged off visible text (`clearSpot` in `crew-math.ts` · the drift is counted in): the arrow may point into a display headline (40 px and up) · the tag never covers words. Scene targets are never nudged. The watch looks again every two seconds and a resting cursor steps aside when a scene puts words under it.
+- An anchor inside a hidden element is skipped (the next shown anchor or the section's fallback spot wins) · a target that disappears leaves the cursor where it is.
+- Tags and bubbles flip to the side that fits (`shouldFlip` with the width) and a long bubble slides back onto the page (`fitShift`).
+- Never name a class `.rest` or `.drifting` on a page: the first is the homepage's anchor layer · the second the crew's.
+
+## Motion budget (phase 12 · e2e/motion.spec.ts)
+
+- No endless requestAnimationFrame. A loop stops when nothing moves and waits off screen (IntersectionObserver). A page at rest runs no JavaScript frames (the Lab field · the Motion curve demo · the homepage scene are the deliberate exceptions while on screen).
+- Endless CSS loops animate transform and opacity only. A live dot's ring is `ping` on the dot's `::after` (base.css). Sections off screen get `data-off` from `app.ts` and their CSS animations pause.
+- Layout that changes with scene content keeps its tallest size: the Process inspector's hidden `.room` copy · the homepage headline (`hold()` in `home/hero.ts`) · the Websites width readout (4ch).
+- The server's first state equals the client's first state (the Websites frame: `src/shared/frame.ts` · a unit test checks the CSS). Animated reflow on purpose (the frame being dragged) is the only layout shift allowed.
+- A scaled-down mock keeps its tools at reading size: `scale: calc(1 / var(--k))` on labels and buttons (home services `--k` · process flow `--pk` · board `--bk`).
+- Tap targets are at least 24 px (an invisible `::before` pad where the drawing must stay small). Text on screen is at least 10.5 px (decorative miniatures with `role="img"` or `aria-hidden` excepted).
 
 ## Homepage (src/server/pages/home · src/client/home)
 
