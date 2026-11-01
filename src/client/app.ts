@@ -105,7 +105,8 @@ menu();
 placeholders();
 drawFooter();
 
-// Page modules run before DOMContentLoaded and register their scenes first. With the preloader
-// the team starts once the page is free (they are born from the header avatars after the logo lands).
-const parsed = new Promise<void>((r) => (document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', () => r(), { once: true }) : r()));
-Promise.all([parsed, playIntro()]).then(() => getCrew()?.start());
+// Page modules run after this one and register their scenes before DOMContentLoaded: the team
+// starts after that event. With the preloader they also wait until the page is free (born from
+// the header avatars after the logo lands).
+const intro = playIntro();
+document.addEventListener('DOMContentLoaded', () => intro.then(() => getCrew()?.start()));
