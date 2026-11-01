@@ -16,6 +16,9 @@ export const ROUTES = {
   start: { tr: '/tr/basla', en: '/en/start' },
   now: { tr: '/tr/simdi', en: '/en/now' },
   uses: { tr: '/tr/araclar', en: '/en/uses' },
+  privacy: { tr: '/tr/gizlilik', en: '/en/privacy' },
+  kvkk: { tr: '/tr/kvkk', en: '/en/kvkk' },
+  cookies: { tr: '/tr/cerezler', en: '/en/cookies' },
 } as const satisfies Record<string, Record<Lang, string>>;
 
 export type RouteId = keyof typeof ROUTES;

@@ -1,6 +1,7 @@
 /** Shared behaviour on every page: team cursors · footer clock · language switch roll · mobile menu. */
 import { getCrew } from './lib/crew';
 import { reducedMotion } from './lib/motion';
+import { startStats, track } from './lib/stats';
 
 const LANG_COOKIE = 'lang';
 const ROLL_MS = 560;
@@ -27,6 +28,7 @@ function langSwitch(): void {
     const a = (e.target as Element | null)?.closest<HTMLAnchorElement>('.lang a[data-lang]');
     if (!a) return;
     const lang = a.dataset.lang ?? '';
+    if (!a.classList.contains('on')) track('lang', lang);
     document.cookie = `${LANG_COOKIE}=${lang}; path=/; max-age=31536000; samesite=lax`;
     if (a.classList.contains('on') || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     if (reducedMotion()) return;
@@ -94,6 +96,7 @@ function offscreen(): void {
 
 comma();
 offscreen();
+startStats();
 startClock();
 langSwitch();
 menu();

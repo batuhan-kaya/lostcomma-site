@@ -378,3 +378,72 @@ for (const area of $$<HTMLTextAreaElement>('textarea[data-md-source]')) {
 
 const story = $<HTMLTextAreaElement>('textarea[data-story]');
 if (story) mountStory(story);
+
+/* ---------------- statistics (docs/ISTATISTIK.md) ---------------- */
+
+// "Right now on the site" refreshes every 15 seconds while the tab shows.
+const liveBox = $('[data-live]');
+if (liveBox?.dataset.src) {
+  window.setInterval(async () => {
+    if (document.hidden) return;
+    try {
+      const res = await fetch(liveBox.dataset.src!, { credentials: 'same-origin' });
+      if (res.ok) liveBox.innerHTML = await res.text();
+    } catch {
+      /* offline: try again next time */
+    }
+  }, 15_000);
+}
+
+// "Do not count this browser": your own visits stay out of the numbers (src/client/lib/stats.ts).
+const OFF_KEY = 'lc-stats-off';
+for (const b of $$<HTMLButtonElement>('[data-statsoff]')) {
+  const show = () => {
+    let off = false;
+    try {
+      off = localStorage.getItem(OFF_KEY) === '1';
+    } catch {
+      /* storage blocked */
+    }
+    b.textContent = off ? 'Bu tarayıcı sayılmıyor ✓' : 'Bu tarayıcıyı sayma';
+    b.setAttribute('aria-pressed', String(off));
+  };
+  b.addEventListener('click', () => {
+    try {
+      if (localStorage.getItem(OFF_KEY) === '1') localStorage.removeItem(OFF_KEY);
+      else localStorage.setItem(OFF_KEY, '1');
+    } catch {
+      /* storage blocked */
+    }
+    show();
+  });
+  show();
+}
+
+// The click map: the page in a frame at its real width · scaled to the column · dots on top.
+for (const map of $$('[data-map]')) {
+  const frame = $<HTMLIFrameElement>('[data-map-frame]', map);
+  const dots = $<SVGSVGElement>('[data-map-dots]', map);
+  if (!frame || !dots) continue;
+  const width = Number(dots.dataset.frame) || 1440;
+  let height = 2400;
+  const fit = () => {
+    const s = Math.min(1, map.clientWidth / width);
+    for (const el of [frame, dots] as (HTMLElement | SVGSVGElement)[]) {
+      el.style.height = `${height}px`;
+      el.style.transform = `scale(${s.toFixed(4)})`;
+    }
+    dots.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    map.style.height = `${Math.round(height * s)}px`;
+  };
+  frame.addEventListener('load', () => {
+    try {
+      height = Math.max(600, Math.min(20_000, frame.contentDocument?.documentElement.scrollHeight ?? height));
+    } catch {
+      /* another origin: keep the default */
+    }
+    fit();
+  });
+  addEventListener('resize', fit, { passive: true });
+  fit();
+}

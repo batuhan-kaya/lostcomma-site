@@ -96,6 +96,7 @@ function form(ctx: Ctx): Safe {
   )}</fieldset>
 <label class="fld note"><span class="mono">${t('Bir iki cümleyle anlat · isteğe bağlı')}</span><textarea class="inp" name="note" maxlength="600" rows="3"></textarea></label>
 <div class="sum"><p data-sum aria-live="polite">${t('Önce bir gün ve bir saat seç.')}</p><button type="submit" class="go" data-go>${t('Yirmi dakika ayır')} <span aria-hidden="true">↗</span></button></div>
+<p class="lnote">${t('Bilgilerini sadece görüşmeyi ayarlamak için kullanırız.')} <a href="${href(ctx.lang, 'kvkk')}">${t('KVKK aydınlatma metni')}</a></p>
 </div>`;
 }
 

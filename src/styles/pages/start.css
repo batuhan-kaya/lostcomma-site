@@ -110,6 +110,8 @@ textarea.inp { min-height: 96px; padding: 14px 16px; resize: vertical; line-heig
 .chip:has(input:checked) { border-color: var(--ink); background: var(--ink); color: var(--milk); }
 .chip:has(input:checked) span::before { border-color: var(--lime); background: var(--lime); }
 .chip:has(input:focus-visible) { outline: 2px solid var(--blue); outline-offset: 3px; }
+.lnote { grid-column: 1 / -1; margin: 2px 0 0; color: var(--pmu); font-size: 13px; line-height: 1.4; }
+.lnote a { display: inline-block; padding: 4px 0; color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .sum { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 6px; padding: 12px 12px 12px 24px; border-radius: 999px; background: var(--ink); color: var(--milk); }
 .sum p { margin: 0; font-size: 17px; }
 .go { flex: none; display: inline-flex; align-items: center; gap: 10px; min-height: 54px; padding: 0 26px; border: 0; border-radius: 999px; background: var(--lime); color: var(--ink); font: 600 16px/1 var(--sans); cursor: pointer; transition: transform .45s var(--ease-pop), opacity .3s; }

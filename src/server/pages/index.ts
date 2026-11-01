@@ -3,6 +3,7 @@ import type { RouteId } from '../routes';
 import { casePage } from './case';
 import { homePage } from './home';
 import { labPage } from './lab';
+import { cookiesPage, kvkkPage, privacyPage } from './legal';
 import { notePage } from './note';
 import { notesPage } from './notes';
 import { processPage } from './process';
@@ -25,6 +26,9 @@ export const STATIC_PAGES: Partial<Record<RouteId, AnyPage>> = {
   start: startPage,
   now: stubs.now,
   uses: stubs.uses,
+  privacy: privacyPage,
+  kvkk: kvkkPage,
+  cookies: cookiesPage,
 };
 
 /** Pages on a route with params. load() finds the content · null is a 404. */

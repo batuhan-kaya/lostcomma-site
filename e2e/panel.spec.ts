@@ -39,9 +39,11 @@ test.describe('panel', () => {
   });
 
   test('every section loads clean: no console errors · axe · no sideways scroll', async ({ page }) => {
+    // Nineteen pages with axe on each.
+    test.setTimeout(90_000);
     const errors = watchErrors(page);
     await signIn(page);
-    for (const url of ['/panel', '/panel/projects', '/panel/projects/new', '/panel/projects/1', '/panel/notes', '/panel/notes/1', '/panel/media', '/panel/people', '/panel/people/design', '/panel/briefs', '/panel/bookings', '/panel/mail', '/panel/settings', '/panel/redirects', '/panel/log', '/panel/account']) {
+    for (const url of ['/panel', '/panel/projects', '/panel/projects/new', '/panel/projects/1', '/panel/notes', '/panel/notes/1', '/panel/media', '/panel/people', '/panel/people/design', '/panel/briefs', '/panel/bookings', '/panel/mail', '/panel/settings', '/panel/redirects', '/panel/log', '/panel/account', '/panel/stats', '/panel/stats/visits', '/panel/stats/page?path=/en']) {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
       expect(await horizontalOverflow(page), `${url} overflow`).toBeLessThanOrEqual(0);

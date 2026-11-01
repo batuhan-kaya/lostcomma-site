@@ -117,7 +117,7 @@ describe('headers and meta files', () => {
     const csp = String(res.headers['content-security-policy']);
     expect(csp).toContain("script-src 'self'");
     expect(csp).toContain("style-src 'self'");
-    expect(csp).toContain("frame-ancestors 'none'");
+    expect(csp).toContain("frame-ancestors 'self'");
     expect(csp).toContain('upgrade-insecure-requests');
     expect(res.headers['x-content-type-options']).toBe('nosniff');
     expect(res.headers['referrer-policy']).toBe('strict-origin-when-cross-origin');

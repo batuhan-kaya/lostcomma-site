@@ -16,7 +16,7 @@ export type SettingKind = 'localized' | 'text' | 'month';
 export interface SettingDef {
   key: string;
   kind: SettingKind;
-  group: 'prices' | 'plans' | 'studio';
+  group: 'prices' | 'plans' | 'studio' | 'legal';
   /** Panel label (Turkish). */
   label: string;
   hint?: string;
@@ -42,6 +42,10 @@ export const SETTINGS: SettingDef[] = [
   { key: 'work.nextMonth', kind: 'month', group: 'studio', label: 'Bir sonraki boş yer', hint: 'İşler sayfası: "Bir sonraki boş yer … ayında açılıyor."', where: '/tr/isler' },
   { key: 'studio.address', kind: 'text', group: 'studio', label: 'Stüdyo adresi', hint: 'Sokak ve numara. Kadıköy · 34710 İstanbul satırı ayrıca yazılıyor.', where: '/tr/studyo' },
   { key: 'studio.phone', kind: 'text', group: 'studio', label: 'Telefon', hint: 'Örnek: +90 216 555 01 23', where: '/tr/basla' },
+  { key: 'legal.controller', kind: 'text', group: 'legal', label: 'Veri sorumlusu', hint: 'Şirket kurulana kadar adın soyadın (Örnek: Batuhan Kaya). Şirket kurulunca unvanı.', where: '/tr/kvkk' },
+  { key: 'legal.address', kind: 'text', group: 'legal', label: 'Yazışma adresi', hint: 'KVKK başvurularının gönderileceği açık adres. Boşsa stüdyo adresi yazılır.', where: '/tr/kvkk' },
+  { key: 'legal.email', kind: 'text', group: 'legal', label: 'Başvuru e-postası', hint: 'KVKK başvuruları ve gizlilik soruları için. Boşsa hello@lostcomma.co yazılır.', where: '/tr/kvkk' },
+  { key: 'legal.mail', kind: 'text', group: 'legal', label: 'E-posta servisi', hint: 'Bildirimlerin ve yazışmaların geçtiği servis ve ülkesi. Örnek: Google Workspace (ABD) · Zoho Mail (AB).', where: '/tr/kvkk' },
 ];
 
 export const SETTING_KEYS = new Set(SETTINGS.map((s) => s.key));

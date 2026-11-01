@@ -4,6 +4,7 @@ import { and, asc, count, desc, eq, gte, isNull, lte, gt } from 'drizzle-orm';
 import { audit, bookings, briefs, notes, outbox, projects } from '../../db/schema';
 import { html } from '../../html';
 import { cityOf, localHm } from '../../../shared/booking';
+import { today as statsToday } from '../../data/stats';
 import { readiness } from '../checklist';
 import { send, type Kit } from '../kit';
 import { badge, empty, section, timeTag, when } from '../ui';
@@ -27,6 +28,7 @@ export function registerDashboard(p: FastifyInstance, k: Kit): void {
       stat(db.select({ n: count() }).from(outbox).where(eq(outbox.status, 'failed'))),
     ]);
     const scheduled = await stat(db.select({ n: count() }).from(notes).where(gt(notes.publishedAt, now)));
+    const visits = await statsToday(db, now);
     const must = checks.filter((c) => c.kind === 'must');
     const done = must.filter((c) => c.ok).length;
     const pct = Math.round((done / Math.max(1, must.length)) * 100);
@@ -37,6 +39,7 @@ export function registerDashboard(p: FastifyInstance, k: Kit): void {
       wide: true,
       body: html`
 <div class="p-stats">
+<a class="p-stat" href="/panel/stats?p=today"><span class="mono">Bugün</span><b>${visits.visits}</b><small>ziyaret · ${visits.views} sayfa${visits.live ? ` · şu an ${visits.live} kişi` : ''}</small></a>
 <a class="p-stat" href="/panel/briefs"><span class="mono">Yeni brief</span><b>${fresh.length}</b><small>${fresh[0] ? `Son: ${fresh[0].name || fresh[0].email}` : 'Gelen kutusu boş'}</small></a>
 <a class="p-stat" href="/panel/bookings"><span class="mono">Yaklaşan görüşme</span><b>${calls.length}</b><small>${calls[0] ? `İlk: ${when(calls[0].startsAt)}` : 'Takvim boş'}</small></a>
 <a class="p-stat${failed ? ' bad' : ''}" href="/panel/mail${failed ? '?status=failed' : ''}"><span class="mono">E-posta</span><b>${failed ? failed : k.postman.on ? 'Açık' : 'Kapalı'}</b><small>${failed ? 'gönderilemedi' : k.postman.on ? 'Bildirimler gidiyor' : 'MAIL_URL boş'}</small></a>

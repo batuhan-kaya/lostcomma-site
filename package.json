@@ -32,6 +32,7 @@
     "fastify": "^5.12.7",
     "fontkit": "^2.0.4",
     "markdown-it": "^14.3.3",
+    "maxmind": "^4.3.29",
     "nodemailer": "^7.0.13",
     "pg": "8.16",
     "qrcode": "^1.5.4",

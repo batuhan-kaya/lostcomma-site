@@ -122,11 +122,30 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 ## Panel (src/server/panel · src/client/panel.ts · panel/story.ts · docs/PANEL.md)
 
 - One Fastify plugin under `/panel` (Turkish only · noindex · no-store · same CSP). One user: the password is scrypt in `panel_user` (set with `npm run panel -- password` or `PANEL_PASSWORD` on first boot). Optional TOTP (QR from `qrcode`). Sessions keep only the sha256 of the cookie token · 24 h idle · 14 days max · cookie `Path=/panel` HttpOnly SameSite=Strict. Every post needs the session's CSRF token (`_csrf` or `x-csrf`) and our Origin. `PANEL_SIGNIN_LIMIT` = sign-in attempts per address per 15 minutes.
-- Sections in `src/server/panel/views/`: Pano (launch checklist in `checklist.ts`) · İşler (case study editor) · Notlar (live preview through the site's renderer) · Görseller (images and loops · multipart only here) · Ekip · Gelen kutusu · Görüşmeler (cancel with a calendar cancellation · closed days and hours) · E-postalar · Site ayarları · Yönlendirmeler · Kayıt · Hesap.
+- Sections in `src/server/panel/views/`: Pano (launch checklist in `checklist.ts`) · İstatistik · İşler (case study editor) · Notlar (live preview through the site's renderer) · Görseller (images and loops · multipart only here) · Ekip · Gelen kutusu · Görüşmeler (cancel with a calendar cancellation · closed days and hours) · E-postalar · Site ayarları · Yönlendirmeler · Kayıt · Hesap.
 - Every change goes to the `audit` table · content keeps before and after snapshots (`snapshot.ts`) and "Bu hale dön" restores them (a deleted project or note comes back with its id). Saves use the row's `updated_at` as an optimistic lock.
 - The comma rule holds in the panel: visible copy with a comma is refused (code fences in notes are free).
-- Site settings (`src/server/data/settings.ts`): prices · the next free month · address · phone. Pages read them through `ctx.settings` · an empty value keeps the placeholder. Closures (`data/closures.ts`) drop closed days from Start and block closed hours in the API. A changed slug of a live page adds a redirect (`data/redirects.ts`) · the 404 handler looks there first.
+- Site settings (`src/server/data/settings.ts`): prices · the next free month · address · phone · the legal pages' controller · address · email · mail service. Pages read them through `ctx.settings` · an empty value keeps the placeholder. Closures (`data/closures.ts`) drop closed days from Start and block closed hours in the API. A changed slug of a live page adds a redirect (`data/redirects.ts`) · the 404 handler looks there first.
 - Panel classes start with `p-` (app.css loads too). Previews render the site's own pages with draft data (`projectBySlug(…, preview)` · `noteBySlug(…, preview)`).
+
+## Statistics (src/server/stats · src/client/lib/stats.ts · docs/ISTATISTIK.md)
+
+- Cookieless and anonymous (Batuhan's choice). The browser sends one beacon per page view (`/api/stats` · after 1.5 s · every 30 s while visible · on hide) with the view · time on screen · scroll depth · clicks on links and buttons (label · target · position). Nothing is written on the device · form fields are never read.
+- A visitor is `sha256(day salt · IP · user agent · host)` (16 hex). The salt lives in `stats_salts` for one Istanbul day and older salts are deleted. Thirty quiet minutes end a visit. The IP is never stored.
+- Not counted: bots and automation (`stats/agent.ts` · HeadlessChrome too · e2e browses with an ordinary user agent) · DNT · GPC · `localStorage['lc-stats-off']` (privacy page · panel button) · frames · `/panel`.
+- Country from the time zone (`stats/zones.ts` from zone.tab) · city only with `GEOIP_DB` (DB-IP Lite mmdb · CC BY 4.0).
+- A brief or a booking is linked to its visit (`visit_id`) and logs an event · the panel shows "Nasıl geldi" on it.
+- Panel: İstatistik (`panel/views/stats.ts` · queries in `data/stats.ts`): live · summary · chart (server SVG) · tables · funnels · visits · a visit's timeline · a page's click map (the page in an `inert` frame · `frame-ancestors 'self'`).
+- Keeping: visits `STATS_DAYS` (395) except ones linked to a brief or call · briefs · bookings · outbox · audit `RECORD_DAYS` (730 · `data/retention.ts`). The prune runs at boot and every 12 hours.
+- `/api/stats/me` and `/api/stats/forget` serve the privacy page's "your record".
+
+## Legal pages (src/server/pages/legal · src/client/legal.ts · src/server/content/legal.ts)
+
+- Gizlilik (`/tr/gizlilik` · `/en/privacy`) · KVKK aydınlatma metni (`/tr/kvkk` · `/en/kvkk`) · Çerezler (`/tr/cerezler` · `/en/cookies`). Linked from both footers and under the brief and booking forms.
+- Copy per language in `content/legal.ts` (comma rule) · `{controller}` · `{address}` · `{email}` · `{mail}` come from Site ayarları · Yasal sayfalar (placeholders until filled · on the launch checklist). Change `LEGAL_UPDATED` when the text changes.
+- What the text promises must stay true: no cookies but `lang` (and the panel's) · the three localStorage keys · thirteen months · two years · thirty days of server logs (deploy) · Hetzner in Germany.
+- Each page's own interaction: privacy · your record (today's visits · delete · do not count me) · kvkk · use your right (ticked rights become an application email · nothing is sent to us) · cookies · in your browser now (our cookie and keys · delete one by one).
+- Never name a page attribute `data-off` (sections off screen get it from app.ts).
 
 ## Mail (src/server/mail)
 

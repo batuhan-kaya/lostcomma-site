@@ -1,7 +1,8 @@
 # Lost Comma site. Own project name so it never collides with the other stacks on the server.
 # The app only listens on the loopback interface: the existing reverse proxy forwards to it.
 # Postgres publishes no port at all: only the web container reaches it on this stack's own network.
-# Phase 13 (deploy) adapts this to the server's proxy setup.
+# Phase 15 (deploy) adapts this to the server's proxy setup and keeps request logs thirty days
+# (the privacy page promises it: they hold IP addresses).
 name: lostcomma
 
 services:

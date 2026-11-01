@@ -6,6 +6,7 @@
 import type { Crew } from '../lib/crew';
 import { step } from '../lib/crew-math';
 import { reducedMotion } from '../lib/motion';
+import { track } from '../lib/stats';
 import { t } from '../lib/t';
 import { $ } from './shared';
 
@@ -147,6 +148,7 @@ export class Comma {
 
   private caught(): void {
     if (isFound()) return;
+    track('comma');
     try {
       localStorage.setItem(KEY, '1');
     } catch {

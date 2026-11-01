@@ -6,6 +6,7 @@ import { briefs } from '../../db/schema';
 import { html } from '../../html';
 import { back, bodyOf, log, send, str, type Kit } from '../kit';
 import { briefSnap } from '../snapshot';
+import { journey } from './stats';
 import { actionForm, area, badge, csrfField, empty, saveBar, section, select, timeTag, when } from '../ui';
 
 const STATES = [
@@ -66,6 +67,7 @@ ${
 <div><dt>Geldi</dt><dd>${when(b.createdAt)}</dd></div>
 </dl>
 ${section('Mesaj', b.message ? html`<blockquote class="p-quote" lang="${b.lang}">${b.message}</blockquote>` : empty('Mesaj yazılmamış.'))}
+${await journey(k.db, b.visitId)}
 <form method="post" action="/panel/briefs/${b.id}" class="p-form" data-dirty-guard>${csrfField(csrf)}
 <div class="p-cols2">${select('status', 'Durum', b.status, [...STATES])}</div>
 ${area('note', 'Not', b.note, { rows: 3, hint: 'Sadece sen görürsün. Örnek: Perşembe aradım · teklif gidecek.' })}

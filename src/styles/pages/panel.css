@@ -190,7 +190,7 @@ select.p-in { padding-right: 32px; }
 .p-badge.mute { background: rgba(14,14,15,.06); color: var(--grey); }
 
 /* ================= dashboard ================= */
-.p-stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+.p-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
 .p-stat { display: flex; flex-direction: column; gap: 6px; padding: 18px 18px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); text-decoration: none; transition: transform .35s var(--ease-pop), box-shadow .3s; }
 .p-stat:hover { transform: translateY(-3px); box-shadow: 0 18px 30px -24px rgba(14,14,15,.5); }
 .p-stat .mono { color: var(--grey); }
@@ -339,6 +339,84 @@ select.p-in { padding-right: 32px; }
   .p-totp { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* ================= statistics (docs/ISTATISTIK.md) ================= */
+.p-statgrid { margin-bottom: 20px; }
+.p-statgrid > .p-sec, .p-statgrid > div > .p-sec { margin-bottom: 20px; }
+.p-sub { margin: 18px 0 8px; color: var(--grey); font: 450 11px/1.3 var(--mono); letter-spacing: .03em; text-transform: uppercase; }
+.p-sub:first-child { margin-top: 0; }
+.p-delta { color: var(--grey); font-style: normal; font-weight: 600; }
+.p-delta.up { color: var(--okc); }
+.p-delta.down { color: var(--badc); }
+/* The chart: a stretched drawing with HTML numbers beside (y) and under (x) it. */
+.p-chart { margin: 0; container-type: inline-size; }
+.p-plot { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 180px auto; column-gap: 10px; padding-top: 8px; }
+.p-plot svg { grid-area: 1 / 2; display: block; width: 100%; height: 100%; overflow: visible; }
+.p-chart .p-gl { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.p-chart .p-bar { fill: var(--ink); opacity: .85; }
+.p-chart .p-bar:hover { fill: var(--blue); opacity: 1; }
+.p-chart .p-line { fill: none; stroke: var(--blue); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.p-yax { grid-area: 1 / 1; display: flex; flex-direction: column; justify-content: space-between; margin: 0; padding: 0; list-style: none; color: var(--grey); font-size: 10.5px; line-height: 14px; text-align: right; }
+/* Each number centred on its line: half a line out at the top and the bottom. */
+.p-yax li { margin: -7px 0; }
+.p-xax { grid-area: 2 / 2; display: flex; margin: 8px 0 0; padding: 0; list-style: none; color: var(--grey); font-size: 10.5px; }
+.p-xax li { display: flex; flex: 1 1 0; justify-content: center; min-width: 0; white-space: nowrap; }
+@container (max-width: 520px) { .p-xax li.alt { visibility: hidden; } }
+.p-legend { display: flex; gap: 18px; margin-top: 8px; color: var(--grey); font-size: 11px; }
+.p-legend i { display: inline-block; width: 12px; height: 8px; margin-right: 6px; vertical-align: 1px; border-radius: 2px; background: var(--ink); }
+.p-legend i.line { height: 2px; vertical-align: 3px; background: var(--blue); }
+.p-rank td:first-child { position: relative; }
+.p-rank .num, .p-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.p-rbar { display: block; width: 100%; height: 3px; margin-top: 6px; border: 0; border-radius: 2px; background: var(--soft); appearance: none; }
+.p-rbar::-webkit-progress-bar { background: var(--soft); border-radius: 2px; }
+.p-rbar::-webkit-progress-value { background: var(--ink); border-radius: 2px; }
+.p-rbar::-moz-progress-bar { background: var(--ink); border-radius: 2px; }
+.p-rank a { text-decoration: none; }
+.p-rank a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.p-funnel { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.p-funnel li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: baseline; gap: 4px 12px; }
+.p-funnel b { font-variant-numeric: tabular-nums; }
+.p-funnel small { min-width: 40px; color: var(--grey); text-align: right; }
+.p-funnel progress { grid-column: 1 / -1; width: 100%; height: 6px; border: 0; border-radius: 3px; background: var(--soft); appearance: none; }
+.p-funnel progress::-webkit-progress-bar { background: var(--soft); border-radius: 3px; }
+.p-funnel progress::-webkit-progress-value { background: var(--lime); border-radius: 3px; }
+.p-funnel progress::-moz-progress-bar { background: var(--lime); border-radius: 3px; }
+.p-live b { font-weight: 500; }
+.p-live a { position: relative; padding-left: 18px; }
+.p-live a::before { content: ''; position: absolute; left: 2px; top: 17px; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+/* Addresses keep their own letters (upper case would turn i into İ). */
+.p-url, .p-url small { text-transform: none; letter-spacing: 0; }
+.p-path { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 14px 0 0; padding: 0; list-style: none; font-size: 12px; }
+.p-path li { padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--soft); }
+.p-path li + li::before { content: '→ '; color: var(--grey); }
+.p-path small { margin-left: 6px; color: var(--grey); }
+.p-timeline { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.p-timeline > li { position: relative; padding: 0 0 18px 22px; border-left: 2px solid var(--line); margin-left: 6px; }
+.p-timeline > li:last-child { border-left-color: transparent; }
+.p-timeline > li::before { content: ''; position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 50%; background: var(--card); }
+.p-tlhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.p-tlhead a { font-weight: 500; }
+.p-tlhead small { color: var(--grey); }
+.p-evs { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.p-evs li, .p-tlevent li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 6px 10px; border-radius: 10px; background: var(--soft); font-size: 13.5px; }
+.p-evs li .mono, .p-tlevent li .mono { color: var(--grey); font-size: 11.5px; }
+.p-evs li small, .p-tlevent li small { color: var(--grey); }
+.p-evs li.event, .p-tlevent li.event { background: var(--accb); }
+.p-tlevent { list-style: none; }
+.p-tlevent > li { padding: 0; background: none; }
+.p-map { position: relative; overflow: hidden; margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); }
+.p-map iframe { display: block; border: 0; transform-origin: 0 0; pointer-events: none; }
+.p-map .p-dots { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; }
+.p-map .p-dots circle { fill: var(--coral); fill-opacity: .28; }
+/* The page is drawn at its real width · panel.ts scales it to the column and sets the height. */
+.p-map { height: 640px; }
+.p-map.desktop iframe, .p-map.desktop .p-dots { width: 1440px; height: 2400px; }
+.p-map.tablet { max-width: 460px; }
+.p-map.tablet iframe, .p-map.tablet .p-dots { width: 834px; height: 2400px; }
+.p-map.phone { max-width: 320px; }
+.p-map.phone iframe, .p-map.phone .p-dots { width: 390px; height: 2400px; }
+.p-js-only { display: none; }
+.p-js .p-js-only { display: inline-flex; }
+
 @media (max-width: 640px) {
   .p-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .p-pair, .p-cols2, .p-cols3, .p-cols4 { grid-template-columns: minmax(0, 1fr); }
@@ -346,11 +424,15 @@ select.p-in { padding-right: 32px; }
   .p-savebar { margin: 8px -16px 20px; padding: 10px 16px; }
   .p-savebar kbd { display: none; }
   .p-search { width: 100%; }
-  .p-table { display: block; border: 0; background: none; }
-  .p-table thead { display: none; }
-  .p-table tbody { display: grid; gap: 8px; }
-  .p-table tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
-  .p-table td { padding: 0; border: 0; color: var(--grey); font-size: 13.5px; }
+  /* Rows become cards · a statistics table of a label and a number stays a table. */
+  .p-table:not(.p-rank), .p-pages { display: block; border: 0; background: none; }
+  :is(.p-table:not(.p-rank), .p-pages) thead { display: none; }
+  :is(.p-table:not(.p-rank), .p-pages) tbody { display: grid; gap: 8px; }
+  :is(.p-table:not(.p-rank), .p-pages) tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+  :is(.p-table:not(.p-rank), .p-pages) td { padding: 0; border: 0; color: var(--grey); font-size: 13.5px; }
+  .p-pages td:first-child { flex-basis: 100%; color: var(--ink); }
+  .p-pages td.num::after { content: ' ' attr(data-l); }
+  .p-rank td { padding: 10px 12px; }
   .p-table td:has(.p-rowlink) { order: -1; flex-basis: 100%; color: var(--ink); font-size: 15px; }
   .p-table td.p-thumbcell { display: none; }
   .p-table td.p-end { margin-left: auto; }

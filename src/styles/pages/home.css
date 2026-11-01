@@ -597,6 +597,8 @@
 .inp:focus { border-color: var(--ink); }
 .inp.err { border-color: var(--coral); box-shadow: 0 0 0 4px rgba(255,90,43,.16); }
 .inp.full { grid-column: 1 / -1; }
+.lnote { margin: 8px 0 0; color: var(--grey); font-size: 13px; line-height: 1.4; }
+.lnote a { display: inline-block; padding: 4px 0; color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .sum { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 20px; margin-top: 30px; padding: 18px 18px 18px 22px; border-radius: 20px; background: var(--ink); color: var(--milk); }
 .sum .sl { display: block; color: rgba(242,241,236,.6); }
 .sum p { margin: 6px 0 0; font-family: var(--display); font-size: clamp(20px, 1.8vw, 25px); line-height: 1.12; letter-spacing: -.015em; font-variation-settings: 'wdth' 84, 'wght' 640; text-wrap: pretty; }

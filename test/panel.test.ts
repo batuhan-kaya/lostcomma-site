@@ -517,12 +517,72 @@ describe('every panel page', () => {
   it('renders for a signed-in browser', async () => {
     const [p] = await app.db.select().from(projects).limit(1);
     const [n] = await app.db.select().from(noteText).limit(1);
-    for (const url of ['/panel', '/panel/projects', '/panel/projects?status=live', '/panel/projects/new', `/panel/projects/${p!.id}`, '/panel/notes', '/panel/notes/new', `/panel/notes/${n!.noteId}`, '/panel/media', '/panel/media?filter=noalt', '/panel/people', '/panel/people/motion', '/panel/briefs', '/panel/bookings', '/panel/mail', '/panel/settings', '/panel/redirects', '/panel/log', '/panel/log?entity=project', '/panel/account']) {
+    for (const url of ['/panel', '/panel/projects', '/panel/projects?status=live', '/panel/projects/new', `/panel/projects/${p!.id}`, '/panel/notes', '/panel/notes/new', `/panel/notes/${n!.noteId}`, '/panel/media', '/panel/media?filter=noalt', '/panel/people', '/panel/people/motion', '/panel/briefs', '/panel/bookings', '/panel/mail', '/panel/settings', '/panel/redirects', '/panel/log', '/panel/log?entity=project', '/panel/account', '/panel/stats', '/panel/stats?p=today', '/panel/stats?p=12m', '/panel/stats/visits', '/panel/stats/page?path=/tr', '/panel/stats/page?path=/tr&b=phone']) {
       const res = await get(url);
       expect(res.statusCode, url).toBe(200);
       expect(res.headers['content-security-policy'], url).toContain("script-src 'self'");
       expect(res.body, url).not.toMatch(/ style="/);
     }
     expect((await get('/panel/projects/99999')).statusCode).toBe(404);
+  });
+});
+
+describe('statistics in the panel', () => {
+  const CHROME = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';
+  const beacon = (id: string, o: Record<string, unknown> = {}) =>
+    app.inject({
+      method: 'POST',
+      url: '/api/stats',
+      remoteAddress: '203.0.113.50',
+      headers: { 'content-type': 'application/json', 'user-agent': CHROME, origin: SITE },
+      payload: JSON.stringify({ id, path: '/tr', page: 'home', lang: 'tr', ref: 'https://www.instagram.com/', q: '', w: 1440, tz: 'Europe/Istanbul', bl: 'tr', ms: 15_000, sc: 70, age: 20_000, ev: [], ...o }),
+    });
+
+  it('shows a visit from the overview down to its timeline · and on the brief it became', async () => {
+    await beacon('11111111-1111-4111-8111-111111111111', { ev: [{ k: 'click', n: 'Proje başlat', g: '/tr/basla', x: 400, y: 800, t: 12_000 }] });
+    await beacon('22222222-2222-4222-8222-222222222222', { path: '/tr/basla', page: 'start' });
+    const sent = await app.inject({
+      method: 'POST',
+      url: '/api/brief',
+      remoteAddress: '203.0.113.50',
+      headers: { 'content-type': 'application/json', 'user-agent': CHROME, origin: SITE },
+      payload: JSON.stringify({ lang: 'tr', email: 'iz@example.com', name: 'İz' }),
+    });
+    expect(sent.statusCode).toBe(200);
+
+    const overview = await get('/panel/stats?p=today');
+    expect(overview.statusCode).toBe(200);
+    expect(overview.body).toContain('Instagram');
+    expect(overview.body).toContain('Proje başlat');
+    expect(overview.body).toContain('/tr/basla');
+    expect(overview.body).not.toMatch(/ style="/);
+
+    const live = await get('/panel/stats/live');
+    expect(live.body).toContain('/tr/basla');
+
+    const list = await get('/panel/stats/visits?p=today');
+    const id = /href="\/panel\/stats\/visits\/([0-9a-f-]{36})"/.exec(list.body)![1]!;
+    const detail = await get(`/panel/stats/visits/${id}`);
+    expect(detail.body).toContain('Zaman çizelgesi');
+    expect(detail.body).toContain('Proje başlat');
+    expect(detail.body).toContain('Brief gönderildi');
+    expect(detail.body).toMatch(/href="\/panel\/briefs\/[0-9a-f-]{36}">İz</);
+
+    const [b] = await app.db.select().from(briefs).where(eq(briefs.email, 'iz@example.com'));
+    const inbox = await get(`/panel/briefs/${b!.id}`);
+    expect(inbox.body).toContain('Nasıl geldi');
+    expect(inbox.body).toContain('Instagram');
+
+    const map = await get('/panel/stats/page?path=/tr&p=today');
+    expect(map.body).toContain('<iframe src="/tr"');
+    expect(map.body).toMatch(/<circle cx="576" cy="800"/);
+    // Pages of the panel itself are never a page of the site.
+    expect((await get('/panel/stats/page?path=/panel')).statusCode).toBe(404);
+    expect((await get('/panel/stats/visits/not-a-visit')).statusCode).toBe(404);
+  });
+
+  it('needs a signed-in browser', async () => {
+    expect((await app.inject({ method: 'GET', url: '/panel/stats' })).statusCode).toBe(303);
+    expect((await app.inject({ method: 'GET', url: '/panel/stats/live' })).statusCode).toBe(303);
   });
 });

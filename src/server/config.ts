@@ -42,6 +42,15 @@ const Env = z.object({
   PANEL_PASSWORD: z.string().optional(),
   /** Panel sign-in attempts one address may make per 15 minutes. */
   PANEL_SIGNIN_LIMIT: z.coerce.number().int().min(1).default(5),
+  /**
+   * An IP database for the city of a visit (docs/ISTATISTIK.md): DB-IP Lite "IP to City" in MaxMind
+   * format (.mmdb · free · CC BY 4.0). Empty = the country comes from the browser's time zone.
+   */
+  GEOIP_DB: z.string().optional(),
+  /** Days a visit is kept in the statistics (ones linked to a brief or a call stay with it). */
+  STATS_DAYS: z.coerce.number().int().min(1).default(395),
+  /** Days briefs · calls · the mail log and the panel log are kept (the privacy page promises two years). */
+  RECORD_DAYS: z.coerce.number().int().min(30).default(730),
 });
 
 type Parsed = z.infer<typeof Env>;

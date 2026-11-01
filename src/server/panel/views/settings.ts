@@ -9,6 +9,7 @@ const GROUPS = [
   { key: 'prices', title: 'Hizmet fiyatları', hint: 'Her hizmetin üç basamağı. Hizmetler sayfasındaki "Başlangıç fiyatı" ilk basamaktır. İki dilde ayrı yaz: para birimi farklı olabilir (₺90.000 · €2.500). Virgül yerine nokta ya da boşluk kullan.' },
   { key: 'plans', title: 'Süreç planları', hint: 'Süreç sayfasının altındaki iki plan. Üçüncüsü "iş başına".' },
   { key: 'studio', title: 'Stüdyo', hint: 'Boş bırakılan alan sayfada yer tutucu olarak kalır ve Pano\'daki hazırlık listesinde görünür.' },
+  { key: 'legal', title: 'Yasal sayfalar', hint: 'Gizlilik · KVKK ve Çerezler sayfalarında yazar. Boş olan yer tutucu olarak kalır.' },
 ] as const;
 
 export function registerSettings(p: FastifyInstance, k: Kit): void {
@@ -35,7 +36,7 @@ ${GROUPS.map((g) =>
         ? pair(s.key, s.label, { tr: v(s.key, 'tr'), en: v(s.key, 'en') }, e, { copy: true, hint: s.hint, attrs: html` placeholder="${s.key.startsWith('price') ? '[FİYAT]' : ''}"` })
         : s.kind === 'month'
           ? input(s.key, s.label, v(s.key), { type: 'month', error: e[s.key], hint: s.hint })
-          : input(s.key, s.label, v(s.key), { error: e[s.key], hint: s.hint, copy: true, type: s.key === 'studio.phone' ? 'tel' : 'text' }),
+          : input(s.key, s.label, v(s.key), { error: e[s.key], hint: s.hint, copy: true, type: s.key === 'studio.phone' ? 'tel' : s.key === 'legal.email' ? 'email' : 'text' }),
     )}`,
     { id: g.key, hint: g.hint },
   ),
