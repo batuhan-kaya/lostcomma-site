@@ -30,6 +30,9 @@ export default defineConfig({
       BOOK_LIMIT: '1000',
       PANEL_PASSWORD: 'e2e-panel-password',
       PANEL_SIGNIN_LIMIT: '1000',
+      // Every page.goto arrives "from outside": the preloader would greet each test. e2e/intro.spec.ts
+      // runs its own server with it on.
+      PRELOADER: 'off',
     },
   },
   projects: [

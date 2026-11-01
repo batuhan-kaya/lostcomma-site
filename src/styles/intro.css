@@ -1,0 +1,68 @@
+/*
+ * The preloader (layout/intro.ts · src/client/lib/intro.ts): the lost comma is found.
+ * Server drawn so it is on the first paint · shown only with JS and with motion (no JS or reduced
+ * motion: the page as it is). On the page's own ground (the theme on <html>) so it opens into it.
+ * .go starts the run (the script adds it) · the exit is the script's (the mark flies to the logo).
+ * A failsafe hides it after six seconds if the script never comes.
+ */
+.lci { display: none; }
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .lci { position: fixed; inset: 0; z-index: 200; display: block; overflow: hidden; color: var(--pfg); cursor: pointer; animation: lci-fail .3s 6s forwards; }
+}
+@keyframes lci-fail { to { opacity: 0; visibility: hidden; } }
+.lci-bg { position: absolute; inset: 0; background-color: var(--pbg); background-image: radial-gradient(color-mix(in srgb, var(--pfg) 16%, transparent) 1px, transparent 1.4px); background-size: 24px 24px; }
+
+/* The mark in the middle: the corner · a dashed place for the comma · the comma itself. */
+.lci-mk { position: absolute; left: 50%; top: 50%; height: min(34vh, 300px); aspect-ratio: 493 / 869; transform: translate(-50%, -56%); transform-origin: 0 0; }
+.lci-mk > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.lci-t { fill: currentColor; }
+.lci-gh { fill: none; stroke: currentColor; stroke-width: 5; stroke-dasharray: 18 14; opacity: .3; }
+.lci-cm { position: absolute; left: 6.897%; top: 67.43%; width: 50.1%; height: 32.57%; transform-origin: 50% 0; opacity: 0; }
+.lci-cm > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.lci-cm path { fill: var(--coral); }
+
+/* The team: arrow and name like the crew's (crew.css) · their own classes so the crew never picks them up. */
+.lci-cur { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; }
+.lci-cur svg { display: block; overflow: visible; }
+.lci-cur path { fill: var(--c); stroke: #FFFFFF; stroke-width: 1.5; stroke-linejoin: round; }
+.lci-cur b { position: absolute; left: 16px; top: 20px; padding: 3px 9px; border-radius: 999px; background: var(--c); color: var(--on); font: 600 12px/1.2 var(--sans); white-space: nowrap; }
+.lci-design { --c: var(--blue); --on: var(--milk); }
+.lci-code { --c: var(--mint); --on: var(--ink); }
+.lci-motion { --c: var(--pink); --on: var(--ink); left: 82%; top: -6%; }
+
+.lci-st { position: absolute; left: 50%; bottom: max(40px, 6vh); display: flex; align-items: center; gap: 14px; margin: 0; color: color-mix(in srgb, var(--pfg) 62%, transparent); white-space: nowrap; transform: translateX(-50%); }
+.lci-st b { color: var(--pfg); font-weight: 600; font-variant-numeric: tabular-nums; }
+/* Both lines in one cell: the count stays where it is when "found" takes over. */
+.lci-say { display: inline-grid; justify-items: center; }
+.lci-say > span { grid-area: 1 / 1; }
+.lci-s2 { opacity: 0; color: var(--pfg); }
+
+/* The run · about 1.2 s: two of us look around · motion brings the comma · it drops in and settles. */
+.lci.go .lci-design { animation: lci-on .15s .05s forwards, lci-d .95s .05s cubic-bezier(.45,0,.4,1) forwards, lci-off .2s 1s forwards; }
+.lci.go .lci-code { animation: lci-on .15s .12s forwards, lci-c .9s .12s cubic-bezier(.45,0,.4,1) forwards, lci-off .2s 1s forwards; }
+.lci.go .lci-gh { animation: lci-pulse .45s ease-in-out 2 alternate, lci-off .15s .95s forwards; }
+.lci.go .lci-cm { animation: lci-comma .75s .4s both; }
+.lci.go .lci-cm path { animation: lci-ink .35s 1.05s forwards; }
+.lci.go .lci-motion { animation: lci-on .1s .4s both, lci-off .25s 1.05s forwards; }
+.lci.go .lci-s1 { animation: lci-off .15s 1s forwards; }
+.lci.go .lci-s2 { animation: lci-on .2s 1.05s forwards; }
+/* Skipped (a click · a key · a wheel): everything where it ends · the exit follows at once. */
+.lci.done .lci-cur, .lci.done .lci-gh, .lci.done .lci-s1 { animation: none; opacity: 0; }
+.lci.done .lci-cm { animation: none; opacity: 1; transform: none; }
+.lci.done .lci-cm path { animation: none; fill: currentColor; }
+.lci.done .lci-s2 { animation: none; opacity: 1; }
+
+@keyframes lci-on { to { opacity: 1; } }
+@keyframes lci-off { to { opacity: 0; } }
+@keyframes lci-pulse { from { opacity: .18; } to { opacity: .55; } }
+@keyframes lci-ink { to { fill: currentColor; } }
+@keyframes lci-d { 0% { transform: translate(16vw, 74vh); } 35% { transform: translate(70vw, 28vh); } 70% { transform: translate(60vw, 76vh); } 100% { transform: translate(32vw, 34vh); } }
+@keyframes lci-c { 0% { transform: translate(86vw, 18vh); } 40% { transform: translate(24vw, 62vh); } 75% { transform: translate(80vw, 66vh); } 100% { transform: translate(70vw, 22vh); } }
+@keyframes lci-comma {
+  0% { opacity: 0; transform: translate(min(34vw, 440px), 12vh) rotate(-24deg); }
+  10% { opacity: 1; }
+  55% { transform: translate(min(5vw, 48px), -15vh) rotate(12deg); }
+  76% { transform: none; }
+  86% { transform: translateY(-2.4vh) rotate(-3deg); }
+  94%, 100% { opacity: 1; transform: none; }
+}

@@ -64,8 +64,9 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 12 | Sertleştirme | **12a:** imleç motoru · animasyonlar · bütün ekran genişlikleri · dokunma hedefleri · yazı boyları · yüklenirken kayma (300 ölçüm · kalıcı testler) · **12b:** SEO · erişilebilirlik turu · çapraz tarayıcı | 12a onay bekliyor |
 | 13 | İstatistik ve yasal sayfalar | Çerezsiz anonim istatistik (panelde canlı · özet · ziyaret akışı · tıklama haritası · brief ve görüşmenin "nasıl geldi" izi) · Gizlilik · KVKK aydınlatma metni · Çerezler (iki dil) · saklama süreleri | Onay bekliyor |
 | 14 | Footer ve logo | Her sayfada aynı footer (çağrı · site haritası · çizilerek gelen logo ve isim · yasal · dil · başa dön) · logo her yerde (header · panel · paylaşım görselleri · favicon · telefon ikonları · RSS · arama verisi) · sosyal hesaplar panelden · Codespaces önizlemesinde panel ve formlar | Onay bekliyor |
-| 15 | Sayfa geçişleri | 91.99.4.44'teki sitenin geçişinin aynısı (kodu Batuhan'dan gelecek) | Kod bekliyor |
-| 16 | Yayın | Staging · Compose + Caddy · yedekleme · izleme · `GEOIP_DB` (DB-IP Lite şehir · ayda bir güncelleme) · sunucu günlükleri 30 gün (gizlilik metni böyle söylüyor) | |
+| 15 | Preloader | Kayıp virgül aranıyor (beş fikirden Batuhan'ın seçtiği 1. fikir): sadece dışarıdan gelene · yaklaşık 1,5 sn · tıklayınca geçilir · hareket azaltmada ve JS yokken hiç yok · logo header'daki yerine iner | Onay bekliyor |
+| 16 | Sayfa geçişleri | 91.99.4.44'teki sitenin geçişinin aynısı (kodu Batuhan'dan gelecek) | Kod bekliyor |
+| 17 | Yayın | Staging · Compose + Caddy · yedekleme · izleme · `GEOIP_DB` (DB-IP Lite şehir · ayda bir güncelleme) · sunucu günlükleri 30 gün (gizlilik metni böyle söylüyor) | |
 
 Taslaklar sadece 1440 px masaüstü. Her sayfa aşamasında 1024 · 768 · 390 px düzenleri de önerilir ve ekran görüntüsüyle onaya sunulur.
 
@@ -96,8 +97,8 @@ Gerçek görsel gelmesi gereken her yer `docs/GORSELLER.md` dosyasında tutulur 
 - Bütün sayfalar için renk turu (Batuhan'ın isteğiyle sonraya bırakıldı)
 - E-posta gönderimi için SMTP sağlayıcısı (9. aşama)
 - Panel şifresi: ilk girişte Batuhan kendisi belirler · sunucuda sadece hash'i durur (11. aşama)
-- Sunucudaki mevcut ters vekil düzeni: Caddy ortak mı · ağ adı · port (16. aşama)
+- Sunucudaki mevcut ters vekil düzeni: Caddy ortak mı · ağ adı · port (17. aşama)
 - Veri sorumlusunun adı ve adresi · başvuru e-postası · e-posta servisinin adı (13. aşama · panelde Site ayarları · Yasal sayfalar)
 - Yayından önce: Hetzner ve e-posta servisiyle KVKK standart sözleşmesi · imzadan sonra beş iş günü içinde Kurul'a bildirim (yurt dışı aktarım · 13. aşama metinleri buna dayanıyor)
-- Sayfa geçişinin kodu (91.99.4.44 · 15. aşama)
+- Sayfa geçişinin kodu (91.99.4.44 · 16. aşama)
 - Sosyal hesap adresleri (panelde Site ayarları · Sosyal hesaplar · boş olan footer'da görünmez)

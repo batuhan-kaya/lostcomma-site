@@ -162,6 +162,14 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Social accounts · the phone · the address show only once filled (Site ayarları · Sosyal hesaplar: https on the network's own site).
 - Footer classes start with `ft-` · logo classes with `lc-` (plain names like `.mt` · `.fb` · `.lock` already exist on pages).
 
+## Preloader (layout/intro.ts · src/client/lib/intro.ts · src/styles/intro.css)
+
+- "The lost comma is found": the corner of the mark waits in the middle with a dashed place for its comma · design and code look around · motion brings the comma (coral · it turns the logo's colour once it sits) · the mark flies onto the header logo and the page is there. About 1.5 s · a click · a key or the wheel skips it.
+- Only for visitors who arrive from outside (`arrivesFromOutside`: Sec-Fetch-Site none · cross-site · same-site on a document navigation). The server decides so nothing is stored on the device (the privacy page promises three localStorage keys). Our own links · old browsers without the headers · error pages · the panel: never. `Vary: Sec-Fetch-Site`.
+- Server drawn first in the body so it is on the first paint. CSS shows it only with `scripting: enabled` and no reduced motion · a failsafe hides it after six seconds. On the page's own ground (`--pbg` · `--pfg` of the theme on `<html>`).
+- The team cursors start once it is gone (`app.ts`: the crew waits for `playIntro()`). Its cursors are `.lci-cur` (never `.cur`: that is the crew's).
+- `PRELOADER=off` turns it off (the shared e2e server · every page.goto arrives from outside). `e2e/intro.spec.ts` starts its own server with it on.
+
 ## Share images (src/server/og)
 
 - Every page links `/og/<page address>.png?v=<hash>` (1200 × 630). The server draws it from our own fonts: woff2 unpacked once with wawoff2 · letters to outlines with fontkit · sharp turns the SVG into a PNG. Cached in `DATA_DIR/og/` by content. A page can set its label · title · cursor with `og()` (notes do). 404 pages have none.

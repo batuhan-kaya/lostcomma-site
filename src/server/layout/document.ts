@@ -6,6 +6,7 @@ import type { Ctx, Page } from '../page';
 import { href } from '../routes';
 import { THEMES } from '../themes';
 import { footer, header, nextBand } from './chrome';
+import { intro } from './intro';
 
 const OG_LOCALE: Record<Lang, string> = { tr: 'tr_TR', en: 'en_US' };
 const PRELOAD_FONTS = ['anybody-latin', 'geist-latin', 'martian-latin'];
@@ -73,6 +74,7 @@ ${css.map((c) => html`<link rel="stylesheet" href="${c}">`)}
 ${js.map((s) => html`<script type="module" src="${s}"></script>`)}
 </head>
 <body>
+${ctx.intro && !page.bare ? intro(ctx) : ''}
 <a class="skip" href="#main">${t('İçeriğe geç')}</a>
 <div class="pg" data-root data-host="${page.host ?? 'design'}">
 ${header(ctx, page.section, { home: page.home })}
