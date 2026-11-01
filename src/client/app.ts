@@ -1,5 +1,6 @@
-/** Shared behaviour on every page: team cursors · footer clock · language switch roll · mobile menu. */
+/** Shared behaviour on every page: team cursors · footer clock and drawn sign-off · language switch roll · mobile menu. */
 import { getCrew } from './lib/crew';
+import { drawFooter } from './lib/footer';
 import { reducedMotion } from './lib/motion';
 import { startStats, track } from './lib/stats';
 
@@ -101,6 +102,7 @@ startClock();
 langSwitch();
 menu();
 placeholders();
+drawFooter();
 
 // Page modules run before DOMContentLoaded and register their scenes first.
 document.addEventListener('DOMContentLoaded', () => getCrew()?.start());

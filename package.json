@@ -13,6 +13,7 @@
     "preview": "npm run build && node scripts/preview.mjs",
     "typecheck": "tsc --noEmit",
     "i18n": "tsx scripts/i18n.ts",
+    "icons": "tsx scripts/icons.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/server/cli.ts migrate",
     "db:seed": "tsx src/server/cli.ts seed",

@@ -380,6 +380,20 @@ describe('site settings', () => {
     expect((await post(`/panel/log/${entry!.id}/restore`)).statusCode).toBe(303);
     expect((await app.inject({ method: 'GET', url: '/tr/hizmetler' })).body).toContain('[FİYAT]');
   });
+
+  it('takes the social accounts for the footer · each on its own network over https', async () => {
+    expect((await get('/panel/settings')).body).toContain('<span lang="en">LinkedIn</span>');
+    const bad = await post('/panel/settings', { 'social.instagram': 'https://evil.example/lostcomma', 'social.x': 'http://x.com/lostcomma' });
+    expect(bad.statusCode).toBe(422);
+    expect(bad.body).toContain('Bu alan instagram.com adresi istiyor.');
+    expect(bad.body).toContain('Adres https:// ile başlamalı.');
+    const ok = await post('/panel/settings', { 'social.behance': 'https://www.behance.net/lostcomma' });
+    expect(ok.statusCode).toBe(303);
+    const ft = (await app.inject({ method: 'GET', url: '/tr' })).body.split('data-ft>')[1]!;
+    expect(ft).toContain('href="https://www.behance.net/lostcomma" rel="me noopener">Behance');
+    expect(ft).not.toContain('Instagram');
+    await post('/panel/settings', { 'social.behance': '' });
+  });
 });
 
 const png = await sharp({ create: { width: 640, height: 400, channels: 3, background: '#3b35ff' } }).png().toBuffer();

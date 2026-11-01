@@ -3,7 +3,7 @@ import { bookingByToken, takenBetween, ticketNo, type Booking } from '../../data
 import { blockedOn, openDays } from '../../data/closures';
 import { html, type Safe } from '../../html';
 import type { Lang, T } from '../../i18n';
-import { footer, nextBand } from '../../layout/chrome';
+import { nextBand } from '../../layout/chrome';
 import { firstName, istTime } from '../../mail/messages';
 import { msg } from '../../msg';
 import type { Ctx, Page } from '../../page';
@@ -171,5 +171,4 @@ ${ways(ctx)}
 ${then(ctx)}
 ${nextBand(ctx, { to: 'work', kick: msg('Hâlâ karar veremedin mi?'), big: msg('İşlere bak'), tone: 'ink' })}
 </div>`,
-  footer: (ctx) => html`<div class="below th-paper">${footer(ctx)}</div>`,
 };

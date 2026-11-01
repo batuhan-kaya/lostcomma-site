@@ -64,7 +64,10 @@ ${image
 <link rel="alternate" type="application/rss+xml" title="Lost Comma · Notes" href="${site + href(lang, 'rss')}">
 ${page.head ? page.head(ctx, data) : ''}
 <meta name="theme-color" content="${THEMES[theme]}">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 ${fonts.map((f) => html`<link rel="preload" href="${f}" as="font" type="font/woff2" crossorigin>`)}
 ${css.map((c) => html`<link rel="stylesheet" href="${c}">`)}
 ${js.map((s) => html`<script type="module" src="${s}"></script>`)}

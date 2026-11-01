@@ -11,6 +11,18 @@ Kendi sunucundaki önizleme kurulana kadar siteyi GitHub üzerinden açabilirsin
 
 Adres `…-3000.app.github.dev` gibi görünür. Varsayılan olarak sadece sen (GitHub hesabınla) açabilirsin.
 
+## Panel
+
+Terminalde açılışta iki satır çıkar: sitenin adresi ve panelin şifresi (`Panel → …/panel · şifre: …`). Her açılışta yeni bir şifre üretilir. Kendi şifreni vermek istersen terminalde `Ctrl + C` ve:
+
+```
+PANEL_PASSWORD='kendi-sifren' npm run preview
+```
+
+Şifreyi tek tırnak içinde yaz (`!` `$` `&` gibi işaretleri terminal kendi anlamında okur).
+
+Codespaces her isteğin geldiği adresi (Origin) `localhost` olarak değiştiriyor. Önizleme bunu bildiği için panele giriş · brief · görüşme formu ve istatistik Codespaces'te de çalışır (`EXTRA_ORIGINS` · gerçek sunucuda boş kalır).
+
 ## Telefonda bakmak
 
 **Ports** sekmesinde 3000 satırına sağ tıkla → **Port Visibility** → **Public**. Adresi telefonuna gönder. İş bitince yine **Private** yap.
@@ -19,7 +31,7 @@ Adres `…-3000.app.github.dev` gibi görünür. Varsayılan olarak sadece sen (
 
 Terminalde `Ctrl + C` · `git pull` · `npm run preview`. Ya da yeni PR'ın dalında yeni bir codespace aç.
 
-Her açılış örnek içerikle temiz bir veritabanından başlar. Brief formu da çalışır, gönderilenler o codespace'te kalır.
+Her açılış örnek içerikle temiz bir veritabanından başlar. Brief ve görüşme formları da çalışır · gönderilenler o codespace'te kalır ve panelde görünür.
 
 ## Kapatmak
 

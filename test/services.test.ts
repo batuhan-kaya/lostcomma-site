@@ -154,7 +154,7 @@ describe('Services · the overview', async () => {
   const tr = (await get('/tr/hizmetler')).body;
 
   it('has its sections in order', () => {
-    expect(secs(en)).toEqual(['hero', 'tools', 'combo', 'faq', 'next']);
+    expect(secs(en)).toEqual(['hero', 'tools', 'combo', 'faq', 'next', 'ft']);
   });
 
   it('has a tool and an inspector for each service · only the first one showing', () => {
@@ -218,8 +218,8 @@ describe('Service pages', async () => {
   });
 
   it('have the five beats below the hero', () => {
-    expect(secs(pages['en:web']!.body)).toEqual(['hero', 'get', 'hood', 'price', 'rel', 'next']);
-    expect(secs(pages['tr:motion']!.body)).toEqual(['hero', 'get', 'hood', 'price', 'reel', 'next']);
+    expect(secs(pages['en:web']!.body)).toEqual(['hero', 'get', 'hood', 'price', 'rel', 'next', 'ft']);
+    expect(secs(pages['tr:motion']!.body)).toEqual(['hero', 'get', 'hood', 'price', 'reel', 'next', 'ft']);
   });
 
   it('start the checklist with its verdict', () => {
@@ -251,7 +251,8 @@ describe('Service pages', async () => {
   it('wrap the Websites page below its blue hero in paper', () => {
     const body = pages['en:web']!.body;
     expect(body).toContain('<div class="below th-paper"><section class="get"');
-    expect(body).toMatch(/<div class="below th-paper"><footer class="ft">/);
+    // The footer is always ink · it follows the paper wrapper instead of sitting in it.
+    expect(body).toMatch(/<\/main>\s*<footer class="ft th-ink" data-sec="ft"/);
   });
 
   it('render each hero first state on the server', () => {

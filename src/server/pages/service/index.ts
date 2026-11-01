@@ -3,7 +3,6 @@ import { EDITOR_SAMPLE, HERO, SERVICE_SLUGS, SERVICES, serviceBySlug, type Servi
 import { projectsOf, type ProjectCard } from '../../data/content';
 import { html, type Safe } from '../../html';
 import type { Lang } from '../../i18n';
-import { footer } from '../../layout/chrome';
 import type { CrewName, Ctx, Page } from '../../page';
 import { href } from '../../routes';
 import type { NextTone, ThemeId } from '../../themes';
@@ -162,7 +161,6 @@ ${next(ctx, d.key)}`;
     return html`${hero(ctx, d.key, s)}
 ${d.key === 'web' ? html`<div class="below th-paper">${below}</div>` : below}`;
   },
-  footer: (ctx, d) => (d.key === 'web' ? html`<div class="below th-paper">${footer(ctx)}</div>` : footer(ctx)),
   data: (ctx, d) => {
     const s = SERVICES[ctx.lang].services[d.key];
     const hero = HERO[ctx.lang];

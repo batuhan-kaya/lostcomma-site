@@ -6,7 +6,7 @@ test.describe('language switch', () => {
     test.skip(info.project.name === 'phone', 'header nav is hidden on phones');
     const errors = watchErrors(page);
     await page.goto('/tr/isler');
-    await page.locator('.lang a[data-lang="en"]').click();
+    await page.locator('.hd .lang a[data-lang="en"]').click();
     await expect(page.locator('html')).toHaveClass(/rolling/);
     await page.waitForURL('**/en/work');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -18,7 +18,7 @@ test.describe('language switch', () => {
 
   test('the cookie decides where / goes next time', async ({ page }) => {
     await page.goto('/en/work');
-    await page.locator('.lang a[data-lang="tr"]').click();
+    await page.locator('.hd .lang a[data-lang="tr"]').click();
     await page.waitForURL('**/tr/isler');
     await page.goto('/');
     await expect(page).toHaveURL(/\/tr$/);
@@ -27,7 +27,7 @@ test.describe('language switch', () => {
   test('navigates at once with reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/en/studio');
-    await page.locator('.lang a[data-lang="tr"]').click();
+    await page.locator('.hd .lang a[data-lang="tr"]').click();
     await page.waitForURL('**/tr/studyo', { timeout: 400 });
   });
 });

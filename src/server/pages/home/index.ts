@@ -1,6 +1,6 @@
 import { boardProjects, newestLoop, type BoardProject, type ProjectCard } from '../../data/content';
-import { html, type Safe } from '../../html';
-import { istanbulTime } from '../../layout/chrome';
+import { SOCIAL } from '../../data/settings';
+import { html, raw, type Safe } from '../../html';
 import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
 import { HOME } from '../../content/home';
@@ -18,25 +18,20 @@ import { services } from './services';
  */
 export const CONTACT_THEME: ContactTheme = 'blue';
 
-const LETTERS_A = ['l', 'o', 's', 't'];
-const LETTERS_B = ['c', 'o', 'm', 'm', 'a'];
-
-/** The homepage ends with the big wordmark instead of the shared footer. */
-function bigFooter(ctx: Ctx): Safe {
-  const { t, lang } = ctx;
-  const letter = (ch: string, i: number) => html`<span data-fl="${i}"${i === 0 ? html` data-rest="motion" data-rest-at="0.4 0.12"` : ''}>${ch}</span>`;
-  return html`<footer class="bigft" data-sec="ft" data-host="motion">
-<div class="wrap">
-<p class="fwm"><span class="sr">Lost Comma</span><span class="fwl" aria-hidden="true">${LETTERS_A.map(letter)}<b class="fc2 egg">,</b><i class="gp"></i>${LETTERS_B.map((ch, i) => letter(ch, i + 4))}</span></p>
-<div class="frow mono">
-<span>© ${ctx.now.getFullYear()} Lost Comma · ${t('İstanbul')} <time data-clock>${istanbulTime(ctx.now)}</time></span>
-<nav aria-label="${t('Diğer sayfalar')}"><a href="${href(lang, 'process')}">${t('Süreç')}</a><a href="${href(lang, 'now')}">${t('Şimdi')}</a><a href="${href(lang, 'uses')}">${t('Araçlar')}</a><a href="${href(lang, 'rss')}">RSS</a></nav>
-<nav aria-label="${t('Yasal')}"><a href="${href(lang, 'privacy')}">${t('Gizlilik')}</a><a href="${href(lang, 'kvkk')}">KVKK</a><a href="${href(lang, 'cookies')}">${t('Çerezler')}</a></nav>
-<span data-footnote>${t('Üç kişi ve bir yerlerde bir virgül')}</span>
-<a href="#top">${t('Başa dön')} <span aria-hidden="true">↑</span></a>
-</div>
-</div>
-</footer>`;
+/** Who we are for search engines: name · logo · the accounts filled in the panel. */
+function organization(ctx: Ctx): Safe {
+  const sameAs = SOCIAL.map((s) => ctx.settings.text(s.key, ctx.lang)).filter((u): u is string => !!u);
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Lost Comma',
+    url: `${ctx.site}${href(ctx.lang, 'home')}`,
+    logo: `${ctx.site}/icon-512.png`,
+    email: 'hello@lostcomma.co',
+    address: { '@type': 'PostalAddress', addressLocality: 'İstanbul', addressCountry: 'TR' },
+    ...(sameAs.length ? { sameAs } : {}),
+  };
+  return raw(`<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`);
 }
 
 export interface HomeOptions {
@@ -70,7 +65,7 @@ ${services(ctx, d.loop)}
 ${board(ctx, d.board)}
 ${process(ctx)}
 ${brief(ctx, { theme: CONTACT_THEME, sent: !!opts.sent, error: !!opts.error })}`,
-    footer: bigFooter,
+    head: (ctx) => organization(ctx),
     data: (ctx) => {
       const c = HOME[ctx.lang];
       return {

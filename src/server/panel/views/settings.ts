@@ -1,6 +1,6 @@
-/** Site ayarları: the placeholders filled from the panel (prices · the next free month · address · phone). */
+/** Site ayarları: the placeholders filled from the panel (prices · the next free month · address · phone · legal · social). */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { SETTINGS, type Localized } from '../../data/settings';
+import { SETTINGS, SOCIAL, type Localized } from '../../data/settings';
 import { html } from '../../html';
 import { back, bodyOf, COMMA, hasComma, log, send, str, type Kit } from '../kit';
 import { csrfField, errorSummary, input, pair, saveBar, section, type Errors } from '../ui';
@@ -10,7 +10,22 @@ const GROUPS = [
   { key: 'plans', title: 'Süreç planları', hint: 'Süreç sayfasının altındaki iki plan. Üçüncüsü "iş başına".' },
   { key: 'studio', title: 'Stüdyo', hint: 'Boş bırakılan alan sayfada yer tutucu olarak kalır ve Pano\'daki hazırlık listesinde görünür.' },
   { key: 'legal', title: 'Yasal sayfalar', hint: 'Gizlilik · KVKK ve Çerezler sayfalarında yazar. Boş olan yer tutucu olarak kalır.' },
+  { key: 'social', title: 'Sosyal hesaplar', hint: 'Footer\'daki Takip et sütunu. Boş bırakılan görünmez · hiçbiri dolu değilse sütun da görünmez.' },
 ] as const;
+
+/** A profile address: https and the network's own site (or a subdomain of it). */
+export function socialError(x: string, host: string): string | null {
+  if (!x) return null;
+  let u: URL;
+  try {
+    u = new URL(x);
+  } catch {
+    return 'Tam adresi yaz (https:// ile başlayan).';
+  }
+  if (u.protocol !== 'https:') return 'Adres https:// ile başlamalı.';
+  if (u.hostname !== host && !u.hostname.endsWith(`.${host}`)) return `Bu alan ${host} adresi istiyor.`;
+  return null;
+}
 
 export function registerSettings(p: FastifyInstance, k: Kit): void {
   const page = async (req: FastifyRequest, reply: FastifyReply, o: { values?: Record<string, string>; errors?: Errors; status?: number } = {}) => {
@@ -36,7 +51,9 @@ ${GROUPS.map((g) =>
         ? pair(s.key, s.label, { tr: v(s.key, 'tr'), en: v(s.key, 'en') }, e, { copy: true, hint: s.hint, attrs: html` placeholder="${s.key.startsWith('price') ? '[FİYAT]' : ''}"` })
         : s.kind === 'month'
           ? input(s.key, s.label, v(s.key), { type: 'month', error: e[s.key], hint: s.hint })
-          : input(s.key, s.label, v(s.key), { error: e[s.key], hint: s.hint, copy: true, type: s.key === 'studio.phone' ? 'tel' : s.key === 'legal.email' ? 'email' : 'text' }),
+          : s.kind === 'url'
+            ? input(s.key, html`<span lang="en">${s.label}</span>`, v(s.key), { type: 'url', error: e[s.key], hint: s.hint })
+            : input(s.key, s.label, v(s.key), { error: e[s.key], hint: s.hint, copy: true, type: s.key === 'studio.phone' ? 'tel' : s.key === 'legal.email' ? 'email' : 'text' }),
     )}`,
     { id: g.key, hint: g.hint },
   ),
@@ -69,7 +86,11 @@ ${saveBar()}
         values[s.key] = x;
         if (s.kind === 'month' && x && !/^\d{4}-(0[1-9]|1[0-2])$/.test(x)) e[s.key] = 'Bir ay seç.';
         if (s.kind === 'text' && hasComma(x)) e[s.key] = COMMA;
-        if (x.length > 120) e[s.key] = 'Çok uzun.';
+        if (s.kind === 'url') {
+          const err = socialError(x, SOCIAL.find((n) => n.key === s.key)!.host);
+          if (err) e[s.key] = err;
+        }
+        if (x.length > (s.kind === 'url' ? 200 : 120)) e[s.key] = 'Çok uzun.';
         next.set(s.key, x || null);
       }
     }
