@@ -59,7 +59,7 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 7 | Notes + Note | Bul ve blame · yay oyun alanı · RSS · OG görselleri | Bitti |
 | 8 | Lab | Canlı örnekler · ekran dışında duraklatma · performans bütçesi · döngü videoları (karar: hazır dosya · sunucu kontrol eder ve sunar) | Bitti |
 | 9 | Start | Ofis saatleri · saat dilimi · randevu · form · bildirim (outbox · SMTP · takvim daveti) | Onay bekliyor |
-| 10 | Now + Uses + 404 | Duvar takvimi · klavye · geri al | |
+| 10 | 404 (Now + Uses kararı bekliyor) | Site haritası olarak 404: en yakın sayfa harf farkıyla · ⌘Z şakası | Onay bekliyor |
 | 11 | Panel | Şifreyle giriş (tek kullanıcı) · içerik ve görsel yönetimi · denetim kaydı | |
 | 12 | Sertleştirme | SEO · performans · erişilebilirlik · çapraz tarayıcı | |
 | 13 | Yayın | Staging · Compose + Caddy · yedekleme · izleme | |

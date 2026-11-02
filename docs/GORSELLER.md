@@ -92,6 +92,12 @@ Görsel olmayan yer tutucular: ekip adları ve rolleri ([Name] · veritabanında
 
 Görsel olmayan yer tutucular: telefon numarası ([+90 telefon] · `src/server/content/start.ts`) · görüşme bağlantısı (`MEET_URL` boşsa bağlantıyı bir gün önce elle gönderiyoruz) · e-posta ayarları (`MAIL_URL` · boşsa mesajlar outbox tablosunda bekler).
 
+## 404 (10. aşama)
+
+| # | Yer | Ne lazım | Oran · teslim boyutu | Durum |
+|---|---|---|---|---|
+| I1 | 404 · site haritası ve kayıp virgül | Kodla çiziliyor | | Gerekmez |
+
 ## Döngü videoları nasıl hazırlanır (D5 · A6)
 
 Her hareket projesi için bir döngü: sessiz · kendi içinde dönen · 6 ile 12 saniye. Sayfada ses olmadan ve ekrandayken oynar. Azaltılmış hareket isteyen ziyaretçi önce posteri görür.

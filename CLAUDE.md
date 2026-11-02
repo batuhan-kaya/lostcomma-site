@@ -98,6 +98,12 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - `bookings` table: one booked call per instant (partial unique index) · a cancelled call frees the slot. `BOOK_LIMIT` = bookings per address per hour. `/api/booking/<token>.ics` is the calendar file.
 - Copy per language in `src/server/content/start.ts` (including both emails). The phone number is a placeholder.
 
+## 404 (src/server/pages/notFound · src/client/notfound.ts · src/shared/lost.ts)
+
+- "This place is not on the map": the site drawn as a star chart on ink (home in the middle · main pages on the first ring · services · the newest cases and notes on the second). The visitor is a lime comma standing next to the page their address came closest to.
+- Closeness is counted in letters (edit distance with swaps · Turkish letters and accents forgiven · either language's address). Nothing close: the comma stands outside the edge and the way leads home. `placeYou` picks the free side so the comma never covers a label.
+- Every star is a link. Hover or focus draws the way there on the cursor spring and the box says how many letters away it is. ⌘Z / Ctrl+Z: the team cannot undo it. Without JS the way to the closest page is already drawn.
+
 ## Mail (src/server/mail)
 
 - Every message goes into the `outbox` table first. The `Postman` sends what is pending through `MAIL_URL` (any SMTP · `log://` prints) · retries failures every five minutes · gives up after five tries · skips anything older than two days. Without `MAIL_URL` nothing is sent and nothing is lost.

@@ -93,7 +93,7 @@ describe('not found', () => {
     const res = await get('/tr/yok-boyle-bir-sayfa');
     expect(res.statusCode).toBe(404);
     expect(res.body).toContain('<html lang="tr"');
-    expect(res.body).toContain('Bu sayfa silindi.');
+    expect(res.body).toContain('Burası haritada yok.');
     expect(res.body).toContain('<meta name="robots" content="noindex">');
     expect(res.body).not.toContain('rel="canonical"');
   });
