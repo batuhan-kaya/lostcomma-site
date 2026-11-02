@@ -35,6 +35,8 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Bubble copy goes through `t()` like everything else and keeps the comma rule.
 - Below the hero only one cursor is ever visible. A scene that needs a different teammate calls `crew.cast(name)` first (the others fade).
 - `data-rest-at-m` is the spot below 700 px. Rest spots are picked again after a resize (and when late fonts arrive).
+- The spring (`src/shared/spring.ts`): pull .018 · damping .79 · gain .618 px a frame per frame (it sets off like a hand · no leap) · top speed 14.8 px a frame (about 890 px/s) · a pixel or two of overshoot. A 300 px move reads in about .6 s and is still before .9 s. Births .618 s then every .382 s · a far jump fades for .618 s · a bubble stays 2.618 s. The sample note "How our cursors move" quotes these numbers.
+- Every spring on the site steps at a fixed 60 Hz through `Clock` (`crew-math.ts`) and draws each frame between its last two steps (`between`): the same pace on 60 · 120 · 144 Hz screens and no frozen or doubled frames. Never call `step()` once per requestAnimationFrame (the Lab's canvas specimens are the exception).
 - The spring runs in requestAnimationFrame only while a cursor moves. A settled cursor gets `.drifting`: the ±6 px drift is CSS (`cur-dx` · `cur-dy` in `crew.css`) and leaving it folds the drifted offset into the position (no jump). Scroll · resize · a 700 ms watch (a page that moved under a resting cursor) wake the loop. `crew.state().running` tells.
 - A resting spot is nudged off visible text (`clearSpot` in `crew-math.ts` · the drift is counted in): the arrow may point into a display headline (40 px and up) · the tag never covers words. Scene targets are never nudged. The watch looks again every two seconds and a resting cursor steps aside when a scene puts words under it.
 - An anchor inside a hidden element is skipped (the next shown anchor or the section's fallback spot wins) · a target that disappears leaves the cursor where it is.
@@ -161,6 +163,15 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - One footer on every page (the homepage too): a way to start (next free month from Site ayarları) · the sitemap · the sign-off (the mark drawn with a pen when it first shows · `data-draw` wait → go · then the name rises · reduced motion and no JS: simply there) · the small print with the language switch. Always ink (`th-ink`) · lime is its accent. `data-sec="ft"` · the host rests after the name.
 - Social accounts · the phone · the address show only once filled (Site ayarları · Sosyal hesaplar: https on the network's own site).
 - Footer classes start with `ft-` · logo classes with `lc-` (plain names like `.mt` · `.fb` · `.lock` already exist on pages).
+
+## Preloader (layout/intro.ts · src/client/lib/intro.ts · src/styles/intro.css)
+
+- "The lost comma is found": the corner of the mark waits in the middle with a dashed place for its comma · design and code glide in · motion brings the comma (coral · it turns the logo's colour once it sits) · the mark flies onto the header logo and the page is there. A click · a key or the wheel skips it.
+- Timed so each beat can be read (Batuhan: "too fast · chaotic" · then "neither slow nor fast · flawlessly fluid"): a .382 s pause · design at .382 s and code at .618 s (1 s glides) · the comma from 1.236 s (picked up slowly · .75 s on one arc · dropped in at 2 s · .3 s settle) · found at 2.382 s · the exit at 2.618 s (.786 s). Each axis has its own easing (x on `translate` · y on `transform` · tilt on `rotate`) so every path is one curve with no corner and nothing stops in mid air.
+- Only for visitors who arrive from outside (`arrivesFromOutside`: Sec-Fetch-Site none · cross-site · same-site on a document navigation). The server decides so nothing is stored on the device (the privacy page promises three localStorage keys). Our own links · old browsers without the headers · error pages · the panel: never. `Vary: Sec-Fetch-Site`.
+- Server drawn first in the body so it is on the first paint. CSS shows it only with `scripting: enabled` and no reduced motion · a failsafe hides it after six seconds. On the page's own ground (`--pbg` · `--pfg` of the theme on `<html>`).
+- The team cursors start once it is gone (`app.ts`: the crew waits for `playIntro()`). Its cursors are `.lci-cur` (never `.cur`: that is the crew's).
+- `PRELOADER=off` turns it off (the shared e2e server · every page.goto arrives from outside). `e2e/intro.spec.ts` starts its own server with it on.
 
 ## Share images (src/server/og)
 

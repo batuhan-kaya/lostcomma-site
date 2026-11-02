@@ -23,6 +23,7 @@ import { addDemoCover, addDemoLoop } from './media/demo';
 import { mediaDirs } from './media/ingest';
 import { createMailer, Postman, type Mailer } from './mail';
 import { getUser, setPassword } from './panel/auth';
+import { arrivesFromOutside } from './layout/intro';
 import { registerPanel } from './panel';
 import { rssXml } from './notes/rss';
 import { OgImages } from './og';
@@ -226,10 +227,13 @@ export async function buildApp({ config, now = () => new Date(), database, maile
   /** Renders a page. `loaded` skips load() when the route already fetched the data. */
   async function send(reply: FastifyReply, page: AnyPage, ctx: Ctx, status = 200, loaded?: { data: unknown }) {
     const data = loaded ? loaded.data : page.load ? await page.load(ctx, {}) : undefined;
+    // The preloader greets visitors who arrive from outside (layout/intro.ts) · the answer depends on it.
+    ctx.intro = status === 200 && config.PRELOADER === 'on' && arrivesFromOutside(reply.request);
     return reply
       .status(status)
       .type('text/html; charset=utf-8')
       .header('cache-control', 'no-cache')
+      .header('vary', 'Sec-Fetch-Site')
       .send(documentHtml(page, ctx, data).value);
   }
 

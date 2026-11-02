@@ -1,6 +1,7 @@
 /** Shared behaviour on every page: team cursors · footer clock and drawn sign-off · language switch roll · mobile menu. */
 import { getCrew } from './lib/crew';
 import { drawFooter } from './lib/footer';
+import { playIntro } from './lib/intro';
 import { reducedMotion } from './lib/motion';
 import { startStats, track } from './lib/stats';
 
@@ -104,5 +105,8 @@ menu();
 placeholders();
 drawFooter();
 
-// Page modules run before DOMContentLoaded and register their scenes first.
-document.addEventListener('DOMContentLoaded', () => getCrew()?.start());
+// Page modules run after this one and register their scenes before DOMContentLoaded: the team
+// starts after that event. With the preloader they also wait until the page is free (born from
+// the header avatars after the logo lands).
+const intro = playIntro();
+document.addEventListener('DOMContentLoaded', () => intro.then(() => getCrew()?.start()));

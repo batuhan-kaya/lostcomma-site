@@ -17,26 +17,38 @@ export interface Spring {
   damping: number;
   /** Pixels per frame. */
   maxSpeed: number;
+  /** Speed it may gain per frame (px per frame per frame) · none: it leaps off at once. */
+  accel?: number;
   arriveDist: number;
   arriveSpeed: number;
 }
 
+/**
+ * Moves like a hand (phase 15): it sets off slowly (it may gain only .618 px per frame of speed
+ * each frame) · cruises at 14.8 px per frame at most (24 / φ · about 890 px/s) · lands softly with
+ * an overshoot of a pixel or two. A 300 px move reads in about .6 s and is still at .85 s.
+ * The steps are a fixed 60 a second on every screen (crew-math.ts `stepsFor`).
+ */
 export const SPRING: Spring = {
-  damping: 0.8,
-  pull: 0.026,
-  maxSpeed: 24,
+  damping: 0.79,
+  pull: 0.018,
+  maxSpeed: 14.8,
+  accel: 0.618,
   arriveDist: 6,
-  arriveSpeed: 1.2,
+  arriveSpeed: 1,
 };
 
 /** One spring step toward (tx, ty). Returns true once the body has settled. */
 export function step(b: Body, tx: number, ty: number, k: Spring = SPRING): boolean {
+  const was = k.accel === undefined ? 0 : Math.hypot(b.vx, b.vy);
   b.vx = b.vx * k.damping + (tx - b.x) * k.pull;
   b.vy = b.vy * k.damping + (ty - b.y) * k.pull;
   const sp = Math.hypot(b.vx, b.vy);
-  if (sp > k.maxSpeed) {
-    b.vx *= k.maxSpeed / sp;
-    b.vy *= k.maxSpeed / sp;
+  // Speeding up is gradual · slowing down never is (it would overshoot).
+  const top = k.accel === undefined ? k.maxSpeed : Math.min(k.maxSpeed, was + k.accel);
+  if (sp > top) {
+    b.vx *= top / sp;
+    b.vy *= top / sp;
   }
   b.x += b.vx;
   b.y += b.vy;
@@ -46,8 +58,8 @@ export function step(b: Body, tx: number, ty: number, k: Spring = SPRING): boole
 /** The playground presets. The first one is what the homepage shipped with · the second is today. */
 export const PRESETS = [
   { key: 'first', pull: 0.052, damping: 0.74 },
-  { key: 'calm', pull: 0.026, damping: 0.8 },
-  { key: 'jelly', pull: 0.09, damping: 0.88 },
+  { key: 'calm', pull: 0.018, damping: 0.79 },
+  { key: 'jelly', pull: 0.08, damping: 0.91 },
   { key: 'sleepy', pull: 0.012, damping: 0.8 },
 ] as const;
 
@@ -78,7 +90,7 @@ export function response(pull: number, damping: number, n = 160, from = 300): nu
 
 /**
  * Below this damping the spring never overshoots (both roots of z² − (1 + d − k)z + d are real).
- * About 0.70 for our stiffness.
+ * About 0.75 for our stiffness.
  */
 export function criticalDamping(pull: number): number {
   return (1 - Math.sqrt(pull)) ** 2;

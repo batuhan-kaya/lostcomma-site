@@ -4,7 +4,7 @@
  * this browser · the logo and the footer get their comma back on every page).
  */
 import type { Crew } from '../lib/crew';
-import { step } from '../lib/crew-math';
+import { between, Clock, step } from '../lib/crew-math';
 import { reducedMotion } from '../lib/motion';
 import { track } from '../lib/stats';
 import { t } from '../lib/t';
@@ -26,6 +26,9 @@ export class Comma {
   private readonly el: HTMLButtonElement;
   private readonly bub: HTMLElement;
   private readonly body = { x: -300, y: -300, vx: 0, vy: 0 };
+  /** Where it was one step ago (the cursors' clock · the same pace on every screen). */
+  private readonly prev = { x: -300, y: -300 };
+  private readonly clock = new Clock();
   private target = { x: -300, y: -300 };
   private on = false;
   private flees = 0;
@@ -101,6 +104,8 @@ export class Comma {
       if (!this.on && now > this.next && this.crew?.current && !document.hidden) {
         const s = this.spot();
         Object.assign(this.body, { x: s.x, y: s.y, vx: 0, vy: 0 });
+        Object.assign(this.prev, s);
+        this.clock.reset();
         this.target = s;
         this.el.classList.add('in');
         this.on = true;
@@ -114,8 +119,15 @@ export class Comma {
         this.next = now + 24_000;
       }
       if (this.on) {
-        step(this.body, this.target.x, this.target.y, FAST);
-        this.el.style.transform = `translate3d(${this.body.x.toFixed(1)}px,${this.body.y.toFixed(1)}px,0)`;
+        const { steps, alpha } = this.clock.tick(now);
+        for (let i = 0; i < steps; i++) {
+          this.prev.x = this.body.x;
+          this.prev.y = this.body.y;
+          step(this.body, this.target.x, this.target.y, FAST);
+        }
+        const x = between(this.prev.x, this.body.x, alpha);
+        const y = between(this.prev.y, this.body.y, alpha);
+        this.el.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;
       }
     };
     this.raf = requestAnimationFrame(tick);

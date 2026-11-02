@@ -8,6 +8,8 @@ const Env = z.object({
   SITE_URL: z.url().default('http://localhost:3000'),
   /** More hosts a POST may come from (space separated). Only for a preview behind a proxy that rewrites Origin (Codespaces). */
   EXTRA_ORIGINS: z.string().default(''),
+  /** The preloader for visitors who arrive from outside (layout/intro.ts). off: never (the e2e server). */
+  PRELOADER: z.enum(['on', 'off']).default('on'),
   /** Where the built assets and manifest live. */
   PUBLIC_DIR: z.string().default('dist/public'),
   /** Writable data: uploaded images and their variants (and the PGlite files in development). A Docker volume in production. */

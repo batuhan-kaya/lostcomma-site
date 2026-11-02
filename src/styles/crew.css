@@ -2,7 +2,7 @@
 .crew { position: absolute; inset: 0; z-index: 60; overflow: clip; pointer-events: none; transition: opacity .3s; }
 .pg:has(details.menu[open]) .crew { opacity: 0; }
 
-.cur { position: absolute; left: 0; top: 0; display: block; transform: translate3d(-300px,-300px,0); transition: opacity .45s; will-change: transform; }
+.cur { position: absolute; left: 0; top: 0; display: block; transform: translate3d(-300px,-300px,0); transition: opacity .618s; will-change: transform; }
 .cur.zz { opacity: 0; }
 .cur .dr { position: relative; display: block; }
 

@@ -69,9 +69,9 @@ describe('the spring', () => {
     expect(Math.abs(r[r.length - 1]!)).toBeLessThan(0.01);
   });
 
-  it('stops overshooting below the critical damping (about 0.70 for ours)', () => {
+  it('stops overshooting below the critical damping (about 0.75 for ours)', () => {
     const c = criticalDamping(SPRING.pull);
-    expect(c).toBeCloseTo(0.704, 3);
+    expect(c).toBeCloseTo(0.75, 3);
     expect(Math.min(...response(SPRING.pull, c - 0.01, 600))).toBeGreaterThanOrEqual(0);
     expect(Math.min(...response(SPRING.pull, c + 0.05, 600))).toBeLessThan(0);
   });
@@ -79,8 +79,9 @@ describe('the spring', () => {
   it('names how each preset feels', () => {
     const f = Object.fromEntries(PRESETS.map((p) => [p.key, feel(p.pull, p.damping)]));
     expect(f).toEqual({ first: 'little', calm: 'little', jelly: 'wobbly', sleepy: 'none' });
-    expect(presetOf(0.026, 0.8)).toBe('calm');
-    expect(presetOf(0.03, 0.8)).toBeNull();
+    expect(presetOf(0.018, 0.79)).toBe('calm');
+    expect(presetOf(0.014, 0.84)).toBeNull();
+    expect(presetOf(0.026, 0.8)).toBeNull();
   });
 
   it('draws the graph inside its 640 × 110 box', () => {

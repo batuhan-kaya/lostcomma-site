@@ -27,6 +27,8 @@ export interface Ctx {
   query: Record<string, string>;
   /** Values filled from the panel (prices · month · address · phone · src/server/data/settings.ts). */
   settings: SettingsStore;
+  /** Someone arrived from outside: the page opens with the preloader (layout/intro.ts). */
+  intro?: boolean;
 }
 
 export interface NextBand {

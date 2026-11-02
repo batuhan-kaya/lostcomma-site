@@ -5,6 +5,7 @@
  */
 import { feel, graphPoints, PRESETS, presetOf, SPRING, step, type Body } from '../shared/spring';
 import { getCrew, type Name } from './lib/crew';
+import { between, Clock } from './lib/crew-math';
 import { reducedMotion } from './lib/motion';
 import { t } from './lib/t';
 
@@ -165,6 +166,8 @@ function playground(root: HTMLElement): void {
 
   const k = { ...SPRING };
   const b: Body = { x: 0, y: 0, vx: 0, vy: 0 };
+  const prev = { x: 0, y: 0 };
+  const clock = new Clock();
   const target = { x: 0, y: 0 };
   let axisX = true;
   let e0 = 1;
@@ -210,21 +213,31 @@ function playground(root: HTMLElement): void {
       const s = SPOTS[auto]!;
       aimAt(s[0] * W, s[1] * H);
     }
-    if (reduce) Object.assign(b, { x: target.x, y: target.y, vx: 0, vy: 0 });
-    else step(b, target.x, target.y, k);
-    place();
-    hist.push((axisX ? b.x - target.x : b.y - target.y) / e0);
-    if (hist.length > 160) hist.shift();
-    if (++frames % 2 === 0) line!.setAttribute('points', graphPoints(hist));
+    // The cursors' own clock: 60 steps a second on any screen · drawn in between.
+    const { steps, alpha } = clock.tick(now);
+    for (let i = 0; i < steps; i++) {
+      prev.x = b.x;
+      prev.y = b.y;
+      if (reduce) Object.assign(b, { x: target.x, y: target.y, vx: 0, vy: 0 });
+      else step(b, target.x, target.y, k);
+      hist.push((axisX ? b.x - target.x : b.y - target.y) / e0);
+      if (hist.length > 160) hist.shift();
+    }
+    place(alpha);
+    if (steps && ++frames % 2 === 0) line!.setAttribute('points', graphPoints(hist));
   }
 
-  function place(): void {
-    cur!.style.transform = `translate3d(${(b.x - 3).toFixed(1)}px,${(b.y - 2).toFixed(1)}px,0)`;
+  function place(alpha = 1): void {
+    const x = between(prev.x, b.x, alpha);
+    const y = between(prev.y, b.y, alpha);
+    cur!.style.transform = `translate3d(${(x - 3).toFixed(2)}px,${(y - 2).toFixed(2)}px,0)`;
     tgt!.style.transform = `translate3d(${target.x.toFixed(1)}px,${target.y.toFixed(1)}px,0)`;
   }
 
   function start(): void {
-    if (!raf) raf = requestAnimationFrame(frame);
+    if (raf) return;
+    clock.reset();
+    raf = requestAnimationFrame(frame);
   }
   function stop(): void {
     cancelAnimationFrame(raf);
@@ -282,6 +295,7 @@ function playground(root: HTMLElement): void {
   // First paint before it ever runs: the cursor resting beside its target (the graph comes from the server).
   aimAt(box.clientWidth * 0.62, box.clientHeight * 0.44);
   Object.assign(b, { x: target.x + 12, y: target.y + 10 });
+  Object.assign(prev, { x: b.x, y: b.y });
   place();
 }
 

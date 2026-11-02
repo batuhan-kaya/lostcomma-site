@@ -19,7 +19,7 @@
  * stops the loop · the resting drift is a CSS animation (compositor only) · a slow watch notices
  * when the page moves under a resting cursor (content opened · images arrived · a resize).
  */
-import { clampPoint, clearSpot, fitShift, HOP_DIST, parseRestAt, pickSection, probeLine, SECTION_SETTLE_MS, settled, shouldFlip, step, stepsFor, TEAM, type Box, type Name } from './crew-math';
+import { between, clampPoint, clearSpot, Clock, fitShift, HOP_DIST, parseRestAt, pickSection, probeLine, SECTION_SETTLE_MS, settled, shouldFlip, step, TEAM, type Box, type Name } from './crew-math';
 import { reducedMotion } from './motion';
 import { t } from './t';
 
@@ -51,6 +51,9 @@ interface Cursor {
   bub: HTMLElement;
   x: number;
   y: number;
+  /** Where it was one step ago: frames between two steps are drawn in between. */
+  px: number;
+  py: number;
   vx: number;
   vy: number;
   target: Target | null;
@@ -101,8 +104,10 @@ export class Crew {
   private candidateAt = 0;
   private ctrl: AbortController | null = null;
   private raf = 0;
-  private last = 0;
-  private acc = 0;
+  /** Fixed 60 Hz steps drawn in between on fast screens (crew-math.ts). */
+  private clock = new Clock();
+  /** How far this frame is between the last two steps. */
+  private alpha = 1;
   private started = false;
   private width = 0;
   private resizeTimer = 0;
@@ -135,6 +140,8 @@ export class Crew {
         bub: el.querySelector('.bub') as HTMLElement,
         x: -300,
         y: -300,
+        px: -300,
+        py: -300,
         vx: 0,
         vy: 0,
         target: null,
@@ -316,7 +323,7 @@ export class Crew {
     if (r) this.send(c, r);
   }
 
-  say(name: Name, text: string, ms = 2200): void {
+  say(name: Name, text: string, ms = 2618): void {
     const c = this.cursors[name];
     if (c.hidden) return;
     c.bub.textContent = text;
@@ -398,7 +405,8 @@ export class Crew {
       const show = team || (!this.touch && name === host);
       const target = show ? (this.restTarget(sec, name) ?? this.restTarget('hero', name)) : null;
       if (!target) return this.fade(c);
-      if (c.hidden) return this.appear(c, target, team ? 500 + i * 320 : 260);
+      // Born one after the other on golden ratio steps: .618 s · then every .382 s.
+      if (c.hidden) return this.appear(c, target, team ? 618 + i * 382 : 382);
       const p = this.point(target);
       if (p && Math.hypot(p.x - c.x, p.y - c.y) > HOP_DIST && !this.reduce) this.hop(c, target);
       else this.send(c, target);
@@ -562,7 +570,7 @@ export class Crew {
       }
       this.unrest(c, false);
       c.tagW = c.tag.offsetWidth;
-      Object.assign(c, { x: sx, y: sy, vx: 0, vy: 0, target: tg, arrived: false, still: false, placed: true });
+      Object.assign(c, { x: sx, y: sy, px: sx, py: sy, vx: 0, vy: 0, target: tg, arrived: false, still: false, placed: true });
       this.render(c);
       c.el.classList.remove('zz');
       this.wake();
@@ -579,11 +587,11 @@ export class Crew {
       if (c.hidden) return;
       const p = this.point(target);
       if (!p) return;
-      Object.assign(c, { x: p.x - 50, y: p.y - 34, vx: 0, vy: 0, target, arrived: false, still: false, placed: true });
+      Object.assign(c, { x: p.x - 50, y: p.y - 34, px: p.x - 50, py: p.y - 34, vx: 0, vy: 0, target, arrived: false, still: false, placed: true });
       this.render(c);
       c.el.classList.remove('zz');
       this.wake();
-    }, 460);
+    }, 618);
   }
 
   /** Start the resting drift (CSS) once a cursor is still at a resting spot. */
@@ -604,6 +612,8 @@ export class Crew {
       const b = c.el.getBoundingClientRect();
       c.x += a.left - b.left;
       c.y += a.top - b.top;
+      c.px = c.x;
+      c.py = c.y;
     }
     c.resting = false;
     c.el.classList.remove('drifting');
@@ -680,7 +690,7 @@ export class Crew {
 
   private wake(): void {
     if (!this.raf && !document.hidden) {
-      this.last = performance.now();
+      this.clock.reset();
       this.raf = requestAnimationFrame(this.tick);
     }
   }
@@ -740,9 +750,8 @@ export class Crew {
   private tick(now: number): void {
     this.raf = 0;
     this.pickNow();
-    const { steps, rest } = stepsFor(this.acc, now - this.last);
-    this.acc = rest;
-    this.last = now;
+    const { steps, alpha } = this.clock.tick(now);
+    this.alpha = alpha;
 
     let moving = false;
     for (const name of TEAM) {
@@ -751,8 +760,8 @@ export class Crew {
       const p = this.point(c.target);
       if (!p) continue;
       if (this.reduce) {
-        c.x = p.x;
-        c.y = p.y;
+        c.x = c.px = p.x;
+        c.y = c.py = p.y;
         c.arrived = c.still = true;
       } else {
         if (c.still && Math.hypot(p.x - c.x, p.y - c.y) > 0.5) {
@@ -761,9 +770,13 @@ export class Crew {
           c.still = false;
         }
         if (!c.still) {
-          for (let i = 0; i < steps; i++) c.arrived = step(c, p.x, p.y);
+          for (let i = 0; i < steps; i++) {
+            c.px = c.x;
+            c.py = c.y;
+            c.arrived = step(c, p.x, p.y);
+          }
           if (settled(c, p.x, p.y)) {
-            Object.assign(c, { x: p.x, y: p.y, vx: 0, vy: 0, arrived: true, still: true });
+            Object.assign(c, { x: p.x, y: p.y, px: p.x, py: p.y, vx: 0, vy: 0, arrived: true, still: true });
             this.rest(c);
           } else moving = true;
         }
@@ -780,7 +793,10 @@ export class Crew {
   private render(c: Cursor): void {
     const W = this.width || this.root.clientWidth;
     const need = Math.max(c.tagW, c.saying ? c.bubW : 0);
-    const flip = shouldFlip(c.x, W, need || undefined);
+    // Drawn between its last two steps (a fast screen draws two or more frames per step).
+    const x = between(c.px, c.x, this.alpha);
+    const y = between(c.py, c.y, this.alpha);
+    const flip = shouldFlip(x, W, need || undefined);
     if (flip !== c.flipped) {
       c.flipped = flip;
       c.el.classList.toggle('flip', flip);
@@ -789,14 +805,14 @@ export class Crew {
     let shift = 0;
     if (c.saying && c.bubW) {
       const A = this.touch ? 20 : 24;
-      const left = c.flipped ? c.x + A - 4 - c.bubW : c.x + (this.touch ? 15 : 18);
+      const left = c.flipped ? x + A - 4 - c.bubW : x + (this.touch ? 15 : 18);
       shift = Math.round(fitShift(left, c.bubW, W));
     }
     if (shift !== c.shift) {
       c.shift = shift;
       c.bub.style.translate = shift ? `${shift}px 0` : '';
     }
-    c.el.style.transform = `translate3d(${c.x.toFixed(1)}px,${c.y.toFixed(1)}px,0)`;
+    c.el.style.transform = `translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0)`;
   }
 }
 

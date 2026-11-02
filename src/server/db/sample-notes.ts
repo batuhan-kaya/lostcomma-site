@@ -18,25 +18,30 @@ So we changed two things. The cursors got slower and most of them now step back 
 
 Each cursor is a point that wants to reach a target. Every frame we pull it a little toward the target and let some of its speed fade away. That is a spring. Two numbers decide how it feels.
 
-~~~ts title=spring.ts hl=2 note="runs once per frame"
-const pull = 0.026    // stiffness · was 0.052
-const damping = 0.8   // damping · was 0.74
-const max = 24        // pixels per frame · was 70
+~~~ts title=spring.ts hl=2 note="sixty times a second on every screen"
+const pull = 0.018    // stiffness · was 0.026
+const damping = 0.79  // damping · was 0.8
+const max = 14.8      // pixels per frame · was 24
+const gain = 0.618    // speed it may gain per frame · new
 
 export function step(c: Cursor) {
+  const was = Math.sqrt(c.vx ** 2 + c.vy ** 2)
   c.vx = c.vx * damping + (c.tx - c.x) * pull
   c.vy = c.vy * damping + (c.ty - c.y) * pull
   const speed = Math.sqrt(c.vx ** 2 + c.vy ** 2)
-  if (speed > max) {
-    c.vx *= max / speed
-    c.vy *= max / speed
+  const top = Math.min(max, was + gain)
+  if (speed > top) {
+    c.vx *= top / speed
+    c.vy *= top / speed
   }
   c.x += c.vx
   c.y += c.vy
 }
 ~~~
 
-Stiffness is how hard the target pulls. Damping is how much speed survives each frame. We halved the pull and let the cursor keep a little more of its speed.[^1] On short moves it now arrives a few frames later and overshoots less. On long moves the new speed cap does most of the calming.
+Stiffness is how hard the target pulls. Damping is how much speed survives each frame. We softened the pull and let a little less speed survive.[^1] The cursor now lands without a wobble. The new line is the gain. A spring leaps off at full speed and that leap was most of the rush. Now the cursor may only gain a little speed each frame so it sets off the way a hand does. A move across half a screen reads in about half a second and is still before one. On long moves the speed cap does the rest.
+
+A fast screen draws twice or more as many frames. So the spring steps sixty times a second on every screen and each frame in between is drawn where the cursor is on its way. Same pace and no stutter on 60 120 or 144 Hz.
 
 ## Try it
 
@@ -65,7 +70,7 @@ If your system asks for \`prefers-reduced-motion\` the cursors snap to their pla
 
 Thank you to everyone who told us it was too much. Please keep doing that.
 
-[^1]: With our stiffness the cursor stops overshooting at all once damping drops below about 0.70. Then it starts to feel dragged.
+[^1]: With our stiffness the cursor stops overshooting at all once damping drops below about 0.75. Then it starts to feel dragged. At 0.79 it goes a pixel or two past and settles.
 [^2]: We use 720 pixels. Anything further becomes a fade instead of a flight.`,
 
   'imleclerimiz-nasil-hareket-ediyor': `Bu sitedeki her sayfada üç imleç var. Ekibe ait ve insanların hareket ettiği gibi hareket ediyorlar. Bu yazı arkalarındaki küçük kod parçası ve onların fazla geldiğini öğrendiğimiz günün hikâyesi.
@@ -80,25 +85,30 @@ Bu yüzden iki şeyi değiştirdik. İmleçler yavaşladı ve çoğu artık ilk 
 
 Her imleç bir hedefe ulaşmak isteyen bir nokta. Her karede onu hedefe doğru biraz çekiyoruz ve hızının bir kısmını söndürüyoruz. Buna yay deniyor. Nasıl hissettireceğine iki sayı karar veriyor.
 
-~~~ts title=spring.ts hl=2 note="her karede bir kez"
-const pull = 0.026    // sertlik · önceden 0.052
-const damping = 0.8   // sönüm · önceden 0.74
-const max = 24        // kare başına piksel · önceden 70
+~~~ts title=spring.ts hl=2 note="her ekranda saniyede altmış kez"
+const pull = 0.018    // sertlik · önceden 0.026
+const damping = 0.79  // sönüm · önceden 0.8
+const max = 14.8      // kare başına piksel · önceden 24
+const gain = 0.618    // kare başına kazanabileceği hız · yeni
 
 export function step(c: Cursor) {
+  const was = Math.sqrt(c.vx ** 2 + c.vy ** 2)
   c.vx = c.vx * damping + (c.tx - c.x) * pull
   c.vy = c.vy * damping + (c.ty - c.y) * pull
   const speed = Math.sqrt(c.vx ** 2 + c.vy ** 2)
-  if (speed > max) {
-    c.vx *= max / speed
-    c.vy *= max / speed
+  const top = Math.min(max, was + gain)
+  if (speed > top) {
+    c.vx *= top / speed
+    c.vy *= top / speed
   }
   c.x += c.vx
   c.y += c.vy
 }
 ~~~
 
-Sertlik hedefin ne kadar güçlü çektiği. Sönüm her karede hızın ne kadarının kaldığı. Çekişi yarıya indirdik ve imlecin hızından biraz daha fazlasını korumasına izin verdik.[^1] Kısa hareketlerde artık birkaç kare geç varıyor ve daha az aşıyor. Uzun hareketlerde sakinliğin çoğunu yeni hız sınırı sağlıyor.
+Sertlik hedefin ne kadar güçlü çektiği. Sönüm her karede hızın ne kadarının kaldığı. Çekişi yumuşattık ve hızın biraz daha azının kalmasına izin verdik.[^1] İmleç artık titremeden iniyor. Yeni satır kazanç. Yay hedefe tam hızla atılır ve o atılış telaşın çoğuydu. Şimdi imleç her karede hızına ancak biraz ekleyebiliyor ve bir elin kalktığı gibi yola çıkıyor. Yarım ekranlık bir hareket yaklaşık yarım saniyede okunuyor ve bir saniye dolmadan duruyor. Uzun hareketlerde gerisini hız sınırı yapıyor.
+
+Hızlı bir ekran iki katı ya da daha fazla kare çiziyor. Bu yüzden yay her ekranda saniyede altmış adım atıyor ve aradaki her kare imlecin yolda olduğu yere çiziliyor. 60 120 ya da 144 Hz fark etmiyor. Hız aynı ve takılma yok.
 
 ## Dene
 
@@ -127,7 +137,7 @@ Sistemin \`prefers-reduced-motion\` istiyorsa imleçler yerlerine oturuyor ve k�
 
 Bize fazla olduğunu söyleyen herkese teşekkürler. Lütfen söylemeye devam edin.
 
-[^1]: Bizim sertliğimizle sönüm yaklaşık 0.70’in altına indiğinde imleç hiç aşmıyor. O zaman da sürükleniyormuş gibi hissettiriyor.
+[^1]: Bizim sertliğimizle sönüm yaklaşık 0.75’in altına indiğinde imleç hiç aşmıyor. O zaman da sürükleniyormuş gibi hissettiriyor. 0.79’da bir iki piksel geçip yerine oturuyor.
 [^2]: 720 piksel kullanıyoruz. Bundan uzağı uçuş yerine kaybolup belirme oluyor.`,
 
   /* ---------------- Variable fonts on a budget ---------------- */

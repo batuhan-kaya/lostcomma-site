@@ -4,6 +4,7 @@
  * Leaving the map goes back to the closest page. ⌘Z / Ctrl+Z: the team tries to undo. It never existed.
  */
 import { getCrew } from './lib/crew';
+import { between, Clock } from './lib/crew-math';
 import { reducedMotion } from './lib/motion';
 import { t } from './lib/t';
 import { PRESETS, step, type Body } from '../shared/spring';
@@ -32,10 +33,24 @@ if (map && route && you && rname && rlabel && rk && rd) {
   let raf = 0;
   let current: SVGAElement = home;
 
-  const draw = () => route.setAttribute('d', `M${from.x} ${from.y}L${tip.x.toFixed(2)} ${tip.y.toFixed(2)}`);
-  const tick = () => {
-    if (step(tip, goal.x, goal.y, SPRING)) {
+  // The cursors' clock: 60 steps a second on any screen · each frame drawn between two steps.
+  const clock = new Clock();
+  const prev = { x: tip.x, y: tip.y };
+  let alpha = 1;
+  const draw = () =>
+    route.setAttribute('d', `M${from.x} ${from.y}L${between(prev.x, tip.x, alpha).toFixed(2)} ${between(prev.y, tip.y, alpha).toFixed(2)}`);
+  const tick = (now: number) => {
+    const f = clock.tick(now);
+    alpha = f.alpha;
+    let done = false;
+    for (let i = 0; i < f.steps && !done; i++) {
+      prev.x = tip.x;
+      prev.y = tip.y;
+      done = step(tip, goal.x, goal.y, SPRING);
+    }
+    if (done) {
       Object.assign(tip, { x: goal.x, y: goal.y, vx: 0, vy: 0 });
+      Object.assign(prev, goal);
       raf = 0;
     } else raf = requestAnimationFrame(tick);
     draw();
@@ -48,10 +63,13 @@ if (map && route && you && rname && rlabel && rk && rd) {
     if (n !== home) n.classList.add('peek');
     goal = { x: Number(n.dataset.x), y: Number(n.dataset.y) };
     if (reducedMotion()) {
-      tip.x = goal.x;
-      tip.y = goal.y;
+      tip.x = prev.x = goal.x;
+      tip.y = prev.y = goal.y;
       draw();
-    } else if (!raf) raf = requestAnimationFrame(tick);
+    } else if (!raf) {
+      clock.reset();
+      raf = requestAnimationFrame(tick);
+    }
     if (n === home) {
       rk.textContent = first.kick;
       rlabel.textContent = first.label;

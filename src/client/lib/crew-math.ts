@@ -24,6 +24,37 @@ export function stepsFor(acc: number, dt: number): { steps: number; rest: number
 }
 
 /**
+ * Springs at the same pace on every screen (60 · 120 · 144 Hz): each frame runs the whole 60 Hz
+ * steps that fit (`steps`) and is drawn `alpha` of the way from the step before to the last one.
+ * So a fast screen draws every frame in a new place (no frozen frames · no double jumps) and the
+ * motion is one frame behind at most.
+ */
+export class Clock {
+  private last = -1;
+  private acc = 0;
+
+  /** After a pause (the loop slept): count from the next frame. */
+  reset(): void {
+    this.last = -1;
+    this.acc = 0;
+  }
+
+  tick(now: number): { steps: number; alpha: number } {
+    if (this.last < 0) {
+      this.last = now;
+      return { steps: 0, alpha: 0 };
+    }
+    const { steps, rest } = stepsFor(this.acc, now - this.last);
+    this.acc = rest;
+    this.last = now;
+    return { steps, alpha: rest / STEP_MS };
+  }
+}
+
+/** Where to draw a body between its last two steps. */
+export const between = (from: number, to: number, alpha: number): number => from + (to - from) * alpha;
+
+/**
  * A cursor counts as settled (and the loop may stop) once it is this close and this slow.
  * Looser than nothing so the spring's tail does not keep the page busy · tighter than arrived.
  */

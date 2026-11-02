@@ -13,7 +13,8 @@ const SITE = 'https://lostcomma.co';
 let app: Awaited<ReturnType<typeof buildApp>>;
 
 beforeAll(async () => {
-  app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: SITE }), now: () => new Date('2026-11-02T01:20:00+03:00') });
+  // The icons straight from public/ (the build copies them to dist/public): CI runs the unit tests before it builds.
+  app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: SITE, PUBLIC_DIR: 'public' }), now: () => new Date('2026-11-02T01:20:00+03:00') });
 });
 afterAll(() => app.close());
 
