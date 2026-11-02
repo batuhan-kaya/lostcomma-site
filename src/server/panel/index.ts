@@ -3,6 +3,8 @@
  * section. Uploads (multipart) are accepted here only. Nothing under /panel is cached or indexed.
  */
 import multipart from '@fastify/multipart';
+import { mark } from '../layout/logo';
+import { fromHere, originHosts } from '../origin';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { eq } from 'drizzle-orm';
 import { readCookie } from '../cookies';
@@ -40,7 +42,7 @@ interface Pending {
 const safeNext = (n: string | undefined) => (n && /^\/panel(\/[\w./?=&%-]*)?$/.test(n) && !n.startsWith('/panel/login') ? n : '/panel');
 
 export async function registerPanel(app: FastifyInstance, k: Kit): Promise<void> {
-  const siteHost = new URL(k.config.SITE_URL).host;
+  const hosts = originHosts(k.config.SITE_URL, k.config.EXTRA_ORIGINS);
   const signIns = new RateLimit(k.config.PANEL_SIGNIN_LIMIT, 15 * 60_000);
   const pending = new Map<string, Pending>();
 
@@ -53,16 +55,8 @@ export async function registerPanel(app: FastifyInstance, k: Kit): Promise<void>
 
       p.addHook('onRequest', async (req, reply) => {
         reply.header('x-robots-tag', 'noindex, nofollow').header('cache-control', 'no-store');
-        // Same-site posts only (browsers always send Origin on POST).
-        if (req.method === 'POST' && req.headers.origin) {
-          let host = '';
-          try {
-            host = new URL(req.headers.origin).host;
-          } catch {
-            host = '';
-          }
-          if (host !== siteHost) return reply.status(403).type('text/plain; charset=utf-8').send('Forbidden');
-        }
+        // Same-site posts only (src/server/origin.ts).
+        if (req.method === 'POST' && !fromHere(req.headers.origin, hosts)) return reply.status(403).type('text/plain; charset=utf-8').send('Forbidden');
         const path = req.url.split('?')[0]!;
         if (OPEN.has(path)) return;
         const session = await readSession(k.db, readCookie(req.headers.cookie, SESSION_COOKIE), k.now());
@@ -86,7 +80,7 @@ export async function registerPanel(app: FastifyInstance, k: Kit): Promise<void>
 
       const loginForm = (next: string, error?: string, setup = false) =>
         html`<div class="p-card">
-<p class="p-logo big"><span>lost</span><i aria-hidden="true">|</i><span>comma</span><small class="mono">panel</small></p>
+<p class="p-logo big"><span class="lc-lock">${mark('lc-mark')}<span>lost</span><i aria-hidden="true">|</i><span>comma</span></span><small class="mono">panel</small></p>
 ${
   setup
     ? html`<h1>Panel henüz kurulmadı</h1><p>Önce bir şifre koy. Sunucuda şunu çalıştır:</p><pre class="p-code">npm run panel -- password</pre><p class="p-hint">Docker içinde: <code>node dist/server/cli.js panel password</code> · ya da ilk açılışta <code>PANEL_PASSWORD</code> ortam değişkeni.</p>`
@@ -144,7 +138,7 @@ ${error ? html`<p class="p-errors" role="alert">${error}</p>` : ''}
 
       const codeForm = (error?: string) =>
         html`<div class="p-card">
-<p class="p-logo big"><span>lost</span><i aria-hidden="true">|</i><span>comma</span><small class="mono">panel</small></p>
+<p class="p-logo big"><span class="lc-lock">${mark('lc-mark')}<span>lost</span><i aria-hidden="true">|</i><span>comma</span></span><small class="mono">panel</small></p>
 <h1>Doğrulama kodu</h1>
 <p>Doğrulama uygulamandaki altı haneli kodu yaz.</p>
 ${error ? html`<p class="p-errors" role="alert">${error}</p>` : ''}

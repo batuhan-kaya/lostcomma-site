@@ -1,6 +1,6 @@
 /**
  * Values filled from the panel (docs/PANEL.md · Site ayarları): prices · the next free month ·
- * the studio address · the phone number. Kept in the `settings` table and cached in memory: pages
+ * the studio address · the phone number · the legal pages' details · the social accounts (footer). Kept in the `settings` table and cached in memory: pages
  * read them synchronously through ctx.settings. An empty value keeps the placeholder on the page
  * ([FİYAT] · [AY] · [ADRES] · [+90 telefon]) and shows up on the panel's launch checklist.
  */
@@ -11,12 +11,12 @@ import type { Db } from '../db';
 import { settings } from '../db/schema';
 import type { Lang } from '../i18n';
 
-export type SettingKind = 'localized' | 'text' | 'month';
+export type SettingKind = 'localized' | 'text' | 'month' | 'url';
 
 export interface SettingDef {
   key: string;
   kind: SettingKind;
-  group: 'prices' | 'plans' | 'studio' | 'legal';
+  group: 'prices' | 'plans' | 'studio' | 'legal' | 'social';
   /** Panel label (Turkish). */
   label: string;
   hint?: string;
@@ -26,6 +26,16 @@ export interface SettingDef {
 
 export const priceKey = (k: ServiceKey, tier: number) => `price.${k}.${tier}`;
 export const planKey = (i: number) => `price.plan.${i}`;
+
+/** The studio's accounts · the footer links the filled ones (labels are the networks' own names). */
+export const SOCIAL = [
+  { key: 'social.instagram', label: 'Instagram', host: 'instagram.com' },
+  { key: 'social.linkedin', label: 'LinkedIn', host: 'linkedin.com' },
+  { key: 'social.behance', label: 'Behance', host: 'behance.net' },
+  { key: 'social.dribbble', label: 'Dribbble', host: 'dribbble.com' },
+  { key: 'social.github', label: 'GitHub', host: 'github.com' },
+  { key: 'social.x', label: 'X', host: 'x.com' },
+] as const;
 
 export const SETTINGS: SettingDef[] = [
   ...SERVICE_KEYS.flatMap((k) =>
@@ -46,6 +56,7 @@ export const SETTINGS: SettingDef[] = [
   { key: 'legal.address', kind: 'text', group: 'legal', label: 'Yazışma adresi', hint: 'KVKK başvurularının gönderileceği açık adres. Boşsa stüdyo adresi yazılır.', where: '/tr/kvkk' },
   { key: 'legal.email', kind: 'text', group: 'legal', label: 'Başvuru e-postası', hint: 'KVKK başvuruları ve gizlilik soruları için. Boşsa hello@lostcomma.co yazılır.', where: '/tr/kvkk' },
   { key: 'legal.mail', kind: 'text', group: 'legal', label: 'E-posta servisi', hint: 'Bildirimlerin ve yazışmaların geçtiği servis ve ülkesi. Örnek: Google Workspace (ABD) · Zoho Mail (AB).', where: '/tr/kvkk' },
+  ...SOCIAL.map((s) => ({ key: s.key, kind: 'url' as const, group: 'social' as const, label: s.label, hint: `Profilin tam adresi · örnek: https://${s.host}/lostcomma`, where: '/tr' })),
 ];
 
 export const SETTING_KEYS = new Set(SETTINGS.map((s) => s.key));

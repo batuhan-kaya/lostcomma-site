@@ -639,21 +639,6 @@
 .again:hover { background: var(--ink); color: var(--milk); }
 .tfoot .mono { color: var(--grey); }
 
-/* ================= big footer ================= */
-.bigft { position: relative; min-height: 480px; background: var(--ink); color: var(--milk); box-shadow: inset 0 1px 0 rgba(242,241,236,.12); }
-.bigft .wrap { padding: 120px var(--gut) 60px; }
-.fwm { display: block; margin: 0; font-family: var(--display); font-size: clamp(76px, 18.4vw, 266px); line-height: .8; letter-spacing: -.03em; font-variation-settings: 'wdth' 76, 'wght' 860; white-space: nowrap; }
-.fwl { display: flex; align-items: baseline; }
-.fwl > span { display: inline-block; transition: font-variation-settings .6s cubic-bezier(.2,.9,.2,1); }
-.fwl > span:hover { font-variation-settings: 'wdth' 76, 'wght' 260; }
-.fwl .gp { width: .2em; }
-.fwl .fc2 { display: none; color: var(--coral); }
-.found .fwl .fc2 { display: inline-block; animation: pop .7s var(--ease-pop) both; }
-.frow { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 32px; margin-top: 40px; padding-top: 18px; border-top: 1px solid rgba(242,241,236,.16); color: var(--dim); }
-.frow a { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; min-height: 40px; text-decoration: none; }
-.frow a:hover { color: var(--milk); }
-.frow nav { display: flex; flex-wrap: wrap; gap: 0 20px; }
-
 /* ================= the shy comma ================= */
 .cur.c-comma { pointer-events: none; }
 .cur.c-comma.in { pointer-events: auto; cursor: pointer; }
@@ -752,7 +737,6 @@ button.cur { padding: 0; border: 0; background: none; color: inherit; font: inhe
   .sum { grid-template-columns: minmax(0, 1fr); }
   .send { justify-self: end; width: 96px; height: 96px; }
   .stp > span { font-size: 11px; letter-spacing: 0; }
-  .bigft .wrap { padding-top: 80px; }
 }
 
 /* the egg layer sits above the crew */
@@ -762,7 +746,6 @@ button.cur { padding: 0; border: 0; background: none; color: inherit; font: inhe
 
 /* Section headings on the homepage follow the Live board (80 px). */
 [data-page="home"] .h2 { font-size: clamp(44px, 5.6vw, 80px); line-height: .94; letter-spacing: -.04em; font-variation-settings: 'wdth' 80, 'wght' 760; }
-.frow { align-items: center; }
 /* Turkish heading breaks after the box: the size label goes to its right. */
 :lang(tr) .sbox .sz { left: calc(100% + 14px); top: 50%; transform: translateY(-50%); }
 /* The design cursor on the blue contact section gets a light ring. */

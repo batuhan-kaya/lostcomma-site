@@ -42,7 +42,7 @@ i, b, em { font-style: normal; }
 }
 .skip:focus { top: 12px; }
 
-/* A coloured hero over a calm page: everything after it (and the footer) wraps in .below.th-paper. */
+/* A coloured hero over a calm page: everything after it wraps in .below.th-paper (the footer is always ink). */
 .below { background: var(--pbg); color: var(--pfg); }
 
 /* ---------- type ---------- */

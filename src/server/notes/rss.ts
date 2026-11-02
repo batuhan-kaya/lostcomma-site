@@ -42,6 +42,7 @@ export function rssXml(site: string, lang: Lang, t: T, notes: (NoteCard & { body
     `<description>${esc(t('Tasarım ve kod üzerine yazdıklarımız.'))}</description>`,
     `<language>${lang}</language>`,
     `<atom:link href="${esc(self)}" rel="self" type="application/rss+xml"/>`,
+    `<image><url>${esc(site)}/icon-144.png</url><title>Lost Comma · Notes</title><link>${esc(home)}</link><width>144</width><height>144</height></image>`,
     `<lastBuildDate>${RFC822(updated)}</lastBuildDate>`,
     ...items,
     '</channel>',

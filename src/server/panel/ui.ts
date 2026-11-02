@@ -4,6 +4,7 @@
  * for fonts · tokens · base type).
  */
 import type { Assets } from '../assets';
+import { mark } from '../layout/logo';
 import { html, raw, type Safe, type Value } from '../html';
 
 export type Errors = Record<string, string>;
@@ -87,6 +88,7 @@ export function shell(assets: Assets, s: Shell): string {
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="same-origin">
 <title>${s.title} · Panel · Lost Comma</title>
+<link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 ${css.map((c) => html`<link rel="stylesheet" href="${c}">`)}
 ${js ? html`<script type="module" src="${js}"></script>` : ''}
@@ -95,7 +97,7 @@ ${js ? html`<script type="module" src="${js}"></script>` : ''}
 <a class="p-skip" href="#main">İçeriğe geç</a>
 <div class="p-shell">
 <header class="p-side">
-<a class="p-logo" href="/panel"><span>lost</span><i aria-hidden="true">|</i><span>comma</span><small class="mono">panel</small></a>
+<a class="p-logo" href="/panel"><span class="lc-lock">${mark('lc-mark')}<span>lost</span><i aria-hidden="true">|</i><span>comma</span></span><small class="mono">panel</small></a>
 <details class="p-menu"><summary class="mono">Menü</summary><nav aria-label="Panel">${navList(s.section, s.counts)}</nav></details>
 <nav class="p-navd" aria-label="Panel">${navList(s.section, s.counts)}</nav>
 <div class="p-sidefoot">
@@ -126,6 +128,7 @@ export function bare(assets: Assets, title: string, body: Safe): string {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>${title} · Panel · Lost Comma</title>
+<link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 ${css.map((c) => html`<link rel="stylesheet" href="${c}">`)}
 ${js ? html`<script type="module" src="${js}"></script>` : ''}

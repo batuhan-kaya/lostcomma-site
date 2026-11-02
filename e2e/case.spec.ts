@@ -49,7 +49,7 @@ test.describe('Case · the version history', () => {
 
   test('the next layer leads on and the language switch keeps the project', async ({ page }) => {
     await page.goto('/en/work/sailing-club');
-    await page.locator('a.lg[hreflang="tr"]').click();
+    await page.locator('.hd a.lg[hreflang="tr"]').click();
     await expect(page).toHaveURL(/\/tr\/isler\/yelken-kulubu$/);
     await page.locator('a.nx').click();
     await expect(page).toHaveURL(/\/tr\/isler\/urun-lansman-filmi$/);

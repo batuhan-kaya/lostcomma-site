@@ -3,12 +3,15 @@
  * /api/stats/forget for the privacy page ("your record"). docs/ISTATISTIK.md
  */
 import type { FastifyInstance, FastifyRequest } from 'fastify';
+import { fromHere, originHosts } from '../origin';
 import { BeaconSchema, type Client, type Stats } from '../stats';
 import { RateLimit } from './rate';
 
 export interface StatsApiOptions {
   stats: Stats;
   siteUrl: string;
+  /** More hosts a beacon may come from (EXTRA_ORIGINS · a preview behind a proxy). */
+  extraOrigins?: string;
   limit?: RateLimit;
 }
 
@@ -17,17 +20,9 @@ export const declines = (req: FastifyRequest) => req.headers.dnt === '1' || req.
 
 export const clientOf = (req: FastifyRequest): Client => ({ ip: req.ip ?? '', ua: String(req.headers['user-agent'] ?? '').slice(0, 400) });
 
-export function registerStats(app: FastifyInstance, { stats, siteUrl, limit = new RateLimit(120, 60_000) }: StatsApiOptions): void {
-  const siteHost = new URL(siteUrl).host;
-  const sameSite = (req: FastifyRequest) => {
-    const origin = req.headers.origin;
-    if (!origin) return true;
-    try {
-      return new URL(origin).host === siteHost;
-    } catch {
-      return false;
-    }
-  };
+export function registerStats(app: FastifyInstance, { stats, siteUrl, extraOrigins, limit = new RateLimit(120, 60_000) }: StatsApiOptions): void {
+  const hosts = originHosts(siteUrl, extraOrigins);
+  const sameSite = (req: FastifyRequest) => fromHere(req.headers.origin, hosts);
 
   app.post('/api/stats', { bodyLimit: 16_384 }, async (req, reply) => {
     reply.header('cache-control', 'no-store');

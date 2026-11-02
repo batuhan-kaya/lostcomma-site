@@ -56,7 +56,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Client data comes from the `<script type="application/json" id="page-data">` block (`page.data`). Never inline executable scripts or `style=""` (strict CSP).
 - The brief is a real form posting to `/api/brief` (works without JS · redirects to `?brief=sent|error`). With JS it posts JSON. Briefs go to the `briefs` table. `BRIEF_LIMIT` = briefs per address per 10 minutes.
 - Contact colour: `CONTACT_THEME` in `src/server/pages/home/index.ts` (ink · paper · lime · coral · blue).
-- The shy comma egg sets `localStorage['lc-comma']`; `html.found` then shows the comma in the logo on every page.
+- The shy comma egg sets `localStorage['lc-comma']`; `html.found` then shows the comma in the logo on every page (header and the footer's sign-off).
 
 ## Data (src/server/db · src/server/data)
 
@@ -121,7 +121,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 
 ## Panel (src/server/panel · src/client/panel.ts · panel/story.ts · docs/PANEL.md)
 
-- One Fastify plugin under `/panel` (Turkish only · noindex · no-store · same CSP). One user: the password is scrypt in `panel_user` (set with `npm run panel -- password` or `PANEL_PASSWORD` on first boot). Optional TOTP (QR from `qrcode`). Sessions keep only the sha256 of the cookie token · 24 h idle · 14 days max · cookie `Path=/panel` HttpOnly SameSite=Strict. Every post needs the session's CSRF token (`_csrf` or `x-csrf`) and our Origin. `PANEL_SIGNIN_LIMIT` = sign-in attempts per address per 15 minutes.
+- One Fastify plugin under `/panel` (Turkish only · noindex · no-store · same CSP). One user: the password is scrypt in `panel_user` (set with `npm run panel -- password` or `PANEL_PASSWORD` on first boot). Optional TOTP (QR from `qrcode`). Sessions keep only the sha256 of the cookie token · 24 h idle · 14 days max · cookie `Path=/panel` HttpOnly SameSite=Strict. Every post needs the session's CSRF token (`_csrf` or `x-csrf`) and our Origin (`src/server/origin.ts` · `EXTRA_ORIGINS` only for a preview behind a proxy that rewrites Origin · Codespaces). `PANEL_SIGNIN_LIMIT` = sign-in attempts per address per 15 minutes.
 - Sections in `src/server/panel/views/`: Pano (launch checklist in `checklist.ts`) · İstatistik · İşler (case study editor) · Notlar (live preview through the site's renderer) · Görseller (images and loops · multipart only here) · Ekip · Gelen kutusu · Görüşmeler (cancel with a calendar cancellation · closed days and hours) · E-postalar · Site ayarları · Yönlendirmeler · Kayıt · Hesap.
 - Every change goes to the `audit` table · content keeps before and after snapshots (`snapshot.ts`) and "Bu hale dön" restores them (a deleted project or note comes back with its id). Saves use the row's `updated_at` as an optimistic lock.
 - The comma rule holds in the panel: visible copy with a comma is refused (code fences in notes are free).
@@ -152,6 +152,15 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Every message goes into the `outbox` table first. The `Postman` sends what is pending through `MAIL_URL` (any SMTP · `log://` prints) · retries failures every five minutes · gives up after five tries · skips anything older than two days. Without `MAIL_URL` nothing is sent and nothing is lost.
 - A booking sends two: the studio's (Turkish · reply goes to the visitor) and the visitor's (their language · calendar invitation attached). A brief sends one to the studio. `MAIL_TO` is the studio inbox · `MAIL_FROM` the sender · `MEET_URL` an optional video link template with `{ticket}`.
 - Mail copy keeps the comma rule. `npm run bookings` · `npm run mail -- test <address>` · `npm run mail -- outbox` · `npm run mail -- retry`.
+
+## Logo and footer (src/shared/logo.ts · layout/logo.ts · layout/chrome.ts · src/client/lib/footer.ts)
+
+- The mark (a corner and the comma under it) lives once in `src/shared/logo.ts`: redrawn with smooth curves from Batuhan's traced file. Everything draws it from there.
+- Beside the name the mark is one size with it: the corner is as tall as the l (`L_HEIGHT` .785 em · a unit test measures it from Anybody) and ends on the baseline · the comma hangs under it. `.lc-lock` · `.lc-mark` in `chrome.css` (a negative bottom margin keeps the comma out of the line box). Header · panel · share images · footer.
+- Icons: `npm run icons` draws `public/favicon.svg` (ink on light tabs · milk on dark) · `favicon.ico` · `apple-touch-icon.png` · `icon-192/512/maskable/144.png` · `site.webmanifest` from the mark. They are committed · a unit test fails when they drift.
+- One footer on every page (the homepage too): a way to start (next free month from Site ayarları) · the sitemap · the sign-off (the mark drawn with a pen when it first shows · `data-draw` wait → go · then the name rises · reduced motion and no JS: simply there) · the small print with the language switch. Always ink (`th-ink`) · lime is its accent. `data-sec="ft"` · the host rests after the name.
+- Social accounts · the phone · the address show only once filled (Site ayarları · Sosyal hesaplar: https on the network's own site).
+- Footer classes start with `ft-` · logo classes with `lc-` (plain names like `.mt` · `.fb` · `.lock` already exist on pages).
 
 ## Share images (src/server/og)
 
@@ -190,6 +199,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 | `npm run bookings` | the next calls booked on Start |
 | `npm run mail -- test <address>\|outbox\|retry` | check the mail settings · see or resend the outbox |
 | `npm run panel -- password\|totp off\|signout` | set the panel password · turn two-step off · sign every browser out |
+| `npm run icons` | draw the favicon and icons from the mark into `public/` |
 
 ## Layout
 

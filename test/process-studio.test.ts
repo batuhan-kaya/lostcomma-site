@@ -128,10 +128,11 @@ describe('Process page', async () => {
   const wed = (await midweek.inject('/en/process')).body;
 
   it('has the edit suite then calm paper', () => {
-    expect(secs(en)).toEqual(['hero', 'week', 'rules', 'after', 'next']);
+    expect(secs(en)).toEqual(['hero', 'week', 'rules', 'after', 'next', 'ft']);
     expect(en).toContain('class="th-night" data-page="process"');
     expect(en).toContain('<div class="below th-paper">\n<section class="week"');
-    expect(en).toMatch(/<div class="below th-paper"><footer class="ft">/);
+    // The footer is always ink · it follows the paper wrapper instead of sitting in it.
+    expect(en).toMatch(/<\/main>\s*<footer class="ft th-ink" data-sec="ft"/);
   });
 
   it('opens on week five in Design', () => {
@@ -160,7 +161,7 @@ describe('Studio page', async () => {
   const tr = (await app.inject('/tr/studyo')).body;
 
   it('has its sections in order', () => {
-    expect(secs(en)).toEqual(['hero', 'team', 'set', 'nums', 'city', 'next']);
+    expect(secs(en)).toEqual(['hero', 'team', 'set', 'nums', 'city', 'next', 'ft']);
     expect(en).toContain('class="th-paper" data-page="studio"');
   });
 

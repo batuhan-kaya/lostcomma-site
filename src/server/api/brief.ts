@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { fromHere, originHosts } from '../origin';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { BRIEF_BUDGETS, BRIEF_TIMES, BRIEF_TYPES } from '../content/home';
@@ -34,6 +35,8 @@ export type BriefInput = z.input<typeof BriefSchema>;
 export interface BriefOptions {
   db: Db;
   siteUrl: string;
+  /** More hosts a post may come from (EXTRA_ORIGINS · a preview behind a proxy). */
+  extraOrigins?: string;
   now?: () => Date;
   limit?: RateLimit;
   /** The studio hears about every brief (src/server/mail). */
@@ -43,8 +46,8 @@ export interface BriefOptions {
   stats?: Stats;
 }
 
-export function registerBrief(app: FastifyInstance, { db, siteUrl, now = () => new Date(), limit = new RateLimit(5, 10 * 60_000), postman, studio, stats }: BriefOptions): void {
-  const siteHost = new URL(siteUrl).host;
+export function registerBrief(app: FastifyInstance, { db, siteUrl, extraOrigins, now = () => new Date(), limit = new RateLimit(5, 10 * 60_000), postman, studio, stats }: BriefOptions): void {
+  const hosts = originHosts(siteUrl, extraOrigins);
 
   app.post('/api/brief', async (req, reply) => {
     const wantsJson = String(req.headers['content-type'] ?? '').includes('application/json');
@@ -52,17 +55,8 @@ export function registerBrief(app: FastifyInstance, { db, siteUrl, now = () => n
     const lang = body.lang === 'tr' ? 'tr' : 'en';
     const back = (state: string) => reply.redirect(`${href(lang, 'home')}?brief=${state}#contact`, 303);
 
-    // Same-site posts only. Browsers always send Origin on POST.
-    const origin = req.headers.origin;
-    if (origin) {
-      let host = '';
-      try {
-        host = new URL(origin).host;
-      } catch {
-        host = '';
-      }
-      if (host !== siteHost) return reply.status(403).send({ ok: false, error: 'origin' });
-    }
+    // Same-site posts only (src/server/origin.ts).
+    if (!fromHere(req.headers.origin, hosts)) return reply.status(403).send({ ok: false, error: 'origin' });
 
     if (!limit.take(req.ip)) {
       return wantsJson ? reply.status(429).send({ ok: false, error: 'slow-down' }) : back('error');

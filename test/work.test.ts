@@ -24,7 +24,7 @@ describe('Work · the Layers panel', async () => {
   const tr = (await get('/tr/isler')).body;
 
   it('has its sections in order', () => {
-    expect(secs(en)).toEqual(['hero', 'list', 'lock', 'ask', 'next']);
+    expect(secs(en)).toEqual(['hero', 'list', 'lock', 'ask', 'next', 'ft']);
   });
 
   it('lists every live layer newest first · each one links to its case', () => {
@@ -84,7 +84,7 @@ describe('Case · a full case study', async () => {
 
   it('renders every section of the story in order in the story colours', () => {
     expect(res.statusCode).toBe(200);
-    expect(secs(doc)).toEqual(['hero', 'hist', 'brief', 'dets', 'res', 'cred', 'next']);
+    expect(secs(doc)).toEqual(['hero', 'hist', 'brief', 'dets', 'res', 'cred', 'next', 'ft']);
     expect(doc).toContain('<html lang="tr" class="th-navy" data-page="case">');
     expect(doc).toContain('<title>Yelken kulübü · Lost Comma</title>');
   });
@@ -132,7 +132,7 @@ describe('Case · a full case study', async () => {
 describe('Case · short pages and misses', () => {
   it('a project without a story gets the hero and the way on', async () => {
     const doc = (await get('/en/work/ferry-timetable')).body;
-    expect(secs(doc)).toEqual(['hero', 'next']);
+    expect(secs(doc)).toEqual(['hero', 'next', 'ft']);
     expect(doc).toContain('class="th-ink"');
     expect(doc).toContain('Ferry times for Istanbul that still work on a pier without signal.');
     expect(doc).toContain('class="art a-fer on"');
@@ -155,7 +155,7 @@ describe('Case · short pages and misses', () => {
     await app.db.update(projects).set({ story: { team: ['nobody'] } as never }).where(eq(projects.no, 4));
     const res = await get('/en/work/architecture-office');
     expect(res.statusCode).toBe(200);
-    expect(secs(res.body)).toEqual(['hero', 'next']);
+    expect(secs(res.body)).toEqual(['hero', 'next', 'ft']);
     await app.db.update(projects).set({ story: row!.story }).where(eq(projects.no, 4));
   });
 

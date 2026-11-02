@@ -141,11 +141,12 @@ export async function buildApp({ config, now = () => new Date(), database, maile
   }
 
   await app.register(formbody, { bodyLimit: 16_384 });
-  registerStats(app, { stats, siteUrl: config.SITE_URL });
+  registerStats(app, { stats, siteUrl: config.SITE_URL, extraOrigins: config.EXTRA_ORIGINS });
   registerBrief(app, {
     stats,
     db,
     siteUrl: config.SITE_URL,
+    extraOrigins: config.EXTRA_ORIGINS,
     now,
     limit: new RateLimit(config.BRIEF_LIMIT, 10 * 60_000),
     postman,
@@ -155,6 +156,7 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     stats,
     db,
     siteUrl: config.SITE_URL,
+    extraOrigins: config.EXTRA_ORIGINS,
     now,
     limit: new RateLimit(config.BOOK_LIMIT, 60 * 60_000),
     postman,
@@ -186,10 +188,23 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     allowedPath: (path) => /^\/[0-9a-f]{16}\/(\d{2,4}\.(avif|webp)|loop\.(mp4|webm))$/.test(path),
   });
 
-  app.get('/favicon.svg', (_req, reply) => {
-    reply.header('cache-control', 'public, max-age=86400');
-    return reply.sendFile('favicon.svg', publicDir);
-  });
+  // The favicon and the icons drawn from the mark (npm run icons · public/).
+  for (const [file, type] of [
+    ['favicon.svg', 'image/svg+xml'],
+    ['favicon.ico', 'image/vnd.microsoft.icon'],
+    ['apple-touch-icon.png', 'image/png'],
+    ['icon-192.png', 'image/png'],
+    ['icon-512.png', 'image/png'],
+    ['icon-maskable.png', 'image/png'],
+    ['icon-144.png', 'image/png'],
+    ['site.webmanifest', 'application/manifest+json'],
+  ] as const) {
+    app.get(`/${file}`, (_req, reply) => {
+      // A day: they change only with the mark (the hashed assets are the ones kept for a year).
+      reply.type(type);
+      return reply.sendFile(file, publicDir, { maxAge: 86_400_000, immutable: false });
+    });
+  }
 
   function ctxFor(lang: Lang, path: string, alt: Ctx['alt'], query: unknown = {}): Ctx {
     const q = Object.fromEntries(Object.entries((query ?? {}) as Record<string, unknown>).filter((e): e is [string, string] => typeof e[1] === 'string'));

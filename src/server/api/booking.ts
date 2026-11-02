@@ -1,4 +1,5 @@
 import { randomBytes, randomUUID } from 'node:crypto';
+import { fromHere, originHosts } from '../origin';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { ABOUT_KEYS } from '../content/start';
@@ -39,6 +40,8 @@ export const BookingSchema = z.object({
 export interface BookingOptions {
   db: Db;
   siteUrl: string;
+  /** More hosts a post may come from (EXTRA_ORIGINS · a preview behind a proxy). */
+  extraOrigins?: string;
   postman: Postman;
   studio: string;
   meet?: string;
@@ -48,8 +51,8 @@ export interface BookingOptions {
   stats?: Stats;
 }
 
-export function registerBooking(app: FastifyInstance, { db, siteUrl, postman, studio, meet, now = () => new Date(), limit = new RateLimit(3, 3_600_000), stats }: BookingOptions): void {
-  const siteHost = new URL(siteUrl).host;
+export function registerBooking(app: FastifyInstance, { db, siteUrl, extraOrigins, postman, studio, meet, now = () => new Date(), limit = new RateLimit(3, 3_600_000), stats }: BookingOptions): void {
+  const hosts = originHosts(siteUrl, extraOrigins);
 
   app.post('/api/booking', async (req, reply) => {
     const wantsJson = String(req.headers['content-type'] ?? '').includes('application/json');
@@ -60,17 +63,8 @@ export function registerBooking(app: FastifyInstance, { db, siteUrl, postman, st
     const fail = (status: number, error: string, extra: Record<string, unknown> = {}) =>
       wantsJson ? reply.status(status).send({ ok: false, error, ...extra }) : back(`booking=${error === 'slow-down' ? 'slow' : error === 'taken' ? 'taken' : 'error'}${/^\d{4}-\d{2}-\d{2}$/.test(slotDay) ? `&day=${slotDay}` : ''}`);
 
-    // Same-site posts only. Browsers always send Origin on POST.
-    const origin = req.headers.origin;
-    if (origin) {
-      let host = '';
-      try {
-        host = new URL(origin).host;
-      } catch {
-        host = '';
-      }
-      if (host !== siteHost) return reply.status(403).send({ ok: false, error: 'origin' });
-    }
+    // Same-site posts only (src/server/origin.ts).
+    if (!fromHere(req.headers.origin, hosts)) return reply.status(403).send({ ok: false, error: 'origin' });
     if (!limit.take(req.ip)) return fail(429, 'slow-down');
 
     const parsed = BookingSchema.safeParse(body);

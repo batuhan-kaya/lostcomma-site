@@ -1,7 +1,7 @@
 import { planKey } from '../../data/settings';
 import { PROCESS, type ProcessCopy } from '../../content/process';
 import { html, raw, type Safe } from '../../html';
-import { footer, nextBand } from '../../layout/chrome';
+import { nextBand } from '../../layout/chrome';
 import { msg } from '../../msg';
 import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
@@ -182,7 +182,6 @@ ${after(ctx, copy)}
 ${nextBand(ctx, { to: 'studio', kick: msg('Sonraki sayfa'), big: msg('Stüdyo'), tone: 'ink' })}
 </div>`;
   },
-  footer: (ctx) => html`<div class="below th-paper">${footer(ctx)}</div>`,
   /** The client needs every phase in the page language and the timecode pattern. */
   data: (ctx) => {
     const copy = PROCESS[ctx.lang];

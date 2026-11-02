@@ -99,7 +99,7 @@ export const notePage: Page<NoteData> = {
       inLanguage: ctx.lang,
       url: ctx.site + ctx.path,
       author: { '@type': 'Person', name: n.author.name },
-      publisher: { '@type': 'Organization', name: 'Lost Comma' },
+      publisher: { '@type': 'Organization', name: 'Lost Comma', logo: { '@type': 'ImageObject', url: `${ctx.site}/icon-512.png`, width: 512, height: 512 } },
     };
     return html`<meta property="article:published_time" content="${n.publishedAt.toISOString()}">
 ${n.tags.map((k) => html`<meta property="article:tag" content="${tagLabel(ctx, k)}">`)}

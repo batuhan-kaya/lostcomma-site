@@ -17,11 +17,12 @@ import { esc } from '../html';
 import type { Lang } from '../i18n';
 import type { CrewName } from '../page';
 import { THEMES, type ThemeId } from '../themes';
+import { MARK, MARK_EM } from '../../shared/logo';
 
 export const OG_W = 1200;
 export const OG_H = 630;
 /** Bump when the drawing changes so cached images are drawn again. */
-const VERSION = 1;
+const VERSION = 2;
 
 export interface OgSpec {
   lang: Lang;
@@ -90,7 +91,7 @@ function ttf(path: string): Promise<Buffer> {
   return p;
 }
 
-async function fontsFor(face: Face, src: FontSource, axes: Record<string, number> = FACES[face].axes): Promise<Font[]> {
+export async function fontsFor(face: Face, src: FontSource, axes: Record<string, number> = FACES[face].axes): Promise<Font[]> {
   return Promise.all(
     FACES[face].keys.map(async (key) => {
       const f = create(await ttf(fileFor(face, key, src))) as Font;
@@ -210,14 +211,19 @@ export async function drawOg(spec: OgSpec, src: FontSource): Promise<Buffer> {
       '</g>',
   );
 
-  // Footer: rule · wordmark with its caret · the three team dots.
+  // Footer: rule · the mark and the wordmark with its caret (one size: the corner is as tall as
+  // the l · the comma hangs under the baseline) · the three team dots.
   const fy = OG_H - PAD;
   out.push(`<rect x="${PAD}" y="${fy - 58}" width="${OG_W - PAD * 2}" height="1.5" fill="${c.rule}"/>`);
-  const lost = shape('lost', mark, 36, -0.02);
-  const comma = shape('comma', mark, 36, -0.02);
-  out.push(at(lost, PAD, fy, c.fg));
-  out.push(`<rect x="${(PAD + lost.width + 6).toFixed(1)}" y="${fy - 27}" width="3" height="28" fill="${c.fg}"/>`);
-  out.push(at(comma, PAD + lost.width + 15, fy, c.fg));
+  const WM = 36;
+  const mk = (MARK_EM.h * WM) / MARK.h;
+  out.push(`<g transform="translate(${PAD} ${(fy - MARK.base * mk).toFixed(2)}) scale(${mk.toFixed(5)})" fill="${c.fg}"><path d="${MARK.top}"/><path d="${MARK.comma}"/></g>`);
+  const wx = PAD + MARK_EM.w * WM + 0.16 * WM;
+  const lost = shape('lost', mark, WM, -0.02);
+  const comma = shape('comma', mark, WM, -0.02);
+  out.push(at(lost, wx, fy, c.fg));
+  out.push(`<rect x="${(wx + lost.width + 6).toFixed(1)}" y="${fy - 27}" width="3" height="28" fill="${c.fg}"/>`);
+  out.push(at(comma, wx + lost.width + 15, fy, c.fg));
   (['design', 'code', 'motion'] as const).forEach((n, i) => {
     const ring = CREW[n].toLowerCase() === c.bg.toLowerCase() ? ` stroke="${c.fg}" stroke-width="1.5"` : '';
     out.push(`<circle cx="${OG_W - PAD - 9 - (2 - i) * 26}" cy="${fy - 11}" r="9" fill="${CREW[n]}"${ring}/>`);
