@@ -23,6 +23,9 @@ export interface StartCopy {
     calendar: string;
     before: string;
     change: string;
+    cancelSubject: string;
+    cancelled: string;
+    rebook: string;
   };
 }
 
@@ -64,6 +67,9 @@ const en: StartCopy = {
     calendar: 'The calendar invitation is attached.',
     before: 'Before the call we read your note and look at your current site or app if you have one.',
     change: 'Need another time? Just reply to this email.',
+    cancelSubject: 'Our call is cancelled: {when} Istanbul',
+    cancelled: 'We are sorry. We had to cancel our call on {when} Istanbul time.',
+    rebook: 'Pick a new time here: {url} · or just reply to this email.',
   },
 };
 
@@ -105,6 +111,9 @@ const tr: StartCopy = {
     calendar: 'Takvim davetini ekte bulacaksın.',
     before: 'Görüşmeden önce notunu okuyacağız ve varsa şu anki siteni ya da uygulamanı inceleyeceğiz.',
     change: 'Başka bir saat mi lazım? Bu e-postayı yanıtlaman yeterli.',
+    cancelSubject: 'Görüşmemiz iptal oldu: {when} İstanbul',
+    cancelled: 'Kusura bakma. {when} İstanbul saatindeki görüşmemizi iptal etmek zorunda kaldık.',
+    rebook: 'Yeni bir saat seçmek için: {url} · ya da bu e-postayı yanıtla.',
   },
 };
 

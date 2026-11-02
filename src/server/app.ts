@@ -11,6 +11,8 @@ import { Assets } from './assets';
 import type { Config } from './config';
 import { SERVICE_KEYS, SERVICE_SLUGS } from './content/services';
 import { caseSlugs, noteSlugs, notesIn } from './data/content';
+import { findRedirect } from './data/redirects';
+import { SettingsStore } from './data/settings';
 import { openDatabase, safeUrl, type Database, type Db } from './db';
 import { seedIfEmpty } from './db/seed';
 import { isLang, LANGS, negotiate, translator, type Lang } from './i18n';
@@ -18,12 +20,15 @@ import { documentHtml } from './layout/document';
 import { addDemoCover, addDemoLoop } from './media/demo';
 import { mediaDirs } from './media/ingest';
 import { createMailer, Postman, type Mailer } from './mail';
+import { getUser, setPassword } from './panel/auth';
+import { registerPanel } from './panel';
 import { rssXml } from './notes/rss';
 import { OgImages } from './og';
 import { ogSpec } from './og/spec';
 import type { AnyPage, Ctx } from './page';
 import { homePage, notFound, PARAM_PAGES, STATIC_PAGES } from './pages';
 import { href, ROUTES, type RouteId } from './routes';
+import { readCookie } from './cookies';
 import { securityHeaders } from './security';
 import { robotsTxt, sitemapXml } from './seo';
 
@@ -41,6 +46,7 @@ declare module 'fastify' {
   interface FastifyInstance {
     db: Db;
     postman: Postman;
+    settings: SettingsStore;
   }
 }
 
@@ -50,6 +56,7 @@ declare module 'fastify' {
  */
 export async function prepareDatabase(database: Database, config: Config): Promise<void> {
   await database.migrate();
+  if (config.PANEL_PASSWORD && !(await getUser(database.db))) await setPassword(database.db, config.PANEL_PASSWORD);
   if (config.SEED === 'none') return;
   await seedIfEmpty(database.db);
   if (config.SEED === 'demo') {
@@ -60,14 +67,7 @@ export async function prepareDatabase(database: Database, config: Config): Promi
 
 export const LANG_COOKIE = 'lang';
 
-export function readCookie(header: string | undefined, name: string): string | undefined {
-  if (!header) return undefined;
-  for (const part of header.split(';')) {
-    const [k, ...v] = part.trim().split('=');
-    if (k === name) return decodeURIComponent(v.join('='));
-  }
-  return undefined;
-}
+export { readCookie } from './cookies';
 
 export async function buildApp({ config, now = () => new Date(), database, mailer }: AppOptions) {
   const app = Fastify({
@@ -86,6 +86,9 @@ export async function buildApp({ config, now = () => new Date(), database, maile
   }
   const db = dbh.db;
   app.decorate('db', db);
+  const settings = new SettingsStore(db);
+  await settings.load();
+  app.decorate('settings', settings);
 
   // One canonical form per URL: no trailing slash (except the root).
   app.addHook('onRequest', async (req, reply) => {
@@ -171,6 +174,7 @@ export async function buildApp({ config, now = () => new Date(), database, maile
       assets,
       now: now(),
       db,
+      settings,
     };
   }
 
@@ -295,12 +299,30 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     return reply.type('application/xml; charset=utf-8').send(sitemapXml(config.SITE_URL, Object.keys(STATIC_PAGES) as RouteId[], [...services, ...cases, ...notes]));
   });
 
-  function notFoundPage(req: FastifyRequest, reply: FastifyReply) {
+  async function notFoundPage(req: FastifyRequest, reply: FastifyReply) {
     const path = req.url.split('?')[0] ?? '/';
+    // An address that moved (a slug changed in the panel).
+    if (req.method === 'GET' || req.method === 'HEAD') {
+      const to = path.length <= 200 ? await findRedirect(db, path) : null;
+      if (to) return reply.header('cache-control', 'no-cache').redirect(to, 301);
+    }
     const prefix = path.split('/')[1];
     const lang = isLang(prefix) ? prefix : negotiate(readCookie(req.headers.cookie, LANG_COOKIE), req.headers['accept-language']);
     return send(reply, notFound, ctxFor(lang, path, { tr: null, en: null }), 404);
   }
+
+  // The panel (docs/PANEL.md): sign in · content · media · inbox · calls · mail · settings · log.
+  await registerPanel(app, {
+    db,
+    config,
+    now,
+    settings,
+    postman,
+    dirs: media,
+    assets,
+    secure: config.SITE_URL.startsWith('https://'),
+    preview: (reply, page, lang, path, data) => send(reply, page, ctxFor(lang, path, { tr: null, en: null }), 200, { data }),
+  });
 
   app.setNotFoundHandler(notFoundPage);
 

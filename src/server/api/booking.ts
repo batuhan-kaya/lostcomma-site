@@ -9,8 +9,11 @@ import { enqueue, type Postman } from '../mail';
 import { bookingMails, callIcs, meetUrl } from '../mail/messages';
 import { ticketHtml } from '../pages/start';
 import { href } from '../routes';
-import { parseSlot, validZone } from '../../shared/booking';
+import { IST_OFFSET, istDay, parseSlot, validZone } from '../../shared/booking';
+import { blockedOn, openDays } from '../data/closures';
 import { RateLimit } from './rate';
+
+const istMinutes = (d: Date) => (((Math.floor(d.getTime() / 60_000) + IST_OFFSET) % 1440) + 1440) % 1440;
 
 /** Shared by the JSON (fetch) and the form (no JS) paths. */
 export const BookingSchema = z.object({
@@ -73,8 +76,11 @@ export function registerBooking(app: FastifyInstance, { db, siteUrl, postman, st
     if (b.company) return wantsJson ? reply.send({ ok: true, ticket: null }) : reply.redirect(`${href(lang, 'start')}#book`, 303);
 
     const at = now();
-    const startsAt = parseSlot(b.slot, at);
+    const open = await openDays(db, at);
+    const startsAt = parseSlot(b.slot, at, open.days);
     if (!startsAt) return fail(422, 'invalid', { fields: ['slot'] });
+    // A closed hour behaves like a taken one.
+    if (blockedOn(open.closures, istDay(startsAt)).has(istMinutes(startsAt))) return fail(409, 'taken');
 
     const booking = await addBooking(db, {
       id: randomUUID(),

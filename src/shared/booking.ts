@@ -39,9 +39,9 @@ function addDays(day: string, n: number): string {
 }
 
 /** The next ten working days, starting tomorrow (a call today would be too soon to prepare). */
-export function bookingDays(now: Date): string[] {
+export function bookingDays(now: Date, count = WINDOW): string[] {
   const out: string[] = [];
-  for (let day = addDays(istDay(now), 1); out.length < WINDOW; day = addDays(day, 1)) {
+  for (let day = addDays(istDay(now), 1); out.length < count; day = addDays(day, 1)) {
     const w = weekdayOf(day);
     if (w >= 1 && w <= 5) out.push(day);
   }
@@ -60,13 +60,13 @@ export const hm = (minutes: number) => `${pad(Math.floor(minutes / 60) % 24)}:${
 /** "2026-11-03T10:30" (Istanbul) · the value a slot carries in the form. */
 export const slotKey = (day: string, minutes: number) => `${day}T${hm(minutes)}`;
 
-/** A slot key back to its instant · null unless it is on the grid of a bookable day. */
-export function parseSlot(key: string, now: Date): Date | null {
+/** A slot key back to its instant · null unless it is on the grid of a bookable day (the open days when given). */
+export function parseSlot(key: string, now: Date, days: string[] = bookingDays(now)): Date | null {
   const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})$/.exec(key);
   if (!m) return null;
   const [, day, h, min] = m;
   const minutes = Number(h) * 60 + Number(min);
-  if (!bookingDays(now).includes(day!) || !slotMinutes().includes(minutes)) return null;
+  if (!days.includes(day!) || !slotMinutes().includes(minutes)) return null;
   return istInstant(day!, minutes);
 }
 

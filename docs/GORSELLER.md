@@ -98,6 +98,10 @@ Görsel olmayan yer tutucular: telefon numarası ([+90 telefon] · `src/server/c
 |---|---|---|---|---|
 | I1 | 404 · site haritası ve kayıp virgül | Kodla çiziliyor | | Gerekmez |
 
+## Panel (11. aşama)
+
+Panel görsel istemiyor. Görseller artık panelden yükleniyor: **Görseller** sayfasına sürükle bırak · alt metni iki dilde yaz · sonra işin formunda kapak olarak seç. Portreler **Ekip** sayfasından · döngüler **Görseller → Döngü videoları** bölümünden.
+
 ## Döngü videoları nasıl hazırlanır (D5 · A6)
 
 Her hareket projesi için bir döngü: sessiz · kendi içinde dönen · 6 ile 12 saniye. Sayfada ses olmadan ve ekrandayken oynar. Azaltılmış hareket isteyen ziyaretçi önce posteri görür.

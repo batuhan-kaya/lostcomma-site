@@ -1,3 +1,4 @@
+import { priceKey } from '../../data/settings';
 import { EDITOR_SAMPLE, HERO, SERVICE_SLUGS, SERVICES, serviceBySlug, type ServiceCopy, type ServiceKey } from '../../content/services';
 import { projectsOf, type ProjectCard } from '../../data/content';
 import { html, type Safe } from '../../html';
@@ -88,13 +89,13 @@ function hood(ctx: Ctx, key: ServiceKey, s: ServiceCopy, host: CrewName): Safe {
 </div></section>`;
 }
 
-function price(ctx: Ctx, s: ServiceCopy, host: CrewName): Safe {
+function price(ctx: Ctx, key: ServiceKey, s: ServiceCopy, host: CrewName): Safe {
   const { t, lang } = ctx;
   return html`<section class="price" data-sec="price" data-host="${host}"><div class="wrap">
 <p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Şekiller ve fiyatlar')}</p>
 <h2 class="h2" data-rest="host" data-rest-at="end 18 -10">${t('Üç şekil.')}<br>${t('Sabit teklifler.')}</h2>
 <div class="pcs">${s.tiers.map(
-    (x) => html`<div class="pc${x.hot ? ' hot' : ''}">${x.hot ? html`<span class="badge mono">${t('En çok istenen')}</span>` : ''}<span class="mono">${x.size}</span><h3>${x.name}</h3><p>${x.text}</p><div class="amt"><span class="mono">${t('Başlangıç')}</span><b>${t('[FİYAT]')}</b></div></div>`,
+    (x, i) => html`<div class="pc${x.hot ? ' hot' : ''}">${x.hot ? html`<span class="badge mono">${t('En çok istenen')}</span>` : ''}<span class="mono">${x.size}</span><h3>${x.name}</h3><p>${x.text}</p><div class="amt"><span class="mono">${t('Başlangıç')}</span><b>${ctx.settings.text(priceKey(key, i), lang) ?? t('[FİYAT]')}</b></div></div>`,
   )}</div>
 <div class="pnote mono"><span>${t('Her teklif başlamadan önce sabitlenir. Saatlik sürpriz yok.')}</span><a href="${href(lang, 'process')}">${t('Bir proje nasıl ilerler')} <span aria-hidden="true">→</span></a></div>
 </div></section>`;
@@ -154,7 +155,7 @@ export const servicePage: Page<ServiceData> = {
     const host = HOST[d.key];
     const below = html`${get(ctx, d.key, s, host)}
 ${hood(ctx, d.key, s, host)}
-${price(ctx, s, host)}
+${price(ctx, d.key, s, host)}
 ${d.key === 'motion' ? reel(ctx, d.work, host) : related(ctx, s, d.work, host)}
 ${next(ctx, d.key)}`;
     // Websites: a blue hero over a paper page. The others keep their colour all the way down.

@@ -135,10 +135,11 @@ export async function projectsOf(db: Db, lang: Lang, discipline: Discipline, lim
 }
 
 /** A case study by its slug in this language. NDA and draft projects have no public page. */
-export async function projectBySlug(db: Db, lang: Lang, slug: string): Promise<ProjectPage | null> {
+export async function projectBySlug(db: Db, lang: Lang, slug: string, preview = false): Promise<ProjectPage | null> {
   const hit = await db.query.projectText.findFirst({ where: and(eq(projectText.lang, lang), eq(projectText.slug, slug)) });
   if (!hit) return null;
-  const row = await db.query.projects.findFirst({ where: and(eq(projects.id, hit.projectId), eq(projects.status, 'live')), with: projectWith });
+  // The panel previews drafts and NDA projects as they would look once live.
+  const row = await db.query.projects.findFirst({ where: preview ? eq(projects.id, hit.projectId) : and(eq(projects.id, hit.projectId), eq(projects.status, 'live')), with: projectWith });
   if (!row) return null;
   const t = pickText(row.texts, lang)!;
 
@@ -228,7 +229,8 @@ function noteCard(row: NoteRow, lang: Lang): NoteCard {
     langs: (['tr', 'en'] as const).filter((l) => row.texts.some((x) => x.lang === l)),
     author: { crew: row.author.crew, name: row.author.name },
     tags: row.tags,
-    publishedAt: row.publishedAt!,
+    // A draft (panel preview) shows today.
+    publishedAt: row.publishedAt ?? new Date(),
     minutes: readMinutes(t.body),
   };
 }
@@ -245,10 +247,11 @@ export async function listNotes(db: Db, lang: Lang, now: Date, limit?: number): 
 }
 
 /** A note by its slug in this language. A note written only in the other language is not found here. */
-export async function noteBySlug(db: Db, lang: Lang, slug: string, now: Date): Promise<NotePage | null> {
+export async function noteBySlug(db: Db, lang: Lang, slug: string, now: Date, preview = false): Promise<NotePage | null> {
   const hit = await db.query.noteText.findFirst({ where: and(eq(noteText.lang, lang), eq(noteText.slug, slug)) });
   if (!hit) return null;
-  const row = await db.query.notes.findFirst({ where: and(eq(notes.id, hit.noteId), published(now)), with: noteWith });
+  // The panel previews drafts and scheduled notes.
+  const row = await db.query.notes.findFirst({ where: preview ? eq(notes.id, hit.noteId) : and(eq(notes.id, hit.noteId), published(now)), with: noteWith });
   if (!row) return null;
   const all = await listNotes(db, lang, now);
   const at = all.findIndex((n) => n.id === row.id);

@@ -1,3 +1,4 @@
+import { priceKey } from '../../data/settings';
 import { SERVICE_KEYS, SERVICE_SLUGS, SERVICES, type ServiceKey } from '../../content/services';
 import { html, raw, type Safe } from '../../html';
 import { msg } from '../../msg';
@@ -66,7 +67,7 @@ ${SERVICE_KEYS.map(
 <p>${s[k].desc}</p>
 <ul class="dl">${s[k].dl.map((d) => html`<li>${d}</li>`)}</ul>
 <div class="ir"><span class="mono">${t('Genelde')}</span><b>${s[k].time}</b></div>
-<div class="ir"><span class="mono">${t('Başlangıç fiyatı')}</span><b>${t('[FİYAT]')}</b></div>
+<div class="ir"><span class="mono">${t('Başlangıç fiyatı')}</span><b>${ctx.settings.text(priceKey(k, 0), ctx.lang) ?? t('[FİYAT]')}</b></div>
 <a class="ilink" href="${serviceHref(ctx, k)}"${k === 'web' ? html` data-rest="code" data-rest-at="0.82 1 0 16"` : ''}><span>${s[k].more}</span><span aria-hidden="true">→</span></a>
 </div>`,
 )}

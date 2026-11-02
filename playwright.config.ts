@@ -28,6 +28,8 @@ export default defineConfig({
       SEED: 'demo',
       BRIEF_LIMIT: '1000',
       BOOK_LIMIT: '1000',
+      PANEL_PASSWORD: 'e2e-panel-password',
+      PANEL_SIGNIN_LIMIT: '1000',
     },
   },
   projects: [

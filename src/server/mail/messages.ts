@@ -90,6 +90,30 @@ export function bookingMails(b: Booking, o: { studio: string; meet: string | nul
   return [studio, guest];
 }
 
+/** The visitor hears that their call is off (their language) · the calendar file removes the event. */
+export function cancelMail(b: Booking, o: { studio: string; startUrl: string; message?: string; now: Date }): Mail {
+  const lang = b.lang;
+  const c = START[lang].mail;
+  return {
+    kind: 'booking-cancel',
+    to: b.email,
+    replyTo: o.studio,
+    subject: fill(c.cancelSubject, { when: when(b.startsAt, lang) }),
+    text: [
+      fill(c.hello, { name: firstName(b.name) }),
+      '',
+      fill(c.cancelled, { when: when(b.startsAt, lang) }),
+      ...(o.message?.trim() ? ['', o.message.trim()] : []),
+      '',
+      fill(c.rebook, { url: o.startUrl }),
+      '',
+      'Lost Comma',
+      'hello@lostcomma.co',
+    ].join('\n'),
+    ics: ics({ uid: `${b.token}@lostcomma.co`, start: b.startsAt, minutes: b.minutes, title: lang === 'tr' ? 'Lost Comma ile görüşme' : 'Call with Lost Comma', description: fill(c.cancelled, { when: when(b.startsAt, lang) }), now: o.now, cancel: true }),
+  };
+}
+
 const TYPE_TR: Record<(typeof BRIEF_TYPES)[number], string> = { website: 'Web sitesi', app: 'Uygulama', identity: 'Kimlik', motion: 'Hareket' };
 /** The labels the visitor saw on the homepage brief (Turkish). */
 const TIME_TR = (k: (typeof BRIEF_TIMES)[number]) => HOME.tr.times[BRIEF_TIMES.indexOf(k)]?.n ?? k;

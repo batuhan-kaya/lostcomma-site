@@ -1,4 +1,5 @@
 import type { Assets } from './assets';
+import type { SettingsStore } from './data/settings';
 import type { Db } from './db';
 import type { Safe } from './html';
 import type { Lang, T } from './i18n';
@@ -24,6 +25,8 @@ export interface Ctx {
   db: Db;
   /** The query string (?day=… on Start). Never part of the canonical address. */
   query: Record<string, string>;
+  /** Values filled from the panel (prices · month · address · phone · src/server/data/settings.ts). */
+  settings: SettingsStore;
 }
 
 export interface NextBand {

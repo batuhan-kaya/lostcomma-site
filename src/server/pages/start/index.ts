@@ -1,5 +1,6 @@
 import { ABOUT_KEYS, START, type About } from '../../content/start';
 import { bookingByToken, takenBetween, ticketNo, type Booking } from '../../data/bookings';
+import { blockedOn, openDays } from '../../data/closures';
 import { html, type Safe } from '../../html';
 import type { Lang, T } from '../../i18n';
 import { footer, nextBand } from '../../layout/chrome';
@@ -7,7 +8,7 @@ import { firstName, istTime } from '../../mail/messages';
 import { msg } from '../../msg';
 import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
-import { bookingDays, cityOf, istDay, istInstant, localHm, slotKey, slotMinutes } from '../../../shared/booking';
+import { cityOf, istDay, istInstant, localHm, slotKey, slotMinutes } from '../../../shared/booking';
 import { dayLabel, dayParts } from '../../../shared/dates';
 import { istanbul, studioOpen } from '../../../shared/istanbul';
 
@@ -119,6 +120,7 @@ ${message ? html`<p class="bmsg" role="alert" data-bmsg>${message}</p>` : html`<
 function ways(ctx: Ctx): Safe {
   const { t, lang } = ctx;
   const w = START[lang].ways;
+  const phone = ctx.settings.text('studio.phone', lang);
   return html`<section class="ways" data-sec="ways" data-host="design"><div class="wrap">
 <p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Başka yollar')}</p>
 <h2 class="h2">${t('Görüşme insanı değil misin?')}</h2>
@@ -126,7 +128,7 @@ function ways(ctx: Ctx): Safe {
 <div class="way"><span class="mono">${w.email.k}</span><a class="wb" href="mailto:hello@lostcomma.co" data-rest="host" data-rest-at="end 10 -6">hello@<wbr>lostcomma.co</a><span class="d">${w.email.d}</span><button type="button" class="wcopy mono" data-copy="hello@lostcomma.co" hidden>${t('Adresi kopyala')}</button></div>
 <details class="way"><summary><span class="mono">${w.brief.k}</span><b>${w.brief.b}</b><span class="d">${w.brief.d}</span><span class="wcopy mono wopen" aria-hidden="true">${t('Soruları gör')}</span></summary><ol class="qs" data-qs>${w.brief.q.map((q) => html`<li>${q}</li>`)}</ol><button type="button" class="wcopy mono" data-copybrief hidden>${t('Soruları kopyala')}</button></details>
 <a class="way" href="${href(lang, 'studio')}#city"><span class="mono">${w.visit.k}</span><b>${w.visit.b}</b><span class="d">${w.visit.d}</span><span class="wcopy mono">${t('Haritaya bak')} <span aria-hidden="true">→</span></span></a>
-<div class="way"><span class="mono">${w.phone.k}</span><b>${w.phone.b}</b><span class="d">${w.phone.d}</span></div>
+<div class="way"><span class="mono">${w.phone.k}</span>${phone ? html`<a class="wb" href="tel:${phone.replace(/[^\d+]/g, '')}">${phone}</a>` : html`<b>${w.phone.b}</b>`}<span class="d">${w.phone.d}</span></div>
 </div>
 </div></section>`;
 }
@@ -149,9 +151,12 @@ export const startPage: Page<StartData> = {
   title: (t) => t('Proje başlat'),
   description: (t) => t('Ofis saatlerimizden birini seç ve konuşalım.'),
   load: async (ctx) => {
-    const list = bookingDays(ctx.now);
+    const open = await openDays(ctx.db, ctx.now);
+    const list = open.days;
     const day = list.includes(ctx.query.day ?? '') ? ctx.query.day! : list[0]!;
     const taken = await takenBetween(ctx.db, istInstant(list[0]!, 0), istInstant(list[list.length - 1]!, 1440));
+    // Closed hours look taken to visitors.
+    for (const d of list) for (const m of blockedOn(open.closures, d)) taken.add(istInstant(d, m).getTime());
     const token = ctx.query.ticket;
     const ticket = token && /^[\w-]{10,40}$/.test(token) ? ((await bookingByToken(ctx.db, token)) ?? null) : null;
     const s = ctx.query.booking;

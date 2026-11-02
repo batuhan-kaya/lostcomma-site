@@ -19,12 +19,14 @@
     "media": "tsx src/server/cli.ts media",
     "bookings": "tsx src/server/cli.ts bookings",
     "mail": "tsx src/server/cli.ts mail",
+    "panel": "tsx src/server/cli.ts panel",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run i18n -- --check && npm run test && npm run build && npm run test:e2e"
   },
   "dependencies": {
     "@fastify/formbody": "^8.0.2",
+    "@fastify/multipart": "^9.4.0",
     "@fastify/static": "^10.1.8",
     "drizzle-orm": "^0.45.4",
     "fastify": "^5.12.7",
@@ -32,6 +34,7 @@
     "markdown-it": "^14.3.3",
     "nodemailer": "^7.0.13",
     "pg": "8.16",
+    "qrcode": "^1.5.4",
     "sharp": "^0.35.5",
     "wawoff2": "^2.0.1",
     "zod": "^4.6.7"
@@ -48,6 +51,7 @@
     "@types/node": "^22.20.5",
     "@types/nodemailer": "^7.0.12",
     "@types/pg": "^8.23.1",
+    "@types/qrcode": "^1.5.6",
     "acorn": "^8.19.0",
     "acorn-walk": "^8.3.5",
     "drizzle-kit": "^0.31.11",
