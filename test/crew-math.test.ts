@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clampPoint, clearSpot, fitShift, NUDGES, overlap, parseRestAt, pickSection, probeLine, settled, shouldFlip, SPRING, step, STEP_MS, stepsFor, type Body, type Box } from '../src/client/lib/crew-math';
+import { clampPoint, Clock, clearSpot, fitShift, NUDGES, overlap, parseRestAt, pickSection, probeLine, settled, shouldFlip, SPRING, step, STEP_MS, stepsFor, type Body, type Box } from '../src/client/lib/crew-math';
 
 describe('spring step', () => {
   it('settles on the target without running away', () => {
@@ -30,6 +30,82 @@ describe('spring step', () => {
       maxX = Math.max(maxX, b.x);
     }
     expect(maxX).toBeLessThan(300 * 1.15);
+  });
+
+  it('sets off like a hand: speed grows gradually · then lands softly with a pixel or two over', () => {
+    const b: Body = { x: 0, y: 0, vx: 0, vy: 0 };
+    let was = 0;
+    let gain = 0;
+    let maxX = 0;
+    let read = -1;
+    let still = -1;
+    for (let i = 1; i <= 120; i++) {
+      step(b, 300, 0);
+      const sp = Math.hypot(b.vx, b.vy);
+      gain = Math.max(gain, sp - was);
+      was = sp;
+      maxX = Math.max(maxX, b.x);
+      if (read < 0 && b.x >= 270) read = i;
+      if (still < 0 && Math.abs(300 - b.x) < 2 && sp < 0.3) still = i;
+    }
+    expect(gain).toBeLessThanOrEqual(SPRING.accel! + 1e-9);
+    expect(maxX - 300).toBeGreaterThan(0.5);
+    expect(maxX - 300).toBeLessThan(3);
+    // 90 % of the way in about .6 s · still well before a second (60 steps a second).
+    expect(read * STEP_MS).toBeGreaterThan(450);
+    expect(read * STEP_MS).toBeLessThan(700);
+    expect(still * STEP_MS).toBeLessThan(1000);
+  });
+});
+
+describe('the clock', () => {
+  it('moves at the same pace on a 60 · 120 and 144 Hz screen', () => {
+    const at = (hz: number) => {
+      const clock = new Clock();
+      const b: Body = { x: 0, y: 0, vx: 0, vy: 0 };
+      const prev = { x: 0, y: 0 };
+      let shown = 0;
+      for (let now = 0; now <= 500; now += 1000 / hz) {
+        const { steps, alpha } = clock.tick(now);
+        for (let i = 0; i < steps; i++) {
+          prev.x = b.x;
+          step(b, 600, 0);
+        }
+        shown = prev.x + (b.x - prev.x) * alpha;
+      }
+      return shown;
+    };
+    // Within one step of each other (drawn at most one step behind) · stepping once per frame
+    // would put the 120 Hz cursor hundreds of pixels ahead.
+    const base = at(60);
+    expect(Math.abs(at(120) - base)).toBeLessThanOrEqual(SPRING.maxSpeed + 0.01);
+    expect(Math.abs(at(144) - base)).toBeLessThanOrEqual(SPRING.maxSpeed + 0.01);
+  });
+
+  it('draws between steps so every frame moves (no frozen frames on fast screens)', () => {
+    const clock = new Clock();
+    const b: Body = { x: 0, y: 0, vx: 0, vy: 0 };
+    const prev = { x: 0 };
+    const shown: number[] = [];
+    for (let now = 0; now <= 400; now += 1000 / 120) {
+      const { steps, alpha } = clock.tick(now);
+      for (let i = 0; i < steps; i++) {
+        prev.x = b.x;
+        step(b, 600, 0);
+      }
+      shown.push(prev.x + (b.x - prev.x) * alpha);
+    }
+    const moves = shown.slice(10).map((x, i) => x - shown[9 + i]!);
+    expect(Math.min(...moves)).toBeGreaterThan(0);
+  });
+
+  it('starts again from zero after a pause', () => {
+    const clock = new Clock();
+    clock.tick(0);
+    clock.tick(16.7);
+    clock.reset();
+    expect(clock.tick(5000)).toEqual({ steps: 0, alpha: 0 });
+    expect(clock.tick(5000 + STEP_MS + 0.5).steps).toBe(1);
   });
 });
 

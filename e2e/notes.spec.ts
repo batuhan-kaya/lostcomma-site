@@ -124,8 +124,8 @@ test.describe('a note', () => {
     await copy.click();
     await expect(copy).toHaveText('Copied');
     const text = await page.evaluate(() => navigator.clipboard.readText());
-    expect(text.startsWith('const pull = 0.026')).toBe(true);
-    expect(text.split('\n')).toHaveLength(15);
+    expect(text.startsWith('const pull = 0.018')).toBe(true);
+    expect(text.split('\n')).toHaveLength(18);
   });
 
   test('the playground: presets · sliders · how it feels', async ({ page }) => {

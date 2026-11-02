@@ -27,6 +27,11 @@
 .lci-cur path { fill: var(--c); stroke: #FFFFFF; stroke-width: 1.5; stroke-linejoin: round; }
 .lci-cur b { position: absolute; left: 16px; top: 20px; padding: 3px 9px; border-radius: 999px; background: var(--c); color: var(--on); font: 600 12px/1.2 var(--sans); white-space: nowrap; }
 .lci-design { --c: var(--blue); --on: var(--milk); }
+/* Where the two searchers stop: beside the mark (wide) · clear of the corner and the comma's place (narrow). */
+.lci { --d-x: 36vw; --d-y: 63vh; --d-top: 54vh; --c-x: 61vw; --c-y: 27vh; --c-low: 35vh; }
+@media (max-width: 699px) {
+  .lci { --d-x: 10vw; --d-y: 74vh; --d-top: 62vh; --c-x: 68vw; --c-y: 21vh; --c-low: 28vh; }
+}
 .lci-code { --c: var(--mint); --on: var(--ink); }
 .lci-motion { --c: var(--pink); --on: var(--ink); left: 82%; top: -6%; }
 
@@ -37,18 +42,31 @@
 .lci-say > span { grid-area: 1 / 1; }
 .lci-s2 { opacity: 0; color: var(--pfg); }
 
-/* The run · about 1.2 s: two of us look around · motion brings the comma · it drops in and settles. */
-.lci.go .lci-design { animation: lci-on .15s .05s forwards, lci-d .95s .05s cubic-bezier(.45,0,.4,1) forwards, lci-off .2s 1s forwards; }
-.lci.go .lci-code { animation: lci-on .15s .12s forwards, lci-c .9s .12s cubic-bezier(.45,0,.4,1) forwards, lci-off .2s 1s forwards; }
-.lci.go .lci-gh { animation: lci-pulse .45s ease-in-out 2 alternate, lci-off .15s .95s forwards; }
-.lci.go .lci-cm { animation: lci-comma .75s .4s both; }
-.lci.go .lci-cm path { animation: lci-ink .35s 1.05s forwards; }
-.lci.go .lci-motion { animation: lci-on .1s .4s both, lci-off .25s 1.05s forwards; }
-.lci.go .lci-s1 { animation: lci-off .15s 1s forwards; }
-.lci.go .lci-s2 { animation: lci-on .2s 1.05s forwards; }
+/*
+ * The run · 2.618 s so every beat can be read: the empty place waits · design comes in · code a
+ * little after · then motion brings the comma · it lands and settles · "found".
+ *   0       the corner and the dashed place · nothing moves for .382 s
+ *   .382    design glides in (1 s)          .618   code glides in (1 s)
+ *   1.236   motion picks the comma up and carries it (.75 s) · it lands at 2 s and settles (.3 s)
+ *   2.382   found: the comma takes the logo's colour · the team fades · the count says 100
+ *   2.618   the exit (src/client/lib/intro.ts): the mark flies onto the header logo (.786 s)
+ * Smooth paths: each axis has its own easing (x on `translate` · y on `transform` · the tilt on
+ * `rotate`) so every path is one soft curve. No corners · nothing stops in mid air · the cursors
+ * enter already moving (from off screen) · the comma sets off slowly · everything comes to rest
+ * softly. About the site's cursor pace (src/shared/spring.ts) · the drop is the one quick moment.
+ */
+.lci.go .lci-gh { animation: lci-pulse .618s ease-in-out 3 alternate, lci-off .236s 1.9s forwards; }
+.lci.go .lci-design { animation: lci-on .236s .382s both, lci-dx 1s .382s both, lci-dy 1s .382s both, lci-off .382s 2.382s forwards; }
+.lci.go .lci-code { animation: lci-on .236s .618s both, lci-cx 1s .618s both, lci-cy 1s .618s both, lci-off .382s 2.382s forwards; }
+.lci.go .lci-cm { animation: lci-on .236s 1.236s both, lci-mx 1.2s 1.236s both, lci-my 1.2s 1.236s both, lci-tilt 1.2s 1.236s both; }
+.lci.go .lci-motion { animation: lci-on .236s 1.236s both, lci-off .382s 2.382s forwards; }
+.lci.go .lci-cm path { animation: lci-ink .382s 2.382s forwards; }
+/* One line after the other (never both at once): "looking" leaves as the comma settles · "found" comes in. */
+.lci.go .lci-s1 { animation: lci-off .146s 2.236s forwards; }
+.lci.go .lci-s2 { animation: lci-on .236s 2.382s forwards; }
 /* Skipped (a click · a key · a wheel): everything where it ends · the exit follows at once. */
 .lci.done .lci-cur, .lci.done .lci-gh, .lci.done .lci-s1 { animation: none; opacity: 0; }
-.lci.done .lci-cm { animation: none; opacity: 1; transform: none; }
+.lci.done .lci-cm { animation: none; opacity: 1; transform: none; translate: none; rotate: none; }
 .lci.done .lci-cm path { animation: none; fill: currentColor; }
 .lci.done .lci-s2 { animation: none; opacity: 1; }
 
@@ -56,13 +74,46 @@
 @keyframes lci-off { to { opacity: 0; } }
 @keyframes lci-pulse { from { opacity: .18; } to { opacity: .55; } }
 @keyframes lci-ink { to { fill: currentColor; } }
-@keyframes lci-d { 0% { transform: translate(16vw, 74vh); } 35% { transform: translate(70vw, 28vh); } 70% { transform: translate(60vw, 76vh); } 100% { transform: translate(32vw, 34vh); } }
-@keyframes lci-c { 0% { transform: translate(86vw, 18vh); } 40% { transform: translate(24vw, 62vh); } 75% { transform: translate(80vw, 66vh); } 100% { transform: translate(70vw, 22vh); } }
-@keyframes lci-comma {
-  0% { opacity: 0; transform: translate(min(34vw, 440px), 12vh) rotate(-24deg); }
-  10% { opacity: 1; }
-  55% { transform: translate(min(5vw, 48px), -15vh) rotate(12deg); }
-  76% { transform: none; }
-  86% { transform: translateY(-2.4vh) rotate(-3deg); }
-  94%, 100% { opacity: 1; transform: none; }
+/* design: in from the lower left · rises a little while it looks · comes down beside the mark. */
+@keyframes lci-dx {
+  from { translate: -4vw 0; animation-timing-function: cubic-bezier(.3, .5, .35, 1); }
+  to { translate: var(--d-x) 0; }
+}
+@keyframes lci-dy {
+  0% { transform: translateY(74vh); animation-timing-function: cubic-bezier(.35, .45, .5, 1); }
+  50% { transform: translateY(var(--d-top)); animation-timing-function: cubic-bezier(.45, 0, .35, 1); }
+  100% { transform: translateY(var(--d-y)); }
+}
+/* code: in from the upper right · dips while it looks · rises to its spot. */
+@keyframes lci-cx {
+  from { translate: 104vw 0; animation-timing-function: cubic-bezier(.3, .5, .35, 1); }
+  to { translate: var(--c-x) 0; }
+}
+@keyframes lci-cy {
+  0% { transform: translateY(12vh); animation-timing-function: cubic-bezier(.35, .45, .5, 1); }
+  50% { transform: translateY(var(--c-low)); animation-timing-function: cubic-bezier(.45, 0, .35, 1); }
+  100% { transform: translateY(var(--c-y)); }
+}
+/*
+ * The comma (1.2 s): picked up where it appears (it sets off slowly) · carried up and across on one
+ * arc (it never stops in mid air: only its rise ends at the top) · dropped straight into its
+ * place at 62 % · one small bounce · still from 88 %.
+ */
+@keyframes lci-mx {
+  0% { translate: min(24vw, 300px) 0; animation-timing-function: cubic-bezier(.45, 0, .3, 1); }
+  62%, 100% { translate: 0 0; }
+}
+@keyframes lci-my {
+  0% { transform: translateY(16vh); animation-timing-function: cubic-bezier(.45, 0, .4, 1); }
+  38% { transform: translateY(-5.5vh); animation-timing-function: cubic-bezier(.55, 0, .85, .4); }
+  62% { transform: none; animation-timing-function: cubic-bezier(.25, .6, .45, 1); }
+  76% { transform: translateY(-1.2vh); animation-timing-function: cubic-bezier(.55, 0, .75, .45); }
+  88%, 100% { transform: none; }
+}
+@keyframes lci-tilt {
+  0% { rotate: -16deg; animation-timing-function: cubic-bezier(.45, 0, .4, 1); }
+  38% { rotate: 6deg; animation-timing-function: cubic-bezier(.4, 0, .4, 1); }
+  62% { rotate: 0deg; animation-timing-function: cubic-bezier(.3, .5, .5, 1); }
+  76% { rotate: -2deg; animation-timing-function: cubic-bezier(.4, 0, .4, 1); }
+  88%, 100% { rotate: 0deg; }
 }

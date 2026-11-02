@@ -38,8 +38,9 @@ test.describe('preloader', () => {
     const box = page.locator('[data-intro]');
     await expect(box).toBeVisible();
     await expect(box).toHaveClass(/go/);
-    // The comma is carried in and settles under the corner.
-    await expect.poll(() => page.locator('.lci-cm').evaluate((el) => getComputedStyle(el).opacity), { timeout: 2000 }).toBe('1');
+    // The comma is carried in (from 1.236 s) and settles under the corner. It stays until the mark
+    // has landed (about 3.4 s) · a busy machine starts CSS animations a little late.
+    await expect.poll(() => page.locator('.lci-cm').evaluate((el) => getComputedStyle(el).opacity), { timeout: 3000, intervals: [100] }).toBe('1');
     await expect(box).toHaveCount(0, { timeout: 4000 });
     await expect(page.locator('.hd .lc-mark')).toBeVisible();
     // The team starts after it: born from the header avatars (pointer devices).

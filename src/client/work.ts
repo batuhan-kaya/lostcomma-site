@@ -4,6 +4,7 @@
  * Everything works from the markup: without JS the list is a plain list of links.
  */
 import { getCrew, type Crew } from './lib/crew';
+import { between, Clock } from './lib/crew-math';
 import { reducedMotion } from './lib/motion';
 import { t } from './lib/t';
 
@@ -128,8 +129,10 @@ let leaveTimer = 0;
 /** Where the frame wants to be: the pointer · or a fixed point when a teammate or the keyboard picks a layer. */
 const me = { x: 0, y: 0 };
 let fixed: { x: number; y: number } | null = null;
-let spring: { x: number; y: number; vx: number; vy: number } | null = null;
+let spring: { x: number; y: number; vx: number; vy: number; px: number; py: number } | null = null;
 let raf = 0;
+/** The cursors' clock: 60 steps a second on any screen · each frame drawn between two steps. */
+const clock = new Clock();
 
 function local(clientX: number, clientY: number) {
   const r = root.getBoundingClientRect();
@@ -156,30 +159,45 @@ function hover(i: number, at: { x: number; y: number } | null = null): void {
   for (const a of arts) a.classList.toggle('on', Number(a.dataset.pa) === i);
   pv.classList.add('on');
   if (was < 0) spring = null;
-  tick();
+  wake();
 }
 
-function tick(): void {
-  cancelAnimationFrame(raf);
+/** The frame follows on a spring while it moves · the loop sleeps once it has settled. */
+function wake(): void {
+  if (raf || !pv || hov < 0) return;
+  clock.reset();
+  raf = requestAnimationFrame(tick);
+}
+
+function tick(now: number): void {
+  raf = 0;
   if (!pv || hov < 0) return;
   const src = fixed ?? me;
   const tx = Math.min(src.x + 48, root.offsetWidth - 480);
   const ty = src.y - 170;
-  if (!spring || reduce) spring = { x: tx, y: reduce ? ty : ty + 30, vx: 0, vy: 0 };
+  if (!spring || reduce) {
+    const y = reduce ? ty : ty + 30;
+    spring = { x: tx, y, vx: 0, vy: 0, px: tx, py: y };
+  }
   const s = spring;
-  s.vx = s.vx * 0.72 + (tx - s.x) * 0.1;
-  s.vy = s.vy * 0.72 + (ty - s.y) * 0.1;
-  s.x += s.vx;
-  s.y += s.vy;
+  const { steps, alpha } = clock.tick(now);
+  for (let i = 0; i < steps; i++) {
+    s.px = s.x;
+    s.py = s.y;
+    s.vx = s.vx * 0.72 + (tx - s.x) * 0.1;
+    s.vy = s.vy * 0.72 + (ty - s.y) * 0.1;
+    s.x += s.vx;
+    s.y += s.vy;
+  }
   const rot = reduce ? 0 : Math.max(-5, Math.min(5, s.vx * 0.3));
-  pv.style.transform = `translate3d(${s.x.toFixed(1)}px,${s.y.toFixed(1)}px,0) rotate(${rot.toFixed(2)}deg)`;
+  pv.style.transform = `translate3d(${between(s.px, s.x, alpha).toFixed(2)}px,${between(s.py, s.y, alpha).toFixed(2)}px,0) rotate(${rot.toFixed(2)}deg)`;
   if (Math.abs(s.vx) + Math.abs(s.vy) > 0.05 || Math.abs(tx - s.x) + Math.abs(ty - s.y) > 0.5) raf = requestAnimationFrame(tick);
 }
 
 root.addEventListener('pointermove', (e) => {
   if (e.pointerType !== 'mouse') return;
   Object.assign(me, local(e.clientX, e.clientY));
-  if (hov >= 0 && !fixed) tick();
+  if (hov >= 0 && !fixed) wake();
 });
 
 for (const row of $$('.row[data-i]')) {
