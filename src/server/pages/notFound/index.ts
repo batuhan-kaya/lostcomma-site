@@ -160,7 +160,7 @@ ${grid()}
 <path class="route" d="M${d.you.x} ${d.you.y}L${target.x} ${target.y}" aria-hidden="true" data-route/>
 <g class="nodes">${d.nodes.map((n, i) => {
     const l = label(n);
-    return html`<a class="nd r${n.ring}${i === d.target ? ' on' : ''}" href="${n.href}" data-node data-x="${n.x}" data-y="${n.y}" data-d="${n.d}"${n.lang ? html` hreflang="${n.lang}"` : ''}><circle class="hit" cx="${n.x}" cy="${n.y}" r="6"/><circle class="halo" cx="${n.x}" cy="${n.y}" r="${n.ring === 0 ? 6.2 : n.ring === 1 ? 4.6 : 3.6}"/><circle class="dot" cx="${n.x}" cy="${n.y}" r="${n.ring === 0 ? 3 : n.ring === 1 ? 2.1 : 1.3}"/><text x="${l.x}" y="${l.y}" text-anchor="${l.anchor}"${n.lang ? html` lang="${n.lang}"` : ''}>${n.label}</text></a>`;
+    return html`<a class="nd r${n.ring}${i === d.target ? ' on' : ''}" href="${n.href}" data-node data-x="${n.x}" data-y="${n.y}" data-d="${n.d}"${n.lang ? html` hreflang="${n.lang}"` : ''}><circle class="hit" cx="${n.x}" cy="${n.y}" r="8.5"/><circle class="halo" cx="${n.x}" cy="${n.y}" r="${n.ring === 0 ? 6.2 : n.ring === 1 ? 4.6 : 3.6}"/><circle class="dot" cx="${n.x}" cy="${n.y}" r="${n.ring === 0 ? 3 : n.ring === 1 ? 2.1 : 1.3}"/><text x="${l.x}" y="${l.y}" text-anchor="${l.anchor}"${n.lang ? html` lang="${n.lang}"` : ''}>${n.label}</text></a>`;
   })}</g>
 <g class="me${d.close ? '' : ' off'}" transform="translate(${d.you.x} ${d.you.y})" aria-hidden="true" data-you-at data-x="${d.you.x}" data-y="${d.you.y}"><circle class="ping" r="5"/><g class="bob"><path class="cm" d="${COMMA}"/></g><text class="yl" x="${yl.x}" y="${yl.y}" text-anchor="${yl.a}">${t('sen')}<tspan class="yp"> ${shown}</tspan></text></g>
 </svg>`;

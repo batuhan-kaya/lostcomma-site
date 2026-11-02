@@ -56,6 +56,8 @@ let drawing: Drawing | null = null;
 /** The visitor drew something: the demo steps aside. */
 let userDrew = false;
 let raf = 0;
+/** The riders only ride while the board is on screen. */
+let onScreen = true;
 
 /* ---------------- tools and inspector ---------------- */
 
@@ -282,13 +284,20 @@ function frame(now: number): void {
       const p = it.path.getPointAtLength(q * len);
       dot.style.transform = `translate3d(${p.x.toFixed(1)}px,${p.y.toFixed(1)}px,0)`;
     }
-    if (!reduce) again = true;
+    if (!reduce && onScreen) again = true;
   }
   if (again) raf = requestAnimationFrame(frame);
 }
 
 function loop(): void {
   if (!raf) raf = requestAnimationFrame(frame);
+}
+
+if (board) {
+  new IntersectionObserver(([en]) => {
+    onScreen = !!en?.isIntersecting;
+    if (onScreen) loop();
+  }).observe(board);
 }
 
 /* ---------------- the visitor draws ---------------- */

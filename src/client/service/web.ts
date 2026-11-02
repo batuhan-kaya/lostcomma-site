@@ -6,11 +6,12 @@
  */
 import { getCrew } from '../lib/crew';
 import { t } from '../lib/t';
+import { FRAME } from '../../shared/frame';
 import type { ServiceData } from './types';
 import { $, $$, press, stopTween, text, tween } from './util';
 
-const MIN = 340;
-const MAX = 1360;
+const MIN = FRAME.min;
+const MAX = FRAME.max;
 
 export function init(data: ServiceData): void {
   hero();
@@ -26,7 +27,7 @@ function hero(): void {
   const presets = $$<HTMLButtonElement>('[data-w]', rz);
   const bps = $$('[data-bp]', rz);
   const crew = getCrew();
-  let w = 1280;
+  let w: number = FRAME.start;
   let k = 1;
   let user = false;
 

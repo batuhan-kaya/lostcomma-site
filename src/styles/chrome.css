@@ -13,7 +13,8 @@
   text-decoration: none;
 }
 .pres { display: flex; align-items: center; gap: 10px; color: var(--pmu); }
-.pres > i { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--mint); animation: ping 2s ease-out infinite; }
+.pres > i { position: relative; display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--mint); }
+.pres > i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--mint); opacity: 0; animation: ping 2s ease-out infinite; }
 .avs { display: flex; padding-left: 8px; }
 .av {
   display: grid;
@@ -182,7 +183,7 @@
   color: var(--pmu);
 }
 .ft nav { display: flex; flex-wrap: wrap; gap: 0 22px; }
-.ft a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; transition: color .25s; }
+.ft a { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; min-height: 44px; text-decoration: none; transition: color .25s; }
 .ft a:hover { color: var(--pfg); }
 @media (max-width: 760px) {
   .ft .wrap { flex-direction: column; align-items: flex-start; padding: 24px var(--gut) 28px; }

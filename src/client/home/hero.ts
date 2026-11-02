@@ -8,6 +8,8 @@ export class Hero {
   readonly word = $('[data-word]');
   readonly dot = $('[data-dot]');
   readonly pub = $('[data-pub]');
+  /** The headline around the word box. */
+  private readonly hl = this.box?.closest<HTMLElement>('h1') ?? null;
   private wi = 0;
   private ver = 214;
   private live = true;
@@ -32,7 +34,14 @@ export class Hero {
       this.crew?.say('code', t('yayınladın. süper'), 1800);
     });
     this.frameLabel();
-    addEventListener('resize', () => this.frameLabel(), { passive: true });
+    let width = innerWidth;
+    addEventListener('resize', () => {
+      this.frameLabel();
+      // New width · new line breaks: let the headline find its own height again.
+      // (A phone's toolbar sliding away changes only the height: keep it then.)
+      if (this.hl && innerWidth !== width) this.hl.style.minHeight = '';
+      width = innerWidth;
+    }, { passive: true });
     this.popovers();
   }
 
@@ -42,8 +51,20 @@ export class Hero {
     if (el) el.textContent = `${t('Ana sayfa')} · ${innerWidth} × ${innerHeight}`;
   }
 
+  /**
+   * Words have different lengths. On a phone a shorter word can take a line away from the
+   * headline and everything below would jump up and back. The headline keeps the tallest
+   * height it has had at this width instead.
+   */
+  private hold(): void {
+    if (!this.hl) return;
+    const h = this.hl.offsetHeight;
+    if (h > (parseFloat(this.hl.style.minHeight) || 0)) this.hl.style.minHeight = `${h}px`;
+  }
+
   private userWord(): void {
     if (this.typing || !this.word || !this.box) return;
+    this.hold();
     this.wi = (this.wi + 1) % this.data.words.length;
     this.word.textContent = this.data.words[this.wi] ?? '';
     replay(this.box, 'flash');
@@ -74,6 +95,7 @@ export class Hero {
     if (!el || !this.box || !this.crew) return;
     this.wi = (this.wi + 1) % this.data.words.length;
     const next = this.data.words[this.wi] ?? '';
+    this.hold();
     this.typing = true;
     this.box.classList.add('typing');
     try {
@@ -94,6 +116,7 @@ export class Hero {
     } finally {
       this.box.classList.remove('typing', 'sel');
       this.typing = false;
+      this.hold();
     }
   }
 

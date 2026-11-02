@@ -116,7 +116,10 @@
 .irows { display: flex; flex-direction: column; margin: 18px 0 0; border-top: 1px solid var(--seam); }
 .ir { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--seam); }
 .ir dt { padding-top: 3px; color: var(--pmu); }
-.ir dd { margin: 0; font-size: 18px; line-height: 1.38; }
+.ir dd { display: grid; margin: 0; font-size: 18px; line-height: 1.38; }
+/* Every phase's text and the longest one share one cell: the row is as tall as the longest. */
+.ir dd > span { grid-area: 1 / 1; }
+.ir dd > .room { visibility: hidden; }
 .iwho { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: auto 0 0; padding-top: 14px; color: var(--pmu); }
 .iwho .avs { display: flex; padding-left: 8px; }
 .iwho .av { display: grid; place-items: center; width: 30px; height: 30px; margin-left: -8px; border: 2.5px solid var(--panel); border-radius: 50%; background: var(--c); color: var(--on); font: 600 12px/1 var(--sans); text-transform: none; letter-spacing: 0; }
@@ -202,7 +205,8 @@
 .day.s2 .slot { margin-top: 150px; margin-bottom: auto; }
 .async { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 16px 0 0; padding: 16px 20px; border: 1px dashed var(--rule); border-radius: 14px; color: var(--pmu); }
 .async b { color: var(--pfg); font-weight: 500; }
-.async > i { display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--mint); animation: ping 2s ease-out infinite; }
+.async > i { position: relative; display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--mint); }
+.async > i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--mint); opacity: 0; animation: ping 2s ease-out infinite; --ping-to: 3; }
 .wkend { margin-left: auto; color: var(--pfg); }
 
 .rules { position: relative; padding: 40px 0 140px; }
@@ -300,6 +304,6 @@
   .clip.on { color: var(--on); }
   .day { grid-template-columns: minmax(0, 1fr); }
   .dh { flex-direction: row; }
-  .async { font-size: 10px; }
+  .async { font-size: 11px; }
   .wkend { margin-left: 0; }
 }

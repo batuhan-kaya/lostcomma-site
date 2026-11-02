@@ -6,7 +6,9 @@ import { EDITOR_SAMPLE, HERO, SERVICE_KEYS, SERVICE_SLUGS, SERVICES, serviceBySl
 import { tierOf } from '../src/shared/checklist';
 import { contrast, PALETTE } from '../src/shared/contrast';
 import { cssCurve, ease, PRESETS, plotPath, X, Y } from '../src/shared/curve';
+import { FRAME } from '../src/shared/frame';
 import { ACTIONS, actionAt, boxOf, easyCount, zoneAt } from '../src/shared/thumb';
+import { WIDTHS } from '../src/server/pages/service/heroes';
 
 const SITE = 'https://lostcomma.co';
 const app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: SITE }), now: () => new Date('2026-10-31T09:41:00+03:00') });
@@ -102,6 +104,10 @@ describe('the thumb zone', () => {
     const b = boxOf(2, 'a', 'r');
     expect(actionAt(b.x + 4, b.y + 4, 'a', 'r')).toBe(2);
     expect(actionAt(180, 380, 'a', 'r')).toBe(-1);
+  });
+  it('the resizable frame starts in CSS where the client starts (no jump when JS arrives)', () => {
+    expect(css).toContain(`width: min(${FRAME.start}px, calc(100% * ${FRAME.start} / ${FRAME.max}))`);
+    for (const { w } of WIDTHS) expect(css).toContain(`.bp[data-bp="${w}"] { left: min(${w}px, calc(100% * ${w} / ${FRAME.max})); }`);
   });
   it('draws the same first layout in CSS (the page without JS)', () => {
     ACTIONS.forEach((a, i) => {

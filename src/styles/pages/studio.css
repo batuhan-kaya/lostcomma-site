@@ -31,7 +31,9 @@ html.st-hc[data-page="studio"] { --pmu: #26262A; --rule: rgba(14,14,15,.4); --so
 .hmeta .clk { font-family: var(--display); font-size: 52px; line-height: 1; color: var(--pfg); text-transform: none; font-variation-settings: 'wdth' 80, 'wght' 780; font-variant-numeric: tabular-nums; }
 .opn { display: inline-flex; align-items: center; gap: 8px; }
 .opn i { display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--coral); }
-.opn.is i { background: var(--mint); animation: ping 2s ease-out infinite; }
+.opn i { position: relative; }
+.opn.is i { background: var(--mint); }
+.opn.is i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--mint); opacity: 0; animation: ping 2s ease-out infinite; --ping-to: 3; }
 .hfoot { display: flex; justify-content: space-between; gap: 20px; margin: 90px 0 0; color: var(--pmu); }
 
 /* ================= team ================= */
@@ -154,7 +156,7 @@ html.st-hc .mlbl.w { color: var(--ink); }
 .l-bo { left: 63.2%; top: 30%; transform: rotate(78deg); transform-origin: 0 0; } .l-gh { left: 33%; top: 44%; transform: rotate(14deg); transform-origin: 0 0; }
 .pin { position: absolute; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -100%); }
 .pin > span { padding: 8px 12px; border-radius: 12px; background: var(--ink); color: var(--milk); font: 600 14px/1.2 var(--sans); white-space: nowrap; text-align: center; }
-.pin small { display: block; margin-top: 2px; color: var(--dim); font: 500 10px/1 var(--mono); letter-spacing: .03em; text-transform: uppercase; }
+.pin small { display: block; margin-top: 2px; color: var(--dim); font: 500 11px/1 var(--mono); letter-spacing: .03em; text-transform: uppercase; }
 .pin i { display: block; width: 3px; height: 22px; background: var(--ink); }
 .pin em { display: block; width: 12px; height: 12px; margin-top: -2px; border: 3px solid var(--ink); border-radius: 50%; background: var(--milk); }
 .p-lc em { background: var(--pink); }

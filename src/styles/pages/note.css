@@ -50,7 +50,7 @@
 .body table { width: 100%; margin: 0 0 26px; border-collapse: collapse; font-size: 17px; }
 .body th, .body td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--rule); text-align: left; }
 .ic { padding: 2px 6px; border-radius: 6px; background: rgba(14,14,15,.07); font: 500 .8em/1 var(--mono); font-variation-settings: 'wdth' 87.5, 'wght' 450; }
-.fn { display: inline-grid; place-items: center; min-width: 22px; height: 22px; margin: 0 2px; padding: 0 6px; border-radius: 999px; background: var(--acc); color: var(--milk); font: 600 12px/1 var(--sans); text-decoration: none; vertical-align: 3px; transition: transform .35s var(--ease-pop); }
+.fn { display: inline-grid; place-items: center; min-width: 24px; height: 24px; margin: 0 2px; padding: 0 6px; border-radius: 999px; background: var(--acc); color: var(--milk); font: 600 12px/1 var(--sans); text-decoration: none; vertical-align: 3px; transition: transform .35s var(--ease-pop); }
 .fn.hi, .fn:hover { transform: scale(1.15); }
 
 /* footnotes beside their line (JS places them · .placed) */

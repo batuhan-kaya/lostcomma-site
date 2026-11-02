@@ -20,7 +20,9 @@
 .clk > b { grid-column: 2; grid-row: 1 / span 2; font-family: var(--display); font-size: 76px; font-weight: 400; line-height: .86; letter-spacing: -.04em; font-variation-settings: 'wdth' 80, 'wght' 800; font-variant-numeric: tabular-nums; }
 .clk .st { display: flex; align-items: center; gap: 8px; color: var(--milk); }
 .clk .st i { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); }
-.clk .st.on i { background: var(--mint); animation: ping 2s ease-out infinite; }
+.clk .st i { position: relative; }
+.clk .st.on i { background: var(--mint); }
+.clk .st.on i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--mint); opacity: 0; animation: ping 2s ease-out infinite; }
 .clk.yz { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
 .clk.yz > .mono { color: var(--pmu); }
 .clk .city { font-size: 22px; font-weight: 600; line-height: 1.15; }

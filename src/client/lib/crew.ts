@@ -11,10 +11,15 @@
  *   <h1 data-rest="design" data-rest-at="end">…</h1>
  *   <svg data-rest="host" data-rest-at="0.35 0.5">…</svg>   (whoever hosts that section)
  * Without an anchor a cursor falls back to a spot inside the section box.
+ * A resting spot is nudged a few pixels when the arrow or the tag would cover text people read.
  *
  * Pages add little scripted moments per section with crew.addScenes({ hero: async (c, signal) => … }).
+ *
+ * Cost: the spring runs in requestAnimationFrame only while someone is moving. A settled team
+ * stops the loop · the resting drift is a CSS animation (compositor only) · a slow watch notices
+ * when the page moves under a resting cursor (content opened · images arrived · a resize).
  */
-import { clampPoint, drift, HOP_DIST, parseRestAt, pickSection, probeLine, SECTION_SETTLE_MS, shouldFlip, step, stepsFor, TEAM, type Name } from './crew-math';
+import { clampPoint, clearSpot, fitShift, HOP_DIST, parseRestAt, pickSection, probeLine, SECTION_SETTLE_MS, settled, shouldFlip, step, stepsFor, TEAM, type Box, type Name } from './crew-math';
 import { reducedMotion } from './motion';
 import { t } from './t';
 
@@ -40,6 +45,9 @@ export type Scene = (crew: Crew, signal: AbortSignal) => Promise<void>;
 interface Cursor {
   name: Name;
   el: HTMLElement;
+  /** The inner wrapper that carries the CSS drift. */
+  dr: HTMLElement;
+  tag: HTMLElement;
   bub: HTMLElement;
   x: number;
   y: number;
@@ -47,10 +55,18 @@ interface Cursor {
   vy: number;
   target: Target | null;
   arrived: boolean;
+  /** Arrived and still: the loop can stop for this one. */
+  still: boolean;
+  /** The CSS drift is on. */
+  resting: boolean;
   hidden: boolean;
   born: boolean;
   flipped: boolean;
-  phase: number;
+  saying: boolean;
+  tagW: number;
+  bubW: number;
+  /** How far the bubble slides to stay on the page. */
+  shift: number;
   timer: number;
   sayTimer: number;
   /** Positioned on stage. Until then the loop leaves it alone. */
@@ -61,6 +77,10 @@ interface Cursor {
 const HERO_SPOTS: Record<Name, [number, number]> = { design: [0.62, 0.42], code: [0.78, 0.7], motion: [0.86, 0.22] };
 const HOST_SPOT: [number, number] = [0.8, 0.38];
 const ARROW = 'M3 2 L3 19.5 L7.8 15.2 L11 22 L14.2 20.6 L11.1 13.9 L17.6 13.7 Z';
+/** How often the watch looks for a page that moved under a resting cursor. */
+const WATCH_MS = 700;
+/** Text at least this large is a display headline: the arrow may point into it · the tag keeps off. */
+const BIG_TEXT = 40;
 
 export class Crew {
   readonly root: HTMLElement;
@@ -74,6 +94,8 @@ export class Crew {
   private readonly cursors: Record<Name, Cursor>;
   private readonly scenes = new Map<string, Scene>();
   private readonly said = new Set<string>();
+  /** Lines of text per section (viewport boxes) · kept for a moment (one section change asks three times). */
+  private readonly lines = new Map<string, { at: number; boxes: Box[] }>();
   private section: string | null = null;
   private candidate: string | null = null;
   private candidateAt = 0;
@@ -82,6 +104,9 @@ export class Crew {
   private last = 0;
   private acc = 0;
   private started = false;
+  private width = 0;
+  private resizeTimer = 0;
+  private watched = 0;
   private pointer: { x: number; y: number } | null = null;
   private idleOn = false;
   private idle = false;
@@ -96,15 +121,17 @@ export class Crew {
     this.layer.className = 'crew' + (this.touch ? ' touch' : '');
     this.layer.setAttribute('aria-hidden', 'true');
 
-    const make = (name: Name, i: number): Cursor => {
+    const make = (name: Name): Cursor => {
       const el = document.createElement('div');
       el.className = `cur c-${name} zz`;
       el.dataset.cur = name;
-      el.innerHTML = `<svg class="arw" viewBox="0 0 24 24"><path d="${ARROW}"></path></svg><span class="tag">${name}</span><span class="bub"></span>`;
+      el.innerHTML = `<span class="dr"><svg class="arw" viewBox="0 0 24 24"><path d="${ARROW}"></path></svg><span class="tag">${name}</span><span class="bub"></span></span>`;
       this.layer.append(el);
       return {
         name,
         el,
+        dr: el.firstElementChild as HTMLElement,
+        tag: el.querySelector('.tag') as HTMLElement,
         bub: el.querySelector('.bub') as HTMLElement,
         x: -300,
         y: -300,
@@ -112,16 +139,21 @@ export class Crew {
         vy: 0,
         target: null,
         arrived: false,
+        still: false,
+        resting: false,
         hidden: true,
         born: false,
         flipped: false,
-        phase: i * 1.9 + 0.3,
+        saying: false,
+        tagW: 0,
+        bubW: 0,
+        shift: 0,
         timer: 0,
         sayTimer: 0,
         placed: false,
       };
     };
-    this.cursors = { design: make('design', 0), code: make('code', 1), motion: make('motion', 2) };
+    this.cursors = { design: make('design'), code: make('code'), motion: make('motion') };
 
     this.you = document.createElement('div');
     this.you.className = 'you c-you';
@@ -144,12 +176,12 @@ export class Crew {
   start(): void {
     if (this.started) return;
     this.started = true;
-    const onScroll = () => {
+    this.width = this.root.clientWidth;
+    addEventListener('scroll', () => {
       this.lastActive = performance.now();
       this.wake();
-    };
-    addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('resize', onScroll, { passive: true });
+    }, { passive: true });
+    addEventListener('resize', () => this.resized(), { passive: true });
     if (!this.touch) {
       addEventListener('pointermove', (e) => {
         if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
@@ -166,6 +198,11 @@ export class Crew {
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) this.wake();
     });
+    // Late fonts change line lengths: look again once they are in. (fonts.ready alone can
+    // resolve before the page has asked for a single font · loadingdone and load come after.)
+    document.fonts?.addEventListener('loadingdone', () => this.resized());
+    if (document.readyState !== 'complete') addEventListener('load', () => this.resized(), { once: true });
+    window.setInterval(() => this.watch(), WATCH_MS);
     this.pickNow(true);
     this.wake();
   }
@@ -181,9 +218,14 @@ export class Crew {
     this.calmOn = on;
     if (on) {
       this.ctrl?.abort(new DOMException('calm', 'AbortError'));
-      for (const n of TEAM) this.cursors[n].el.classList.remove('say');
+      for (const n of TEAM) {
+        const c = this.cursors[n];
+        this.hush(c);
+        this.unrest(c, false);
+      }
       document.documentElement.classList.add('still');
     } else document.documentElement.classList.remove('still');
+    for (const n of TEAM) this.cursors[n].still = false;
     this.wake();
   }
 
@@ -240,9 +282,7 @@ export class Crew {
   async go(name: Name, target: Target, signal: AbortSignal, maxMs = 4200): Promise<void> {
     const c = this.cursors[name];
     if (c.hidden) return;
-    c.target = target;
-    c.arrived = false;
-    this.wake();
+    this.send(c, target);
     const t0 = performance.now();
     await this.sleep(80, signal);
     while (!c.arrived && performance.now() - t0 < maxMs) await this.sleep(50, signal);
@@ -252,9 +292,7 @@ export class Crew {
   aim(name: Name, target: Target): void {
     const c = this.cursors[name];
     if (c.hidden) return;
-    c.target = target;
-    c.arrived = false;
-    this.wake();
+    this.send(c, target);
   }
 
   /** Where a cursor's arrow tip is right now in viewport coordinates · null when it is off stage. */
@@ -275,11 +313,7 @@ export class Crew {
     const c = this.cursors[name];
     if (c.hidden || !this.section) return;
     const r = this.restTarget(this.section, name);
-    if (r) {
-      c.target = r;
-      c.arrived = false;
-      this.wake();
-    }
+    if (r) this.send(c, r);
   }
 
   say(name: Name, text: string, ms = 2200): void {
@@ -287,8 +321,11 @@ export class Crew {
     if (c.hidden) return;
     c.bub.textContent = text;
     c.el.classList.add('say');
+    c.saying = true;
+    c.bubW = c.bub.offsetWidth;
+    this.render(c);
     clearTimeout(c.sayTimer);
-    c.sayTimer = window.setTimeout(() => c.el.classList.remove('say'), ms);
+    c.sayTimer = window.setTimeout(() => this.hush(c), ms);
   }
 
   /** say() once per page view. */
@@ -319,9 +356,9 @@ export class Crew {
     });
   }
 
-  /** For tests and debugging. */
-  state(): { section: string | null; visible: Name[] } {
-    return { section: this.section, visible: TEAM.filter((n) => !this.cursors[n].hidden) };
+  /** For tests and debugging. `running` is the animation loop (off once everyone has settled). */
+  state(): { section: string | null; visible: Name[]; running: boolean } {
+    return { section: this.section, visible: TEAM.filter((n) => !this.cursors[n].hidden), running: this.raf !== 0 };
   }
 
   /* ---------------- sections ---------------- */
@@ -350,6 +387,7 @@ export class Crew {
     const ctrl = new AbortController();
     this.ctrl = ctrl;
     this.section = sec;
+    this.lines.delete(sec);
     // Lets page CSS adjust cursors per section (a blue cursor on a blue section).
     this.layer.dataset.sec = sec;
     const team = sec === 'hero';
@@ -363,10 +401,7 @@ export class Crew {
       if (c.hidden) return this.appear(c, target, team ? 500 + i * 320 : 260);
       const p = this.point(target);
       if (p && Math.hypot(p.x - c.x, p.y - c.y) > HOP_DIST && !this.reduce) this.hop(c, target);
-      else {
-        c.target = target;
-        c.arrived = false;
-      }
+      else this.send(c, target);
     });
     this.placeYou();
 
@@ -383,25 +418,119 @@ export class Crew {
     const S = this.sec(sec);
     if (!S) return null;
     const isHost = sec !== 'hero' && name === this.hostOf(sec);
-    const anchor = S.querySelector(`[data-rest~="${name}"]`) ?? (isHost ? S.querySelector('[data-rest~="host"]') : null);
+    // The first anchor that is on the page right now (one inside a hidden panel would send the
+    // cursor to the top left corner).
+    const shown = (sel: string) => [...S.querySelectorAll(sel)].find((a) => a.getClientRects().length > 0) ?? null;
+    const anchor = shown(`[data-rest~="${name}"]`) ?? (isHost ? shown('[data-rest~="host"]') : null);
+    let tg: Target;
     if (anchor) {
       const narrow = this.root.clientWidth < 700 && anchor.getAttribute('data-rest-at-m');
       const at = parseRestAt(narrow || anchor.getAttribute('data-rest-at'));
-      return at.end ? { el: anchor, end: true, dx: at.dx, dy: at.dy, rest: true } : { el: anchor, fx: at.fx, fy: at.fy, dx: at.dx, dy: at.dy, rest: true };
+      tg = at.end ? { el: anchor, end: true, dx: at.dx, dy: at.dy, rest: true } : { el: anchor, fx: at.fx, fy: at.fy, dx: at.dx, dy: at.dy, rest: true };
+    } else {
+      const [fx, fy] = sec === 'hero' ? HERO_SPOTS[name] : HOST_SPOT;
+      tg = { el: S, fx, fy, rest: true };
     }
-    const [fx, fy] = sec === 'hero' ? HERO_SPOTS[name] : HOST_SPOT;
-    return { el: S, fx, fy, rest: true };
+    return this.clear(sec, S, this.cursors[name], tg);
+  }
+
+  /* ---------------- keeping text readable ---------------- */
+
+  /** Lines of text in a section (viewport boxes). Display headlines are marked big. */
+  private linesOf(sec: string, S: HTMLElement): Box[] {
+    const have = this.lines.get(sec);
+    // Scenes rewrite text and scroll moves the boxes: never trust an old measurement for long.
+    if (have && performance.now() - have.at < 300) return have.boxes;
+    const out: Box[] = [];
+    const walk = document.createTreeWalker(S, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    // Font size per element · 0 for text nobody can see (a hidden panel · a faded tab) and for
+    // text far off screen (a long section: only what is near the view costs anything).
+    const sizes = new Map<Element, number>();
+    const top = -240;
+    const bottom = innerHeight + 240;
+    for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+      const host = n.parentElement;
+      if (!host || !n.nodeValue?.trim() || host.closest('.crew,[aria-hidden="true"]')) continue;
+      let size = sizes.get(host);
+      if (size === undefined) {
+        const hr = host.getBoundingClientRect();
+        const seen = hr.bottom > top && hr.top < bottom && (host.checkVisibility?.({ visibilityProperty: true, opacityProperty: true }) ?? true);
+        size = seen ? parseFloat(getComputedStyle(host).fontSize) || 16 : 0;
+        sizes.set(host, size);
+      }
+      if (!size) continue;
+      const big = size >= BIG_TEXT;
+      range.selectNodeContents(n);
+      for (const r of range.getClientRects()) {
+        if (r.width < 1 || r.height < 1) continue;
+        // A headline's line box is a little taller than its letters (ascenders reach close to the top).
+        const inset = big ? r.height * 0.04 : 0;
+        out.push({ left: r.left, top: r.top + inset, right: r.right, bottom: r.bottom - inset, big });
+      }
+    }
+    this.lines.set(sec, { at: performance.now(), boxes: out });
+    return out;
+  }
+
+  /** Nudge a resting spot off any text it would cover (arrow and tag). */
+  private clear(sec: string, S: HTMLElement, c: Cursor, tg: Target): Target {
+    const p = this.point(tg);
+    if (!p) return tg;
+    const lines = this.linesOf(sec, S);
+    if (!lines.length) return tg;
+    if (!c.tagW) c.tagW = c.tag.offsetWidth;
+    const rr = this.root.getBoundingClientRect();
+    const W = this.root.clientWidth;
+    const A = this.touch ? 20 : 24;
+    const L = this.touch ? 15 : 18;
+    const T = this.touch ? 18 : 21;
+    const H = c.tag.offsetHeight || 21;
+    // Room for the resting drift (±6 · ±5) so the drift never wanders onto the words either.
+    const px = 6;
+    const py = 5;
+    const boxesAt = (dx: number, dy: number): Box[] => {
+      const { x, y } = clampPoint(p.x + dx, p.y + dy, W);
+      const vx = rr.left + x;
+      const vy = rr.top + y;
+      const flip = shouldFlip(x, W, c.tagW);
+      const tl = flip ? vx + A - 4 - c.tagW : vx + L;
+      return [
+        { left: vx + 2 - px, top: vy + 1 - py, right: vx + A * 0.72 + px, bottom: vy + A - 1 + py },
+        { left: tl - px, top: vy + T - py, right: tl + c.tagW + px, bottom: vy + T + H + py, strict: true },
+      ];
+    };
+    const [dx, dy] = clearSpot(boxesAt, lines, rr.left + W);
+    if (!dx && !dy) return tg;
+    return { ...tg, dx: (tg.dx ?? (tg.end ? 10 : 0)) + dx, dy: (tg.dy ?? 0) + dy };
   }
 
   /* ---------------- appearing and hopping ---------------- */
+
+  /** A new target for a cursor that is on stage. */
+  private send(c: Cursor, target: Target): void {
+    this.unrest(c, true);
+    c.target = target;
+    c.arrived = false;
+    c.still = false;
+    this.wake();
+  }
+
+  private hush(c: Cursor): void {
+    clearTimeout(c.sayTimer);
+    c.el.classList.remove('say');
+    c.saying = false;
+    if (c.placed) this.render(c);
+  }
 
   private fade(c: Cursor): void {
     c.hidden = true;
     c.placed = false;
     c.target = null;
     clearTimeout(c.timer);
+    this.unrest(c, false);
     c.el.classList.add('zz');
-    c.el.classList.remove('say');
+    this.hush(c);
   }
 
   private appear(c: Cursor, target: Target, delay: number): void {
@@ -431,8 +560,10 @@ export class Crew {
         sx = p.x;
         sy = p.y;
       }
-      Object.assign(c, { x: sx, y: sy, vx: 0, vy: 0, target: tg, arrived: false, placed: true });
-      this.render(c, 0);
+      this.unrest(c, false);
+      c.tagW = c.tag.offsetWidth;
+      Object.assign(c, { x: sx, y: sy, vx: 0, vy: 0, target: tg, arrived: false, still: false, placed: true });
+      this.render(c);
       c.el.classList.remove('zz');
       this.wake();
     }, this.reduce ? 0 : delay);
@@ -442,16 +573,40 @@ export class Crew {
   private hop(c: Cursor, target: Target): void {
     c.el.classList.add('zz');
     c.target = null;
+    this.unrest(c, false);
     clearTimeout(c.timer);
     c.timer = window.setTimeout(() => {
       if (c.hidden) return;
       const p = this.point(target);
       if (!p) return;
-      Object.assign(c, { x: p.x - 50, y: p.y - 34, vx: 0, vy: 0, target, arrived: false, placed: true });
-      this.render(c, 0);
+      Object.assign(c, { x: p.x - 50, y: p.y - 34, vx: 0, vy: 0, target, arrived: false, still: false, placed: true });
+      this.render(c);
       c.el.classList.remove('zz');
       this.wake();
     }, 460);
+  }
+
+  /** Start the resting drift (CSS) once a cursor is still at a resting spot. */
+  private rest(c: Cursor): void {
+    if (c.resting || this.reduce || !c.target?.rest) return;
+    c.resting = true;
+    c.el.classList.add('drifting');
+  }
+
+  /**
+   * Stop the drift. With `keep` the drifted offset becomes the cursor's real position so it
+   * glides on from exactly where it is (no jump back to the centre of the drift).
+   */
+  private unrest(c: Cursor, keep: boolean): void {
+    if (!c.resting) return;
+    if (keep && c.placed) {
+      const a = c.dr.getBoundingClientRect();
+      const b = c.el.getBoundingClientRect();
+      c.x += a.left - b.left;
+      c.y += a.top - b.top;
+    }
+    c.resting = false;
+    c.el.classList.remove('drifting');
   }
 
   /* ---------------- geometry ---------------- */
@@ -461,7 +616,8 @@ export class Crew {
     if (tg.at) return clampPoint(tg.at.x, tg.at.y, this.root.clientWidth);
     let el = tg.el;
     if ((!el || !el.isConnected) && tg.sel) el = tg.el = this.root.querySelector(tg.sel);
-    if (!el || !el.isConnected) return null;
+    // Gone or hidden (display none): no spot · the cursor stays where it is.
+    if (!el || !el.isConnected || !el.getClientRects().length) return null;
     const rr = this.root.getBoundingClientRect();
     let x: number;
     let y: number;
@@ -505,11 +661,7 @@ export class Crew {
     const m = { x: this.pointer.x - rr.left, y: this.pointer.y - rr.top };
     const off: Record<Name, [number, number]> = { design: [-120, -90], code: [80, -70], motion: [-50, 96] };
     const visible = TEAM.filter((n) => !this.cursors[n].hidden);
-    for (const n of visible) {
-      const c = this.cursors[n];
-      c.target = { at: { x: m.x + off[n][0], y: m.y + off[n][1] } };
-      c.arrived = false;
-    }
+    for (const n of visible) this.send(this.cursors[n], { at: { x: m.x + off[n][0], y: m.y + off[n][1] } });
     const first = visible[0];
     if (first) window.setTimeout(() => this.idle && this.say(first, t('hâlâ burada mısın?'), 3200), 1400);
   }
@@ -533,6 +685,58 @@ export class Crew {
     }
   }
 
+  /** The page changed shape: new widths · new line breaks · maybe a new resting anchor (data-rest-at-m). */
+  private resized(): void {
+    this.lastActive = performance.now();
+    this.wake();
+    clearTimeout(this.resizeTimer);
+    this.resizeTimer = window.setTimeout(() => {
+      this.width = this.root.clientWidth;
+      this.lines.clear();
+      const sec = this.section;
+      if (!sec) return;
+      for (const n of TEAM) {
+        const c = this.cursors[n];
+        if (c.hidden || !c.target?.rest) continue;
+        const tg = this.restTarget(sec, n);
+        if (tg) this.send(c, tg);
+      }
+    }, 160);
+  }
+
+  /**
+   * Runs a few times a second while the loop sleeps: a section that changed without a scroll ·
+   * a resting cursor whose anchor moved · the homepage's idle gather.
+   */
+  private watch(): void {
+    if (this.raf || document.hidden || !this.started) return;
+    if (this.idleOn && !this.idle && this.pointer && performance.now() - this.lastActive > 20_000) {
+      this.goIdle();
+      return;
+    }
+    this.pickNow();
+    if (this.candidate !== this.section) return this.wake();
+    for (const n of TEAM) {
+      const c = this.cursors[n];
+      if (c.hidden || !c.placed || !c.target) continue;
+      const p = this.point(c.target);
+      if (p && Math.hypot(p.x - c.x, p.y - c.y) > 1) {
+        this.unrest(c, true);
+        c.still = false;
+        return this.wake();
+      }
+    }
+    // Every other second: did words appear under a resting cursor (a scene changed a panel)?
+    // Then it steps aside to the nearest clear spot.
+    if (++this.watched % 3 || !this.section) return;
+    for (const n of TEAM) {
+      const c = this.cursors[n];
+      if (c.hidden || !c.still || !c.target?.rest) continue;
+      const tg = this.restTarget(this.section, n);
+      if (tg && (tg.el !== c.target.el || tg.dx !== c.target.dx || tg.dy !== c.target.dy)) this.send(c, tg);
+    }
+  }
+
   private tick(now: number): void {
     this.raf = 0;
     this.pickNow();
@@ -549,29 +753,50 @@ export class Crew {
       if (this.reduce) {
         c.x = p.x;
         c.y = p.y;
-        c.arrived = true;
+        c.arrived = c.still = true;
       } else {
-        for (let i = 0; i < steps; i++) c.arrived = step(c, p.x, p.y);
-        moving = true;
+        if (c.still && Math.hypot(p.x - c.x, p.y - c.y) > 0.5) {
+          // The spot moved under a resting cursor (a scene changed the text · a late image).
+          this.unrest(c, true);
+          c.still = false;
+        }
+        if (!c.still) {
+          for (let i = 0; i < steps; i++) c.arrived = step(c, p.x, p.y);
+          if (settled(c, p.x, p.y)) {
+            Object.assign(c, { x: p.x, y: p.y, vx: 0, vy: 0, arrived: true, still: true });
+            this.rest(c);
+          } else moving = true;
+        }
       }
-      this.render(c, now);
+      this.render(c);
     }
     if (this.pointer) this.placeYou();
-    if (this.idleOn && !this.idle && this.pointer && now - this.lastActive > 20_000) this.goIdle();
-    // Keep ticking while anyone is on stage (the idle drift) or a section change is pending.
-    // With reduced motion everything is still: scroll and resize wake the loop again.
+    // Keep ticking only while someone is moving or a section change is pending.
+    // Everyone settled: the loop stops · the drift is CSS · scroll · resize and the watch wake it.
     const pending = this.candidate !== this.section;
     if ((moving || pending) && !document.hidden) this.raf = requestAnimationFrame(this.tick);
   }
 
-  private render(c: Cursor, now: number): void {
-    const d = c.target?.rest && !this.reduce ? drift(now, c.phase) : { dx: 0, dy: 0 };
-    const flip = shouldFlip(c.x, this.root.clientWidth);
+  private render(c: Cursor): void {
+    const W = this.width || this.root.clientWidth;
+    const need = Math.max(c.tagW, c.saying ? c.bubW : 0);
+    const flip = shouldFlip(c.x, W, need || undefined);
     if (flip !== c.flipped) {
       c.flipped = flip;
       c.el.classList.toggle('flip', flip);
     }
-    c.el.style.transform = `translate3d(${(c.x + d.dx).toFixed(1)}px,${(c.y + d.dy).toFixed(1)}px,0)`;
+    // A long bubble near an edge slides back onto the page.
+    let shift = 0;
+    if (c.saying && c.bubW) {
+      const A = this.touch ? 20 : 24;
+      const left = c.flipped ? c.x + A - 4 - c.bubW : c.x + (this.touch ? 15 : 18);
+      shift = Math.round(fitShift(left, c.bubW, W));
+    }
+    if (shift !== c.shift) {
+      c.shift = shift;
+      c.bub.style.translate = shift ? `${shift}px 0` : '';
+    }
+    c.el.style.transform = `translate3d(${c.x.toFixed(1)}px,${c.y.toFixed(1)}px,0)`;
   }
 }
 

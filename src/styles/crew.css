@@ -4,6 +4,31 @@
 
 .cur { position: absolute; left: 0; top: 0; display: block; transform: translate3d(-300px,-300px,0); transition: opacity .45s; will-change: transform; }
 .cur.zz { opacity: 0; }
+.cur .dr { position: relative; display: block; }
+
+/*
+ * The resting drift: ±6 px across and ±5 px down on two slow waves (about 16 s and 13 s).
+ * Each wave starts at zero so it can begin at any moment without a jump · crew.ts folds the
+ * offset into the cursor's position when it is sent somewhere else. Compositor only: a
+ * resting team costs no JavaScript.
+ */
+@keyframes cur-dx {
+  0% { translate: 0 0; animation-timing-function: cubic-bezier(.33, .67, .67, 1); }
+  25% { translate: 6px 0; animation-timing-function: cubic-bezier(.37, 0, .63, 1); }
+  75% { translate: -6px 0; animation-timing-function: cubic-bezier(.33, 0, .67, .33); }
+  100% { translate: 0 0; }
+}
+@keyframes cur-dy {
+  0% { transform: translateY(0); animation-timing-function: cubic-bezier(.33, .67, .67, 1); }
+  25% { transform: translateY(5px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); }
+  75% { transform: translateY(-5px); animation-timing-function: cubic-bezier(.33, 0, .67, .33); }
+  100% { transform: translateY(0); }
+}
+.cur.drifting .dr { animation: cur-dx 15.7s infinite, cur-dy 12.6s infinite; }
+.c-code.drifting .dr { animation-duration: 14.1s, 11.3s; animation-direction: reverse, normal; }
+.c-motion.drifting .dr { animation-duration: 17.3s, 13.9s; animation-direction: normal, reverse; }
+html.still .cur .dr { animation: none; }
+@media (prefers-reduced-motion: reduce) { .cur .dr { animation: none; } }
 .cur .arw {
   display: block;
   width: 24px;
