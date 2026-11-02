@@ -21,3 +21,16 @@ export function ago(d: Date, now: Date, lang: Lang): string {
   if (days < 365) return rtf.format(-Math.round(days / 30), 'month');
   return rtf.format(-Math.round(days / 365), 'year');
 }
+
+/** Parts of an Istanbul calendar day ("2026-11-03") in a language. Never through Intl's own joins (en-GB puts a comma after the weekday). */
+export function dayParts(day: string, lang: Lang): { dow: string; dowShort: string; d: number; month: string; monthShort: string; year: number } {
+  const at = new Date(`${day}T12:00:00Z`);
+  const f = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(LOCALE[lang], { ...o, timeZone: 'UTC' }).format(at);
+  return { dow: f({ weekday: 'long' }), dowShort: f({ weekday: 'short' }).replace('.', ''), d: at.getUTCDate(), month: f({ month: 'long' }), monthShort: f({ month: 'short' }).replace('.', ''), year: at.getUTCFullYear() };
+}
+
+/** "3 Kasım Salı" · "Tuesday 3 November" (with the year when asked). */
+export function dayLabel(day: string, lang: Lang, year = false): string {
+  const p = dayParts(day, lang);
+  return lang === 'tr' ? `${p.d} ${p.month}${year ? ` ${p.year}` : ''} ${p.dow}` : `${p.dow} ${p.d} ${p.month}${year ? ` ${p.year}` : ''}`;
+}

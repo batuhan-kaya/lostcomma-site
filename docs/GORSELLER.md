@@ -83,6 +83,15 @@ Görsel olmayan yer tutucular: ekip adları ve rolleri ([Name] · veritabanında
 |---|---|---|---|---|
 | G1 | Lab · virgül alanı ve altı deney | Hepsi tarayıcıda kodla çiziliyor | | Gerekmez |
 
+## Başla (9. aşama)
+
+| # | Yer | Ne lazım | Oran · teslim boyutu | Durum |
+|---|---|---|---|---|
+| H1 | Başla · iki saat · cetvel · saatler · bilet | Hepsi kodla çiziliyor | | Gerekmez |
+| H2 | Başla · "Ziyaret" kartı | İsteğe bağlı: stüdyonun kapısı ya da masası. Şimdilik kart Stüdyo sayfasındaki haritaya gidiyor | 4:3 · 1200×900 | İsteğe bağlı |
+
+Görsel olmayan yer tutucular: telefon numarası ([+90 telefon] · `src/server/content/start.ts`) · görüşme bağlantısı (`MEET_URL` boşsa bağlantıyı bir gün önce elle gönderiyoruz) · e-posta ayarları (`MAIL_URL` · boşsa mesajlar outbox tablosunda bekler).
+
 ## Döngü videoları nasıl hazırlanır (D5 · A6)
 
 Her hareket projesi için bir döngü: sessiz · kendi içinde dönen · 6 ile 12 saniye. Sayfada ses olmadan ve ekrandayken oynar. Azaltılmış hareket isteyen ziyaretçi önce posteri görür.

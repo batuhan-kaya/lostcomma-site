@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { BRIEF_BUDGETS, BRIEF_TIMES, BRIEF_TYPES } from '../content/home';
 import { addBrief } from '../data/briefs';
 import type { Db } from '../db';
+import { enqueue, type Postman } from '../mail';
+import { briefMail } from '../mail/messages';
 import { href } from '../routes';
 import { RateLimit } from './rate';
 
@@ -32,9 +34,12 @@ export interface BriefOptions {
   siteUrl: string;
   now?: () => Date;
   limit?: RateLimit;
+  /** The studio hears about every brief (src/server/mail). */
+  postman?: Postman;
+  studio?: string;
 }
 
-export function registerBrief(app: FastifyInstance, { db, siteUrl, now = () => new Date(), limit = new RateLimit(5, 10 * 60_000) }: BriefOptions): void {
+export function registerBrief(app: FastifyInstance, { db, siteUrl, now = () => new Date(), limit = new RateLimit(5, 10 * 60_000), postman, studio }: BriefOptions): void {
   const siteHost = new URL(siteUrl).host;
 
   app.post('/api/brief', async (req, reply) => {
@@ -81,6 +86,10 @@ export function registerBrief(app: FastifyInstance, { db, siteUrl, now = () => n
       email: b.email,
       message: b.message,
     });
+    if (postman && studio) {
+      await enqueue(db, [briefMail({ ...b, time: b.time ?? null, budget: b.budget ?? null }, studio)], now());
+      void postman.kick().catch((err) => req.log.error(err, 'mail'));
+    }
     req.log.info({ brief: id }, 'brief received');
     return wantsJson ? reply.send({ ok: true }) : back('sent');
   });

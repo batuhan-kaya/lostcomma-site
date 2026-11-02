@@ -23,6 +23,18 @@ const Env = z.object({
   SEED: z.enum(['none', 'sample', 'demo']).optional(),
   /** Briefs one address may send per 10 minutes. */
   BRIEF_LIMIT: z.coerce.number().int().min(1).default(5),
+  /** Calls one address may book per hour (Start). */
+  BOOK_LIMIT: z.coerce.number().int().min(1).default(3),
+  /**
+   * Where mail goes out (src/server/mail): smtps://user:pass@host:465 · smtp://…:587 · log://
+   * Empty = nothing is sent · messages wait in the outbox table.
+   */
+  MAIL_URL: z.string().optional(),
+  MAIL_FROM: z.string().default('Lost Comma <hello@lostcomma.co>'),
+  /** The studio inbox that hears about briefs and bookings. */
+  MAIL_TO: z.string().default('hello@lostcomma.co'),
+  /** The video link for a call · {ticket} becomes the booking's token (https://meet.jit.si/lostcomma-{ticket}). Empty = we send links by hand. */
+  MEET_URL: z.string().optional(),
 });
 
 type Parsed = z.infer<typeof Env>;

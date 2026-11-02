@@ -11,6 +11,10 @@
  *   media loop <project no> <mp4> --poster <image> [--webm <file>] [--alt-..]
  *                                                 a ready-made loop (motion work · docs/GORSELLER.md)
  *   media list                                    every image with its key and size
+ *   bookings                                      the next calls (Start)
+ *   mail test <address>                           send one message through MAIL_URL now
+ *   mail outbox                                   the last messages and whether they went out
+ *   mail retry                                    send what is still waiting in the outbox now
  */
 import { readFile } from 'node:fs/promises';
 import { basename } from 'node:path';
@@ -18,9 +22,13 @@ import { parseArgs } from 'node:util';
 import { desc, eq } from 'drizzle-orm';
 import { prepareDatabase } from './app';
 import { loadConfig } from './config';
+import { ticketNo, upcomingBookings } from './data/bookings';
 import { openDatabase, safeUrl } from './db';
-import { media, people, projects } from './db/schema';
+import { media, outbox, people, projects } from './db/schema';
 import { seed } from './db/seed';
+import { createMailer, Postman } from './mail';
+import { when } from './mail/messages';
+import { cityOf, localHm } from '../shared/booking';
 import { addDemoCover, addDemoLoop } from './media/demo';
 import { ingestImage, MediaError, mediaDirs } from './media/ingest';
 import { ingestLoop } from './media/video';
@@ -32,7 +40,11 @@ const USAGE = `usage:
   media cover <project no> <file> [--alt-tr "…"] [--alt-en "…"]
   media portrait <design|code|motion> <file> [--alt-tr "…"] [--alt-en "…"]
   media loop <project no> <file.mp4> --poster <image> [--webm <file.webm>] [--alt-tr "…"] [--alt-en "…"]
-  media list`;
+  media list
+  bookings
+  mail test <address>
+  mail outbox
+  mail retry`;
 
 const { values: flags, positionals } = parseArgs({
   allowPositionals: true,
@@ -107,6 +119,34 @@ try {
         for (const m of await db.select().from(media).orderBy(desc(media.createdAt))) {
           console.log(`${m.id}\t${m.key}\t${m.width}×${m.height}\t${m.source}\t${m.alt.tr ?? ''} / ${m.alt.en ?? ''}`);
         }
+      } else {
+        console.log(USAGE);
+        process.exitCode = 1;
+      }
+      break;
+    }
+    case 'bookings': {
+      const list = await upcomingBookings(db, new Date());
+      if (!list.length) console.log('no calls booked');
+      for (const b of list) {
+        const theirs = b.tz === 'Europe/Istanbul' ? '' : `  (${localHm(b.startsAt, b.tz)} ${cityOf(b.tz)})`;
+        console.log(`${ticketNo(b.no)}  ${when(b.startsAt, 'tr')}${theirs}  ${b.name} <${b.email}>  ${b.lang}  ${b.about.join(' ')}${b.note ? `\n         ${b.note}` : ''}`);
+      }
+      break;
+    }
+    case 'mail': {
+      if (sub === 'test' && rest[0]) {
+        const mailer = createMailer(config.MAIL_URL);
+        if (!mailer) throw new MediaError('MAIL_URL is not set');
+        await mailer.send({ kind: 'test', to: rest[0], from: config.MAIL_FROM, subject: 'Lost Comma deneme', text: 'Bu bir deneme. Bunu okuyorsan e-posta ayarları doğru.' });
+        console.log(`sent to ${rest[0]}`);
+      } else if (sub === 'outbox') {
+        for (const m of await db.select().from(outbox).orderBy(desc(outbox.id)).limit(30)) {
+          console.log(`${m.id}\t${m.status}\t${m.tries}\t${m.kind}\t${m.to}\t${m.subject}${m.lastError ? `\t${m.lastError}` : ''}`);
+        }
+      } else if (sub === 'retry') {
+        await new Postman(db, createMailer(config.MAIL_URL), config.MAIL_FROM).kick(true);
+        console.log('outbox retried');
       } else {
         console.log(USAGE);
         process.exitCode = 1;

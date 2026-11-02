@@ -27,6 +27,7 @@ export default defineConfig({
       DATABASE_URL: process.env.E2E_DATABASE_URL ?? 'memory://',
       SEED: 'demo',
       BRIEF_LIMIT: '1000',
+      BOOK_LIMIT: '1000',
     },
   },
   projects: [

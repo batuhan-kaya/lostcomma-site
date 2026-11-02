@@ -4,6 +4,7 @@ import formbody from '@fastify/formbody';
 import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
 import { sql } from 'drizzle-orm';
+import { registerBooking } from './api/booking';
 import { registerBrief } from './api/brief';
 import { RateLimit } from './api/rate';
 import { Assets } from './assets';
@@ -16,6 +17,7 @@ import { isLang, LANGS, negotiate, translator, type Lang } from './i18n';
 import { documentHtml } from './layout/document';
 import { addDemoCover, addDemoLoop } from './media/demo';
 import { mediaDirs } from './media/ingest';
+import { createMailer, Postman, type Mailer } from './mail';
 import { rssXml } from './notes/rss';
 import { OgImages } from './og';
 import { ogSpec } from './og/spec';
@@ -31,11 +33,14 @@ export interface AppOptions {
   now?: () => Date;
   /** An open database (tests share one). Defaults to opening config.DATABASE_URL · closed with the app. */
   database?: Database;
+  /** Where mail goes (tests pass a MemoryMailer). Defaults to MAIL_URL · null sends nothing. */
+  mailer?: Mailer | null;
 }
 
 declare module 'fastify' {
   interface FastifyInstance {
     db: Db;
+    postman: Postman;
   }
 }
 
@@ -64,7 +69,7 @@ export function readCookie(header: string | undefined, name: string): string | u
   return undefined;
 }
 
-export async function buildApp({ config, now = () => new Date(), database }: AppOptions) {
+export async function buildApp({ config, now = () => new Date(), database, mailer }: AppOptions) {
   const app = Fastify({
     logger: config.NODE_ENV === 'test' ? false : { level: config.NODE_ENV === 'production' ? 'info' : 'debug' },
     trustProxy: true,
@@ -96,12 +101,32 @@ export async function buildApp({ config, now = () => new Date(), database }: App
     return payload;
   });
 
+  // Mail: briefs and bookings go into the outbox · the postman sends them when MAIL_URL is set.
+  const postman = new Postman(db, mailer !== undefined ? mailer : createMailer(config.MAIL_URL, (m) => app.log.info(m)), config.MAIL_FROM, now);
+  app.decorate('postman', postman);
+  if (config.NODE_ENV !== 'test') postman.start();
+  app.addHook('onClose', async () => {
+    postman.stop();
+    await postman.drain();
+  });
+
   await app.register(formbody, { bodyLimit: 16_384 });
   registerBrief(app, {
     db,
     siteUrl: config.SITE_URL,
     now,
     limit: new RateLimit(config.BRIEF_LIMIT, 10 * 60_000),
+    postman,
+    studio: config.MAIL_TO,
+  });
+  registerBooking(app, {
+    db,
+    siteUrl: config.SITE_URL,
+    now,
+    limit: new RateLimit(config.BOOK_LIMIT, 60 * 60_000),
+    postman,
+    studio: config.MAIL_TO,
+    meet: config.MEET_URL,
   });
 
   await app.register(fastifyStatic, {
@@ -133,8 +158,10 @@ export async function buildApp({ config, now = () => new Date(), database }: App
     return reply.sendFile('favicon.svg', publicDir);
   });
 
-  function ctxFor(lang: Lang, path: string, alt: Ctx['alt']): Ctx {
+  function ctxFor(lang: Lang, path: string, alt: Ctx['alt'], query: unknown = {}): Ctx {
+    const q = Object.fromEntries(Object.entries((query ?? {}) as Record<string, unknown>).filter((e): e is [string, string] => typeof e[1] === 'string'));
     return {
+      query: q,
       lang,
       t: translator(lang),
       tAlt: translator(lang === 'tr' ? 'en' : 'tr'),
@@ -164,7 +191,7 @@ export async function buildApp({ config, now = () => new Date(), database }: App
         // The homepage shows the brief result after a post without JS.
         const state = id === 'home' ? (req.query as Record<string, string>).brief : undefined;
         const p = state === 'sent' || state === 'error' ? homePage({ sent: state === 'sent', error: state === 'error' }) : page;
-        return send(reply, p, ctxFor(lang, alt[lang], alt));
+        return send(reply, p, ctxFor(lang, alt[lang], alt, req.query));
       });
     }
   }

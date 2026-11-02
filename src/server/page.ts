@@ -22,6 +22,8 @@ export interface Ctx {
   now: Date;
   /** Content lives here (see src/server/data). Read it in a page's load(). */
   db: Db;
+  /** The query string (?day=… on Start). Never part of the canonical address. */
+  query: Record<string, string>;
 }
 
 export interface NextBand {
