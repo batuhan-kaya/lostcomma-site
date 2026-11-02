@@ -199,6 +199,8 @@ export const briefs = pgTable(
     status: briefStatusEnum().notNull().default('new'),
     /** Our own note (panel). */
     note: text().notNull().default(''),
+    /** The visit that sent it (docs/ISTATISTIK.md · "how they came"). */
+    visitId: uuid().references(() => statsVisits.id, { onDelete: 'set null' }),
   },
   (t) => [index('briefs_created_at').on(t.createdAt)],
 );
@@ -228,6 +230,8 @@ export const bookings = pgTable(
     /** Our own note (panel) · the visitor never sees it. */
     staffNote: text().notNull().default(''),
     cancelledAt: timestamp({ withTimezone: true }),
+    /** The visit that booked it (docs/ISTATISTIK.md). */
+    visitId: uuid().references(() => statsVisits.id, { onDelete: 'set null' }),
     createdAt: created(),
   },
   (t) => [uniqueIndex('bookings_slot').on(t.startsAt).where(sql`${t.status} = 'booked'`), index('bookings_starts_at').on(t.startsAt)],
@@ -344,6 +348,97 @@ export const redirects = pgTable('redirects', {
   hits: integer().notNull().default(0),
   createdAt: created(),
 });
+
+/*
+ * Statistics (docs/ISTATISTIK.md). No cookies · no IP addresses. A visitor is a hash of the day's
+ * salt with the address and the browser: the salt is deleted after a day so yesterday's rows can
+ * never be traced back to anyone. Thirty quiet minutes end a visit.
+ */
+export const statsSalts = pgTable('stats_salts', {
+  /** The day in Istanbul (YYYY-MM-DD). */
+  day: date({ mode: 'string' }).primaryKey(),
+  salt: text().notNull(),
+});
+
+export const statsVisits = pgTable(
+  'stats_visits',
+  {
+    id: uuid().primaryKey(),
+    /** 16 hex characters of sha256(salt · address · browser · host) · meaningless once the salt is gone. */
+    visitor: text().notNull(),
+    startedAt: timestamp({ withTimezone: true }).notNull(),
+    lastAt: timestamp({ withTimezone: true }).notNull(),
+    entry: text().notNull(),
+    exit: text().notNull(),
+    /** The site they came from (host without www · path without the query) · empty when typed or unknown. */
+    refHost: text().notNull().default(''),
+    refPath: text().notNull().default(''),
+    utmSource: text().notNull().default(''),
+    utmMedium: text().notNull().default(''),
+    utmCampaign: text().notNull().default(''),
+    /** ISO 3166 code (upper case) · empty when unknown. */
+    country: text().notNull().default(''),
+    city: text().notNull().default(''),
+    /** phone · tablet · desktop */
+    device: text().notNull().default('desktop'),
+    os: text().notNull().default(''),
+    browser: text().notNull().default(''),
+    /** The site language they landed in. */
+    lang: langEnum(),
+    /** The browser's own language (en-GB · tr). */
+    browserLang: text().notNull().default(''),
+    tz: text().notNull().default(''),
+    views: integer().notNull().default(0),
+    /** Time with the page on screen · all views together. */
+    engagedMs: integer().notNull().default(0),
+  },
+  (t) => [index('stats_visits_started').on(t.startedAt), index('stats_visits_visitor').on(t.visitor, t.lastAt), index('stats_visits_last').on(t.lastAt)],
+);
+
+export const statsViews = pgTable(
+  'stats_views',
+  {
+    /** Made by the browser for this page view (lives in memory only). */
+    id: uuid().primaryKey(),
+    visitId: uuid()
+      .notNull()
+      .references(() => statsVisits.id, { onDelete: 'cascade' }),
+    at: timestamp({ withTimezone: true }).notNull(),
+    path: text().notNull(),
+    /** The route (home · case · note · …). */
+    page: text().notNull().default(''),
+    lang: langEnum(),
+    engagedMs: integer().notNull().default(0),
+    /** How far down they saw · 0 to 100. */
+    scroll: smallint().notNull().default(0),
+    /** The viewport width in CSS pixels. */
+    width: smallint().notNull().default(0),
+  },
+  (t) => [index('stats_views_visit').on(t.visitId), index('stats_views_at').on(t.at), index('stats_views_path').on(t.path, t.at)],
+);
+
+export const statsEvents = pgTable(
+  'stats_events',
+  {
+    id: serial().primaryKey(),
+    visitId: uuid()
+      .notNull()
+      .references(() => statsVisits.id, { onDelete: 'cascade' }),
+    viewId: uuid(),
+    at: timestamp({ withTimezone: true }).notNull(),
+    /** click (inside the site) · out (another site) · contact (mail · phone) · event (brief · booking · …) */
+    kind: text().notNull(),
+    /** The label people saw · or the event's name. */
+    name: text().notNull(),
+    /** Where it went (a path · a host) or a detail. */
+    target: text().notNull().default(''),
+    /** Where on the page: across in thousandths of the viewport · down in CSS pixels from the top. */
+    x: smallint(),
+    y: integer(),
+    width: smallint(),
+  },
+  (t) => [index('stats_events_visit').on(t.visitId), index('stats_events_view').on(t.viewId), index('stats_events_at').on(t.at)],
+);
 
 export const mediaRelations = relations(media, () => ({}));
 

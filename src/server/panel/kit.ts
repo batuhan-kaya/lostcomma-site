@@ -13,6 +13,7 @@ import type { Lang } from '../i18n';
 import type { Postman } from '../mail';
 import type { MediaDirs } from '../media/ingest';
 import type { AnyPage } from '../page';
+import type { Stats } from '../stats';
 import type { PanelSession } from './auth';
 import { FLASH, shell, type Counts, type Shell } from './ui';
 
@@ -24,6 +25,7 @@ export interface Kit {
   postman: Postman;
   dirs: MediaDirs;
   assets: Assets;
+  stats: Stats;
   secure: boolean;
   /** Renders one of the site's pages with the given data (draft previews). */
   preview: (reply: FastifyReply, page: AnyPage, lang: Lang, path: string, data: unknown) => Promise<unknown>;

@@ -11,7 +11,9 @@ import { ticketHtml } from '../pages/start';
 import { href } from '../routes';
 import { IST_OFFSET, istDay, parseSlot, validZone } from '../../shared/booking';
 import { blockedOn, openDays } from '../data/closures';
+import type { Stats } from '../stats';
 import { RateLimit } from './rate';
+import { clientOf } from './stats';
 
 const istMinutes = (d: Date) => (((Math.floor(d.getTime() / 60_000) + IST_OFFSET) % 1440) + 1440) % 1440;
 
@@ -42,9 +44,11 @@ export interface BookingOptions {
   meet?: string;
   now?: () => Date;
   limit?: RateLimit;
+  /** Links the call to the visit that booked it ("how they came" in the panel). */
+  stats?: Stats;
 }
 
-export function registerBooking(app: FastifyInstance, { db, siteUrl, postman, studio, meet, now = () => new Date(), limit = new RateLimit(3, 3_600_000) }: BookingOptions): void {
+export function registerBooking(app: FastifyInstance, { db, siteUrl, postman, studio, meet, now = () => new Date(), limit = new RateLimit(3, 3_600_000), stats }: BookingOptions): void {
   const siteHost = new URL(siteUrl).host;
 
   app.post('/api/booking', async (req, reply) => {
@@ -82,8 +86,10 @@ export function registerBooking(app: FastifyInstance, { db, siteUrl, postman, st
     // A closed hour behaves like a taken one.
     if (blockedOn(open.closures, istDay(startsAt)).has(istMinutes(startsAt))) return fail(409, 'taken');
 
+    const visitId = stats ? await stats.currentVisit(clientOf(req)).catch(() => null) : null;
     const booking = await addBooking(db, {
       id: randomUUID(),
+      visitId,
       token: randomBytes(12).toString('base64url'),
       startsAt,
       lang: b.lang,
@@ -98,6 +104,7 @@ export function registerBooking(app: FastifyInstance, { db, siteUrl, postman, st
 
     await enqueue(db, bookingMails(booking, { studio, meet: meetUrl(meet, booking.token), now: at }), at);
     void postman.kick().catch((err) => req.log.error(err, 'mail'));
+    if (visitId) await stats!.event(visitId, 'booking', booking.id).catch((err) => req.log.error(err, 'stats'));
     req.log.info({ booking: booking.id }, 'call booked');
 
     if (!wantsJson) return back(`ticket=${booking.token}`);

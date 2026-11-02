@@ -3,6 +3,8 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { BRIEF_BUDGETS, BRIEF_TIMES, BRIEF_TYPES } from '../content/home';
 import { addBrief } from '../data/briefs';
+import type { Stats } from '../stats';
+import { clientOf } from './stats';
 import type { Db } from '../db';
 import { enqueue, type Postman } from '../mail';
 import { briefMail } from '../mail/messages';
@@ -37,9 +39,11 @@ export interface BriefOptions {
   /** The studio hears about every brief (src/server/mail). */
   postman?: Postman;
   studio?: string;
+  /** Links the brief to the visit that sent it ("how they came" in the panel). */
+  stats?: Stats;
 }
 
-export function registerBrief(app: FastifyInstance, { db, siteUrl, now = () => new Date(), limit = new RateLimit(5, 10 * 60_000), postman, studio }: BriefOptions): void {
+export function registerBrief(app: FastifyInstance, { db, siteUrl, now = () => new Date(), limit = new RateLimit(5, 10 * 60_000), postman, studio, stats }: BriefOptions): void {
   const siteHost = new URL(siteUrl).host;
 
   app.post('/api/brief', async (req, reply) => {
@@ -75,8 +79,10 @@ export function registerBrief(app: FastifyInstance, { db, siteUrl, now = () => n
     if (b.company) return wantsJson ? reply.send({ ok: true }) : back('sent');
 
     const id = randomUUID();
+    const visitId = stats ? await stats.currentVisit(clientOf(req)).catch(() => null) : null;
     await addBrief(db, {
       id,
+      visitId,
       createdAt: now(),
       lang: b.lang,
       types: b.types,
@@ -90,6 +96,7 @@ export function registerBrief(app: FastifyInstance, { db, siteUrl, now = () => n
       await enqueue(db, [briefMail({ ...b, time: b.time ?? null, budget: b.budget ?? null }, studio)], now());
       void postman.kick().catch((err) => req.log.error(err, 'mail'));
     }
+    if (visitId) await stats!.event(visitId, 'brief', id).catch((err) => req.log.error(err, 'stats'));
     req.log.info({ brief: id }, 'brief received');
     return wantsJson ? reply.send({ ok: true }) : back('sent');
   });

@@ -25,6 +25,7 @@ import { registerPeople } from './views/people';
 import { registerProjects } from './views/projects';
 import { registerRedirects } from './views/redirects';
 import { registerSettings } from './views/settings';
+import { registerStats } from './views/stats';
 
 const OPEN = new Set(['/panel/login', '/panel/login/code']);
 /** Panel forms can be long (a note · a case study): larger than the site's 16 kb forms. */
@@ -194,6 +195,7 @@ ${error ? html`<p class="p-errors" role="alert">${error}</p>` : ''}
       /* ---------------- sections ---------------- */
 
       registerDashboard(p, k);
+      registerStats(p, k);
       registerProjects(p, k);
       registerNotes(p, k);
       registerMedia(p, k);

@@ -31,6 +31,7 @@ function bigFooter(ctx: Ctx): Safe {
 <div class="frow mono">
 <span>© ${ctx.now.getFullYear()} Lost Comma · ${t('İstanbul')} <time data-clock>${istanbulTime(ctx.now)}</time></span>
 <nav aria-label="${t('Diğer sayfalar')}"><a href="${href(lang, 'process')}">${t('Süreç')}</a><a href="${href(lang, 'now')}">${t('Şimdi')}</a><a href="${href(lang, 'uses')}">${t('Araçlar')}</a><a href="${href(lang, 'rss')}">RSS</a></nav>
+<nav aria-label="${t('Yasal')}"><a href="${href(lang, 'privacy')}">${t('Gizlilik')}</a><a href="${href(lang, 'kvkk')}">KVKK</a><a href="${href(lang, 'cookies')}">${t('Çerezler')}</a></nav>
 <span data-footnote>${t('Üç kişi ve bir yerlerde bir virgül')}</span>
 <a href="#top">${t('Başa dön')} <span aria-hidden="true">↑</span></a>
 </div>

@@ -90,6 +90,7 @@ export function footer(ctx: Ctx): Safe {
 <div class="wrap mono">
 <span>© ${ctx.now.getFullYear()} Lost Comma · ${t('İstanbul')} <time class="clk" data-clock>${istanbulTime(ctx.now)}</time></span>
 <nav aria-label="${t('Diğer sayfalar')}"><a href="${href(lang, 'process')}">${t('Süreç')}</a><a href="${href(lang, 'now')}">${t('Şimdi')}</a><a href="${href(lang, 'uses')}">${t('Araçlar')}</a><a href="${href(lang, 'rss')}">RSS</a></nav>
+<nav aria-label="${t('Yasal')}"><a href="${href(lang, 'privacy')}">${t('Gizlilik')}</a><a href="${href(lang, 'kvkk')}">KVKK</a><a href="${href(lang, 'cookies')}">${t('Çerezler')}</a></nav>
 <a href="mailto:hello@lostcomma.co">hello@lostcomma.co</a>
 </div>
 </footer>`;

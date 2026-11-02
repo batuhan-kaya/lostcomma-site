@@ -6,12 +6,14 @@ import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
 import { sql } from 'drizzle-orm';
 import { registerBooking } from './api/booking';
 import { registerBrief } from './api/brief';
+import { registerStats } from './api/stats';
 import { RateLimit } from './api/rate';
 import { Assets } from './assets';
 import type { Config } from './config';
 import { SERVICE_KEYS, SERVICE_SLUGS } from './content/services';
 import { caseSlugs, noteSlugs, notesIn } from './data/content';
 import { findRedirect } from './data/redirects';
+import { pruneRecords } from './data/retention';
 import { SettingsStore } from './data/settings';
 import { openDatabase, safeUrl, type Database, type Db } from './db';
 import { seedIfEmpty } from './db/seed';
@@ -31,6 +33,8 @@ import { href, ROUTES, type RouteId } from './routes';
 import { readCookie } from './cookies';
 import { securityHeaders } from './security';
 import { robotsTxt, sitemapXml } from './seo';
+import { Stats } from './stats';
+import { openGeo } from './stats/geo';
 
 export interface AppOptions {
   config: Config;
@@ -47,6 +51,7 @@ declare module 'fastify' {
     db: Db;
     postman: Postman;
     settings: SettingsStore;
+    stats: Stats;
   }
 }
 
@@ -113,8 +118,32 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     await postman.drain();
   });
 
+  // Statistics (docs/ISTATISTIK.md): no cookies · a daily salted hash · old visits pruned twice a day.
+  const stats = new Stats({
+    db,
+    host: new URL(config.SITE_URL).host,
+    now,
+    geo: await openGeo(config.GEOIP_DB, (m) => app.log.warn(m)),
+    days: config.STATS_DAYS,
+  });
+  app.decorate('stats', stats);
+  if (config.NODE_ENV !== 'test') {
+    // Old visits · and the briefs · calls and logs the privacy page promises to delete.
+    const prune = () =>
+      void stats
+        .prune()
+        .then(() => pruneRecords(db, now(), config.RECORD_DAYS))
+        .catch((err) => app.log.error(err, 'prune'));
+    prune();
+    const timer = setInterval(prune, 12 * 3600_000);
+    timer.unref();
+    app.addHook('onClose', async () => clearInterval(timer));
+  }
+
   await app.register(formbody, { bodyLimit: 16_384 });
+  registerStats(app, { stats, siteUrl: config.SITE_URL });
   registerBrief(app, {
+    stats,
     db,
     siteUrl: config.SITE_URL,
     now,
@@ -123,6 +152,7 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     studio: config.MAIL_TO,
   });
   registerBooking(app, {
+    stats,
     db,
     siteUrl: config.SITE_URL,
     now,
@@ -320,6 +350,7 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     postman,
     dirs: media,
     assets,
+    stats,
     secure: config.SITE_URL.startsWith('https://'),
     preview: (reply, page, lang, path, data) => send(reply, page, ctxFor(lang, path, { tr: null, en: null }), 200, { data }),
   });

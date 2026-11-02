@@ -32,6 +32,7 @@ export interface Shell {
 
 const NAV: ({ key: string; label: string; href: string; count?: keyof Counts } | null)[] = [
   { key: 'home', label: 'Pano', href: '/panel' },
+  { key: 'stats', label: 'İstatistik', href: '/panel/stats' },
   null,
   { key: 'projects', label: 'İşler', href: '/panel/projects' },
   { key: 'notes', label: 'Notlar', href: '/panel/notes' },
@@ -228,7 +229,7 @@ export function actionForm(action: string, label: string, csrf: string, o: { con
   return html`<form class="p-inline" method="post" action="${action}"${o.confirm ? html` data-confirm="${o.confirm}"` : ''}>${csrfField(csrf)}${o.fields ?? ''}<button class="p-btn${o.danger ? ' danger' : ''}${o.ghost ? ' ghost' : ''}" type="submit">${label}</button></form>`;
 }
 
-export function section(title: string, body: Safe, o: { id?: string; hint?: string | Safe; aside?: Safe } = {}): Safe {
+export function section(title: string | Safe, body: Safe, o: { id?: string; hint?: string | Safe; aside?: Safe } = {}): Safe {
   return html`<section class="p-sec"${o.id ? html` id="${o.id}"` : ''}><div class="p-sech"><h2>${title}</h2>${o.aside ?? ''}</div>${o.hint ? html`<p class="p-hint">${o.hint}</p>` : ''}${body}</section>`;
 }
 

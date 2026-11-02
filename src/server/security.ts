@@ -15,7 +15,8 @@ export function csp(https: boolean): string {
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    "frame-ancestors 'none'",
+    // Our own panel shows pages in a frame (the click map) · nobody else may.
+    "frame-ancestors 'self'",
   ];
   if (https) rules.push('upgrade-insecure-requests');
   return rules.join('; ');
@@ -26,7 +27,7 @@ export function securityHeaders(reply: FastifyReply, https: boolean): void {
   if (type.startsWith('text/html')) reply.header('content-security-policy', csp(https));
   reply.header('x-content-type-options', 'nosniff');
   reply.header('referrer-policy', 'strict-origin-when-cross-origin');
-  reply.header('x-frame-options', 'DENY');
+  reply.header('x-frame-options', 'SAMEORIGIN');
   reply.header('cross-origin-opener-policy', 'same-origin');
   reply.header('permissions-policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=()');
 }

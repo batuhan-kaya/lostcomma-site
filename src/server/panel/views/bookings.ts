@@ -14,6 +14,7 @@ import { href } from '../../routes';
 import { cityOf, hm, istDay, istInstant, localHm } from '../../../shared/booking';
 import { back, bodyOf, log, send, str, type Kit } from '../kit';
 import { actionForm, area, badge, csrfField, empty, errorSummary, input, saveBar, section, timeTag, toggle, when, type Errors } from '../ui';
+import { journey } from './stats';
 
 const ABOUT: Record<string, string> = { website: 'Web sitesi', app: 'Uygulama', identity: 'Kimlik', motion: 'Hareket', unsure: 'Emin değil' };
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -128,6 +129,7 @@ ${section('Geçmiş ve iptal', past.length ? html`<table class="p-table"><thead>
 <div><dt>Bilet</dt><dd class="mono">${ticketNo(b.no)}</dd></div>
 </dl>
 ${section('Notu', b.note ? html`<blockquote class="p-quote" lang="${b.lang}">${b.note}</blockquote>` : empty('Not bırakmamış.'))}
+${await journey(k.db, b.visitId)}
 <form method="post" action="/panel/bookings/${b.id}" class="p-form" data-dirty-guard>${csrfField(csrf)}
 ${area('staffNote', 'Bizim notumuz', b.staffNote, { rows: 3, hint: 'Sadece sen görürsün. Örnek: sitesi WordPress · bütçe net değil.' })}
 ${saveBar()}

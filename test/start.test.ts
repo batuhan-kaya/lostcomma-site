@@ -167,6 +167,7 @@ const booking = (o: Partial<Booking> = {}): Booking => ({
   status: 'booked',
   staffNote: '',
   cancelledAt: null,
+  visitId: null,
   createdAt: NOW,
   ...o,
 });

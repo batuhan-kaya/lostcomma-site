@@ -2,6 +2,7 @@ import { html, raw, type Safe } from '../../html';
 import type { Ctx } from '../../page';
 import { BRIEF_BUDGETS, BRIEF_TIMES, BRIEF_TYPES, HOME } from '../../content/home';
 import { istanbulTime } from '../../layout/chrome';
+import { href } from '../../routes';
 
 export type ContactTheme = 'ink' | 'paper' | 'lime' | 'coral' | 'blue';
 
@@ -69,6 +70,7 @@ ${c.times.map(
 <button type="submit" class="send" data-send><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 L15 5 M7 5 H15 V13"></path></svg><span data-sendtxt>${t('Gönder')}</span></button>
 </div>
 <p class="fnote mono${opts.error ? ' err' : ''}" data-note role="status">${opts.error ? t('Gönderemedik. E-posta adresini kontrol edip tekrar dene.') : t('Genelde bir gün içinde döneriz')}</p>
+<p class="lnote">${t('Bilgilerini sadece sana dönmek için kullanırız.')} <a href="${href(lang, 'kvkk')}">${t('KVKK aydınlatma metni')}</a></p>
 </form>`;
 
   const thread = html`<div class="thread" data-thread${opts.sent ? '' : html` hidden`}>

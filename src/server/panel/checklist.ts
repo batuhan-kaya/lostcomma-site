@@ -52,6 +52,8 @@ export async function readiness(k: Kit): Promise<Check[]> {
   out.push({ key: 'month', label: 'Bir sonraki boş yer', ok: s.filled('work.nextMonth'), detail: s.filled('work.nextMonth') ? `${s.month('work.nextMonth', 'tr')}` : 'İşler sayfasında [AY] yazıyor', href: '/panel/settings#studio', kind: 'must' });
   out.push({ key: 'address', label: 'Stüdyo adresi', ok: s.filled('studio.address'), detail: s.filled('studio.address') ? String(s.raw('studio.address')) : 'Stüdyo sayfasında [ADRES] yazıyor', href: '/panel/settings#studio', kind: 'must' });
   out.push({ key: 'phone', label: 'Telefon', ok: s.filled('studio.phone'), detail: s.filled('studio.phone') ? String(s.raw('studio.phone')) : 'Başla sayfasında [+90 telefon] yazıyor', href: '/panel/settings#studio', kind: 'must' });
+  out.push({ key: 'controller', label: 'Veri sorumlusu', ok: s.filled('legal.controller'), detail: s.filled('legal.controller') ? String(s.raw('legal.controller')) : 'Gizlilik ve KVKK sayfalarında [VERİ SORUMLUSU] yazıyor', href: '/panel/settings#legal', kind: 'must' });
+  out.push({ key: 'mailservice', label: 'E-posta servisi', ok: s.filled('legal.mail'), detail: s.filled('legal.mail') ? String(s.raw('legal.mail')) : 'KVKK metnindeki yurt dışına aktarım bölümünde [E-POSTA SERVİSİ] yazıyor', href: '/panel/settings#legal', kind: 'must' });
 
   const team = await db.query.people.findMany({ with: { texts: true } });
   const unnamed = team.filter((p) => PLACEHOLDER.test(p.name));
