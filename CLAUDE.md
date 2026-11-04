@@ -54,10 +54,12 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 
 ## Homepage (src/server/pages/home · src/client/home)
 
-- Long structured copy (manifesto edits · services · steps · brief choices) lives per language in `src/server/content/home.ts`. Short UI copy stays in `t()`. Board projects come from the database (`projects.board_slot` 0–6 · frame 7 is the Lab). A project with a cover shows it · without one it shows its drawn `art` from `pages/home/art.ts`.
+- Long structured copy (manifesto edits · services · steps · the contact sentence) lives per language in `src/server/content/home.ts`. Short UI copy stays in `t()`. Board projects come from the database (`projects.board_slot` 0–6 · frame 7 is the Lab). A project with a cover shows it · without one it shows its drawn `art` from `pages/home/art.ts`.
 - Client data comes from the `<script type="application/json" id="page-data">` block (`page.data`). Never inline executable scripts or `style=""` (strict CSP).
-- The brief is a real form posting to `/api/brief` (works without JS · redirects to `?brief=sent|error`). With JS it posts JSON. Briefs go to the `briefs` table. `BRIEF_LIMIT` = briefs per address per 10 minutes.
-- Contact colour: `CONTACT_THEME` in `src/server/pages/home/index.ts` (ink · paper · lime · coral · blue).
+- 06 · contact (phase 16): one sentence with three blanks · "Merhaba ben [adın]. [yeni bir web sitesi] hakkında konuşmak istiyorum. Bana [sen@sirket.com] adresinden yazın." Each language puts its blanks in its own place (`HOME[lang].sentence`). The topic is the brief's `message` · no types · time or budget any more (the API still takes them · older briefs keep their labels in the panel and mail).
+- The blank in use carries the hero's selection box and a size label (`.bw.on` · `:focus-within` without JS) · the host walks to the end of that line (never onto the words). The script sizes each blank to its words (a hidden `.bprobe` measures in the sentence's own letters · without JS `field-sizing` · else `size`). The empty topic suggests ideas in turn every 2.618 s while on screen (never with reduced motion) · its width is the longest idea's so the line never moves.
+- It is a real form posting to `/api/brief` (works without JS · redirects to `?brief=sent|error`). With JS it posts JSON and the sentence turns into the thanks with their name and address. Briefs go to the `briefs` table. `BRIEF_LIMIT` = briefs per address per 10 minutes.
+- Contact colour: `CONTACT_THEME` in `src/server/pages/home/index.ts` (ink · night · paper · milk · lime · coral · blue). Milk since phase 16 (Batuhan: the blue was too loud) · a hairline marks where it starts after the paper Process.
 - The shy comma egg sets `localStorage['lc-comma']`; `html.found` then shows the comma in the logo on every page (header and the footer's sign-off).
 
 ## Data (src/server/db · src/server/data)

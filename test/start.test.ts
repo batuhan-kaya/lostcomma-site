@@ -234,6 +234,9 @@ describe('messages', () => {
     const brief = briefMail({ name: 'Ada', email: 'ada@example.com', types: ['website', 'app'], time: '1m', budget: 'b15', message: 'Merhaba', lang: 'tr' }, 's@x.co');
     expect(brief.text).toContain('Ne: Web sitesi · Uygulama');
     expect(brief.subject + brief.text).not.toContain(',');
+    // The homepage sentence: a topic and an address · no empty choice lines.
+    const plain = briefMail({ name: '', email: 'bea@example.com', types: [], message: 'yeni bir web sitesi', lang: 'en' }, 's@x.co');
+    expect(plain.text).toBe('İsimsiz <bea@example.com> ana sayfadan yazdı.\n\nKonu: yeni bir web sitesi\nDil: en');
   });
 });
 

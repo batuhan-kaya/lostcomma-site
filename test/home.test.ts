@@ -31,17 +31,24 @@ for (const lang of ['tr', 'en'] as const) {
       expect(m).not.toBeNull();
       const data = JSON.parse(m![1]!);
       expect(data.words).toEqual(HOME[lang].words);
-      expect(data.types).toHaveLength(4);
+      expect(data.sentence.ideas).toEqual(HOME[lang].sentence.ideas);
       expect(m![1]).not.toContain('<');
     });
 
-    it('the brief is a real form', () => {
+    it('the contact sentence is a real form: a name · a topic · an address', () => {
       expect(doc).toContain('action="/api/brief"');
-      expect(doc.match(/name="types"/g)).toHaveLength(4);
-      expect(doc.match(/name="time"/g)).toHaveLength(5);
-      expect(doc.match(/name="budget"/g)).toHaveLength(5);
-      expect(doc).toMatch(/type="email" name="email" required/);
+      expect(doc).toMatch(/data-in="name" type="text" name="name"/);
+      expect(doc).toMatch(/data-in="what" type="text" name="message"/);
+      expect(doc).toMatch(/data-in="mail" type="email" name="email" required/);
       expect(doc).toContain('name="company" tabindex="-1"');
+      // The earlier brief's choices are gone from the page.
+      expect(doc).not.toMatch(/name="(types|time|budget)"/);
+      // Every blank has a name a screen reader can say · the first one invites (the selection is on it).
+      expect(doc.match(/class="blank[^"]*"[^>]*aria-label="/g)).toHaveLength(3);
+      expect(doc).toMatch(/<span class="bw on" data-bw="name">/);
+      // The topic starts with the first idea and is wide enough for the longest one.
+      const longest = Math.max(...HOME[lang].sentence.ideas.map((i) => i.length));
+      expect(doc).toContain(`placeholder="${HOME[lang].sentence.ideas[0]}" size="${longest + 1}"`);
     });
 
     it('loads its own CSS and script', () => {
@@ -63,6 +70,7 @@ describe('content', () => {
       comments: HOME[l].comments.map((c) => c.who),
       services: HOME[l].services.length,
       steps: HOME[l].steps.length,
+      ideas: HOME[l].sentence.ideas.length,
       types: HOME[l].types.map((x) => x.who),
       times: HOME[l].times.map((x) => x.who),
       budgets: HOME[l].budgets.length,
