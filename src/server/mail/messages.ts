@@ -135,15 +135,16 @@ export function briefMail(b: BriefMailInput, studio: string): Mail {
     to: studio,
     replyTo: b.email,
     subject: `Yeni brief: ${b.name || b.email}`,
+    // The homepage sentence sends a name · a topic (the message) · an address. The earlier brief's
+    // choices still print when a client sends them.
     text: [
-      `${b.name || 'İsimsiz'} <${b.email}> ana sayfadan bir brief gönderdi.`,
+      `${b.name || 'İsimsiz'} <${b.email}> ana sayfadan yazdı.`,
       '',
-      `Ne: ${b.types.map((x) => TYPE_TR[x]).join(' · ') || '-'}`,
-      `Ne zaman: ${b.time ? TIME_TR(b.time) : '-'}`,
-      `Bütçe: ${b.budget ? BUDGET_TR(b.budget) : '-'}`,
+      `Konu: ${b.message || '-'}`,
+      ...(b.types.length ? [`Ne: ${b.types.map((x) => TYPE_TR[x]).join(' · ')}`] : []),
+      ...(b.time ? [`Ne zaman: ${TIME_TR(b.time)}`] : []),
+      ...(b.budget ? [`Bütçe: ${BUDGET_TR(b.budget)}`] : []),
       `Dil: ${b.lang}`,
-      '',
-      b.message || '(mesaj yok)',
     ].join('\n'),
   };
 }

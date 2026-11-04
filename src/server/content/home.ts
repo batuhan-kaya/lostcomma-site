@@ -41,6 +41,22 @@ export interface Choice {
   say: string;
 }
 
+/**
+ * 06 · The contact sentence: the form is one sentence with three blanks. Each line is the text
+ * before and after its blank (the blank sits in a different place in each language).
+ */
+export interface Sentence {
+  name: [string, string];
+  what: [string, string];
+  mail: [string, string];
+  /** What the topic blank suggests in turn (free text · never a choice). The first one is the server's. */
+  ideas: string[];
+  /** After sending: the thanks · the line with their address (before and after it) · the line without JS. */
+  thanks: string;
+  will: [string, string];
+  plain: string;
+}
+
 export interface HomeContent {
   /** Variable word in the headline. The first one is rendered by the server. */
   words: string[];
@@ -50,6 +66,8 @@ export interface HomeContent {
   lab: LabFrame;
   notes: string[];
   steps: Step[];
+  sentence: Sentence;
+  /** The choices of the earlier brief form: kept to label older briefs (panel · mail). */
   types: Choice[];
   times: Choice[];
   budgets: { n: string; say: string }[];
@@ -121,6 +139,15 @@ const en: HomeContent = {
     { n: 'Not sure yet', say: 'totally fine. we will help' },
   ],
   doing: { design: 'Looking around the file', code: 'Reading the codebase', motion: 'Tweaking an easing curve' },
+  sentence: {
+    name: ['Hi I’m ', '.'],
+    what: ['I’d like to talk about ', '.'],
+    mail: ['Write to me at ', '.'],
+    ideas: ['a new website', 'a mobile app', 'our brand identity', 'a launch film'],
+    thanks: 'Thank you',
+    will: ['We’ll write to ', ' within a day.'],
+    plain: 'Your note reached us. We’ll write within a day.',
+  },
 };
 
 const tr: HomeContent = {
@@ -180,6 +207,15 @@ const tr: HomeContent = {
     { n: 'Henüz bilmiyorum', say: 'hiç sorun değil. yardım ederiz' },
   ],
   doing: { design: 'Dosyaya göz atıyor', code: 'Kodu okuyor', motion: 'Bir yumuşatma eğrisiyle uğraşıyor' },
+  sentence: {
+    name: ['Merhaba ben ', '.'],
+    what: ['', ' hakkında konuşmak istiyorum.'],
+    mail: ['Bana ', ' adresinden yazın.'],
+    ideas: ['yeni bir web sitesi', 'yeni bir uygulama', 'markamızın kimliği', 'bir lansman filmi'],
+    thanks: 'Teşekkürler',
+    will: ['Bir gün içinde ', ' adresine yazıyoruz.'],
+    plain: 'İletin bize ulaştı. Bir gün içinde yazıyoruz.',
+  },
 };
 
 export const HOME: Record<Lang, HomeContent> = { tr, en };

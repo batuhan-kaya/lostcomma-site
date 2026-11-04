@@ -12,11 +12,12 @@ import { process } from './process';
 import { services } from './services';
 
 /**
- * The contact section colour (Contact A–D from the design board). Blue for now: the colour of the
- * original Live contact · it breaks the paper → ink rhythm right before the dark footer.
- * Batuhan will revisit it.
+ * The contact section colour (phase 16 · Batuhan: the blue was too loud). Milk: a calm light
+ * ground a step lighter than Process above · the ink footer closes the page · the selection is the
+ * hero's blue (the page opens and ends with a sentence edited in place). Themes in home.css
+ * (`.ct-*`): ink · night · paper · milk · lime · coral · blue.
  */
-export const CONTACT_THEME: ContactTheme = 'blue';
+export const CONTACT_THEME: ContactTheme = 'milk';
 
 /** Who we are for search engines: name · logo · the accounts filled in the panel. */
 function organization(ctx: Ctx): Safe {
@@ -72,9 +73,7 @@ ${brief(ctx, { theme: CONTACT_THEME, sent: !!opts.sent, error: !!opts.error })}`
         words: c.words,
         notes: c.notes,
         services: c.services.map((s) => ({ lab: s.lab, size: s.size, code: s.code, say: s.say })),
-        types: c.types.map((x) => ({ p: x.p, n: x.n, who: x.who, say: x.say })),
-        times: c.times.map((x) => ({ p: x.p, n: x.n, who: x.who, say: x.say })),
-        budgets: c.budgets,
+        sentence: { ideas: c.sentence.ideas, thanks: c.sentence.thanks, will: c.sentence.will, plain: c.sentence.plain },
         doing: c.doing,
       };
     },

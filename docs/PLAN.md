@@ -58,15 +58,16 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 6 | Process + Studio | Kurgu masası zaman çizelgesi · haftalık ritim · ayarlar penceresi · vapurlu İstanbul haritası · sakin renk ve yoğunluk | Bitti |
 | 7 | Notes + Note | Bul ve blame · yay oyun alanı · RSS · OG görselleri | Bitti |
 | 8 | Lab | Canlı örnekler · ekran dışında duraklatma · performans bütçesi · döngü videoları (karar: hazır dosya · sunucu kontrol eder ve sunar) | Bitti |
-| 9 | Start | Ofis saatleri · saat dilimi · randevu · form · bildirim (outbox · SMTP · takvim daveti) | Onay bekliyor |
-| 10 | 404 (Now + Uses kararı bekliyor) | Site haritası olarak 404: en yakın sayfa harf farkıyla · ⌘Z şakası | Onay bekliyor |
-| 11 | Panel | Şifreyle giriş (tek kullanıcı · iki adımlı doğrulama) · içerik ve görsel yönetimi · gelen kutusu · görüşmeler · e-postalar · site ayarları · yönlendirmeler · denetim kaydı ve geri alma | Onay bekliyor |
+| 9 | Start | Ofis saatleri · saat dilimi · randevu · form · bildirim (outbox · SMTP · takvim daveti) | Bitti |
+| 10 | 404 (Now + Uses kararı bekliyor) | Site haritası olarak 404: en yakın sayfa harf farkıyla · ⌘Z şakası | Bitti |
+| 11 | Panel | Şifreyle giriş (tek kullanıcı · iki adımlı doğrulama) · içerik ve görsel yönetimi · gelen kutusu · görüşmeler · e-postalar · site ayarları · yönlendirmeler · denetim kaydı ve geri alma | Bitti |
 | 12 | Sertleştirme | **12a:** imleç motoru · animasyonlar · bütün ekran genişlikleri · dokunma hedefleri · yazı boyları · yüklenirken kayma (300 ölçüm · kalıcı testler) · **12b:** SEO · erişilebilirlik turu · çapraz tarayıcı | 12a onay bekliyor |
-| 13 | İstatistik ve yasal sayfalar | Çerezsiz anonim istatistik (panelde canlı · özet · ziyaret akışı · tıklama haritası · brief ve görüşmenin "nasıl geldi" izi) · Gizlilik · KVKK aydınlatma metni · Çerezler (iki dil) · saklama süreleri | Onay bekliyor |
-| 14 | Footer ve logo | Her sayfada aynı footer (çağrı · site haritası · çizilerek gelen logo ve isim · yasal · dil · başa dön) · logo her yerde (header · panel · paylaşım görselleri · favicon · telefon ikonları · RSS · arama verisi) · sosyal hesaplar panelden · Codespaces önizlemesinde panel ve formlar | Onay bekliyor |
-| 15 | Preloader | Kayıp virgül aranıyor (beş fikirden Batuhan'ın seçtiği 1. fikir): sadece dışarıdan gelene · yaklaşık 3,4 sn (her adım okunabilsin · yollar tek kavis) · tıklayınca geçilir · hareket azaltmada ve JS yokken hiç yok · logo header'daki yerine iner · ekip imleçleri yumuşak kalkıyor ve her ekranda (60 · 120 · 144 Hz) aynı hızda akıyor | Onay bekliyor |
-| 16 | Sayfa geçişleri | 91.99.4.44'teki sitenin geçişinin aynısı (kodu Batuhan'dan gelecek) | Kod bekliyor |
-| 17 | Yayın | Staging · Compose + Caddy · yedekleme · izleme · `GEOIP_DB` (DB-IP Lite şehir · ayda bir güncelleme) · sunucu günlükleri 30 gün (gizlilik metni böyle söylüyor) | |
+| 13 | İstatistik ve yasal sayfalar | Çerezsiz anonim istatistik (panelde canlı · özet · ziyaret akışı · tıklama haritası · brief ve görüşmenin "nasıl geldi" izi) · Gizlilik · KVKK aydınlatma metni · Çerezler (iki dil) · saklama süreleri | Bitti |
+| 14 | Footer ve logo | Her sayfada aynı footer (çağrı · site haritası · çizilerek gelen logo ve isim · yasal · dil · başa dön) · logo her yerde (header · panel · paylaşım görselleri · favicon · telefon ikonları · RSS · arama verisi) · sosyal hesaplar panelden · Codespaces önizlemesinde panel ve formlar | Bitti |
+| 15 | Preloader | Kayıp virgül aranıyor (beş fikirden Batuhan'ın seçtiği 1. fikir): sadece dışarıdan gelene · yaklaşık 3,4 sn (her adım okunabilsin · yollar tek kavis) · tıklayınca geçilir · hareket azaltmada ve JS yokken hiç yok · logo header'daki yerine iner · ekip imleçleri yumuşak kalkıyor ve her ekranda (60 · 120 · 144 Hz) aynı hızda akıyor | Bitti |
+| 16 | İletişim | Ana sayfadaki iletişim tek cümle oldu (1. turdaki 3. seçenek): ad · konu · e-posta boşlukları cümlenin içinde · fiyat · tarih · hizmet seçimi yok · seçili boşlukta tasarım aracının seçim kutusu · konu boşluğu sırayla fikir önerir · gönderince cümle teşekküre döner · JS yokken de form · zemin süt (mavi fazla patlıyordu) | Onay bekliyor |
+| 17 | Sayfa geçişleri | 91.99.4.44'teki sitenin geçişinin aynısı (kodu Batuhan'dan gelecek) | Kod bekliyor |
+| 18 | Yayın | Staging · Compose + Caddy · yedekleme · izleme · `GEOIP_DB` (DB-IP Lite şehir · ayda bir güncelleme) · sunucu günlükleri 30 gün (gizlilik metni böyle söylüyor) | |
 
 Taslaklar sadece 1440 px masaüstü. Her sayfa aşamasında 1024 · 768 · 390 px düzenleri de önerilir ve ekran görüntüsüyle onaya sunulur.
 
@@ -100,5 +101,5 @@ Gerçek görsel gelmesi gereken her yer `docs/GORSELLER.md` dosyasında tutulur 
 - Sunucudaki mevcut ters vekil düzeni: Caddy ortak mı · ağ adı · port (17. aşama)
 - Veri sorumlusunun adı ve adresi · başvuru e-postası · e-posta servisinin adı (13. aşama · panelde Site ayarları · Yasal sayfalar)
 - Yayından önce: Hetzner ve e-posta servisiyle KVKK standart sözleşmesi · imzadan sonra beş iş günü içinde Kurul'a bildirim (yurt dışı aktarım · 13. aşama metinleri buna dayanıyor)
-- Sayfa geçişinin kodu (91.99.4.44 · 16. aşama)
+- Sayfa geçişinin kodu (91.99.4.44 · 17. aşama)
 - Sosyal hesap adresleri (panelde Site ayarları · Sosyal hesaplar · boş olan footer'da görünmez)

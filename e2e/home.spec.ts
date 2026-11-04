@@ -123,64 +123,105 @@ test.describe('homepage · desktop interactions', () => {
   });
 });
 
-test.describe('homepage · brief', () => {
-  test('writes the brief as you go · needs an email · sends and answers', async ({ page }) => {
+test.describe('homepage · contact sentence', () => {
+  test('the sentence is the form: blanks grow · needs an email · sends and thanks you by name', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/en');
     await toSection(page, 'ctc');
-    await page.locator('[data-tile="0"]').click();
-    await page.locator('[data-tile="1"]').click();
-    await expect(page.locator('[data-typehint]')).toHaveText('2 selected');
-    await page.locator('[data-stp="1"]').click();
-    await page.locator('[data-chip="1"]').click();
-    await page.locator('[data-in="name"]').fill('Batu');
-    await expect(page.locator('[data-sum]')).toHaveText('Batu needs a website and an app within a month.');
-    await expect(page.locator('[data-fname]')).toHaveText('Batu’s brief');
-    await page.locator('[data-send]').click();
-    await expect(page.locator('[data-note]')).toHaveText('We need an email address to write back');
-    await expect(page.locator('[data-in="mail"]')).toHaveClass(/err/);
+    const blank = (k: string) => page.locator(`[data-in="${k}"]`);
+    const wrap = (k: string) => page.locator(`[data-bw="${k}"]`);
+    // The selection invites to the first blank · the topic suggests one of our ideas.
+    await expect(wrap('name')).toHaveClass(/\bon\b/);
+    await expect(blank('what')).toHaveAttribute('placeholder', /^(a new website|a mobile app|our brand identity|a launch film)$/);
+    const w0 = (await blank('name').boundingBox())!.width;
+    await blank('name').fill('Batuhan Kaya');
+    await expect.poll(async () => (await blank('name').boundingBox())!.width).toBeGreaterThan(w0 * 1.15);
+    await blank('what').fill('our new website');
+    await expect(wrap('what')).toHaveClass(/\bon\b/);
+    await expect(wrap('name')).not.toHaveClass(/\bon\b/);
+    // No address: the sentence says so where the address goes.
+    await page.locator('[data-go]').click();
+    await expect(wrap('mail')).toHaveClass(/\bbad\b/);
+    await expect(wrap('mail').locator('[data-btag]')).toHaveText('This address looks incomplete');
+    await expect(blank('mail')).toBeFocused();
+    const tag = (await wrap('mail').locator('[data-btag]').boundingBox())!;
+    expect(tag.x + tag.width, 'the label stays on the page').toBeLessThanOrEqual(page.viewportSize()!.width);
     const mail = `e2e-${Date.now()}@example.com`;
-    await page.locator('[data-in="mail"]').fill(mail);
-    await page.locator('[data-send]').click();
-    await expect(page.locator('[data-thread]')).toBeVisible();
-    await expect(page.locator('[data-pinsum]')).toHaveText('Batu needs a website and an app within a month.');
-    await expect(page.locator('[data-ptags] span')).toHaveText(['Website', 'App', '1 month', '€5–15k']);
-    await expect(page.locator('[data-msg="2"]')).toBeVisible({ timeout: 8000 });
-    await expect(page.locator('[data-hi]')).toHaveText('Hi Batu. Thanks for the brief.');
+    await blank('mail').fill(mail);
+    await expect(wrap('mail')).not.toHaveClass(/\bbad\b/);
+    await page.locator('[data-go]').click();
+    await expect(page.locator('[data-sdone]')).toBeVisible();
+    await expect(page.locator('[data-sf]')).toBeHidden();
+    await expect(page.locator('[data-dthanks]')).toHaveText('Thank you Batuhan Kaya.');
+    await expect(page.locator('[data-dwill]')).toHaveText(`We’ll write to ${mail} within a day.`);
     // Against a real Postgres (CI) the row is checked too · the in-memory database lives inside the server.
     if (process.env.E2E_DATABASE_URL) {
       const client = new pg.Client({ connectionString: process.env.E2E_DATABASE_URL });
       await client.connect();
-      const { rows } = await client.query('select name, types, time, budget from briefs where email = $1', [mail]);
+      const { rows } = await client.query('select name, message, types, time, budget from briefs where email = $1', [mail]);
       await client.end();
-      expect(rows).toEqual([{ name: 'Batu', types: ['website', 'app'], time: '1m', budget: 'b15' }]);
+      expect(rows).toEqual([{ name: 'Batuhan Kaya', message: 'our new website', types: [], time: null, budget: null }]);
     }
     await page.locator('[data-again]').click();
-    await expect(page.locator('[data-fb]')).toBeVisible();
+    await expect(page.locator('[data-sf]')).toBeVisible();
+    await expect(blank('name')).toHaveValue('');
+    await expect(blank('name')).toBeFocused();
     expect(errors).toEqual([]);
   });
 
-  test('Turkish sentence reads Turkish', async ({ page }) => {
+  test('Turkish reads Turkish · the page never scrolls sideways', async ({ page }) => {
     await page.goto('/tr');
     await toSection(page, 'ctc');
-    await page.locator('[data-tile="3"]').click();
-    await page.locator('[data-stp="4"]').click();
     await page.locator('[data-in="name"]').fill('Ayşe');
-    await expect(page.locator('[data-sum]')).toHaveText('Ayşe için biraz hareket · hazır olduğunda.');
+    await page.locator('[data-in="mail"]').fill('ayse@');
+    await page.locator('[data-go]').click();
+    await expect(page.locator('[data-bw="mail"] [data-btag]')).toHaveText('Bu adres eksik gibi');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
+    // The label stays on the page (it hangs from the blank's right edge when it would run off).
+    const tag = (await page.locator('[data-bw="mail"] [data-btag]').boundingBox())!;
+    expect(tag.x).toBeGreaterThanOrEqual(0);
+    expect(tag.x + tag.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    const mail = `tr-${Date.now()}@example.com`;
+    await page.locator('[data-in="mail"]').fill(mail);
+    await page.locator('[data-go]').click();
+    await expect(page.locator('[data-dthanks]')).toHaveText('Teşekkürler Ayşe.');
+    await expect(page.locator('[data-dwill]')).toHaveText(`Bir gün içinde ${mail} adresine yazıyoruz.`);
+  });
+
+  test('topics take turns in the empty blank without moving the line', async ({ page }) => {
+    await page.goto('/tr');
+    await toSection(page, 'ctc');
+    const what = page.locator('[data-in="what"]');
+    const first = await what.getAttribute('placeholder');
+    const w = (await what.boundingBox())!.width;
+    await expect.poll(() => what.getAttribute('placeholder'), { timeout: 4000 }).not.toBe(first);
+    expect(Math.abs((await what.boundingBox())!.width - w)).toBeLessThan(1);
+  });
+
+  test('reduced motion: the topic stays put', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/en');
+    await toSection(page, 'ctc');
+    const what = page.locator('[data-in="what"]');
+    await expect(what).toHaveAttribute('placeholder', 'a new website');
+    await page.waitForTimeout(3000);
+    await expect(what).toHaveAttribute('placeholder', 'a new website');
   });
 });
 
 test.describe('homepage · without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
-  test('the brief still posts and thanks you', async ({ page }) => {
+  test('the sentence still posts and thanks you', async ({ page }) => {
     await page.goto('/tr');
-    await page.locator('[data-tile="0"]').click();
+    await page.locator('[data-in="name"]').fill('Deniz');
+    await page.locator('[data-in="what"]').fill('yeni bir web sitesi');
     await page.locator('[data-in="mail"]').fill(`nojs-${Date.now()}@example.com`);
-    await page.locator('[data-send]').click();
+    await page.locator('[data-go]').click();
     await expect(page).toHaveURL(/\/tr\?brief=sent#contact$/);
-    await expect(page.locator('[data-thread]')).toBeVisible();
-    await expect(page.locator('[data-fb]')).toBeHidden();
+    await expect(page.locator('[data-sdone]')).toBeVisible();
+    await expect(page.locator('[data-dwill]')).toHaveText('İletin bize ulaştı. Bir gün içinde yazıyoruz.');
+    await expect(page.locator('[data-sf]')).toBeHidden();
   });
 
   test('the manifesto is readable as finished text', async ({ page }) => {

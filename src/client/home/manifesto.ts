@@ -112,7 +112,8 @@ export class Manifesto {
         c.home(who);
         await c.sleep(420, signal);
       }
-      this.status(t('5 öneri · 3 kişi'));
+      // A visitor who pressed Accept all or Reject all mid-scene keeps their status line.
+      if (this.mode === 'track') this.status(t('5 öneri · 3 kişi'));
       c.cast(c.hostOf('mf'));
       await c.sleep(1600, signal);
       c.once('mf-ship', c.hostOf('mf'), t('Yayınla.'), 2400);
