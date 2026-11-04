@@ -535,6 +535,7 @@
 .bsel .hh.hC { left: -7px; bottom: -7px; }
 .bsel .hh.hD { right: -7px; bottom: -7px; }
 .btag { position: absolute; left: -.2em; bottom: calc(100% + 5px); z-index: 2; padding: 3px 7px; border-radius: 4px; line-height: 1.4; background: var(--sel); color: var(--selOn); white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.btag.end { left: auto; right: -.2em; }
 .bw.on :is(.bsel, .btag), .bw:focus-within :is(.bsel, .btag) { opacity: 1; }
 .sen:focus-within .bw.on:not(:focus-within) :is(.bsel, .btag) { opacity: 0; }
 .bw.bad :is(.bsel, .btag) { opacity: 1; }

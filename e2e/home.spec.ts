@@ -144,6 +144,8 @@ test.describe('homepage · contact sentence', () => {
     await expect(wrap('mail')).toHaveClass(/\bbad\b/);
     await expect(wrap('mail').locator('[data-btag]')).toHaveText('This address looks incomplete');
     await expect(blank('mail')).toBeFocused();
+    const tag = (await wrap('mail').locator('[data-btag]').boundingBox())!;
+    expect(tag.x + tag.width, 'the label stays on the page').toBeLessThanOrEqual(page.viewportSize()!.width);
     const mail = `e2e-${Date.now()}@example.com`;
     await blank('mail').fill(mail);
     await expect(wrap('mail')).not.toHaveClass(/\bbad\b/);
@@ -175,6 +177,10 @@ test.describe('homepage · contact sentence', () => {
     await page.locator('[data-go]').click();
     await expect(page.locator('[data-bw="mail"] [data-btag]')).toHaveText('Bu adres eksik gibi');
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
+    // The label stays on the page (it hangs from the blank's right edge when it would run off).
+    const tag = (await page.locator('[data-bw="mail"] [data-btag]').boundingBox())!;
+    expect(tag.x).toBeGreaterThanOrEqual(0);
+    expect(tag.x + tag.width).toBeLessThanOrEqual(page.viewportSize()!.width);
     const mail = `tr-${Date.now()}@example.com`;
     await page.locator('[data-in="mail"]').fill(mail);
     await page.locator('[data-go]').click();

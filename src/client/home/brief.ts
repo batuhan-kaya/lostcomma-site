@@ -70,6 +70,7 @@ export class Brief {
 
   private sizeAll(): void {
     for (const k of KEYS) this.size(k);
+    this.select();
   }
 
   private later(key: string, ms: number, fn: () => void): void {
@@ -122,6 +123,15 @@ export class Brief {
   private select(): void {
     const on = this.active ?? KEYS.find((k) => !this.val(k)) ?? null;
     for (const k of KEYS) this.wrap(k)?.classList.toggle('on', k === on);
+    if (on) this.fitTag(on);
+  }
+
+  /** A label that would run off the page hangs from the blank's right edge instead. */
+  private fitTag(k: Key): void {
+    const tag = this.wrap(k)?.querySelector<HTMLElement>('[data-btag]');
+    if (!tag) return;
+    tag.classList.remove('end');
+    if (tag.getBoundingClientRect().right > document.documentElement.clientWidth - 8) tag.classList.add('end');
   }
 
   private bad(on: boolean): void {
@@ -130,6 +140,7 @@ export class Brief {
     w.classList.toggle('bad', on);
     const tag = $('[data-btag]', w);
     if (tag) tag.textContent = on ? t('Bu adres eksik gibi') : `${t('Metin')} · ${t('e-posta')}`;
+    this.fitTag('mail');
   }
 
   private typed(k: Key): void {
