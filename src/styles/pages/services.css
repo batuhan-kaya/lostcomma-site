@@ -77,6 +77,7 @@
 .tb {
   position: absolute; left: calc(50% - 180px); bottom: 22px; z-index: 8; display: flex; align-items: center; gap: 4px; padding: 6px;
   border-radius: 18px; background: var(--ink); box-shadow: 0 24px 40px -18px rgba(14,14,15,.6); transform: translateX(-50%);
+  --ring: var(--lime);
 }
 .tl {
   position: relative; display: grid; place-items: center; width: 52px; height: 52px; padding: 0; border: 0; border-radius: 13px;
@@ -115,6 +116,7 @@
   display: flex; align-items: center; justify-content: space-between; min-height: 48px; margin-top: 10px; padding: 0 16px; border-radius: 12px;
   background: var(--ink); color: var(--milk); font-weight: 600; font-size: 15px; text-decoration: none; transition: transform .4s var(--ease-pop);
 }
+.ib.t-web { --ring: var(--lime); }
 .ib.t-web .ilink { background: var(--milk); color: var(--ink); }
 .ilink:hover { transform: translateY(-2px); }
 
@@ -173,7 +175,7 @@
 .tile:hover .ez .bd { animation: along 1.6s cubic-bezier(.6, 0, .2, 1) infinite; }
 
 /* ---------- combinations ---------- */
-.combo { position: relative; padding: 130px 0 140px; background: var(--ink); color: var(--milk); }
+.combo { --ring: var(--lime); position: relative; padding: 130px 0 140px; background: var(--ink); color: var(--milk); }
 .combo .kick { color: var(--dim); }
 .combo .h2 { margin-top: 18px; }
 .eqs { margin: 60px 0 0; padding: 0; border-top: 1px solid rgba(242,241,236,.14); list-style: none; }
@@ -265,6 +267,8 @@
 
 /* ---------- 390 ---------- */
 @media (max-width: 560px) {
+  /* "Uygulamalar" is one long word: the tool name scales with the phone instead of being cut. */
+  .tname { font-size: min(56px, 13.5vw); }
   .shero .lede { font-size: 19px; }
   .stage { height: 420px; }
   .tb { top: 350px; gap: 2px; padding: 5px; border-radius: 16px; }

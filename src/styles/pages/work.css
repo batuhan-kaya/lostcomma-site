@@ -76,7 +76,7 @@
 .row.off .rw { visibility: hidden; }
 .rin { min-height: 0; overflow: hidden; }
 .rw {
-  position: relative; align-items: center; height: 112px; border-bottom: 1px solid var(--rule); text-decoration: none;
+  position: relative; align-items: center; min-height: 112px; padding-top: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); text-decoration: none;
   transition: background-color .18s, color .18s, border-color .18s, visibility 0s .6s;
 }
 .row:not(.off) .rw { transition-delay: 0s; }
@@ -87,9 +87,10 @@
 .rw:hover .rno, .row.hv .rno, .rw:hover .rk, .row.hv .rk { color: rgba(242,241,236,.78); }
 .rn {
   display: flex; align-items: center; gap: 18px; min-width: 0; font-family: var(--display); font-size: 66px; line-height: 1; letter-spacing: -.04em;
-  font-variation-settings: 'wdth' 78, 'wght' 760; white-space: nowrap; transition: transform .5s cubic-bezier(.2,1.2,.3,1);
+  font-variation-settings: 'wdth' 78, 'wght' 760; transition: transform .5s cubic-bezier(.2,1.2,.3,1);
 }
-.rn > span:first-child { overflow: hidden; text-overflow: ellipsis; padding-bottom: .06em; }
+/* A long name takes a second line instead of being cut to "Museu…". */
+.rn > span:first-child { min-width: 0; padding-bottom: .06em; line-height: .98; }
 .rw:hover .rn, .row.hv .rn { transform: translateX(14px); }
 .here { flex: none; padding: 6px 10px; border-radius: 999px; background: var(--lime); color: var(--ink); letter-spacing: .03em; }
 .rw .ry { text-align: right; }
@@ -167,7 +168,7 @@
 
 /* ---------- smaller screens ---------- */
 @media (max-width: 1200px) {
-  .cols, .rw, .lkr { grid-template-columns: 44px 72px minmax(0, 1fr) 240px 64px 32px; }
+  .cols, .rw, .lkr { grid-template-columns: 44px 64px minmax(0, 1fr) 200px 56px 32px; }
   .rn { font-size: 52px; }
 }
 @media (max-width: 1100px) {
@@ -179,6 +180,8 @@
   .lkh { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   .askr { flex-direction: column; align-items: flex-start; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 28px; }
+  /* The name column narrows with the screen: so does the name (two lines at most for the longest). */
+  .rn { font-size: clamp(34px, 4.6vw, 52px); }
 }
 @media (max-width: 760px) {
   .cols, .rw, .lkr { grid-template-columns: 26px 46px minmax(0, 1fr) 22px; gap: 0 10px; }

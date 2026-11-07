@@ -31,6 +31,14 @@
 
 .tabs { display: flex; align-items: flex-end; gap: 2px; margin-top: 30px; overflow-x: auto; border-bottom: 1.5px solid var(--ink); scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
+/* More tabs off to the right (Saved on a phone): the edge fades until the row is scrolled to its end.
+   Scroll-driven · a row that fits has no timeline and no fade · older browsers simply show the row. */
+@property --tabfade { syntax: '<length>'; inherits: false; initial-value: 0px; }
+.tabs { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - var(--tabfade)), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - var(--tabfade)), transparent); }
+@supports (animation-timeline: scroll()) {
+  .tabs { animation: tabfade linear both; animation-timeline: scroll(self inline); }
+}
+@keyframes tabfade { from, 92% { --tabfade: 56px; } to { --tabfade: 0px; } }
 .tab { display: flex; flex: none; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 0; border-radius: 12px 12px 0 0; background: transparent; color: var(--pmu); cursor: pointer; transition: background-color .25s, color .25s; }
 .tab:hover { color: var(--ink); background: rgba(14,14,15,.04); }
 .tab.on { background: var(--ink); color: var(--milk); }

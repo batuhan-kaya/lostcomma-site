@@ -213,7 +213,7 @@
 .tile { position: relative; overflow: hidden; min-height: 400px; padding: 28px; border-radius: 20px; background: var(--raise); }
 .tile > .mono { color: var(--pmu); }
 .tile h3 { margin: 10px 0 0; font-family: var(--display); font-size: 36px; font-weight: 400; line-height: 1; letter-spacing: -.025em; font-variation-settings: 'wdth' 85, 'wght' 760; }
-.t-pal { grid-column: span 2; background: var(--pfg); color: var(--pbg); }
+.t-pal { --ring: var(--pbg); grid-column: span 2; background: var(--pfg); color: var(--pbg); }
 .t-pal > .mono, .t-steps > .mono { color: var(--soft); }
 .sw { position: absolute; left: 28px; right: 28px; bottom: 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 10px; }
 .swb {
@@ -267,7 +267,7 @@
 .wv svg { position: absolute; left: 0; top: 0; width: 200%; height: 120px; fill: none; stroke-width: 3; animation: roll 3.2s linear infinite; }
 .wv svg:nth-child(2) { top: 18px; opacity: .5; animation-duration: 4.6s; }
 .wv path { stroke: var(--acc); }
-.t-tide .pct { position: absolute; left: 28px; bottom: 26px; display: flex; gap: 10px; align-items: baseline; color: var(--pmu); }
+.t-tide .pct { position: absolute; left: 28px; right: 28px; bottom: 26px; display: flex; flex-wrap: wrap; gap: 0 10px; align-items: baseline; color: var(--pmu); }
 .t-tide .pct b { color: var(--pfg); font-family: var(--display); font-size: 44px; font-weight: 400; font-variation-settings: 'wdth' 85, 'wght' 760; }
 
 /* ---------- results ---------- */
@@ -295,7 +295,8 @@
 .onward { padding-top: 30px; }
 .back { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-bottom: 30px; text-decoration: none; color: var(--pmu); transition: color .25s; }
 .back:hover { color: var(--pfg); }
-[data-page="case"] .nxl b { font-size: clamp(64px, 10.4vw, 150px); line-height: .88; text-wrap: balance; }
+/* 40 px at the smallest like every next band: a long name (Architecture office) fits a 320 px phone. */
+[data-page="case"] .nxl b { font-size: clamp(40px, 10.4vw, 150px); line-height: .88; text-wrap: balance; }
 
 @keyframes sway { 0%, 100% { transform: rotate(-2.4deg); } 50% { transform: rotate(2.4deg); } }
 @keyframes veer { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(18deg); } }
@@ -345,8 +346,16 @@
   .bento { grid-template-columns: minmax(0, 1fr); }
   .t-pal, .t-img.w2 { grid-column: auto; }
   .t-pal { min-height: 520px; }
-  .sw { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .swb { height: 96px; }
+  .sw { left: 20px; right: 20px; bottom: 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .swb { height: 96px; padding: 12px; }
+  /* A long colour name (Alacakaranlık) breaks rather than being cut by the swatch. */
+  .swb b { font-size: 14px; overflow-wrap: anywhere; }
+  /* Three step phones share a narrow tile: they may shrink and so does their word (Tamam). */
+  .steps { left: 20px; right: 20px; bottom: 20px; gap: 8px; }
+  .stp { min-width: 0; padding: 10px; }
+  .stp b { font-size: min(22px, 5.4vw); }
+  /* A version name and its date share a row only while they fit. */
+  .vi .top { flex-wrap: wrap; gap: 2px 10px; }
   .aa { font-size: 160px; }
   .stack { margin-top: 56px; }
   .crr { grid-template-columns: minmax(0, 1fr) auto; }

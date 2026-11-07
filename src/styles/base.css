@@ -23,7 +23,8 @@ a { color: inherit; }
 button { font: inherit; color: inherit; }
 i, b, em { font-style: normal; }
 ::selection { background: var(--lime); color: var(--ink); }
-:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+/* The ring follows the ground (--ring per theme in themes.css · dark blocks on light pages set their own). */
+:focus-visible { outline: 2px solid var(--ring, var(--blue)); outline-offset: 4px; }
 
 .pg { position: relative; min-height: 100vh; overflow-x: clip; }
 

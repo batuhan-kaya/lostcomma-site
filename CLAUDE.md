@@ -52,6 +52,14 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - A scaled-down mock keeps its tools at reading size: `scale: calc(1 / var(--k))` on labels and buttons (home services `--k` · process flow `--pk` · board `--bk`).
 - Tap targets are at least 24 px (an invisible `::before` pad where the drawing must stay small). Text on screen is at least 10.5 px (decorative miniatures with `role="img"` or `aria-hidden` excepted).
 
+## Focus and layout (UI pass · e2e/focus.spec.ts · e2e/layout.spec.ts)
+
+- The focus ring is `var(--ring)`: every theme in `themes.css` sets it (the theme's accent). A dark block on a light page (or a light card on a dark one) sets its own `--ring`. Never hard-code a ring colour. `e2e/focus.spec.ts` focuses every stop on every page and measures the ring against the ground under it (3:1 on at least three of its four sides).
+- The ring of a band that changes colour on focus goes inside it (`.nx`: `outline-offset: -10px` in `--nfg`).
+- Keyboard focus on the endless board glides the frame into view (`reveal` in `home/board.ts`) · the board is `overflow: clip` so focus never scrolls it.
+- Long text in a fixed box wraps or scales and is never cut: layer names wrap · next band names shrink to 40 px · the hero is sized for its longest line with the longest word (EN 8.83 em · TR 9.84 em). `e2e/layout.spec.ts` covers 320 · 360 and the edges of each breakpoint.
+- A sticky bar lives in a wrapper with only what it rides along (`.chkw` on service pages) so it never covers the heading above.
+
 ## Homepage (src/server/pages/home · src/client/home)
 
 - Long structured copy (manifesto edits · services · steps · brief choices) lives per language in `src/server/content/home.ts`. Short UI copy stays in `t()`. Board projects come from the database (`projects.board_slot` 0–6 · frame 7 is the Lab). A project with a cover shows it · without one it shows its drawn `art` from `pages/home/art.ts`.

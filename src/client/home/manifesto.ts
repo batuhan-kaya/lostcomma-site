@@ -12,6 +12,8 @@ export class Manifesto {
   private mode: Mode = 'track';
   /** How many changes are finished. */
   private step = 0;
+  /** The visitor pressed Show changes · Accept all · Reject all: the edit is theirs and the team stops typing. */
+  private picked = false;
 
   constructor(private readonly crew: Crew | null) {
     // The server sends the finished edit. If the team is going to type it, rewind first.
@@ -62,6 +64,7 @@ export class Manifesto {
   }
 
   setMode(m: Mode): void {
+    this.picked = true;
     this.finish();
     this.mode = m;
     this.doc?.classList.remove('m-track', 'm-final', 'm-orig');
@@ -87,7 +90,7 @@ export class Manifesto {
   scene = async (c: Crew, signal: AbortSignal): Promise<void> => {
     try {
       await c.sleep(700, signal);
-      while (this.step < this.changes.length && this.mode === 'track') {
+      while (this.step < this.changes.length && !this.picked) {
         const i = this.step;
         const ch = this.changes[i]!;
         const who = (ch.dataset.who ?? 'design') as Name;
@@ -96,22 +99,26 @@ export class Manifesto {
         doing[who] = t('Manifestoyu düzenliyor');
         c.cast(who);
         await c.go(who, { el: del, fx: 0, fy: 0.66, dx: -2 }, signal);
+        if (this.picked) break;
         c.press(who);
         ch.classList.add('on');
         await c.go(who, { el: del, fx: 1, fy: 0.66 }, signal, 1100);
         ch.classList.add('typing');
         const txt = ins.dataset.ins ?? '';
-        for (let j = 1; j <= txt.length; j++) {
+        for (let j = 1; j <= txt.length && !this.picked; j++) {
           ins.textContent = txt.slice(0, j);
           c.aim(who, { el: ins, end: true, dx: 3, dy: 0 });
           await c.sleep(20 + Math.random() * 30, signal);
         }
+        // A choice made mid-word already finished every change (setMode): never write over it.
+        if (this.picked) break;
         ch.classList.remove('typing');
         this.comment(i);
-        this.step = i + 1;
+        this.step = Math.max(this.step, i + 1);
         c.home(who);
         await c.sleep(420, signal);
       }
+      if (this.picked) return;
       this.status(t('5 öneri · 3 kişi'));
       c.cast(c.hostOf('mf'));
       await c.sleep(1600, signal);

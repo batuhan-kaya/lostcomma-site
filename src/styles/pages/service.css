@@ -83,7 +83,8 @@
   transition: transform .35s var(--ease-pop);
 }
 .handle:hover, .handle.drag { transform: scale(1.08); }
-.handle:focus-visible { outline: 3px solid var(--milk); outline-offset: 3px; }
+/* Half on the blue page and half on the light frame: a milk band inside an ink ring reads on both. */
+.handle:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; box-shadow: 0 0 0 3px var(--milk), 0 12px 26px -10px rgba(0,0,0,.5); }
 .handle i { display: block; width: 3px; height: 30px; border-radius: 2px; background: currentColor; box-shadow: -7px 0 0 currentColor, 7px 0 0 currentColor; }
 .dims { position: absolute; right: 0; bottom: -40px; padding: 5px 9px; border-radius: 5px; background: var(--lime); color: var(--ink); }
 
@@ -371,7 +372,7 @@
 .vh-mo .tgl.on .swt::after { transform: translateX(16px); background: var(--ink); }
 .calm { margin: 10px 0 0; color: var(--sun); font-size: 15px; opacity: 0; transition: opacity .3s; }
 .calm.on { opacity: 1; }
-.code { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 22px; padding: 16px 16px 16px 22px; border-radius: 16px; background: var(--milk); color: var(--ink); }
+.code { --ring: var(--blue); display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 22px; padding: 16px 16px 16px 22px; border-radius: 16px; background: var(--milk); color: var(--ink); }
 .code code { min-width: 0; font: 500 14px/1.4 var(--mono); overflow-wrap: anywhere; }
 .code code i { color: #B8136F; }
 .cp { flex: none; min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: var(--ink); color: var(--pink); font: 600 14px/1 var(--sans); cursor: copy; transition: transform .45s var(--ease-pop); }
@@ -380,6 +381,8 @@
 
 /* ================= twelve things ================= */
 .get { position: relative; padding: 150px 0 140px; }
+/* The summary bar is sticky inside .chkw: it rides along the list and never over the heading. */
+.chkw { position: relative; }
 .ghd { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; }
 .ghd .h2 { margin-top: 18px; }
 .ghd > p { max-width: 440px; margin: 0; color: var(--pmu); font-size: 18px; }
@@ -401,19 +404,20 @@
 .sumbar {
   position: sticky; bottom: 20px; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 40px;
   padding: 12px 12px 12px 26px; border-radius: 999px; background: var(--ink); color: var(--milk); box-shadow: 0 30px 60px -30px rgba(14,14,15,.7);
+  --ring: var(--lime);
 }
 .sumbar p { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; margin: 0; font-size: 18px; }
 .sumbar p b { color: var(--lime); font-weight: 600; }
 .sumbar .mono { margin-left: 14px; color: var(--dim); }
-.sumbar a { flex: none; display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 999px; background: var(--lime); color: var(--ink); font-weight: 600; text-decoration: none; transition: transform .45s var(--ease-pop); }
+.sumbar a { flex: none; display: inline-flex; align-items: center; gap: .4em; min-height: 52px; padding: 0 24px; border-radius: 999px; background: var(--lime); color: var(--ink); font-weight: 600; text-decoration: none; transition: transform .45s var(--ease-pop); }
 .sumbar a:hover { transform: rotate(-2deg); }
-.th-ink .sumbar { background: var(--pink); color: var(--ink); }
+.th-ink .sumbar { --ring: var(--ink); background: var(--pink); color: var(--ink); }
 .th-ink .sumbar p b { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 .th-ink .sumbar .mono { color: rgba(14,14,15,.7); }
 .th-ink .sumbar a { background: var(--ink); color: var(--pink); }
 
 /* ================= under the hood ================= */
-.hood { position: relative; padding: 150px 0; background: var(--ink); color: var(--milk); }
+.hood { --ring: var(--lime); position: relative; padding: 150px 0; background: var(--ink); color: var(--milk); }
 .th-ink .hood { background: #161618; }
 .hood .wrap { display: grid; grid-template-columns: 480px minmax(0, 1fr); gap: 60px; }
 .hood .kick { color: var(--dim); }
@@ -429,7 +433,7 @@
 .bud b { display: block; margin-top: 6px; font-family: var(--display); font-size: 32px; font-weight: 400; line-height: 1; font-variation-settings: 'wdth' 80, 'wght' 760; }
 .bud b small { font-size: 16px; color: var(--dim); }
 .mock { align-self: start; min-width: 0; }
-.mock > * { overflow: hidden; border-radius: 18px; background: var(--milk); color: var(--ink); box-shadow: 0 60px 90px -50px rgba(0,0,0,.9); }
+.mock > * { --ring: var(--blue); overflow: hidden; border-radius: 18px; background: var(--milk); color: var(--ink); box-shadow: 0 60px 90px -50px rgba(0,0,0,.9); }
 .mock .mono { color: var(--grey); }
 
 /* the editor (Websites) */
@@ -540,7 +544,7 @@ textarea.inp { min-height: 80px; resize: none; line-height: 1.4; }
 .th-lime .badge { background: var(--lime); color: var(--ink); }
 .pc:hover .badge { background: var(--pbg); color: var(--pfg); }
 .pnote { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 30px; margin-top: 30px; color: var(--pmu); }
-.pnote a { display: inline-flex; align-items: center; min-height: 44px; color: var(--pfg); text-decoration: none; }
+.pnote a { display: inline-flex; align-items: center; gap: .4em; min-height: 44px; color: var(--pfg); text-decoration: none; }
 .pnote a:hover { text-decoration: underline; }
 
 /* ================= work we made · the reel ================= */
@@ -574,7 +578,7 @@ textarea.inp { min-height: 80px; resize: none; line-height: 1.4; }
 .reel .a-rad i:nth-child(2) { animation-delay: -.3s; } .reel .a-rad i:nth-child(3) { animation-delay: -.6s; } .reel .a-rad i:nth-child(4) { animation-delay: -.15s; } .reel .a-rad i:nth-child(5) { animation-delay: -.45s; }
 .reel .a-film i:nth-child(4) { animation: scrub 6s linear infinite; transform-origin: 0 50%; }
 .reel .a-fest em { animation: thump 1.2s var(--ease-pop) infinite; }
-.lab2 { display: inline-flex; align-items: center; min-height: 44px; margin-top: 22px; color: var(--pmu); text-decoration: none; }
+.lab2 { display: inline-flex; align-items: center; gap: .4em; min-height: 44px; margin-top: 22px; color: var(--pmu); text-decoration: none; }
 .lab2:hover { color: var(--pfg); }
 @keyframes eq { from { transform: scaleY(.45); } to { transform: scaleY(1.05); } }
 @keyframes scrub { from { transform: scaleX(.1); } to { transform: scaleX(2.8); } }
@@ -647,6 +651,8 @@ textarea.inp { min-height: 80px; resize: none; line-height: 1.4; }
 /* ================= 390 ================= */
 @media (max-width: 560px) {
   .vhero { padding-bottom: 60px; }
+  /* Narrow cards: the badge goes above the size line instead of on top of it. */
+  .badge { position: static; align-self: flex-start; margin-bottom: 14px; }
   .ttl { margin-top: 10px; }
   .bp:not(.on) > span { visibility: hidden; }
   .sumbar { flex-direction: row; align-items: center; gap: 10px; padding: 8px 8px 8px 18px; border-radius: 999px; }

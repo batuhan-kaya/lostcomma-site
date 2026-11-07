@@ -96,6 +96,29 @@ test.describe('homepage · desktop interactions', () => {
     await expect(page.locator('[data-bf="1"]')).toBeFocused();
   });
 
+  test('board: Tab brings every frame into view · the board itself never scrolls', async ({ page }) => {
+    await page.goto('/en');
+    await toSection(page, 'work');
+    // Keyboard focus (no pointer has touched the page): the first frame then Tab through the rest.
+    await page.locator('[data-bf="0"]').focus();
+    for (let i = 0; i < 8; i++) {
+      if (i) await page.keyboard.press('Tab');
+      await expect(page.locator(`[data-bf="${i}"]`)).toBeFocused();
+      await expect
+        .poll(
+          () =>
+            page.evaluate(() => {
+              const f = document.activeElement!.getBoundingClientRect();
+              const b = document.querySelector('[data-board]')!.getBoundingClientRect();
+              return f.left >= b.left && f.right <= b.right && f.top >= b.top && f.bottom <= b.bottom;
+            }),
+          { message: `frame ${i} inside the board`, timeout: 3000 },
+        )
+        .toBe(true);
+      expect(await page.locator('[data-board]').evaluate((b) => b.scrollLeft + b.scrollTop)).toBe(0);
+    }
+  });
+
   test('board: a project with a cover shows the image from the pipeline · opening it keeps the image', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/en');
@@ -120,6 +143,19 @@ test.describe('homepage · desktop interactions', () => {
     await expect(page.locator('[data-pd="1"] .pn')).toHaveText('Sketch');
     await page.locator('[data-hot="4"]').click();
     await expect(page.locator('[data-pd="0"]')).toHaveClass(/act/);
+  });
+});
+
+test.describe('homepage · phone', () => {
+  test.skip(({ isMobile }) => !isMobile, 'phone layout');
+
+  test('process: the swipe row keeps the page gutter when a screen snaps in', async ({ page }) => {
+    await page.goto('/en');
+    await toSection(page, 'prc');
+    await page.locator('[data-hot="0"]').click();
+    await expect(page.locator('[data-pf="1"]')).toHaveClass(/act/);
+    const gut = await page.locator('[data-pf="1"]').evaluate((c) => parseFloat(getComputedStyle(c.parentElement!).paddingLeft));
+    await expect.poll(() => page.locator('[data-pf="1"]').evaluate((c) => Math.round(c.getBoundingClientRect().left))).toBe(Math.round(gut));
   });
 });
 

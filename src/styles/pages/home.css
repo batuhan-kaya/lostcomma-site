@@ -140,7 +140,7 @@
 .hfoot { position: absolute; left: var(--gut); right: var(--gut); bottom: 34px; display: flex; justify-content: space-between; gap: 20px; color: var(--grey); }
 
 /* ================= 02 manifesto ================= */
-.mf { position: relative; min-height: 1000px; background-color: var(--ink); background-image: radial-gradient(rgba(242,241,236,.07) 1px, transparent 1.6px); background-size: 26px 26px; color: var(--milk); }
+.mf { --ring: var(--lime); position: relative; min-height: 1000px; background-color: var(--ink); background-image: radial-gradient(rgba(242,241,236,.07) 1px, transparent 1.6px); background-size: 26px 26px; color: var(--milk); }
 .mf .wrap { padding: 130px var(--gut) 110px; }
 .mf .kick { color: var(--dim); }
 .mhead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; }
@@ -298,7 +298,7 @@
 .mtc { position: absolute; right: 20px; top: 16px; color: rgba(242,241,236,.6); }
 
 /* ================= 04 work: the board ================= */
-.work { position: relative; min-height: 1000px; padding-bottom: 30px; background: var(--ink); color: var(--milk); }
+.work { --ring: var(--lime); position: relative; min-height: 1000px; padding-bottom: 30px; background: var(--ink); color: var(--milk); }
 .work .kick { color: var(--dim); }
 .whead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 120px var(--gut) 0; }
 .whead .h2 { margin-top: 20px; }
@@ -324,6 +324,8 @@
   height: 620px;
   margin: 50px auto 0;
   overflow: hidden;
+  /* clip: a focused frame must never scroll the board itself (the board moves by its own transform) */
+  overflow: clip;
   cursor: grab;
   touch-action: pan-y;
   user-select: none;
@@ -494,6 +496,8 @@
 .ct-coral { --bg: #FF5A2B; --fg: #0E0E0F; --mu: rgba(14,14,15,.8); --rule: rgba(14,14,15,.24); --dot: rgba(14,14,15,.14); --sel: #0E0E0F; --selOn: #FF5A2B; --pdc: #F2F1EC; --card: #F7F6F1; --sb: #FF5A2B; --sbOn: #0E0E0F; }
 .ct-blue { --bg: #3B35FF; --fg: #F2F1EC; --mu: rgba(242,241,236,.76); --rule: rgba(242,241,236,.22); --dot: rgba(242,241,236,.1); --sel: #CDF23A; --selOn: #0E0E0F; --pdc: #FF5A2B; --card: #F2F1EC; --sb: #3B35FF; --sbOn: #F2F1EC; }
 .ctc :focus-visible { outline-color: var(--sel); }
+/* The brief summary and its answer are ink in every contact colour. */
+.ctc .sum :focus-visible, .ctc .bpin :focus-visible { outline-color: var(--lime); }
 .ctc .wrap { position: relative; min-height: 1120px; padding: 0 var(--gut); }
 .ctop { position: absolute; left: var(--gut); right: var(--gut); top: 72px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; color: var(--mu); }
 .ctop .k { display: flex; gap: 14px; }
@@ -684,8 +688,9 @@ button.cur { padding: 0; border: 0; background: none; color: inherit; font: inhe
   /* hero flows */
   .hw { height: auto; padding: calc(var(--head) + 36px) var(--gut) 40px; display: flex; flex-direction: column; gap: 28px; }
   .flab, .hl, .hlede, .pubc, .hfoot, .hpin { position: static; }
-  .hl { left: auto; top: auto; margin-left: -4px; font-size: min(146px, 11.4vw); }
-  :lang(tr) .hl { font-size: min(136px, 10.4vw); }
+  /* The longest line has to fit: EN "people come back to." is 8.83 em · TR "uygulamalar yapıyoruz." 9.84 em. */
+  .hl { left: auto; top: auto; margin-left: -4px; font-size: min(146px, calc((100vw - 2 * var(--gut)) / 9)); }
+  :lang(tr) .hl { font-size: min(136px, calc((100vw - 2 * var(--gut)) / 10)); }
   .hlede { width: auto; max-width: 600px; }
   .pubc { align-self: flex-start; }
   .hpin { display: none; }
@@ -705,7 +710,7 @@ button.cur { padding: 0; border: 0; background: none; color: inherit; font: inhe
 @media (max-width: 900px) {
   /* process: a swipeable row of screens · no noodles */
   .flowbox { height: auto; margin-top: 56px; }
-  .flow { --pk: 1; display: flex; gap: 16px; width: auto; height: auto; padding: 34px var(--gut) 16px; margin: 0 calc(-1 * var(--gut)); overflow-x: auto; scroll-snap-type: x mandatory; transform: none; }
+  .flow { --pk: 1; display: flex; gap: 16px; width: auto; height: auto; padding: 34px var(--gut) 16px; margin: 0 calc(-1 * var(--gut)); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gut); transform: none; }
   .pf { position: relative; left: auto !important; top: auto !important; flex: none; scroll-snap-align: start; }
   .nood { display: none; }
   .pd { grid-template-columns: minmax(0, 1fr); gap: 16px; }
@@ -752,6 +757,10 @@ button.cur { padding: 0; border: 0; background: none; color: inherit; font: inhe
 .crew[data-sec="ctc"] .c-design :is(.tag, .bub) { box-shadow: inset 0 0 0 1.5px #F2F1EC; }
 
 /* Small phones: five timing labels do not fit on one line · the 2nd and 4th step down a row. */
+@media (max-width: 380px) {
+  /* The file name and its state need the row: the decorative avatars step out. */
+  .file .fh .avs { display: none; }
+}
 @media (max-width: 480px) {
   .tl { height: 80px; }
   .stp.s1 > span, .stp.s3 > span { top: 58px; }

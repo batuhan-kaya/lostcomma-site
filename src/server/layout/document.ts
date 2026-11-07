@@ -80,8 +80,8 @@ ${ctx.intro && !page.bare ? intro(ctx) : ''}
 ${header(ctx, page.section, { home: page.home })}
 <main id="main">
 ${page.body(ctx, data)}
-</main>
 ${!page.bare && page.next ? nextBand(ctx, page.next) : ''}
+</main>
 ${!page.bare ? (page.footer ? page.footer(ctx, data) : footer(ctx)) : ''}
 ${page.data ? jsonData(page.data(ctx, data)) : ''}
 </div>
