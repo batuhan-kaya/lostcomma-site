@@ -7,6 +7,7 @@ import { and, count, eq, gt, gte, lte } from 'drizzle-orm';
 import type { Assets } from '../assets';
 import type { Config } from '../config';
 import type { SettingsStore } from '../data/settings';
+import type { TextStore } from '../data/texts';
 import type { Db } from '../db';
 import { audit, bookings, briefs, outbox } from '../db/schema';
 import type { Lang } from '../i18n';
@@ -22,6 +23,8 @@ export interface Kit {
   config: Config;
   now: () => Date;
   settings: SettingsStore;
+  /** Copy rewritten in the panel (Metinler). */
+  texts: TextStore;
   postman: Postman;
   dirs: MediaDirs;
   assets: Assets;

@@ -39,11 +39,11 @@ test.describe('panel', () => {
   });
 
   test('every section loads clean: no console errors · axe · no sideways scroll', async ({ page }) => {
-    // Nineteen pages with axe on each.
-    test.setTimeout(90_000);
+    // Twenty-one pages with axe on each.
+    test.setTimeout(120_000);
     const errors = watchErrors(page);
     await signIn(page);
-    for (const url of ['/panel', '/panel/projects', '/panel/projects/new', '/panel/projects/1', '/panel/notes', '/panel/notes/1', '/panel/media', '/panel/people', '/panel/people/design', '/panel/briefs', '/panel/bookings', '/panel/mail', '/panel/settings', '/panel/redirects', '/panel/log', '/panel/account', '/panel/stats', '/panel/stats/visits', '/panel/stats/page?path=/en']) {
+    for (const url of ['/panel', '/panel/projects', '/panel/projects/new', '/panel/projects/1', '/panel/notes', '/panel/notes/1', '/panel/media', '/panel/people', '/panel/people/design', '/panel/briefs', '/panel/bookings', '/panel/mail', '/panel/texts', '/panel/texts?g=chrome', '/panel/settings', '/panel/redirects', '/panel/log', '/panel/account', '/panel/stats', '/panel/stats/visits', '/panel/stats/page?path=/en']) {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
       expect(await horizontalOverflow(page), `${url} overflow`).toBeLessThanOrEqual(0);
@@ -112,6 +112,35 @@ test.describe('panel', () => {
     await expect(page.locator('[data-flash]')).toHaveText('Oluşturuldu.');
     await page.goto('/panel/notes?state=scheduled');
     await expect(page.locator('#notes')).toContainText(`Deneme notu ${n}`);
+  });
+
+  test('Metinler: rewrite a line · it is on the site · empty the field and the line of the code is back', async ({ page }, info) => {
+    test.skip(info.project.name !== 'desktop', 'one shared server: one device rewrites the copy');
+    const errors = watchErrors(page);
+    await signIn(page, '/panel/texts?g=chrome');
+    const row = page.locator('.p-pair', { hasText: 'Nokta koymuyoruz · her sayfamız virgülle biter' });
+    const tr = row.locator('[lang="tr"]');
+    await expect(tr).toHaveValue('Nokta koymuyoruz · her sayfamız virgülle biter');
+    // The comma rule holds here too.
+    await tr.fill('Nokta yok, virgül var');
+    await page.locator('.p-savebar button').click();
+    await expect(page.locator('[data-errors]')).toContainText('Virgül kullanma');
+    await page.locator('.p-pair', { hasText: 'Nokta koymuyoruz · her sayfamız virgülle biter' }).locator('[lang="tr"]').fill('Nokta yok · sadece virgül');
+    await page.locator('.p-savebar button').click();
+    await expect(page).toHaveURL(/texts\?g=chrome&m=saved/);
+    await expect(page.locator('.p-pair', { hasText: 'Koddaki hâli' })).toHaveCount(1);
+    await page.goto('/tr/studyo');
+    await expect(page.locator('.ft-note span').first()).toHaveText('Nokta yok · sadece virgül');
+    await page.goto('/en/studio');
+    await expect(page.locator('.ft-note span').first()).toHaveText('No full stops here · every page of ours ends on a comma');
+    // Back to the code's line.
+    await page.goto('/panel/texts?q=Nokta+koymuyoruz');
+    await page.locator('.p-pair [lang="tr"]').first().fill('');
+    await page.locator('.p-savebar button').click();
+    await expect(page).toHaveURL(/m=saved/);
+    await page.goto('/tr/studyo');
+    await expect(page.locator('.ft-note span').first()).toHaveText('Nokta koymuyoruz · her sayfamız virgülle biter');
+    expect(errors).toEqual([]);
   });
 
   test('a delete asks first', async ({ page }, info) => {

@@ -12,7 +12,7 @@ export type Vars = Record<string, string | number>;
 /** Source strings are Turkish. English comes from i18n/en.json keyed by the Turkish text. */
 export type T = (source: string, vars?: Vars) => string;
 
-const EN: Record<string, string> = catalog;
+export const EN: Record<string, string> = catalog;
 const warned = new Set<string>();
 
 export function fill(s: string, vars?: Vars): string {
@@ -20,10 +20,11 @@ export function fill(s: string, vars?: Vars): string {
   return s.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
 }
 
-export function translator(lang: Lang, en: Record<string, string> = EN): T {
-  if (lang === 'tr') return (source, vars) => fill(source, vars);
+/** `over`: lines rewritten in the panel (Metinler · src/server/data/texts.ts) keyed by the Turkish source. */
+export function translator(lang: Lang, en: Record<string, string> = EN, over?: Record<string, string>): T {
+  if (lang === 'tr') return (source, vars) => fill(over?.[source] ?? source, vars);
   return (source, vars) => {
-    const hit = en[source];
+    const hit = over?.[source] ?? en[source];
     if (!hit) {
       if (!warned.has(source) && process.env.NODE_ENV !== 'production') {
         warned.add(source);

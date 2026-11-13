@@ -3,7 +3,6 @@ import { SOCIAL } from '../../data/settings';
 import { html, raw, type Safe } from '../../html';
 import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
-import { HOME } from '../../content/home';
 import { board } from './board';
 import { brief, type ContactTheme } from './brief';
 import { hero } from './hero';
@@ -67,7 +66,7 @@ ${process(ctx)}
 ${brief(ctx, { theme: CONTACT_THEME, sent: !!opts.sent, error: !!opts.error })}`,
     head: (ctx) => organization(ctx),
     data: (ctx) => {
-      const c = HOME[ctx.lang];
+      const c = ctx.texts.home(ctx.lang);
       return {
         words: c.words,
         notes: c.notes,

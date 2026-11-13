@@ -1,5 +1,6 @@
 import type { Assets } from './assets';
 import type { SettingsStore } from './data/settings';
+import type { TextStore } from './data/texts';
 import type { Db } from './db';
 import type { Safe } from './html';
 import type { Lang, T } from './i18n';
@@ -27,6 +28,8 @@ export interface Ctx {
   query: Record<string, string>;
   /** Values filled from the panel (prices · month · address · phone · src/server/data/settings.ts). */
   settings: SettingsStore;
+  /** Copy rewritten in the panel (Metinler): the homepage's structured content with the changes in. */
+  texts: TextStore;
   /** Someone arrived from outside: the page opens with the preloader (layout/intro.ts). */
   intro?: boolean;
 }

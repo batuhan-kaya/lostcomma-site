@@ -1,0 +1,1980 @@
+{
+ " ve ": [
+  "work"
+ ],
+ "[ADRES]": [
+  "legal",
+  "studio"
+ ],
+ "[E-POSTA SERVİSİ]": [
+  "legal"
+ ],
+ "[FİYAT]": [
+  "process",
+  "service",
+  "services"
+ ],
+ "[VERİ SORUMLUSU]": [
+  "legal"
+ ],
+ "{d} tarihinden beri yayında": [
+  "case"
+ ],
+ "{k} silinsin": [
+  "legal"
+ ],
+ "{n} / 12 seçili": [
+  "service"
+ ],
+ "{n} bölüm · {m} dk": [
+  "notes"
+ ],
+ "{n} dk": [
+  "note",
+  "notes"
+ ],
+ "{n} dk okuma": [
+  "note",
+  "notes"
+ ],
+ "{n} görünür": [
+  "work"
+ ],
+ "{n} hafta": [
+  "case"
+ ],
+ "{n} harf uzakta": [
+  "notFound"
+ ],
+ "{n} not": [
+  "notes"
+ ],
+ "{n} numaralı katman olabilir.": [
+  "work"
+ ],
+ "{name} burada": [
+  "chrome"
+ ],
+ "{name} ile selamlaş": [
+  "studio"
+ ],
+ "{q} ya da Türkçe dene ya da": [
+  "notes"
+ ],
+ "{y} yılından beri · Kadıköy": [
+  "studio"
+ ],
+ "{y} yılından beri proje": [
+  "studio"
+ ],
+ "⇅": [
+  "service"
+ ],
+ "✓ derleme geçti · önizleme güncellendi": [
+  "process"
+ ],
+ "1 hafta = 1.4 sn": [
+  "process"
+ ],
+ "1 harf uzakta": [
+  "notFound"
+ ],
+ "1 sa 29 dk": [
+  "service"
+ ],
+ "1 sa 9 dk": [
+  "service"
+ ],
+ "1974’ten beri": [
+  "service"
+ ],
+ "1974’ten beri ekmek · Moda": [
+  "service"
+ ],
+ "20 dakikalık görüşme al": [
+  "chrome"
+ ],
+ "29 dk": [
+  "service"
+ ],
+ "49 dk": [
+  "service"
+ ],
+ "5 öneri · 3 kişi": [
+  "home"
+ ],
+ "9 dk sonra": [
+  "service"
+ ],
+ "AA ✓ metin": [
+  "service"
+ ],
+ "AA sadece büyük yazı": [
+  "service"
+ ],
+ "AA’dan kalır": [
+  "service"
+ ],
+ "AAA değil": [
+  "service"
+ ],
+ "Aç": [
+  "service"
+ ],
+ "Açık": [
+  "studio"
+ ],
+ "Adın": [
+  "home",
+  "start"
+ ],
+ "Adın soyadın": [
+  "legal"
+ ],
+ "Adresi kopyala": [
+  "start"
+ ],
+ "Aklında başka bir şey mi var?": [
+  "services"
+ ],
+ "Alet çantası": [
+  "other"
+ ],
+ "Alt bilgi": [
+  "other"
+ ],
+ "altı şey.": [
+  "lab"
+ ],
+ "Ana menü": [
+  "chrome"
+ ],
+ "Ana sayfa": [
+  "home",
+  "notFound",
+  "process",
+  "service"
+ ],
+ "Ana sayfa · ilk deneme": [
+  "other"
+ ],
+ "Anadolu yakasında.": [
+  "studio"
+ ],
+ "Araç klavyesi": [
+  "other"
+ ],
+ "Araçlar": [
+  "chrome",
+  "other",
+  "services"
+ ],
+ "Araçlar.": [
+  "other"
+ ],
+ "Asya": [
+  "studio"
+ ],
+ "Aşağı kaydır · içimizden biri sana eşlik eder": [
+  "home"
+ ],
+ "aşağı yukarı 20 dakikada bir": [
+  "studio"
+ ],
+ "Aşmıyor · sürüklenmiş gibi": [
+  "other"
+ ],
+ "Atölyeler": [
+  "process",
+  "service"
+ ],
+ "Avrupa": [
+  "studio"
+ ],
+ "Ayar bölümleri": [
+  "studio"
+ ],
+ "Ayarlar": [
+  "service"
+ ],
+ "Ayırdıktan sonra": [
+  "start"
+ ],
+ "Aynı anda az sayıda proje alıyoruz ki her biri bütün ekibi alsın. Bir sonraki boş yer [AY] ayında açılıyor.": [
+  "work"
+ ],
+ "Ayrıldı · görüşürüz {name}": [
+  "start"
+ ],
+ "Azaltılmış hareket": [
+  "service"
+ ],
+ "Azaltılmış hareket açık. Her şey yerinde belirir. Aynı bilgi · yolculuk yok.": [
+  "service"
+ ],
+ "bakılıyor": [
+  "legal"
+ ],
+ "Banka": [
+  "service"
+ ],
+ "Başa dön": [
+  "chrome"
+ ],
+ "Başarı neye benziyor?": [
+  "process"
+ ],
+ "Başka bir görüşme ayır": [
+  "start"
+ ],
+ "Başka bir şey yok. Bakmak için tarayıcının geliştirici araçlarını açabilirsin.": [
+  "legal"
+ ],
+ "Başka yerler": [
+  "home"
+ ],
+ "Başka yollar": [
+  "start"
+ ],
+ "başla": [
+  "service"
+ ],
+ "Başla": [
+  "notFound",
+  "start"
+ ],
+ "Başlangıç": [
+  "service"
+ ],
+ "Başlangıç fiyatı": [
+  "services"
+ ],
+ "Başlayalım": [
+  "lab"
+ ],
+ "Başlık": [
+  "service"
+ ],
+ "Başparmak": [
+  "service"
+ ],
+ "Başparmak alanını göster": [
+  "service"
+ ],
+ "Baştan ↺": [
+  "home"
+ ],
+ "Başvuruyu e-postada aç": [
+  "legal"
+ ],
+ "Bazıları": [
+  "lab"
+ ],
+ "Beni sayma": [
+  "legal"
+ ],
+ "Beni sayma tercihin": [
+  "legal"
+ ],
+ "Bilet": [
+  "start"
+ ],
+ "Bilet al": [
+  "service"
+ ],
+ "Biletler": [
+  "service"
+ ],
+ "Bilgilerini sadece görüşmeyi ayarlamak için kullanırız.": [
+  "start"
+ ],
+ "Bilgilerini sadece sana dönmek için kullanırız.": [
+  "home"
+ ],
+ "Bilmemiz gereken başka bir şey": [
+  "home"
+ ],
+ "bir dosya bırak": [
+  "service"
+ ],
+ "Bir düğme": [
+  "service"
+ ],
+ "Bir fikrin mi var?": [
+  "chrome"
+ ],
+ "Bir gün içinde bir insan cevap verir.": [
+  "services"
+ ],
+ "Bir gün seç": [
+  "start"
+ ],
+ "Bir iki cümleyle anlat · isteğe bağlı": [
+  "start"
+ ],
+ "Bir notu sonraya kaydetmek için satır numarasına tıkla": [
+  "notes"
+ ],
+ "Bir proje konuşalım": [
+  "process"
+ ],
+ "Bir proje nasıl ilerler": [
+  "service"
+ ],
+ "Bir proje nasıl ilerler.": [
+  "home"
+ ],
+ "Bir projenin ilk görüşmeden yayına kadar nasıl ilerlediği.": [
+  "process"
+ ],
+ "Bir saat seç": [
+  "start"
+ ],
+ "Bir sonraki boş yer {m} ayında açılıyor": [
+  "chrome"
+ ],
+ "Bir sorun varsa": [
+  "legal"
+ ],
+ "Bir stüdyoyu stüdyo yapan küçük şeyler.": [
+  "studio"
+ ],
+ "Bir şey eksik kaldı. Gün ve saat ve adın ve e-postan gerekli.": [
+  "start"
+ ],
+ "Biraz aşıyor": [
+  "other"
+ ],
+ "Biri o saati senden hemen önce aldı. Başka bir saat seç.": [
+  "start"
+ ],
+ "Birinci tutamaç": [
+  "service"
+ ],
+ "Birlikte daha iyi · bir satırın üstüne gel": [
+  "services"
+ ],
+ "bitir": [
+  "service"
+ ],
+ "boşluk alanı": [
+  "service"
+ ],
+ "Boşluk alanını göster": [
+  "service"
+ ],
+ "Boyut": [
+  "service"
+ ],
+ "Boyutlandı": [
+  "service"
+ ],
+ "Bölüm": [
+  "other"
+ ],
+ "Brief": [
+  "case"
+ ],
+ "Brief gönder": [
+  "chrome"
+ ],
+ "Brief’in bize ulaştı": [
+  "home"
+ ],
+ "Brief’in bize ulaştı.": [
+  "home"
+ ],
+ "Brief’ini okuyoruz": [
+  "home"
+ ],
+ "Bu adreste bir sayfa yok.": [
+  "notFound"
+ ],
+ "Bu arada sırada ne var bir bak.": [
+  "home"
+ ],
+ "Bu ay neyle uğraşıyoruz.": [
+  "other"
+ ],
+ "Bu deney JavaScript ile çalışıyor": [
+  "lab"
+ ],
+ "Bu gün çalışma saatlerimiz örtüşmüyor. Başka bir gün seç ya da bize yaz ve birlikte bir saat bulalım.": [
+  "start"
+ ],
+ "Bu hafta": [
+  "home",
+  "service"
+ ],
+ "Bu kaydı sil": [
+  "legal"
+ ],
+ "Bu listeyle başla": [
+  "service"
+ ],
+ "Bu sayfa {n}. aşamada kodlanacak.": [
+  "other"
+ ],
+ "Bu sayfada": [
+  "note"
+ ],
+ "Bu sayfaya gelecekler": [
+  "other"
+ ],
+ "Bugün": [
+  "home",
+  "legal",
+  "process"
+ ],
+ "Bugün okuyup bir gün içinde dönüyoruz.": [
+  "home"
+ ],
+ "bulunan virgül": [
+  "studio"
+ ],
+ "Bulundu": [
+  "chrome"
+ ],
+ "Bunlar bu sayfayı gerçekten değiştirir. Dene.": [
+  "studio"
+ ],
+ "Bunlarla ne yapıyoruz": [
+  "other"
+ ],
+ "Bunun üstünde": [
+  "process"
+ ],
+ "Buradan başladık": [
+  "note"
+ ],
+ "Buradasın": [
+  "work"
+ ],
+ "Burası haritada yok.": [
+  "notFound"
+ ],
+ "Buraya çiz": [
+  "services"
+ ],
+ "Bütçe: kare başına {n} ms": [
+  "lab"
+ ],
+ "Bütün araçlar": [
+  "service"
+ ],
+ "bütün filtreleri temizle": [
+  "notes"
+ ],
+ "Bütün işler": [
+  "case"
+ ],
+ "Bütün katmanlar gizli. Çok minimal.": [
+  "work"
+ ],
+ "Bütün notlar": [
+  "note",
+  "notes"
+ ],
+ "büyük küçük harf duyarlı": [
+  "notes"
+ ],
+ "Büyüt": [
+  "lab"
+ ],
+ "Canlı": [
+  "chrome"
+ ],
+ "Cetveldeki saatler İstanbul saati": [
+  "start"
+ ],
+ "comma · kayarak gelir": [
+  "service"
+ ],
+ "Cuma demosu": [
+  "process"
+ ],
+ "Çalışan": [
+  "lab"
+ ],
+ "çaya gel": [
+  "studio"
+ ],
+ "Çerezler": [
+  "chrome",
+  "legal"
+ ],
+ "çıkar.": [
+  "service"
+ ],
+ "Çizim tahtası": [
+  "services"
+ ],
+ "Daha eski": [
+  "note"
+ ],
+ "Değerler": [
+  "studio"
+ ],
+ "Değerlerimiz tercihler olarak. Bazıları bu sayfayı değiştirir. Bazıları pazarlığa kapalı.": [
+  "studio"
+ ],
+ "Değişiklikleri göster": [
+  "home"
+ ],
+ "Değişiklikleri incele": [
+  "home"
+ ],
+ "Demlik": [
+  "service"
+ ],
+ "Denetçi": [
+  "process",
+  "services"
+ ],
+ "Deneyleri süz": [
+  "lab"
+ ],
+ "Dert etme. Kaybolmak adımızda var.": [
+  "notFound"
+ ],
+ "Detaylar": [
+  "case"
+ ],
+ "Devamı var": [
+  "chrome"
+ ],
+ "Diğer metinler": [
+  "legal"
+ ],
+ "Diğer notlar": [
+  "note"
+ ],
+ "Dil": [
+  "chrome"
+ ],
+ "Dil seçimin": [
+  "legal"
+ ],
+ "Dipnot": [
+  "other"
+ ],
+ "Dipnotlar": [
+  "note"
+ ],
+ "Dizüstü": [
+  "service"
+ ],
+ "Doğrudan bize sor.": [
+  "services"
+ ],
+ "Doğrusal": [
+  "service"
+ ],
+ "dolu": [
+  "start"
+ ],
+ "Dosyaya kim dokundu.": [
+  "case"
+ ],
+ "Dosyayı doldurmaya başla. Brief’i sen yazdıkça biz yazacağız.": [
+  "home"
+ ],
+ "Döngüler.": [
+  "service"
+ ],
+ "Dördüncü bir imleç": [
+  "studio"
+ ],
+ "Dört araç": [
+  "services"
+ ],
+ "Dört biçim. Tek stüdyo.": [
+  "home"
+ ],
+ "Dört eğrimiz": [
+  "service"
+ ],
+ "Durum": [
+  "case"
+ ],
+ "Duvar takvimi ve notlar": [
+  "other"
+ ],
+ "Düzen": [
+  "service"
+ ],
+ "E-posta": [
+  "home",
+  "start"
+ ],
+ "editör": [
+  "service"
+ ],
+ "Eğri": [
+  "service"
+ ],
+ "Ekibinin kullanacağı editör": [
+  "service"
+ ],
+ "Ekip": [
+  "case",
+  "note"
+ ],
+ "Ekip · bir kartın üstüne gel": [
+  "studio"
+ ],
+ "Ekip ve roller": [
+  "service"
+ ],
+ "Ekran": [
+  "studio"
+ ],
+ "ekran dışında": [
+  "lab"
+ ],
+ "Ekran genişliği": [
+  "service"
+ ],
+ "Ekran okuyucu": [
+  "process"
+ ],
+ "El": [
+  "service"
+ ],
+ "Eline ne geçiyor": [
+  "process"
+ ],
+ "Emekli": [
+  "lab"
+ ],
+ "En çok istenen": [
+  "service"
+ ],
+ "en fazla 160": [
+  "service"
+ ],
+ "En yakın": [
+  "notFound"
+ ],
+ "En yakın sayfa": [
+  "notFound"
+ ],
+ "Erişilebilirlik": [
+  "other"
+ ],
+ "Ev kuralları": [
+  "process"
+ ],
+ "eylem başparmağın dinlendiği yerde": [
+  "service"
+ ],
+ "Fırın logosu · {cap}": [
+  "service"
+ ],
+ "fırından": [
+  "service"
+ ],
+ "Fincanlar": [
+  "process"
+ ],
+ "Fotoğraflar": [
+  "service"
+ ],
+ "Geçmiş · {n} sürüm": [
+  "case"
+ ],
+ "Geçmiş aylar": [
+  "other"
+ ],
+ "Geçmişi oynat": [
+  "case"
+ ],
+ "Gelecek hafta": [
+  "home"
+ ],
+ "Gelen kutusu": [
+  "service"
+ ],
+ "Genelde": [
+  "services",
+  "studio"
+ ],
+ "Genelde bir gün içinde döneriz": [
+  "home"
+ ],
+ "Geniş tabak": [
+  "service"
+ ],
+ "Genişlik": [
+  "service"
+ ],
+ "Gerçek projelerden kısa döngüler. Sessiz oynar ve ekrandan çıkınca durur. Durdurmak için birine dokun.": [
+  "service"
+ ],
+ "Gerçek teslim tarihi ne?": [
+  "process"
+ ],
+ "Geri al": [
+  "services"
+ ],
+ "Geri dön": [
+  "service"
+ ],
+ "Gezin · virgüller seni izliyor": [
+  "lab"
+ ],
+ "Giriş": [
+  "service"
+ ],
+ "Gizlemek için grubu kapat": [
+  "work"
+ ],
+ "Gizlilik": [
+  "chrome",
+  "legal"
+ ],
+ "Gönder": [
+  "home"
+ ],
+ "Gönderemedik. E-posta adresini kontrol edip tekrar dene.": [
+  "home"
+ ],
+ "Gönderildi · az önce": [
+  "home"
+ ],
+ "Görünüm": [
+  "work"
+ ],
+ "Görüşme insanı değil misin?": [
+  "start"
+ ],
+ "Göz atmak için katmanın üstüne gel": [
+  "work"
+ ],
+ "Gurur duyduğumuz her şey tek bir sonsuz panoda. İstediğin yöne sürükle. Hiç bitmiyor.": [
+  "home"
+ ],
+ "Gün": [
+  "start"
+ ],
+ "Günlük": [
+  "process",
+  "service"
+ ],
+ "H{w}": [
+  "process"
+ ],
+ "H{w} · G{d}": [
+  "process"
+ ],
+ "Hafta sonu. Pazartesi görüşürüz.": [
+  "process"
+ ],
+ "Hakkımda hangi verileri tuttuğunuzu öğrenmek istiyorum": [
+  "legal"
+ ],
+ "Hakkını kullan": [
+  "legal"
+ ],
+ "Haklı": [
+  "services"
+ ],
+ "Hâlâ karar veremedin mi?": [
+  "start"
+ ],
+ "Hâlâ lab’de": [
+  "lab"
+ ],
+ "Haliç": [
+  "studio"
+ ],
+ "Hareket": [
+  "lab",
+  "other",
+  "work"
+ ],
+ "Harita": [
+  "process",
+  "service"
+ ],
+ "Haritada bir noktanın üstüne gel. Kaç harf uzakta olduğunu gösterir.": [
+  "notFound"
+ ],
+ "Haritadaki her nokta bir sayfa.": [
+  "notFound"
+ ],
+ "Haritalar": [
+  "service"
+ ],
+ "Haritanın ortasından başla": [
+  "notFound"
+ ],
+ "Haritaya bak": [
+  "start"
+ ],
+ "Hazır ayarlar": [
+  "other"
+ ],
+ "Hazırlanıyor": [
+  "lab"
+ ],
+ "Hedef": [
+  "other"
+ ],
+ "Hedefe uzaklık": [
+  "other"
+ ],
+ "Henüz gösteremediğimiz projeler. {list} buraya gitti. Yüz yüze sor ve izin verilen her şeyi anlatalım.": [
+  "work"
+ ],
+ "Hepsini durdur": [
+  "lab"
+ ],
+ "Hepsini gör": [
+  "service"
+ ],
+ "Her birini okuyoruz": [
+  "start"
+ ],
+ "Her çerçeve boyutunda aynı ekip ve aynı özen. Birini seç ya da ekibin değiştirmesini izle.": [
+  "home"
+ ],
+ "Her dil için bir besleme. Notun tamamı içinde. Takip pikseli yok.": [
+  "notes"
+ ],
+ "Her hafta": [
+  "process"
+ ],
+ "Her nota dön": [
+  "note"
+ ],
+ "Her projeyle gelen varsayılanlar.": [
+  "studio"
+ ],
+ "her sitede dil": [
+  "studio"
+ ],
+ "her şeyi yapan insan": [
+  "studio"
+ ],
+ "Her teklif başlamadan önce sabitlenir. Saatlik sürpriz yok.": [
+  "service"
+ ],
+ "Hiçbir şey bize gönderilmez. Düğme e-posta programını hazır bir başvuruyla açar.": [
+  "legal"
+ ],
+ "Hiçbir şey bulunamadı.": [
+  "notes"
+ ],
+ "Hiçbiri zorunlu değil. Bir ay sonra plan değiştirmek de serbest.": [
+  "process"
+ ],
+ "Hizmetler": [
+  "chrome",
+  "home",
+  "notFound",
+  "service",
+  "services",
+  "work"
+ ],
+ "i18n": [
+  "other"
+ ],
+ "İçeriğe geç": [
+  "chrome"
+ ],
+ "İçerik dili": [
+  "service"
+ ],
+ "İçerik şemasından üretilen form": [
+  "service"
+ ],
+ "İçindekiler": [
+  "legal"
+ ],
+ "iki dil": [
+  "notes"
+ ],
+ "İki dil": [
+  "process"
+ ],
+ "İki haftada bir · aynı gün": [
+  "service"
+ ],
+ "İkinci tutamaç": [
+  "service"
+ ],
+ "İleri →": [
+  "home"
+ ],
+ "İletişim": [
+  "chrome"
+ ],
+ "İlk ekran": [
+  "other"
+ ],
+ "İlk eskizler dosyanda": [
+  "home"
+ ],
+ "İlk not": [
+  "note"
+ ],
+ "İmleç · gelir": [
+  "service"
+ ],
+ "İncele": [
+  "home"
+ ],
+ "İngilizcesi de var": [
+  "note"
+ ],
+ "İsimsiz brief": [
+  "home"
+ ],
+ "İskele 1": [
+  "service"
+ ],
+ "İskele 2": [
+  "service"
+ ],
+ "İstanbul": [
+  "chrome",
+  "home",
+  "start",
+  "studio"
+ ],
+ "İstanbul · her yerden ekiplerle çalışıyoruz": [
+  "home"
+ ],
+ "İstanbul · şimdi": [
+  "studio"
+ ],
+ "İstanbul Boğazı": [
+  "studio"
+ ],
+ "İstanbul’da web siteleri ve uygulamalar tasarlayıp kodlayan bir ekip.": [
+  "home"
+ ],
+ "İstanbul’un çizilmiş bir haritası. Stüdyo Kadıköy’de vapur iskelesinin yanında.": [
+  "studio"
+ ],
+ "İstediğin kadar seç": [
+  "home"
+ ],
+ "İş başına": [
+  "process"
+ ],
+ "İşlenmesine itiraz ediyorum": [
+  "legal"
+ ],
+ "İşler": [
+  "case",
+  "chrome",
+  "notFound",
+  "work"
+ ],
+ "İşlere bak": [
+  "home",
+  "start"
+ ],
+ "Jöle": [
+  "other"
+ ],
+ "JS kapalıyken seni hiç saymıyoruz. Bugün hakkında bir kaydımız yok.": [
+  "legal"
+ ],
+ "Kabaca bütçe": [
+  "home"
+ ],
+ "Kadıköy’de bir seramik atölyesi": [
+  "service"
+ ],
+ "Kadıköy’de elde çekildi. İki kez pişti. Her gün kullanılmak için yapıldı.": [
+  "service"
+ ],
+ "Kadıköy’den": [
+  "service"
+ ],
+ "Kahvede sor": [
+  "work"
+ ],
+ "Kapak": [
+  "case"
+ ],
+ "Kapak görseli": [
+  "service"
+ ],
+ "Kapalı": [
+  "studio"
+ ],
+ "Kapat": [
+  "chrome",
+  "home"
+ ],
+ "Kapsam": [
+  "case"
+ ],
+ "Kaputun altı": [
+  "service"
+ ],
+ "Karaköy’den sonraki vapur · {time}": [
+  "studio"
+ ],
+ "Karaköy’e": [
+  "service"
+ ],
+ "Kaseler": [
+  "process"
+ ],
+ "Kaseleri incele": [
+  "service"
+ ],
+ "Kategorilere göre liste": [
+  "other"
+ ],
+ "Katkı verenler": [
+  "case"
+ ],
+ "Katman": [
+  "work"
+ ],
+ "Katmanlar": [
+  "work"
+ ],
+ "Kaydedildi": [
+  "service"
+ ],
+ "Kaydedildi ✓": [
+  "service"
+ ],
+ "Kaydedilenler": [
+  "notes"
+ ],
+ "Kaydettiğin notlar": [
+  "legal"
+ ],
+ "Kaydır ↓": [
+  "work"
+ ],
+ "Kayıp virgül tuşu": [
+  "other"
+ ],
+ "Kelimeyi değiştir": [
+  "home"
+ ],
+ "Kendi manifestomuzu düzenledik.": [
+  "home"
+ ],
+ "Kesin olması gerekmiyor": [
+  "home"
+ ],
+ "Kısa bir tanışma görüşmesi": [
+  "home"
+ ],
+ "Kısa sürede çok fazla deneme oldu. Biraz sonra tekrar dene ya da bize yaz.": [
+  "start"
+ ],
+ "Kısaca": [
+  "legal"
+ ],
+ "kilitli": [
+  "studio"
+ ],
+ "Kilitli katmanlar.": [
+  "work"
+ ],
+ "Kilitli proje.": [
+  "work"
+ ],
+ "Kilometre taşı": [
+  "process"
+ ],
+ "Kim karar veriyor?": [
+  "process"
+ ],
+ "Kimin için?": [
+  "process"
+ ],
+ "Kimlere aktardığınızı öğrenmek istiyorum": [
+  "legal"
+ ],
+ "Kimlik": [
+  "work"
+ ],
+ "Kişisel verilerini nasıl işlediğimiz ve haklarını nasıl kullanacağın.": [
+  "legal"
+ ],
+ "Kod": [
+  "other"
+ ],
+ "Kod ve tasarım ve hareket üzerine öğrendiklerimiz. İki kez öğrenmemek için ekip tarafından yazıldı. Bazıları Türkçe bazıları İngilizce ve çoğu ikisinde de.": [
+  "notes"
+ ],
+ "Kolay": [
+  "service"
+ ],
+ "Kontrastıyla renk çiftleri": [
+  "service"
+ ],
+ "Konu": [
+  "start"
+ ],
+ "Konular": [
+  "notes"
+ ],
+ "Konum silindi": [
+  "service"
+ ],
+ "Konuşalım": [
+  "legal"
+ ],
+ "Konuşalım.": [
+  "start"
+ ],
+ "kopyala": [
+  "case"
+ ],
+ "Kopyala": [
+  "home",
+  "other",
+  "service"
+ ],
+ "Kopyalandı": [
+  "case"
+ ],
+ "Kutunun içinde bir yeri göster": [
+  "other"
+ ],
+ "Küçük deneyler ve canlı örnekler.": [
+  "lab"
+ ],
+ "Küçük şeyler.": [
+  "case"
+ ],
+ "KVKK aydınlatma metni": [
+  "home",
+  "legal",
+  "start"
+ ],
+ "Lab": [
+  "chrome",
+  "lab",
+  "notFound",
+  "note",
+  "notes",
+  "other"
+ ],
+ "Lab müşteri fikirlerinin ucuz ilk taslaklarının yeri. Burada işe yarayan bir şey çoğu zaman birkaç ay sonra gerçek bir projede çıkıyor.": [
+  "lab"
+ ],
+ "Lab’de daha fazla deney": [
+  "service"
+ ],
+ "Logo imzası": [
+  "service"
+ ],
+ "lost · kayarak gelir": [
+  "service"
+ ],
+ "Lost Comma · Ayarlar": [
+  "studio"
+ ],
+ "Lost Comma İstanbul’da bir tasarım ve yazılım stüdyosu. Web siteleri ve uygulamalar ve kimlikleri sahipleriyle birlikte ve herkesin önünde yapıyoruz.": [
+  "home"
+ ],
+ "Lost Comma’nın arkasındaki ekip.": [
+  "studio"
+ ],
+ "Mağaza": [
+  "process",
+  "service"
+ ],
+ "Mahalle fırını · 1974’ten beri": [
+  "service"
+ ],
+ "Marmara Denizi": [
+  "studio"
+ ],
+ "Masamızda ve kodumuzda kullandığımız araçlar.": [
+  "other"
+ ],
+ "Masaüstü": [
+  "service"
+ ],
+ "Medya": [
+  "service"
+ ],
+ "Menü": [
+  "chrome",
+  "service"
+ ],
+ "Merhaba": [
+  "start"
+ ],
+ "mesai dışı · sabah hepsini okuyoruz": [
+  "home"
+ ],
+ "Metin": [
+  "home"
+ ],
+ "Metne dön": [
+  "note"
+ ],
+ "Mezun oldu": [
+  "lab"
+ ],
+ "mezun oldu.": [
+  "lab"
+ ],
+ "müşteri": [
+  "case"
+ ],
+ "Müşteri": [
+  "case"
+ ],
+ "Müzik": [
+  "service"
+ ],
+ "Nasıl çalışıyoruz": [
+  "work"
+ ],
+ "Nasıl çalışıyoruz · anahtarları dene": [
+  "studio"
+ ],
+ "Nasıl çalıştığımızın tıklanabilir bir prototipi. Herhangi bir ekranda İleri’ye bas ya da ekibe bırak.": [
+  "home"
+ ],
+ "Ne istiyorsun": [
+  "legal"
+ ],
+ "Ne kullanıyoruz": [
+  "other"
+ ],
+ "Ne oluyor": [
+  "process"
+ ],
+ "Ne topladığımız · neden topladığımız ve ne zaman sildiğimiz. Çerez yok · reklam yok.": [
+  "legal"
+ ],
+ "Ne yapıyoruz": [
+  "home"
+ ],
+ "Ne yaptığını anlat. Bütün ekip her brief’i okur ve dosyana katılır. Genelde bir gün içinde döneriz.": [
+  "home"
+ ],
+ "Ne zaman yayına çıksın": [
+  "home"
+ ],
+ "Neden ve nasıl kullandığınızı öğrenmek istiyorum": [
+  "legal"
+ ],
+ "Neler var · ihtiyacın olanı işaretle": [
+  "service"
+ ],
+ "Neredeyiz": [
+  "studio"
+ ],
+ "Nereye gittiler": [
+  "lab"
+ ],
+ "Nokta koymuyoruz · her sayfamız virgülle biter": [
+  "chrome"
+ ],
+ "Nokta zıplayabilir mi?": [
+  "home"
+ ],
+ "Noktayı zıplat": [
+  "home"
+ ],
+ "Not dili": [
+  "notes"
+ ],
+ "Notes": [
+  "chrome",
+  "notFound",
+  "notes",
+  "studio"
+ ],
+ "Notes.": [
+  "notes"
+ ],
+ "Notlar": [
+  "service"
+ ],
+ "Notlarda bul": [
+  "notes"
+ ],
+ "Notu oku": [
+  "notes"
+ ],
+ "Ofis": [
+  "studio"
+ ],
+ "Ofis saatlerimizden birini seç ve konuşalım.": [
+  "start"
+ ],
+ "Ok tuşlarıyla ekranda gezdir. Enter altındaki eyleme dokunur.": [
+  "service"
+ ],
+ "Ok tuşlarıyla taşı. Shift ile daha hızlı.": [
+  "service"
+ ],
+ "Okuma": [
+  "chrome"
+ ],
+ "Okumak yetmezse": [
+  "note"
+ ],
+ "On birinci hafta": [
+  "process"
+ ],
+ "On haftayı oynat": [
+  "process"
+ ],
+ "On iki şey.": [
+  "service"
+ ],
+ "Oynat": [
+  "service"
+ ],
+ "Oynatma kafası": [
+  "service"
+ ],
+ "Oynuyor · sessiz": [
+  "service"
+ ],
+ "Oyun alanı JavaScript ile çalışıyor": [
+  "other"
+ ],
+ "Önce": [
+  "case",
+  "service"
+ ],
+ "Önce · {n}/5": [
+  "service"
+ ],
+ "Önce bir gün ve bir saat seç.": [
+  "start"
+ ],
+ "Önceki hafta": [
+  "process"
+ ],
+ "Öneriler ekip yazdıkça beliriyor. Tümünü reddet’i dene.": [
+  "home"
+ ],
+ "Önizlemenin genişliği": [
+  "service"
+ ],
+ "örnek proje": [
+  "home"
+ ],
+ "Örnekler · birinin üstüne gel": [
+  "lab"
+ ],
+ "Örnekler aşağıda": [
+  "lab"
+ ],
+ "Pano.": [
+  "home"
+ ],
+ "Panoya dön": [
+  "home"
+ ],
+ "Pazar günü yelken açanlar.": [
+  "home"
+ ],
+ "Pazartesi ile cuma · 10:00 ile 18:00": [
+  "studio"
+ ],
+ "Peki bu aslında kimin için?": [
+  "home"
+ ],
+ "Performans": [
+  "other"
+ ],
+ "Piksel": [
+  "lab"
+ ],
+ "Platform": [
+  "service"
+ ],
+ "Program · göreceğin şey": [
+  "process"
+ ],
+ "Proje başlat": [
+  "chrome",
+  "home",
+  "start",
+  "work"
+ ],
+ "Reklam ve takip çerezi yok. Tarayıcında tuttuklarımızı görüp silebilirsin.": [
+  "legal"
+ ],
+ "renk çiftleri": [
+  "service"
+ ],
+ "S": [
+  "chrome",
+  "home"
+ ],
+ "Saat": [
+  "service",
+  "start"
+ ],
+ "Saatler": [
+  "service"
+ ],
+ "Sabah kasesi": [
+  "service"
+ ],
+ "Sabit teklifler.": [
+  "service"
+ ],
+ "Sadece {l}": [
+  "notes"
+ ],
+ "Sadece dili farklı": [
+  "notFound"
+ ],
+ "Sadece hafta içi": [
+  "start"
+ ],
+ "Sadece klavye": [
+  "process"
+ ],
+ "Sağ": [
+  "service"
+ ],
+ "Sakin · şimdi": [
+  "other"
+ ],
+ "Sana dönebilmemiz için": [
+  "home"
+ ],
+ "Sana kalan": [
+  "home"
+ ],
+ "Sayfa": [
+  "notFound"
+ ],
+ "Sayfa bulunamadı": [
+  "notFound"
+ ],
+ "Sayfalar": [
+  "service"
+ ],
+ "Sayfanın dili": [
+  "chrome"
+ ],
+ "Seçili işler": [
+  "home"
+ ],
+ "Seçili işler · {y} – bugün": [
+  "work"
+ ],
+ "Seçimini yap.": [
+  "service"
+ ],
+ "Selam. Brief için teşekkürler.": [
+  "home"
+ ],
+ "sen": [
+  "home",
+  "notFound"
+ ],
+ "Sen": [
+  "chrome",
+  "notFound",
+  "start"
+ ],
+ "Sen kimsin": [
+  "start"
+ ],
+ "Sen ne yapıyorsun": [
+  "process"
+ ],
+ "sen?": [
+  "studio"
+ ],
+ "sen@sirket.com": [
+  "home"
+ ],
+ "Senin brief’in": [
+  "home"
+ ],
+ "Senin hakkında": [
+  "home"
+ ],
+ "Senin kaydın": [
+  "legal"
+ ],
+ "Senin projen": [
+  "work"
+ ],
+ "Senin saatinle {time} ({city})": [
+  "start"
+ ],
+ "Seninki": [
+  "service"
+ ],
+ "Sepet · 0": [
+  "service"
+ ],
+ "Sepet · 0 ürün": [
+  "service"
+ ],
+ "Sertlik": [
+  "other"
+ ],
+ "Ses gerekmez.": [
+  "service"
+ ],
+ "Sevdiği kısayol": [
+  "studio"
+ ],
+ "Sevdiğimiz matematik.": [
+  "services"
+ ],
+ "sıcak · el yapımı · yavaş": [
+  "process"
+ ],
+ "Sırada ne var": [
+  "home"
+ ],
+ "Sıradaki": [
+  "service"
+ ],
+ "Sırala": [
+  "work"
+ ],
+ "Sil": [
+  "legal"
+ ],
+ "Site": [
+  "case"
+ ],
+ "Site haritası": [
+  "chrome"
+ ],
+ "Sitenin haritası": [
+  "notFound"
+ ],
+ "Siteyi ziyaret et": [
+  "case"
+ ],
+ "Sol": [
+  "service"
+ ],
+ "Son güncelleme": [
+  "legal"
+ ],
+ "Son not": [
+  "notes"
+ ],
+ "Sonra": [
+  "case",
+  "service"
+ ],
+ "Sonra · {n}/5": [
+  "service"
+ ],
+ "Sonraki araç · {no}": [
+  "service"
+ ],
+ "Sonraki hafta": [
+  "process"
+ ],
+ "Sonraki katman · {no}": [
+  "case"
+ ],
+ "Sonraki sayfa": [
+  "notes",
+  "process",
+  "services",
+  "studio",
+  "work"
+ ],
+ "Sonraya kaydet": [
+  "notes"
+ ],
+ "Sorular": [
+  "services"
+ ],
+ "sorular.": [
+  "services"
+ ],
+ "Soruları gör": [
+  "start"
+ ],
+ "Soruları kopyala": [
+  "start"
+ ],
+ "Sönüm": [
+  "other"
+ ],
+ "Stüdyo": [
+  "chrome",
+  "home",
+  "notFound",
+  "other",
+  "process",
+  "studio"
+ ],
+ "Stüdyo · İstanbul": [
+  "start"
+ ],
+ "Stüdyo 10:00 ile 18:00": [
+  "start"
+ ],
+ "stüdyo açık": [
+  "home"
+ ],
+ "Stüdyo açık": [
+  "studio"
+ ],
+ "Stüdyo ayarları.": [
+  "studio"
+ ],
+ "Stüdyo kapalı": [
+  "studio"
+ ],
+ "Stüdyo şu an": [
+  "studio"
+ ],
+ "Süre": [
+  "service"
+ ],
+ "Süreç": [
+  "chrome",
+  "home",
+  "notFound",
+  "process",
+  "services"
+ ],
+ "Sürükle ve gez": [
+  "home"
+ ],
+ "Sürükle ya da dokun": [
+  "home"
+ ],
+ "Sürüm": [
+  "case"
+ ],
+ "Sürüm 2026.10": [
+  "studio"
+ ],
+ "Şekiller ve fiyatlar": [
+  "service"
+ ],
+ "Şimdi": [
+  "chrome",
+  "other"
+ ],
+ "Şimdi.": [
+  "other"
+ ],
+ "Şimdiye kadarki brief": [
+  "home"
+ ],
+ "Şu an açığız": [
+  "start"
+ ],
+ "Şu an ekip almıyoruz": [
+  "studio"
+ ],
+ "Şu an kapalıyız": [
+  "start"
+ ],
+ "Şu an kimseyi aramıyoruz. Webde güzel şeyler yapıyorsan yine de tanışmak isteriz.": [
+  "studio"
+ ],
+ "Şu an tarayıcında": [
+  "legal"
+ ],
+ "Şu sıralar": [
+  "studio"
+ ],
+ "Şunlarla yapıldı": [
+  "case"
+ ],
+ "Tabaklar": [
+  "process"
+ ],
+ "Tablet": [
+  "service"
+ ],
+ "Tahtayı temizle": [
+  "services"
+ ],
+ "Takip et": [
+  "chrome"
+ ],
+ "Takip et ve konular": [
+  "notes"
+ ],
+ "Takvim davetini e-postana gönderiyoruz. Konuşacağın kişi projeni yapacak ekipten biri olacak.": [
+  "start"
+ ],
+ "Takvime ekle": [
+  "start"
+ ],
+ "Tam şu an olduğu gibi.": [
+  "home"
+ ],
+ "Tanışmak için kaydır ↓": [
+  "studio"
+ ],
+ "Tarihler": [
+  "process"
+ ],
+ "Tasarım": [
+  "other"
+ ],
+ "Tasarım ve kod üzerine yazdıklarımız.": [
+  "notes",
+  "other"
+ ],
+ "Tasarım ve yazılım stüdyosu · İstanbul": [
+  "home"
+ ],
+ "Tasarladığımız ve kodladığımız projeler.": [
+  "work"
+ ],
+ "Taslak": [
+  "home"
+ ],
+ "tek çizik": [
+  "service"
+ ],
+ "Tek renk sürüm": [
+  "service"
+ ],
+ "Telefon": [
+  "service"
+ ],
+ "Temizle": [
+  "services"
+ ],
+ "Tipografi": [
+  "lab",
+  "other"
+ ],
+ "Titriyor": [
+  "other"
+ ],
+ "Trendeki bir sürüm": [
+  "service"
+ ],
+ "Tuhaf bir fikrin mi var?": [
+  "lab"
+ ],
+ "Tuval": [
+  "work"
+ ],
+ "Tüm katmanları göster": [
+  "work"
+ ],
+ "Tümü": [
+  "lab",
+  "notes"
+ ],
+ "Tümünü kabul et": [
+  "home"
+ ],
+ "Tümünü reddet": [
+  "home"
+ ],
+ "Tür": [
+  "work"
+ ],
+ "Türkçesi de var": [
+  "note"
+ ],
+ "Uyduğumuz altı kural.": [
+  "process"
+ ],
+ "Uygulamalar": [
+  "work"
+ ],
+ "Uykulu": [
+  "other"
+ ],
+ "Uzanmak": [
+  "service"
+ ],
+ "Uzun fincan": [
+  "service"
+ ],
+ "Üç durum kartı": [
+  "other"
+ ],
+ "Üç şekil.": [
+  "service"
+ ],
+ "Vakayı oku": [
+  "home"
+ ],
+ "Vapur": [
+  "service"
+ ],
+ "Vapur · 20 dakikada bir": [
+  "service"
+ ],
+ "Vapur iskelesine beş dakika": [
+  "studio"
+ ],
+ "Vapura on dakika.": [
+  "studio"
+ ],
+ "Vapurlar uyuyor. İlki {time}’de.": [
+  "studio"
+ ],
+ "ve sonrası.": [
+  "process"
+ ],
+ "Verilerimin silinmesini istiyorum": [
+  "legal"
+ ],
+ "Virgül · düşer": [
+  "service"
+ ],
+ "Virgül aranıyor · üç kişi bakıyor": [
+  "chrome"
+ ],
+ "Web siteleri": [
+  "work"
+ ],
+ "Web siteleri · uygulamalar · kimlik ve hareket.": [
+  "services"
+ ],
+ "Web siteleri ve uygulamalar ve kimlikler ve filmler. Gerçek şeyler üreten insanlarla.": [
+  "work"
+ ],
+ "Yakında bir sayfa yok": [
+  "notFound"
+ ],
+ "Yanlış ya da eksik olanların düzeltilmesini istiyorum": [
+  "legal"
+ ],
+ "Yaptığımız hareket işleri · makara": [
+  "service"
+ ],
+ "Yaratıcı yazılım stüdyosu": [
+  "home"
+ ],
+ "Yarın bu kod da silinir": [
+  "legal"
+ ],
+ "Yasal": [
+  "chrome"
+ ],
+ "Yavaş 3G": [
+  "process"
+ ],
+ "yavaş bitir · 600 ms": [
+  "process"
+ ],
+ "Yavaş sabahlar için kaseler.": [
+  "service"
+ ],
+ "yay": [
+  "notes"
+ ],
+ "Yay oyun alanı": [
+  "other"
+ ],
+ "Yay oyun alanı notun kendisinde çalışıyor →": [
+  "other"
+ ],
+ "Yayında": [
+  "case",
+  "process"
+ ],
+ "Yayında · v{n}": [
+  "home"
+ ],
+ "Yayında · v1.0": [
+  "home"
+ ],
+ "Yayından sonra": [
+  "process"
+ ],
+ "Yayınla": [
+  "home",
+  "service"
+ ],
+ "Yazdığın adres sitemizde hiçbir yere çıkmıyor.": [
+  "notFound"
+ ],
+ "Yazı": [
+  "service"
+ ],
+ "Yazılar": [
+  "process"
+ ],
+ "yazıyor": [
+  "home"
+ ],
+ "Yedide": [
+  "service"
+ ],
+ "Yeni": [
+  "work"
+ ],
+ "Yeni bir brief başlat": [
+  "home"
+ ],
+ "Yeni notlar okuyucuna gelsin.": [
+  "notes"
+ ],
+ "Yeni projeleri konuşmaya açığız": [
+  "chrome"
+ ],
+ "Yeni sır": [
+  "service"
+ ],
+ "Yıl": [
+  "case",
+  "work"
+ ],
+ "Yine de selam ver": [
+  "studio"
+ ],
+ "Yirmi dakika · görüntülü": [
+  "start"
+ ],
+ "Yirmi dakika ayır": [
+  "start"
+ ],
+ "Yola çıkar": [
+  "service"
+ ],
+ "Yola çıkmaya hazır": [
+  "service"
+ ],
+ "zaman": [
+  "service"
+ ],
+ "Zaman çizelgesi": [
+  "process"
+ ],
+ "Zaman çizelgesinde bir logo imzası": [
+  "service"
+ ],
+ "Zaten zıplıyor. İzle.": [
+  "home"
+ ],
+ "Zemin": [
+  "service"
+ ],
+ "Ziyaret": [
+  "process",
+  "service"
+ ],
+ "Ziyaret ayarla": [
+  "studio"
+ ],
+ "Zor": [
+  "service"
+ ]
+}

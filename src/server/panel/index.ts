@@ -28,6 +28,7 @@ import { registerProjects } from './views/projects';
 import { registerRedirects } from './views/redirects';
 import { registerSettings } from './views/settings';
 import { registerStats } from './views/stats';
+import { registerTexts } from './views/texts';
 
 const OPEN = new Set(['/panel/login', '/panel/login/code']);
 /** Panel forms can be long (a note · a case study): larger than the site's 16 kb forms. */
@@ -197,6 +198,7 @@ ${error ? html`<p class="p-errors" role="alert">${error}</p>` : ''}
       registerInbox(p, k);
       registerBookings(p, k);
       registerMail(p, k);
+      registerTexts(p, k);
       registerSettings(p, k);
       registerRedirects(p, k);
       registerLog(p, k);

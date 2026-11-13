@@ -143,6 +143,8 @@ select.p-in { padding-right: 32px; }
 .p-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .p-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
 .p-tabs a { display: inline-flex; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 999px; color: var(--grey); font-size: 14px; font-weight: 500; text-decoration: none; }
+.p-tabs a small { margin-left: 6px; color: var(--grey); font: 400 10.5px/1 var(--mono); }
+.p-src { text-transform: none; letter-spacing: 0; font: 500 13px/1.3 var(--sans); color: var(--ink); }
 .p-tabs a:hover { background: rgba(14,14,15,.05); color: var(--ink); }
 .p-tabs a[aria-current="page"] { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
 .p-search { width: 260px; min-height: 38px; padding: 6px 14px; border-radius: 999px; }

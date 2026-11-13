@@ -108,3 +108,22 @@ export function audit(found: Found[], en: Record<string, string>): Report {
   const commas = [...keys, ...Object.values(en)].filter((s) => s.includes(','));
   return { missing, empty, unused, commas };
 }
+
+/**
+ * Which part of the site says each line the server renders: the folder its t() call lives in
+ * (pages/home → home · layout → chrome · anything else on the server → other). The panel's Metinler
+ * section lists lines by it (i18n/where.json). Lines only the browser says are left out: they are
+ * compiled into the bundles and cannot be rewritten at run time.
+ */
+export function whereOf(found: Found[]): Record<string, string[]> {
+  const groups = new Map<string, Set<string>>();
+  for (const f of found) {
+    const file = f.file.split('\\').join('/');
+    if (!file.startsWith('src/server/') || file.startsWith('src/server/panel/')) continue;
+    const page = /^src\/server\/pages\/([^/]+)\//.exec(file)?.[1];
+    const group = page ?? (file.startsWith('src/server/layout/') ? 'chrome' : 'other');
+    if (!groups.has(f.text)) groups.set(f.text, new Set());
+    groups.get(f.text)!.add(group);
+  }
+  return Object.fromEntries([...groups].sort(([a], [b]) => a.localeCompare(b, 'tr')).map(([text, g]) => [text, [...g].sort()]));
+}

@@ -58,7 +58,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 
 ## Homepage (src/server/pages/home · src/client/home)
 
-- Long structured copy (manifesto edits · services · steps · brief choices) lives per language in `src/server/content/home.ts`. Short UI copy stays in `t()`. Board projects come from the database (`projects.board_slot` 0–6 · frame 7 is the Lab). A project with a cover shows it · without one it shows its drawn `art` from `pages/home/art.ts`.
+- Long structured copy (headline lines · words · manifesto edits · services · steps · brief choices) lives per language in `src/server/content/home.ts`. Pages read it through `ctx.texts.home(lang)` (the panel's Metinler may have rewritten it · never import `HOME` in a page). `{w}` in `headline` and `contact` is the word box. Short UI copy stays in `t()`. The contact section's "Başka yerler" row shows the social accounts from Site ayarları (none filled: no row). Board projects come from the database (`projects.board_slot` 0–6 · frame 7 is the Lab). A project with a cover shows it · without one it shows its drawn `art` from `pages/home/art.ts`.
 - Client data comes from the `<script type="application/json" id="page-data">` block (`page.data`). Never inline executable scripts or `style=""` (strict CSP).
 - The brief is a real form posting to `/api/brief` (works without JS · redirects to `?brief=sent|error`). With JS it posts JSON. Briefs go to the `briefs` table. `BRIEF_LIMIT` = briefs per address per 10 minutes.
 - Contact colour: `CONTACT_THEME` in `src/server/pages/home/index.ts` (ink · paper · lime · coral · blue).
@@ -128,9 +128,10 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 ## Panel (src/server/panel · src/client/panel.ts · panel/story.ts · docs/PANEL.md)
 
 - One Fastify plugin under `/panel` (Turkish only · noindex · no-store · same CSP). One user: the password is scrypt in `panel_user` (set with `npm run panel -- password` or `PANEL_PASSWORD` on first boot). Optional TOTP (QR from `qrcode`). Sessions keep only the sha256 of the cookie token · 24 h idle · 14 days max · cookie `Path=/panel` HttpOnly SameSite=Strict. Every post needs the session's CSRF token (`_csrf` or `x-csrf`) and our Origin (`src/server/origin.ts` · `EXTRA_ORIGINS` only for a preview behind a proxy that rewrites Origin · Codespaces). `PANEL_SIGNIN_LIMIT` = sign-in attempts per address per 15 minutes.
-- Sections in `src/server/panel/views/`: Pano (launch checklist in `checklist.ts`) · İstatistik · İşler (case study editor) · Notlar (live preview through the site's renderer) · Görseller (images and loops · multipart only here) · Ekip · Gelen kutusu · Görüşmeler (cancel with a calendar cancellation · closed days and hours) · E-postalar · Site ayarları · Yönlendirmeler · Kayıt · Hesap.
+- Sections in `src/server/panel/views/`: Pano (launch checklist in `checklist.ts`) · İstatistik · İşler (case study editor) · Notlar (live preview through the site's renderer) · Görseller (images and loops · multipart only here) · Ekip · Gelen kutusu · Görüşmeler (cancel with a calendar cancellation · closed days and hours) · E-postalar · Metinler · Site ayarları · Yönlendirmeler · Kayıt · Hesap.
 - Every change goes to the `audit` table · content keeps before and after snapshots (`snapshot.ts`) and "Bu hale dön" restores them (a deleted project or note comes back with its id). Saves use the row's `updated_at` as an optimistic lock.
 - The comma rule holds in the panel: visible copy with a comma is refused (code fences in notes are free).
+- Metinler (`panel/views/texts.ts` · `src/server/data/texts.ts`): copy without opening the code. Two kinds: every line the server renders through `t()` (listed by where it is said: `i18n/where.json` · one override per language · `translator(lang, en, over)`) and the homepage's structured content (`homeLeaves`: headline · words · manifesto · services · steps · brief). Overrides live in four `settings` rows (`texts.t.tr|en` · `texts.home.tr|en`) · an override equal to the default is not kept · the comma rule and the `{placeholders}` are checked · every save is in the log and can be restored. Not covered: lines only the browser says (`src/client` · compiled into the bundles) · other pages' structured content · legal text · mails.
 - Site settings (`src/server/data/settings.ts`): prices · the next free month · address · phone · the legal pages' controller · address · email · mail service. Pages read them through `ctx.settings` · an empty value keeps the placeholder. Closures (`data/closures.ts`) drop closed days from Start and block closed hours in the API. A changed slug of a live page adds a redirect (`data/redirects.ts`) · the 404 handler looks there first.
 - Panel classes start with `p-` (app.css loads too). Previews render the site's own pages with draft data (`projectBySlug(…, preview)` · `noteBySlug(…, preview)`).
 
@@ -193,7 +194,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 
 - Source language is Turkish: `t('Türkçe metin')` on the server and in client modules.
 - English lives in `i18n/en.json` keyed by the Turkish string.
-- `npm run i18n` extracts every `t()` call with acorn and adds missing keys (empty). `npm run i18n -- --check` fails on missing or unused entries.
+- `npm run i18n` extracts every `t()` call with acorn and adds missing keys (empty) and writes `i18n/where.json` (which part of the site says each server line · the panel's Metinler lists by it). `npm run i18n -- --check` fails on missing or unused entries or a stale `where.json`. Commit both files.
 - Placeholders: `t('{n} sayfa', { n })`.
 - Routes are localized in `src/server/routes.ts`. Use `href(lang, id, params)` and never hand-write paths.
 
