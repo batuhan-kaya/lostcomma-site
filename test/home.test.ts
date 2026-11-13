@@ -48,9 +48,8 @@ for (const lang of ['tr', 'en'] as const) {
       expect(doc).toContain('<html lang="' + lang + '" class="th-paper" data-page="home">');
     });
 
-    it('keeps the comma egg hidden and out of the accessibility tree', () => {
-      expect(doc).toContain('<b class="lgc egg" aria-hidden="true">,</b>');
-      expect(doc).toMatch(/class="av c-comma egg"[^>]*hidden>,<\/button>/);
+    it('has no comma easter egg: no shy cursor · no ghost avatar · no comma in the logo', () => {
+      expect(doc).not.toMatch(/c-comma|av ghost|class="lgc/);
     });
   });
 }

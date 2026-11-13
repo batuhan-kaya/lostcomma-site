@@ -10,6 +10,14 @@
   .lci { position: fixed; inset: 0; z-index: 200; display: block; overflow: hidden; color: var(--pfg); cursor: pointer; animation: lci-fail .3s 6s forwards; }
 }
 @keyframes lci-fail { to { opacity: 0; visibility: hidden; } }
+/*
+ * The mark flies onto the header logo at the end: until it lands its place there is empty (the
+ * name waits for its mark). Gone with the overlay · the same six second failsafe.
+ */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  html:has([data-intro]) .hd .lc-mark { animation: lci-wait 6.3s step-end both; }
+}
+@keyframes lci-wait { from { visibility: hidden; } to { visibility: visible; } }
 .lci-bg { position: absolute; inset: 0; background-color: var(--pbg); background-image: radial-gradient(color-mix(in srgb, var(--pfg) 16%, transparent) 1px, transparent 1.4px); background-size: 24px 24px; }
 
 /* The mark in the middle: the corner · a dashed place for the comma · the comma itself. */
@@ -47,19 +55,21 @@
  * little after · then motion brings the comma · it lands and settles · "found".
  *   0       the corner and the dashed place · nothing moves for .382 s
  *   .382    design glides in (1 s)          .618   code glides in (1 s)
- *   1.236   motion picks the comma up and carries it (.75 s) · it lands at 2 s and settles (.3 s)
+ *   .854    motion comes in over the bottom edge with the comma · carries it up and across
+ *           (.75 s) · drops it in at 2 s · it settles (.25 s)
  *   2.382   found: the comma takes the logo's colour · the team fades · the count says 100
  *   2.618   the exit (src/client/lib/intro.ts): the mark flies onto the header logo (.786 s)
  * Smooth paths: each axis has its own easing (x on `translate` · y on `transform` · the tilt on
- * `rotate`) so every path is one soft curve. No corners · nothing stops in mid air · the cursors
- * enter already moving (from off screen) · the comma sets off slowly · everything comes to rest
- * softly. About the site's cursor pace (src/shared/spring.ts) · the drop is the one quick moment.
+ * `rotate`) so every path is one soft curve. No corners · nothing stops in mid air · everything
+ * comes to rest softly. The drop is the one quick moment.
+ * Everyone comes in from outside the screen and is already moving when they show: nobody fades in
+ * on stage. Motion carries the comma in over the bottom edge (they enter together).
  */
 .lci.go .lci-gh { animation: lci-pulse .618s ease-in-out 3 alternate, lci-off .236s 1.9s forwards; }
-.lci.go .lci-design { animation: lci-on .236s .382s both, lci-dx 1s .382s both, lci-dy 1s .382s both, lci-off .382s 2.382s forwards; }
-.lci.go .lci-code { animation: lci-on .236s .618s both, lci-cx 1s .618s both, lci-cy 1s .618s both, lci-off .382s 2.382s forwards; }
-.lci.go .lci-cm { animation: lci-on .236s 1.236s both, lci-mx 1.2s 1.236s both, lci-my 1.2s 1.236s both, lci-tilt 1.2s 1.236s both; }
-.lci.go .lci-motion { animation: lci-on .236s 1.236s both, lci-off .382s 2.382s forwards; }
+.lci.go .lci-design { opacity: 1; animation: lci-dx 1s .382s both, lci-dy 1s .382s both, lci-off .382s 2.382s forwards; }
+.lci.go .lci-code { opacity: 1; animation: lci-cx 1s .618s both, lci-cy 1s .618s both, lci-off .382s 2.382s forwards; }
+.lci.go .lci-cm { opacity: 1; animation: lci-mx 1.5s .854s both, lci-my 1.5s .854s both, lci-tilt 1.5s .854s both; }
+.lci.go .lci-motion { opacity: 1; animation: lci-off .382s 2.382s forwards; }
 .lci.go .lci-cm path { animation: lci-ink .382s 2.382s forwards; }
 /* One line after the other (never both at once): "looking" leaves as the comma settles · "found" comes in. */
 .lci.go .lci-s1 { animation: lci-off .146s 2.236s forwards; }
@@ -76,7 +86,7 @@
 @keyframes lci-ink { to { fill: currentColor; } }
 /* design: in from the lower left · rises a little while it looks · comes down beside the mark. */
 @keyframes lci-dx {
-  from { translate: -4vw 0; animation-timing-function: cubic-bezier(.3, .5, .35, 1); }
+  from { translate: -120px 0; animation-timing-function: cubic-bezier(.3, .5, .35, 1); }
   to { translate: var(--d-x) 0; }
 }
 @keyframes lci-dy {
@@ -86,7 +96,7 @@
 }
 /* code: in from the upper right · dips while it looks · rises to its spot. */
 @keyframes lci-cx {
-  from { translate: 104vw 0; animation-timing-function: cubic-bezier(.3, .5, .35, 1); }
+  from { translate: calc(100vw + 30px) 0; animation-timing-function: cubic-bezier(.3, .5, .35, 1); }
   to { translate: var(--c-x) 0; }
 }
 @keyframes lci-cy {
@@ -95,25 +105,26 @@
   100% { transform: translateY(var(--c-y)); }
 }
 /*
- * The comma (1.2 s): picked up where it appears (it sets off slowly) · carried up and across on one
- * arc (it never stops in mid air: only its rise ends at the top) · dropped straight into its
- * place at 62 % · one small bounce · still from 88 %.
+ * The comma (1.5 s from .854 s): motion carries it in from under the bottom edge (52vh below its
+ * place is off screen on every screen) · up and across on one arc (it never stops in mid air: only
+ * its rise ends at the top) · dropped straight into its place at 76.4 % (2 s) · one small bounce ·
+ * still from 93 %.
  */
 @keyframes lci-mx {
-  0% { translate: min(24vw, 300px) 0; animation-timing-function: cubic-bezier(.45, 0, .3, 1); }
-  62%, 100% { translate: 0 0; }
+  0% { translate: min(22vw, 280px) 0; animation-timing-function: cubic-bezier(.3, .2, .3, 1); }
+  76.4%, 100% { translate: 0 0; }
 }
 @keyframes lci-my {
-  0% { transform: translateY(16vh); animation-timing-function: cubic-bezier(.45, 0, .4, 1); }
-  38% { transform: translateY(-5.5vh); animation-timing-function: cubic-bezier(.55, 0, .85, .4); }
-  62% { transform: none; animation-timing-function: cubic-bezier(.25, .6, .45, 1); }
-  76% { transform: translateY(-1.2vh); animation-timing-function: cubic-bezier(.55, 0, .75, .45); }
-  88%, 100% { transform: none; }
+  0% { transform: translateY(52vh); animation-timing-function: cubic-bezier(.25, .5, .4, 1); }
+  50% { transform: translateY(-5.5vh); animation-timing-function: cubic-bezier(.55, 0, .85, .4); }
+  76.4% { transform: none; animation-timing-function: cubic-bezier(.25, .6, .45, 1); }
+  85% { transform: translateY(-1.2vh); animation-timing-function: cubic-bezier(.55, 0, .75, .45); }
+  93%, 100% { transform: none; }
 }
 @keyframes lci-tilt {
-  0% { rotate: -16deg; animation-timing-function: cubic-bezier(.45, 0, .4, 1); }
-  38% { rotate: 6deg; animation-timing-function: cubic-bezier(.4, 0, .4, 1); }
-  62% { rotate: 0deg; animation-timing-function: cubic-bezier(.3, .5, .5, 1); }
-  76% { rotate: -2deg; animation-timing-function: cubic-bezier(.4, 0, .4, 1); }
-  88%, 100% { rotate: 0deg; }
+  0% { rotate: -16deg; animation-timing-function: cubic-bezier(.3, .3, .4, 1); }
+  50% { rotate: 6deg; animation-timing-function: cubic-bezier(.4, 0, .4, 1); }
+  76.4% { rotate: 0deg; animation-timing-function: cubic-bezier(.3, .5, .5, 1); }
+  85% { rotate: -2deg; animation-timing-function: cubic-bezier(.4, 0, .4, 1); }
+  93%, 100% { rotate: 0deg; }
 }

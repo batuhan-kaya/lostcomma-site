@@ -38,9 +38,21 @@ test.describe('preloader', () => {
     const box = page.locator('[data-intro]');
     await expect(box).toBeVisible();
     await expect(box).toHaveClass(/go/);
-    // The comma is carried in (from 1.236 s) and settles under the corner. It stays until the mark
+    // Nobody fades in on stage: at the start all three cursors and the comma are outside the screen
+    // (design left · code right · motion under the bottom edge with the comma).
+    const outside = await page.evaluate(() => {
+      const out = (sel: string) => {
+        const parts = [...document.querySelectorAll(`${sel}, ${sel} *`)].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0);
+        return parts.every((r) => r.right <= 0 || r.left >= innerWidth || r.top >= innerHeight);
+      };
+      return { design: out('.lci-design'), code: out('.lci-code'), comma: out('.lci-cm') };
+    });
+    expect(outside).toEqual({ design: true, code: true, comma: true });
+    // The logo's place in the header is empty until the mark lands on it.
+    expect(await page.locator('.hd .lc-mark').evaluate((el) => getComputedStyle(el).visibility)).toBe('hidden');
+    // The comma is carried in (from .854 s) and settles under the corner. It stays until the mark
     // has landed (about 3.4 s) · a busy machine starts CSS animations a little late.
-    await expect.poll(() => page.locator('.lci-cm').evaluate((el) => getComputedStyle(el).opacity), { timeout: 3000, intervals: [100] }).toBe('1');
+    await expect.poll(() => page.locator('.lci-cm').evaluate((el) => Math.abs(el.getBoundingClientRect().bottom - el.parentElement!.getBoundingClientRect().bottom) < 1), { timeout: 3500, intervals: [100] }).toBe(true);
     await expect(box).toHaveCount(0, { timeout: 4000 });
     await expect(page.locator('.hd .lc-mark')).toBeVisible();
     // The team starts after it: born from the header avatars (pointer devices).

@@ -13,5 +13,5 @@ export function mark(cls: string, o: { draw?: boolean } = {}): Safe {
 
 /** Mark and name in one line: the header logo · the panel uses its own text beside the same mark. */
 export function lockup(): Safe {
-  return html`<span class="lc-lock">${mark('lc-mark')}<span>lost</span><b class="lgc egg" aria-hidden="true">,</b><span class="caret"> </span><span>comma</span></span>`;
+  return html`<span class="lc-lock">${mark('lc-mark')}<span>lost</span><span class="caret"> </span><span>comma</span></span>`;
 }

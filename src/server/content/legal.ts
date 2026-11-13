@@ -8,7 +8,7 @@
  */
 import type { Lang } from '../i18n';
 
-export const LEGAL_UPDATED = '2026-11-01';
+export const LEGAL_UPDATED = '2026-11-13';
 
 export type LegalKey = 'privacy' | 'kvkk' | 'cookies';
 
@@ -254,7 +254,6 @@ const TR: Record<LegalKey, LegalDoc> = {
             table: {
               head: ['Ad', 'Ne işe yarar', 'Ne kadar'],
               rows: [
-                ['lc-comma', 'Ana sayfada saklanan virgülü bulduğunu hatırlar.', 'Sen silene kadar'],
                 ['lc-saved-notes', 'Notes sayfasında kaydettiğin notlar.', 'Sen silene kadar'],
                 ['lc-stats-off', 'Seni saymamamızı istediğini hatırlar.', 'Sen silene kadar'],
               ],
@@ -500,7 +499,6 @@ const EN: Record<LegalKey, LegalDoc> = {
             table: {
               head: ['Name', 'What it does', 'How long'],
               rows: [
-                ['lc-comma', 'Remembers that you found the comma hidden on the homepage.', 'Until you delete it'],
                 ['lc-saved-notes', 'The notes you saved on the Notes page.', 'Until you delete it'],
                 ['lc-stats-off', 'Remembers that you asked us not to count you.', 'Until you delete it'],
               ],

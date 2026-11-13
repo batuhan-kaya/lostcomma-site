@@ -81,7 +81,7 @@ describe('the mark', () => {
 });
 
 describe('the footer', () => {
-  it('is the same on every page: a way to start · the whole site · the drawn sign-off · the small print', async () => {
+  it('is the same on every page: a way to start · the whole site · the sign-off that ends on a comma · the small print', async () => {
     for (const lang of ['tr', 'en'] as const) {
       for (const page of [href(lang, 'home'), href(lang, 'work'), href(lang, 'privacy')]) {
         const doc = (await get(page)).body;
@@ -93,7 +93,10 @@ describe('the footer', () => {
         expect(ft).toContain(`href="${href(lang, 'start')}#book"`);
         expect(ft).toContain(`href="${href(lang, 'home')}#contact"`);
         expect(ft).toContain('href="mailto:hello@lostcomma.co"');
-        expect(ft).toMatch(/<svg class="lc-mark ft-mk"[^>]*><path class="lc-t" pathLength="1"/);
+        // The sign-off: one line · the mark's comma as a drawing · a caret after it · the mark beside the small print.
+        expect(ft).toContain(`<span class="ft-say">${lang === 'tr' ? 'Devamı var' : 'To be continued'}</span><svg class="ft-cm egg" viewBox="34 586 247 283" aria-hidden="true"`);
+        expect(ft).toContain(`<path d="${MARK.comma}"></path></svg><i class="ft-caret" aria-hidden="true"></i>`);
+        expect(ft).toMatch(/<span class="ft-id"><svg class="lc-mark"/);
         expect(ft).toContain('href="#top"');
       }
     }

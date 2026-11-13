@@ -224,7 +224,7 @@ describe('the Notes page', () => {
     expect(doc).toContain('imleclerimiz-nasil-hareket-ediyor.md');
     expect(doc).toContain('İmleçlerimiz nasıl hareket ediyor.');
     expect(doc).toContain('class="mm"');
-    expect(doc).toContain('5 bölüm');
+    expect(doc).toContain('6 bölüm');
     expect(doc).toContain('<span lang="en">i18n</span>');
   });
 
@@ -244,7 +244,7 @@ describe('a note', () => {
     const doc = res.body;
     expect(doc).toContain('<h1 class="atl"');
     expect(doc).toContain('How our cursors move.</h1>');
-    expect(doc.match(/<li( class="on")?><a href="#[a-z-]+">/g)).toHaveLength(5);
+    expect(doc.match(/<li( class="on")?><a href="#[a-z-]+">/g)).toHaveLength(6);
     expect(doc).toContain('id="fn-1"');
     expect(doc).toContain('href="/tr/notes/imleclerimiz-nasil-hareket-ediyor" hreflang="tr"');
     expect(doc).toContain('<link rel="alternate" hreflang="tr" href="https://lostcomma.co/tr/notes/imleclerimiz-nasil-hareket-ediyor">');

@@ -2,8 +2,7 @@
  * Studio. The selections in the title say hello · hovering a teammate's card hands the page to
  * that cursor · "Say hi" sends it to the button. The settings window is real: tabs (arrow keys) ·
  * switches that bounce back · locked ones that refuse · Display switches that change this page ·
- * a range and a select that answer. The open sign and the ferry follow Istanbul time. And if you
- * found the comma on the homepage the numbers know.
+ * a range and a select that answer. The open sign and the ferry follow Istanbul time.
  */
 import { getCrew, type Name } from './lib/crew';
 import { reducedMotion } from './lib/motion';
@@ -207,15 +206,6 @@ const schedule = () => {
   }, still || html.classList.contains('still') ? 30_000 : 1000);
 };
 schedule();
-
-/* ---------------- the comma you found on the homepage ---------------- */
-
-if (html.classList.contains('found')) {
-  const n = $('[data-commas]');
-  if (n) n.textContent = '1';
-  const you = $('[data-yfound]');
-  if (you) you.hidden = false;
-}
 
 /* ---------------- the team's lines ---------------- */
 

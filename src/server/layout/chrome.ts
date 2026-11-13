@@ -5,7 +5,7 @@ import { msg } from '../msg';
 import type { Ctx, NextBand } from '../page';
 import { href, type RouteId } from '../routes';
 import { MARK } from '../../shared/logo';
-import { lockup } from './logo';
+import { lockup, mark } from './logo';
 
 const NAV: [RouteId, string][] = [
   ['work', msg('İşler')],
@@ -51,7 +51,7 @@ function presence(ctx: Ctx, home: boolean): Safe {
   return html`<div class="pres mono" data-pres>
 <i></i>${roll(ctx, msg('Canlı'))}<span class="avs">${TEAM.map(
     ([n, l]) => html`<button type="button" class="av c-${n}" data-av="${n}" data-pop="${n}" aria-label="${t('{name} burada', { name: n })}">${l}</button>`,
-  )}<button type="button" class="av c-comma egg" data-av="comma" data-pop="comma" aria-label="${t('virgül burada')}" hidden>,</button><button type="button" class="av ghost" data-pop="ghost" aria-label="${t('Biri dosyadan çıktı')}">?</button><button type="button" class="av c-you" data-pop="you" aria-label="${t('Sen')}">${t('S')}</button></span>
+  )}<button type="button" class="av c-you" data-pop="you" aria-label="${t('Sen')}">${t('S')}</button></span>
 <div class="popv" data-popv role="status" hidden><b></b><span></span></div>
 </div>`;
 }
@@ -96,15 +96,20 @@ function fl(ctx: Ctx, to: string, label: string, o: { rel?: string } = {}): Safe
   return html`<li><a class="ft-l" href="${to}"${here ? html` aria-current="page"` : ''}${o.rel ? html` rel="${o.rel}"` : ''}>${label}</a></li>`;
 }
 
-/** The big sign-off: the mark is drawn with a pen (src/client/lib/footer.ts) · the name rises after it. */
-function signature(): Safe {
-  const letters = (w: string) => w.split('').map((ch) => html`<span>${ch}</span>`);
-  return html`<p class="ft-lock" data-rest="host" data-rest-at="end 18 -10"><svg class="lc-mark ft-mk" viewBox="0 0 ${MARK.w} ${MARK.h}" aria-hidden="true" focusable="false"><path class="lc-t" pathLength="1" d="${MARK.top}"></path><path class="lc-c" pathLength="1" d="${MARK.comma}"></path><path class="lc-r" pathLength="1" d="${MARK.top}"></path></svg><span class="ft-w">${letters('lost')}</span><b class="lgc egg" aria-hidden="true">,</b><span class="ft-gap"> </span><span class="ft-w">${letters('comma')}</span></p>`;
+/**
+ * The sign-off: every page ends on a comma. One big line that is not finished · the comma (the
+ * mark's own · the only comma in our copy · a drawing so the brand rule holds) · a text caret
+ * still blinking after it. The host cursor clicks at the end of the line and the comma is typed
+ * the first time it shows (src/client/lib/footer.ts).
+ */
+function signature(ctx: Ctx): Safe {
+  const { t } = ctx;
+  return html`<p class="ft-line" data-ft-line data-rest="host" data-rest-at="end 22 -8" data-rest-at-m="end 12 -6"><span class="ft-say">${t('Devamı var')}</span><svg class="ft-cm egg" viewBox="34 586 247 283" aria-hidden="true" focusable="false"><path d="${MARK.comma}"></path></svg><i class="ft-caret" aria-hidden="true"></i></p>`;
 }
 
 /**
- * The footer of every page (the homepage too): a way to start · the whole site · the drawn
- * sign-off · the small print. Always on ink · lime is its one accent. Social links come from the
+ * The footer of every page (the homepage too): a way to start · the whole site · the sign-off
+ * that ends on a comma · the small print. Always on ink · lime is its one accent. Social links come from the
  * panel (Site ayarları · Sosyal) and an empty one does not show · so do an empty phone and address.
  */
 export function footer(ctx: Ctx): Safe {
@@ -134,11 +139,11 @@ export function footer(ctx: Ctx): Safe {
 ${social.length ? html`<div class="ft-col"><h3 class="mono">${t('Takip et')}</h3><ul>${social.map((s) => html`<li><a class="ft-l" href="${s.url!}" rel="me noopener">${s.label} <span aria-hidden="true">↗</span></a></li>`)}</ul></div>` : ''}
 </nav>
 <div class="ft-sign">
-${signature()}
-<p class="ft-note mono"><span>${t('Üç kişi ve bir yerlerde bir virgül')}</span><span>${t('İstanbul')} <time data-clock>${istanbulTime(ctx.now)}</time></span></p>
+${signature(ctx)}
+<p class="ft-note mono"><span>${t('Nokta koymuyoruz · her sayfamız virgülle biter')}</span><span>${t('İstanbul')} <time data-clock>${istanbulTime(ctx.now)}</time></span></p>
 </div>
 <div class="ft-bar mono">
-<span>© ${ctx.now.getFullYear()} Lost Comma</span>
+<span class="ft-id">${mark('lc-mark')}<span>© ${ctx.now.getFullYear()} Lost Comma</span></span>
 <nav aria-label="${t('Yasal')}"><a href="${href(lang, 'privacy')}">${t('Gizlilik')}</a><a href="${href(lang, 'kvkk')}">KVKK</a><a href="${href(lang, 'cookies')}">${t('Çerezler')}</a></nav>
 <div class="ft-end">${langSwitch(ctx, msg('Sayfanın dili'))}<a class="ft-up" href="#top">${t('Başa dön')} <span aria-hidden="true">↑</span></a></div>
 </div>
