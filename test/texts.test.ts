@@ -36,7 +36,7 @@ describe('where each line is said (i18n/where.json)', () => {
     const known = new Set(TEXT_GROUPS.map(([id]) => id));
     for (const [line, groups] of Object.entries(WHERE)) for (const g of groups) expect(known.has(g), `${g}: ${line}`).toBe(true);
     expect(linesOf('home')).toContain('Dört biçim. Tek stüdyo.');
-    expect(linesOf('chrome')).toContain('Devamı var');
+    expect(linesOf('chrome')).toContain('Bir fikrin mi var?');
     // A cursor bubble lives in src/client only: compiled into the bundle.
     expect(WHERE['güzel kelime']).toBeUndefined();
   });

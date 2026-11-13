@@ -212,42 +212,32 @@
 .ft-addr { color: var(--pmu); }
 
 /*
- * The sign-off: every page ends on a comma. One line as wide as the page that is not finished ·
- * the mark's comma in lime (it sits like a real comma: a little above the baseline · the tail
- * under it) · a caret still blinking after it.
+ * The sign-off: who we are · who is in the file · what time it is here. Three cells on one
+ * baseline: the logo · the team's avatars · Istanbul's clock in display type (the one big thing).
  */
-.ft-sign { container-type: inline-size; padding: 64px 0 28px; border-top: 1px solid var(--rule); }
-.ft-line { margin: 0 0 .46em; font-family: var(--display); font-size: min(12.1cqw, 196px); font-weight: 400; line-height: .9; letter-spacing: -.035em; font-variation-settings: 'wdth' 84, 'wght' 820; white-space: nowrap; }
-:lang(tr) .ft-line { font-size: min(17.6cqw, 264px); }
-.ft-cm { display: inline-block; width: .338em; height: .388em; margin: 0 0 -.262em .035em; overflow: visible; fill: var(--lime); transform-origin: 40% 15%; }
-.ft-caret { display: inline-block; width: max(3px, .034em); height: .74em; margin-left: .075em; background: var(--pfg); animation: blink 1.1s steps(1) infinite; }
-.ft-note { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; margin: 0; color: var(--pmu); }
-.ft-note time { color: var(--pfg); font-variant-numeric: tabular-nums; }
-
-/*
- * Typed the first time it shows (src/client/lib/footer.ts):
- *   wait   the line without its comma · nobody is in the text yet (no caret)
- *   set    a click at the end of the line: the caret blinks right after the last letter
- *   go     the comma is typed: it drops into place · the caret stands after it
- * Without JS and with reduced motion the comma and the caret are simply there. No layout moves:
- * the comma keeps its room · the caret is shifted with a transform.
- */
-.ft[data-draw="wait"] .ft-cm, .ft[data-draw="set"] .ft-cm { opacity: 0; }
-.ft[data-draw="wait"] .ft-caret { opacity: 0; animation: none; }
-.ft[data-draw="set"] .ft-caret { translate: -.4em 0; }
-.ft[data-draw="go"] .ft-cm { animation: ft-ink .5s var(--ease-pop) both; }
-@keyframes ft-ink { from { opacity: 0; transform: translateY(-.1em) scale(.72); } 25% { opacity: 1; } to { opacity: 1; transform: none; } }
+.ft-base { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) auto; gap: 32px 48px; align-items: end; padding: 56px 0 44px; border-top: 1px solid var(--rule); }
+.ft-who, .ft-team { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.ft-who p, .ft-team p { margin: 0; color: var(--pmu); }
+.ft-logo { align-self: flex-start; font-family: var(--display); font-size: clamp(30px, 3.2vw, 44px); letter-spacing: -.02em; font-variation-settings: 'wdth' 88, 'wght' 820; line-height: 1; }
+.ft-team .avs { padding-left: 8px; }
+.ft-team .av { width: 40px; height: 40px; border-color: var(--pbg); font-size: 14px; }
+.ft-now { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.ft-open { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--pmu); }
+.ft-open i { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); }
+.ft-open i.off { background: var(--dim); }
+.ft-time { display: flex; align-items: baseline; gap: 14px; margin: 0; }
+.ft-time time { font-family: var(--display); font-size: clamp(72px, 10vw, 148px); line-height: .82; letter-spacing: -.045em; font-variation-settings: 'wdth' 80, 'wght' 840; font-variant-numeric: tabular-nums; }
+.ft-time .mono { color: var(--pmu); }
 
 .ft-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 28px; min-height: 76px; padding: 10px 0; border-top: 1px solid var(--rule); color: var(--pmu); }
 .ft-bar nav:not(.lang) { display: flex; flex-wrap: wrap; gap: 0 24px; }
 .ft-bar a:not(.lg) { display: inline-flex; align-items: center; min-height: 44px; transition: color .25s; }
 .ft-bar a:not(.lg):hover { color: var(--pfg); }
 .ft-end { display: flex; align-items: center; gap: 20px; }
-.ft-id { display: inline-flex; align-items: baseline; }
-.ft-id .lc-mark { margin-right: .6em; font-size: 16px; color: var(--pfg); }
-
 @media (max-width: 900px) {
   .ft-top { grid-template-columns: minmax(0, 1fr); padding: 80px 0 48px; }
+  .ft-base { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .ft-now { grid-column: 1 / -1; align-items: flex-start; }
 }
 @media (max-width: 560px) {
   .ft-top { padding: 64px 0 40px; }
@@ -255,9 +245,9 @@
   .ft-b { flex: 1 1 100%; justify-content: center; }
   .ft-map { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; padding: 32px 0 36px; }
   .ft-col .ft-l, .ft-addr { font-size: 16px; }
-  .ft-sign { padding-top: 40px; }
+  .ft-base { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 40px 0 32px; }
   .ft-bar { padding: 14px 0 22px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ft-avail i::after, .ft-caret { animation: none; }
+  .ft-avail i::after { animation: none; }
 }

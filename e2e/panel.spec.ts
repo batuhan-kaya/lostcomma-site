@@ -118,28 +118,28 @@ test.describe('panel', () => {
     test.skip(info.project.name !== 'desktop', 'one shared server: one device rewrites the copy');
     const errors = watchErrors(page);
     await signIn(page, '/panel/texts?g=chrome');
-    const row = page.locator('.p-pair', { hasText: 'Nokta koymuyoruz · her sayfamız virgülle biter' });
+    const row = page.locator('.p-pair', { hasText: 'Üç kişiyiz · dördüncü sensin' });
     const tr = row.locator('[lang="tr"]');
-    await expect(tr).toHaveValue('Nokta koymuyoruz · her sayfamız virgülle biter');
+    await expect(tr).toHaveValue('Üç kişiyiz · dördüncü sensin');
     // The comma rule holds here too.
-    await tr.fill('Nokta yok, virgül var');
+    await tr.fill('Üç kişiyiz, sen dördüncü');
     await page.locator('.p-savebar button').click();
     await expect(page.locator('[data-errors]')).toContainText('Virgül kullanma');
-    await page.locator('.p-pair', { hasText: 'Nokta koymuyoruz · her sayfamız virgülle biter' }).locator('[lang="tr"]').fill('Nokta yok · sadece virgül');
+    await page.locator('.p-pair', { hasText: 'Üç kişiyiz · dördüncü sensin' }).locator('[lang="tr"]').fill('Üçüz · dördüncü sensin');
     await page.locator('.p-savebar button').click();
     await expect(page).toHaveURL(/texts\?g=chrome&m=saved/);
     await expect(page.locator('.p-pair', { hasText: 'Koddaki hâli' })).toHaveCount(1);
     await page.goto('/tr/studyo');
-    await expect(page.locator('.ft-note span').first()).toHaveText('Nokta yok · sadece virgül');
+    await expect(page.locator('.ft-team p')).toHaveText('Üçüz · dördüncü sensin');
     await page.goto('/en/studio');
-    await expect(page.locator('.ft-note span').first()).toHaveText('No full stops here · every page of ours ends on a comma');
+    await expect(page.locator('.ft-team p')).toHaveText('Three of us · you are the fourth');
     // Back to the code's line.
-    await page.goto('/panel/texts?q=Nokta+koymuyoruz');
+    await page.goto('/panel/texts?q=dördüncü+sensin');
     await page.locator('.p-pair [lang="tr"]').first().fill('');
     await page.locator('.p-savebar button').click();
     await expect(page).toHaveURL(/m=saved/);
     await page.goto('/tr/studyo');
-    await expect(page.locator('.ft-note span').first()).toHaveText('Nokta koymuyoruz · her sayfamız virgülle biter');
+    await expect(page.locator('.ft-team p')).toHaveText('Üç kişiyiz · dördüncü sensin');
     expect(errors).toEqual([]);
   });
 

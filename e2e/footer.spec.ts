@@ -3,77 +3,36 @@ import { watchErrors } from './checks';
 
 /**
  * The footer on every page (layout/chrome.ts) and the mark beside the name (src/shared/logo.ts):
- * the sign-off ends on a comma that is typed once it shows · every link in it leads somewhere ·
- * the mark is one size with the name.
+ * the sign-off is the logo · the team · Istanbul's clock with the open sign · every link in it
+ * leads somewhere · the mark is one size with the name.
  */
 
 test.describe('footer', () => {
-  test('types the comma when the last line comes into view · not before', async ({ page }) => {
+  test('signs off with the logo · the team and a place for you · the time in Istanbul', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/en/work');
-    const ft = page.locator('[data-ft]');
-    await expect(ft).toHaveAttribute('data-draw', 'wait');
-    const comma = page.locator('.ft-cm');
-    const caret = page.locator('.ft-caret');
-    expect(await comma.evaluate((el) => getComputedStyle(el).opacity)).toBe('0');
-    expect(await caret.evaluate((el) => getComputedStyle(el).opacity)).toBe('0');
-    await expect(page.locator('.ft-say')).toHaveText('To be continued');
-    const box = await page.locator('.ft-line').evaluate((el) => el.getBoundingClientRect().toJSON() as DOMRect);
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-    // A click at the end of the line (the caret) · then the comma.
-    await expect(ft).toHaveAttribute('data-draw', 'go', { timeout: 6000 });
-    await expect.poll(() => comma.evaluate((el) => getComputedStyle(el).opacity), { timeout: 3000 }).toBe('1');
-    // The caret stands after the comma and blinks on.
-    const at = await page.evaluate(() => {
-      const c = document.querySelector('.ft-cm')!.getBoundingClientRect();
-      const k = document.querySelector('.ft-caret')!.getBoundingClientRect();
-      const s = document.querySelector('.ft-say')!.getBoundingClientRect();
-      return { say: s.right, comma: c.left, commaEnd: c.right, caret: k.left, hang: c.bottom - s.bottom };
-    });
-    expect(at.comma).toBeGreaterThanOrEqual(at.say);
-    expect(at.caret).toBeGreaterThanOrEqual(at.commaEnd);
-    // Nothing moved while it was typed: the line is as wide and as tall as before.
-    const after = await page.locator('.ft-line').evaluate((el) => el.getBoundingClientRect().toJSON() as DOMRect);
-    expect(after.width).toBe(box.width);
-    expect(after.height).toBe(box.height);
-    // One line on every screen.
-    expect(await page.evaluate(() => document.querySelector('.ft-caret')!.getBoundingClientRect().right)).toBeLessThanOrEqual(await page.evaluate(() => document.documentElement.clientWidth));
+    const base = page.locator('.ft-base');
+    await expect(base.locator('.ft-logo')).toHaveAttribute('href', '/en');
+    await expect(base.locator('.ft-team .av')).toHaveText(['D', 'C', 'M', 'Y']);
+    await expect(base.locator('.ft-team p')).toHaveText('Three of us · you are the fourth');
+    // The clock is the browser's own reading of Istanbul time · one of the two open signs shows.
+    const now = await page.evaluate(() => new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' }).format(new Date()));
+    const shown = await base.locator('.ft-time time').innerText();
+    expect(Math.abs(Number(shown.slice(3)) - Number(now.slice(3))) % 58).toBeLessThanOrEqual(1);
+    await expect(base.locator('.ft-open span:visible')).toHaveCount(1);
+    // Nothing waits for a script or an animation: it is simply there · and fits the screen.
+    expect(await base.evaluate((el) => el.getBoundingClientRect().right)).toBeLessThanOrEqual(await page.evaluate(() => document.documentElement.clientWidth));
     expect(errors).toEqual([]);
   });
 
-  test('the comma is a drawing: the page ends on it and the copy still has none', async ({ page }) => {
-    await page.goto('/tr/studyo');
-    await expect(page.locator('.ft-say')).toHaveText('Devamı var');
-    expect(await page.locator('.ft-line').innerText()).not.toContain(',');
-    await expect(page.locator('.ft-cm')).toHaveAttribute('aria-hidden', 'true');
-    // It hangs under the baseline like a comma does.
-    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-    await expect(page.locator('[data-ft]')).toHaveAttribute('data-draw', 'go', { timeout: 6000 });
-    const m = await page.evaluate(() => {
-      const line = document.querySelector('.ft-line')!;
-      const probe = document.createElement('span');
-      probe.style.display = 'inline-block';
-      line.append(probe);
-      const base = probe.getBoundingClientRect().bottom;
-      probe.remove();
-      const c = document.querySelector('.ft-cm')!.getBoundingClientRect();
-      return { above: base - c.top, below: c.bottom - base };
-    });
-    expect(m.above).toBeGreaterThan(0);
-    expect(m.below).toBeGreaterThan(m.above);
-  });
-
-  test('is simply there with reduced motion and without JavaScript', async ({ page, browser }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/tr/studyo');
-    await expect(page.locator('[data-ft]')).not.toHaveAttribute('data-draw', /./);
-    expect(await page.locator('.ft-cm').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
-    expect(await page.locator('.ft-caret').evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
+  test('is the same without JavaScript', async ({ browser }) => {
     const ctx = await browser.newContext({ javaScriptEnabled: false });
     const plain = await ctx.newPage();
-    await plain.goto('/en/notes');
-    await expect(plain.locator('[data-ft]')).not.toHaveAttribute('data-draw', /./);
-    expect(await plain.locator('.ft-cm').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+    await plain.goto('/tr/notes');
+    await expect(plain.locator('.ft-team p')).toHaveText('Üç kişiyiz · dördüncü sensin');
+    await expect(plain.locator('.ft-time time')).toHaveText(/^\d\d:\d\d$/);
+    await expect(plain.locator('.ft-open span:visible')).toHaveCount(1);
     await ctx.close();
   });
 

@@ -540,9 +540,6 @@
  "Detaylar": [
   "case"
  ],
- "Devamı var": [
-  "chrome"
- ],
  "Diğer metinler": [
   "legal"
  ],
@@ -1212,6 +1209,7 @@
   "start"
  ],
  "mesai dışı · sabah hepsini okuyoruz": [
+  "chrome",
   "home"
  ],
  "Metin": [
@@ -1276,9 +1274,6 @@
  ],
  "Nereye gittiler": [
   "lab"
- ],
- "Nokta koymuyoruz · her sayfamız virgülle biter": [
-  "chrome"
  ],
  "Nokta zıplayabilir mi?": [
   "home"
@@ -1627,6 +1622,7 @@
   "start"
  ],
  "stüdyo açık": [
+  "chrome",
   "home"
  ],
  "Stüdyo açık": [
@@ -1735,6 +1731,7 @@
   "other"
  ],
  "Tasarım ve yazılım stüdyosu · İstanbul": [
+  "chrome",
   "home"
  ],
  "Tasarladığımız ve kodladığımız projeler.": [
@@ -1807,6 +1804,9 @@
  ],
  "Üç durum kartı": [
   "other"
+ ],
+ "Üç kişiyiz · dördüncü sensin": [
+  "chrome"
  ],
  "Üç şekil.": [
   "service"

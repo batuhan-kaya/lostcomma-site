@@ -1,8 +1,8 @@
-/** Shared behaviour on every page: team cursors · footer clock and the typed sign-off · language switch roll · mobile menu. */
+/** Shared behaviour on every page: team cursors · footer clock and the footer's open sign · language switch roll · mobile menu. */
 import { getCrew } from './lib/crew';
-import { signOff } from './lib/footer';
 import { playIntro } from './lib/intro';
 import { reducedMotion } from './lib/motion';
+import { studioOpen } from '../shared/istanbul';
 import { startStats, track } from './lib/stats';
 
 const LANG_COOKIE = 'lang';
@@ -20,6 +20,11 @@ function startClock(): void {
     els.forEach((el) => {
       if (el.textContent !== now) el.textContent = now;
     });
+    // The footer's open sign follows the studio's hours too.
+    const open = studioOpen(new Date());
+    document.querySelector('[data-ft-dot]')?.classList.toggle('off', !open);
+    document.querySelector<HTMLElement>('[data-ft-on]')?.toggleAttribute('hidden', !open);
+    document.querySelector<HTMLElement>('[data-ft-off]')?.toggleAttribute('hidden', open);
   };
   tick();
   window.setInterval(tick, 15_000);
@@ -93,7 +98,6 @@ startClock();
 langSwitch();
 menu();
 placeholders();
-signOff();
 
 // Page modules run after this one and register their scenes before DOMContentLoaded: the team
 // starts after that event. With the preloader they also wait until the page is free (born from
