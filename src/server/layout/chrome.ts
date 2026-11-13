@@ -4,7 +4,6 @@ import { cx, html, type Safe } from '../html';
 import { msg } from '../msg';
 import type { Ctx, NextBand } from '../page';
 import { href, type RouteId } from '../routes';
-import { studioOpen } from '../../shared/istanbul';
 import { lockup } from './logo';
 
 const NAV: [RouteId, string][] = [
@@ -97,24 +96,23 @@ function fl(ctx: Ctx, to: string, label: string, o: { rel?: string } = {}): Safe
 }
 
 /**
- * The sign-off: who we are · who is in the file · what time it is here. The site's own language
- * (a live file and the people in it) said once more and quietly: the logo at reading size · the
- * team's avatars with a place for the visitor · Istanbul's clock in display type with the studio's
- * open sign. Nothing to animate but the clock (src/client/app.ts keeps it and the sign right).
+ * The sign-off: who we are · who is in the file · the way back up. The site's own language (a
+ * live file and the people in it) said once more and quietly: the logo at reading size · the
+ * team's avatars with a place for the visitor · a round arrow that takes you to the top (the
+ * same drawn arrow as the next band's). Nothing waits for a script.
  */
 function signature(ctx: Ctx): Safe {
   const { t, lang } = ctx;
-  const open = studioOpen(ctx.now);
   return html`<div class="ft-base">
 <div class="ft-who"><a class="ft-logo" href="${href(lang, 'home')}" aria-label="Lost Comma">${lockup()}</a><p>${t('Tasarım ve yazılım stüdyosu · İstanbul')}</p></div>
 <div class="ft-team"><span class="avs" aria-hidden="true">${TEAM.map(([n, l]) => html`<span class="av c-${n}">${l}</span>`)}<span class="av c-you">${t('S')}</span></span><p class="mono" data-rest="host" data-rest-at="end 14 2">${t('Üç kişiyiz · dördüncü sensin')}</p></div>
-<div class="ft-now"><p class="ft-open mono"><i class="${open ? '' : 'off'}" data-ft-dot aria-hidden="true"></i><span data-ft-on${open ? '' : html` hidden`}>${t('stüdyo açık')}</span><span data-ft-off${open ? html` hidden` : ''}>${t('mesai dışı · sabah hepsini okuyoruz')}</span></p><p class="ft-time"><time data-clock>${istanbulTime(ctx.now)}</time><span class="mono">${t('İstanbul')}</span></p></div>
+<a class="ft-up" href="#top" aria-label="${t('Başa dön')}"><span class="mono" aria-hidden="true">${t('Başa dön')}</span><svg viewBox="-22 -22 92 92" aria-hidden="true"><path d="M24 40V9M12 21l12-12 12 12"></path></svg></a>
 </div>`;
 }
 
 /**
  * The footer of every page (the homepage too): a way to start · the whole site · the sign-off
- * (logo · team · Istanbul's clock) · the small print. Always on ink · lime is its one accent. Social links come from the
+ * (logo · team · back to top) · the small print. Always on ink · lime is its one accent. Social links come from the
  * panel (Site ayarları · Sosyal) and an empty one does not show · so do an empty phone and address.
  */
 export function footer(ctx: Ctx): Safe {
@@ -147,7 +145,7 @@ ${signature(ctx)}
 <div class="ft-bar mono">
 <span>© ${ctx.now.getFullYear()} Lost Comma</span>
 <nav aria-label="${t('Yasal')}"><a href="${href(lang, 'privacy')}">${t('Gizlilik')}</a><a href="${href(lang, 'kvkk')}">KVKK</a><a href="${href(lang, 'cookies')}">${t('Çerezler')}</a></nav>
-<div class="ft-end">${langSwitch(ctx, msg('Sayfanın dili'))}<a class="ft-up" href="#top">${t('Başa dön')} <span aria-hidden="true">↑</span></a></div>
+<div class="ft-end">${langSwitch(ctx, msg('Sayfanın dili'))}</div>
 </div>
 </div>
 </footer>`;

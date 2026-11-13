@@ -81,7 +81,7 @@ export async function registerPanel(app: FastifyInstance, k: Kit): Promise<void>
 
       const loginForm = (next: string, error?: string, setup = false) =>
         html`<div class="p-card">
-<p class="p-logo big"><span class="lc-lock">${mark('lc-mark')}<span>lost</span><i aria-hidden="true">|</i><span>comma</span></span><small class="mono">panel</small></p>
+<p class="p-logo big"><span class="lc-lock">${mark('lc-mark')}<span>lost</span> <span>comma</span></span><small class="mono">panel</small></p>
 ${
   setup
     ? html`<h1>Panel henüz kurulmadı</h1><p>Önce bir şifre koy. Sunucuda şunu çalıştır:</p><pre class="p-code">npm run panel -- password</pre><p class="p-hint">Docker içinde: <code>node dist/server/cli.js panel password</code> · ya da ilk açılışta <code>PANEL_PASSWORD</code> ortam değişkeni.</p>`
@@ -139,7 +139,7 @@ ${error ? html`<p class="p-errors" role="alert">${error}</p>` : ''}
 
       const codeForm = (error?: string) =>
         html`<div class="p-card">
-<p class="p-logo big"><span class="lc-lock">${mark('lc-mark')}<span>lost</span><i aria-hidden="true">|</i><span>comma</span></span><small class="mono">panel</small></p>
+<p class="p-logo big"><span class="lc-lock">${mark('lc-mark')}<span>lost</span> <span>comma</span></span><small class="mono">panel</small></p>
 <h1>Doğrulama kodu</h1>
 <p>Doğrulama uygulamandaki altı haneli kodu yaz.</p>
 ${error ? html`<p class="p-errors" role="alert">${error}</p>` : ''}

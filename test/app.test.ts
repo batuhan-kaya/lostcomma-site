@@ -59,8 +59,9 @@ describe('pages', () => {
     expect(doc).toContain('<a class="lg" href="/en/work" hreflang="en"');
   });
 
-  it('prints the Istanbul clock in the footer', async () => {
-    expect((await get('/en/work')).body).toContain('>09:41</time>');
+  it('prints the Istanbul clock where the studio says it is open (the homepage contact) · the footer has none', async () => {
+    expect((await get('/en')).body).toContain('<b data-clock>09:41</b>');
+    expect((await get('/en/work')).body).not.toContain('data-clock');
   });
 });
 

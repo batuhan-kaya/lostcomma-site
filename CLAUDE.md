@@ -163,10 +163,11 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 ## Logo and footer (src/shared/logo.ts · layout/logo.ts · layout/chrome.ts)
 
 - The mark (a corner and the comma under it) lives once in `src/shared/logo.ts`: redrawn with smooth curves from Batuhan's traced file. Everything draws it from there.
+- The logo is minimal: the mark and the two words · nothing between them (Batuhan had the blinking caret and the panel's bar removed · do not bring a divider back).
 - Beside the name the mark is one size with it: the corner is as tall as the l (`L_HEIGHT` .785 em · a unit test measures it from Anybody) and ends on the baseline · the comma hangs under it. `.lc-lock` · `.lc-mark` in `chrome.css` (a negative bottom margin keeps the comma out of the line box). Header · panel · share images · footer.
 - Icons: `npm run icons` draws `public/favicon.svg` (ink on light tabs · milk on dark) · `favicon.ico` · `apple-touch-icon.png` · `icon-192/512/maskable/144.png` · `site.webmanifest` from the mark. They are committed · a unit test fails when they drift.
 - One footer on every page (the homepage too): a way to start (next free month from Site ayarları) · the sitemap · the sign-off · the small print with the language switch. Always ink (`th-ink`) · lime is its accent. `data-sec="ft"`.
-- The sign-off (Batuhan did not like the big drawn logo and name · nor a line that ended on a comma: "do not force the comma"): three quiet cells in the site's own language (`.ft-base`): the logo at reading size with the studio line · the team's avatars with a place for the visitor · Istanbul's clock in display type with the studio's open sign (`app.ts` keeps both right). No animation · nothing waits for a script. The host rests after the team line.
+- The sign-off (Batuhan did not like the big drawn logo and name · nor a line that ended on a comma: "do not force the comma"): three quiet cells in the site's own language (`.ft-base`): the logo at reading size with the studio line · the team's avatars with a place for the visitor · a round drawn arrow back to the top (he asked for the big clock to go). No animation · nothing waits for a script. The host rests after the team line.
 - Social accounts · the phone · the address show only once filled (Site ayarları · Sosyal hesaplar: https on the network's own site).
 - Footer classes start with `ft-` · logo classes with `lc-` (plain names like `.mt` · `.fb` · `.lock` already exist on pages).
 

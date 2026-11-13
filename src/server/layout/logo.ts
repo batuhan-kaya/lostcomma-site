@@ -11,7 +11,7 @@ export function mark(cls: string, o: { draw?: boolean } = {}): Safe {
   return html`<svg class="${cls}" viewBox="0 0 ${MARK.w} ${MARK.h}" aria-hidden="true" focusable="false"><path class="lc-t"${len} d="${MARK.top}"></path><path class="lc-c"${len} d="${MARK.comma}"></path></svg>`;
 }
 
-/** Mark and name in one line: the header logo · the panel uses its own text beside the same mark. */
+/** Mark and name in one line · nothing between the two words (Batuhan: minimal and plain · no caret). Header · footer. */
 export function lockup(): Safe {
-  return html`<span class="lc-lock">${mark('lc-mark')}<span>lost</span><span class="caret"> </span><span>comma</span></span>`;
+  return html`<span class="lc-lock">${mark('lc-mark')}<span>lost</span> <span>comma</span></span>`;
 }

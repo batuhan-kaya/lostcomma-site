@@ -93,11 +93,12 @@ describe('the footer', () => {
         expect(ft).toContain(`href="${href(lang, 'start')}#book"`);
         expect(ft).toContain(`href="${href(lang, 'home')}#contact"`);
         expect(ft).toContain('href="mailto:hello@lostcomma.co"');
-        // The sign-off: the logo · the team and the visitor · Istanbul's clock with one open sign showing.
+        // The sign-off: the logo · the team and the visitor · the way back up.
         expect(ft).toMatch(/<a class="ft-logo" href="\/(tr|en)" aria-label="Lost Comma"><span class="lc-lock"><svg class="lc-mark"/);
         expect(ft).toContain(lang === 'tr' ? 'Üç kişiyiz · dördüncü sensin' : 'Three of us · you are the fourth');
-        expect(ft).toMatch(/<p class="ft-time"><time data-clock>\d\d:\d\d<\/time>/);
-        expect((ft.match(/data-ft-o(n|ff) hidden/g) ?? []).length).toBe(1);
+        expect(ft).toContain('<span>lost</span> <span>comma</span></span></a>');
+        expect(ft).toMatch(/<a class="ft-up" href="#top" aria-label="[^"]+">/);
+        expect(doc).not.toContain('class="caret"> </span>');
         expect(ft).toContain('href="#top"');
       }
     }

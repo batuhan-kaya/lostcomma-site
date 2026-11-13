@@ -3,12 +3,12 @@ import { watchErrors } from './checks';
 
 /**
  * The footer on every page (layout/chrome.ts) and the mark beside the name (src/shared/logo.ts):
- * the sign-off is the logo · the team · Istanbul's clock with the open sign · every link in it
+ * the sign-off is the logo · the team · the way back up · every link in it
  * leads somewhere · the mark is one size with the name.
  */
 
 test.describe('footer', () => {
-  test('signs off with the logo · the team and a place for you · the time in Istanbul', async ({ page }) => {
+  test('signs off with the logo · the team and a place for you · the way back up', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/en/work');
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
@@ -16,11 +16,10 @@ test.describe('footer', () => {
     await expect(base.locator('.ft-logo')).toHaveAttribute('href', '/en');
     await expect(base.locator('.ft-team .av')).toHaveText(['D', 'C', 'M', 'Y']);
     await expect(base.locator('.ft-team p')).toHaveText('Three of us · you are the fourth');
-    // The clock is the browser's own reading of Istanbul time · one of the two open signs shows.
-    const now = await page.evaluate(() => new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' }).format(new Date()));
-    const shown = await base.locator('.ft-time time').innerText();
-    expect(Math.abs(Number(shown.slice(3)) - Number(now.slice(3))) % 58).toBeLessThanOrEqual(1);
-    await expect(base.locator('.ft-open span:visible')).toHaveCount(1);
+    // The logo is two plain words: nothing between them · nothing blinks.
+    await expect(base.locator('.ft-logo .lc-lock')).toHaveText('lost comma');
+    expect(await page.locator('.hd .logo .lc-lock > *').count()).toBe(3);
+    await expect(base.locator('.ft-up')).toHaveAttribute('href', '#top');
     // Nothing waits for a script or an animation: it is simply there · and fits the screen.
     expect(await base.evaluate((el) => el.getBoundingClientRect().right)).toBeLessThanOrEqual(await page.evaluate(() => document.documentElement.clientWidth));
     expect(errors).toEqual([]);
@@ -31,8 +30,7 @@ test.describe('footer', () => {
     const plain = await ctx.newPage();
     await plain.goto('/tr/notes');
     await expect(plain.locator('.ft-team p')).toHaveText('Üç kişiyiz · dördüncü sensin');
-    await expect(plain.locator('.ft-time time')).toHaveText(/^\d\d:\d\d$/);
-    await expect(plain.locator('.ft-open span:visible')).toHaveCount(1);
+    await expect(plain.locator('.ft-up')).toBeVisible();
     await ctx.close();
   });
 

@@ -99,7 +99,7 @@ ${js ? html`<script type="module" src="${js}"></script>` : ''}
 <a class="p-skip" href="#main">İçeriğe geç</a>
 <div class="p-shell">
 <header class="p-side">
-<a class="p-logo" href="/panel"><span class="lc-lock">${mark('lc-mark')}<span>lost</span><i aria-hidden="true">|</i><span>comma</span></span><small class="mono">panel</small></a>
+<a class="p-logo" href="/panel"><span class="lc-lock">${mark('lc-mark')}<span>lost</span> <span>comma</span></span><small class="mono">panel</small></a>
 <details class="p-menu"><summary class="mono">Menü</summary><nav aria-label="Panel">${navList(s.section, s.counts)}</nav></details>
 <nav class="p-navd" aria-label="Panel">${navList(s.section, s.counts)}</nav>
 <div class="p-sidefoot">

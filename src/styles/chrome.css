@@ -212,8 +212,8 @@
 .ft-addr { color: var(--pmu); }
 
 /*
- * The sign-off: who we are · who is in the file · what time it is here. Three cells on one
- * baseline: the logo · the team's avatars · Istanbul's clock in display type (the one big thing).
+ * The sign-off: who we are · who is in the file · the way back up. Three cells on one
+ * baseline: the logo · the team's avatars · a round arrow to the top.
  */
 .ft-base { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) auto; gap: 32px 48px; align-items: end; padding: 56px 0 44px; border-top: 1px solid var(--rule); }
 .ft-who, .ft-team { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
@@ -221,13 +221,11 @@
 .ft-logo { align-self: flex-start; font-family: var(--display); font-size: clamp(30px, 3.2vw, 44px); letter-spacing: -.02em; font-variation-settings: 'wdth' 88, 'wght' 820; line-height: 1; }
 .ft-team .avs { padding-left: 8px; }
 .ft-team .av { width: 40px; height: 40px; border-color: var(--pbg); font-size: 14px; }
-.ft-now { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-.ft-open { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--pmu); }
-.ft-open i { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); }
-.ft-open i.off { background: var(--dim); }
-.ft-time { display: flex; align-items: baseline; gap: 14px; margin: 0; }
-.ft-time time { font-family: var(--display); font-size: clamp(72px, 10vw, 148px); line-height: .82; letter-spacing: -.045em; font-variation-settings: 'wdth' 80, 'wght' 840; font-variant-numeric: tabular-nums; }
-.ft-time .mono { color: var(--pmu); }
+/* Back to the top: a round drawn arrow (the next band's arrow turned up). Lime when it is meant. */
+.ft-up { display: inline-flex; align-items: center; gap: 18px; justify-self: end; color: var(--pmu); transition: color .3s; }
+.ft-up svg { width: clamp(72px, 7.4vw, 104px); height: clamp(72px, 7.4vw, 104px); border: 1.5px solid rgba(242,241,236,.34); border-radius: 50%; fill: none; stroke: var(--pfg); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; overflow: visible; transition: background-color .3s, border-color .3s, stroke .3s, transform .6s var(--ease-roll); }
+.ft-up:hover, .ft-up:focus-visible { color: var(--pfg); }
+.ft-up:hover svg, .ft-up:focus-visible svg { border-color: var(--lime); background: var(--lime); stroke: var(--ink); transform: translateY(-8px); }
 
 .ft-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 28px; min-height: 76px; padding: 10px 0; border-top: 1px solid var(--rule); color: var(--pmu); }
 .ft-bar nav:not(.lang) { display: flex; flex-wrap: wrap; gap: 0 24px; }
@@ -237,7 +235,7 @@
 @media (max-width: 900px) {
   .ft-top { grid-template-columns: minmax(0, 1fr); padding: 80px 0 48px; }
   .ft-base { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .ft-now { grid-column: 1 / -1; align-items: flex-start; }
+  .ft-up { grid-column: 1 / -1; justify-self: start; }
 }
 @media (max-width: 560px) {
   .ft-top { padding: 64px 0 40px; }
