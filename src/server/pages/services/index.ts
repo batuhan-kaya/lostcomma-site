@@ -6,14 +6,14 @@ import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
 
 /**
- * Services. A calm page that answers three things at a glance: what we make · how long it takes ·
- * where it starts. The hero is the list itself: four rows (number · a small drawing · name and
- * what it is · what you get · time and starting price) · each one leads to its detail page. A row
- * is a layer of the file: hover or focus selects it (the selection frame with its handles and size
- * label) · the teammate who does the work left a comment on it · the usual length is a small ruler
- * of weeks. The team shows its own work: a cursor comes to a row and its drawing plays (so does hover and
- * focus). Below: the combinations we like · fair questions. (The drawing board that used to be
- * the hero is gone: Batuhan found no reason for it.)
+ * Services. The list is the page's big type: four names as tall as the screen allows · one of them
+ * open. The open name is set wide and the others narrow and faint (Anybody's width axis: the type
+ * itself makes room · like a frame being resized). Its selection frame counts the real size while
+ * it stretches. Under it: a small drawing · what it is in our words · what you get · a comment from
+ * the teammate who does it · a ruler of weeks · the starting price. Hover or focus opens a row ·
+ * and the team does it too: a cursor takes the handle of its own service and pulls the name open.
+ * One row is always open and every panel is the same height: nothing below ever moves. Touch
+ * screens and no JS: every row open. Below: the combinations · fair questions.
  */
 
 /** Short keys used in class names (.t-web · .t-app · .t-id · .t-mo). */
@@ -58,15 +58,16 @@ function hero(ctx: Ctx): Safe {
   const { overview: o, services: s } = SERVICES[lang];
   return html`<section class="shero" data-sec="hero" id="top"><div class="wrap">
 <p class="kick mono"><i class="fi" aria-hidden="true"></i><span>${t('Hizmetler')}</span><span aria-hidden="true">·</span><span class="url">lostcomma.co${ctx.path}</span></p>
-<div class="shd"><h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">${o.title.split('\n').map((l, i) => html`${i ? html`<br>` : ''}${l}`)}</h1><p class="lede" data-rest="motion" data-rest-at="0.86 0 0 -40" data-rest-at-m="0.8 1 0 10">${o.lede}</p></div>
-<ol class="sl">${SERVICE_KEYS.map(
-    (k) => html`<li><a class="svr t-${TOOL_CLASS[k]}" href="${serviceHref(ctx, k)}" data-row="${k}" data-by="${SHOWS[k]}">
-<span class="sv-sel" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="mono">${s[k].name} · ${s[k].size}</span></span>
-<span class="sv-no mono"><i aria-hidden="true"></i>${s[k].no}</span>
-<span class="sv-art" aria-hidden="true"${k === 'web' ? html` data-rest="code" data-rest-at="1 1 4 2"` : ''}><span class="tart">${TILE_ART[k]}</span></span>
-<span class="sv-main"><b class="sv-name">${s[k].name}</b><span class="sv-desc">${s[k].pitch}</span><span class="sv-dl mono">${s[k].dl.join(' · ')}</span><span class="sv-note c-${SHOWS[k]}"><i class="av" aria-hidden="true">${SHOWS[k][0]!.toUpperCase()}</i><span class="mono" lang="en">${SHOWS[k]}</span><span>${s[k].note}</span></span></span>
+<div class="shd"><h1 class="ttl" data-rest="design" data-rest-at="end 12 -6">${o.title.split('\n').map((l, i) => html`${i ? html`<br>` : ''}${l}`)}</h1><p class="lede" data-rest="motion" data-rest-at="0.86 0 0 -40" data-rest-at-m="0.8 1 0 10">${o.lede}</p></div>
+<ol class="sl" data-sl data-rest="code" data-rest-at="0.9 1 0 22" data-rest-at-m="0.8 0 0 -26">${SERVICE_KEYS.map(
+    (k, i) => html`<li><a class="svr t-${TOOL_CLASS[k]}${i === 0 ? ' on' : ''}" href="${serviceHref(ctx, k)}" data-row="${k}" data-by="${SHOWS[k]}">
+<span class="sv-head"><span class="sv-no mono"><i aria-hidden="true"></i>${s[k].no}</span><span class="sv-name"><span data-word>${s[k].name}</span><span class="sv-sel" aria-hidden="true"><i></i><i></i><i></i><i></i><b data-grip></b><span class="mono" data-size>${s[k].name} · ${s[k].size}</span></span></span><span class="sv-time mono">${s[k].time}</span></span>
+<span class="sv-more"><span class="sv-in">
+<span class="sv-art" aria-hidden="true"><span class="tart">${TILE_ART[k]}</span></span>
+<span class="sv-main"><span class="sv-desc">${s[k].pitch}</span><span class="sv-dl mono">${s[k].dl.join(' · ')}</span><span class="sv-note c-${SHOWS[k]}"><i class="av" aria-hidden="true">${SHOWS[k][0]!.toUpperCase()}</i><span class="mono" lang="en">${SHOWS[k]}</span><span>${s[k].note}</span></span></span>
 <span class="sv-facts"><span><span class="mono">${t('Genelde')}</span><b>${s[k].time}</b>${weeksRule(s[k].time)}</span><span><span class="mono">${t('Başlangıç fiyatı')}</span><b>${ctx.settings.text(priceKey(k, 0), ctx.lang) ?? t('[FİYAT]')}</b></span></span>
 <span class="sv-go"><span class="sr">${s[k].see}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"></path></svg></span>
+</span></span>
 </a></li>`,
   )}</ol>
 <p class="sl-note">${o.toolsP}</p>

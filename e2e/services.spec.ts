@@ -29,23 +29,37 @@ async function drag(page: Page, a: { x: number; y: number }, b: { x: number; y: 
 test.describe('Services · desktop', () => {
   test.skip(({ isMobile, hasTouch }) => isMobile || hasTouch, 'pointer devices');
 
-  test('the list: four rows · a teammate comes and a drawing plays · hover plays it too', async ({ page }) => {
+  test('the index: one name open and wide · hover opens another · the team pulls one open · nothing below moves', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/en/services');
     await expect(page.locator('h1')).toHaveText(/We do four things\.\s*We do them well\./);
     await expect(page.locator('[data-row]')).toHaveCount(4);
-    // Nobody waits for a board: the page is the list.
     await expect(page.locator('[data-board], [data-tool]')).toHaveCount(0);
-    // The team shows its own work: a row on screen plays while a cursor points at it.
-    await expect(page.locator('[data-row].play')).toHaveCount(1, { timeout: 15_000 });
-    const who = await page.locator('[data-row].play').getAttribute('data-by');
+    await expect(page.locator('[data-row].on')).toHaveCount(1);
+    await expect(page.locator('[data-row="web"]')).toHaveClass(/on/);
+    const below = () => page.locator('.sl-note').evaluate((el) => Math.round(el.getBoundingClientRect().top + scrollY));
+    const width = (k: string) => page.locator(`[data-row="${k}"] .sv-name`).evaluate((el) => el.getBoundingClientRect().width);
+    const at = await below();
+    // The visitor opens Identity: its name gets wide · Websites gets narrow · the panel shows.
+    const narrow = await width('identity');
+    await page.locator('[data-row="identity"] .sv-head').hover();
+    await expect(page.locator('[data-row="identity"]')).toHaveClass(/on/);
+    await expect(page.locator('[data-row].on')).toHaveCount(1);
+    await expect.poll(() => width('identity'), { timeout: 3000 }).toBeGreaterThan(narrow * 1.5);
+    await expect(page.locator('[data-row="identity"] .sv-desc')).toBeVisible();
+    // The selection label counts the real size.
+    await expect.poll(async () => {
+      const w = Math.round(await width('identity'));
+      return (await page.locator('[data-row="identity"] [data-size]').innerText()).toUpperCase().startsWith(`IDENTITY · ${w} ×`);
+    }, { timeout: 4000 }).toBe(true);
+    // One panel closed · one opened: what is under the list stayed where it was.
+    await page.waitForTimeout(1000);
+    expect(Math.abs((await below()) - at)).toBeLessThanOrEqual(2);
+    // Left alone the team takes over: a teammate pulls another name open.
+    await page.mouse.move(700, 80);
+    await expect.poll(() => page.locator('[data-row].on').getAttribute('data-row'), { timeout: 20_000 }).not.toBe('identity');
+    const who = await page.locator('[data-row].on').getAttribute('data-by');
     expect(await visibleCursors(page)).toContain(who);
-    // Hover is the visitor's turn: the row is selected like a layer and nobody else plays meanwhile.
-    await page.locator('[data-row="app"]').hover();
-    await expect(page.locator('[data-row="app"] .sv-sel')).toBeVisible();
-    await expect(page.locator('[data-row="app"] .sv-sel .mono')).toHaveText('Apps · 390 × 844');
-    await expect(page.locator('[data-row="web"] .sv-sel')).toBeHidden();
-    await expect(page.locator('[data-row].play')).toHaveCount(0, { timeout: 6000 });
     expect(errors).toEqual([]);
   });
 
@@ -259,13 +273,23 @@ test.describe('Service pages · desktop', () => {
 });
 
 test.describe('Services · reduced motion', () => {
-  test('the list is simply there · nobody performs', async ({ page }) => {
+  test('the index is simply there · nobody performs', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/en/services');
     await expect(page.locator('[data-row]')).toHaveCount(4);
-    await page.waitForTimeout(3500);
-    await expect(page.locator('[data-row].play')).toHaveCount(0);
+    await page.waitForTimeout(4500);
+    await expect(page.locator('[data-row="web"]')).toHaveClass(/on/);
     await expect(page.locator('.cur.say')).toHaveCount(0);
+  });
+});
+
+test.describe('Services · touch', () => {
+  test.skip(({ hasTouch }) => !hasTouch, 'touch devices');
+
+  test('every row is open: nothing hides behind a hover', async ({ page }) => {
+    await page.goto('/tr/hizmetler');
+    for (const k of ['web', 'app', 'identity', 'motion']) await expect(page.locator(`[data-row="${k}"] .sv-desc`)).toBeVisible();
+    await expect(page.locator('.sv-sel:visible')).toHaveCount(0);
   });
 });
 

@@ -162,9 +162,9 @@ describe('Services · the overview', async () => {
     expect(en.match(/data-row="\w+"/g)).toEqual(['data-row="web"', 'data-row="app"', 'data-row="identity"', 'data-row="motion"']);
     for (const k of SERVICE_KEYS) {
       const s = SERVICES.en.services[k];
-      expect(en).toContain(`<b class="sv-name">${s.name}</b><span class="sv-desc">${s.pitch}</span><span class="sv-dl mono">${s.dl.join(' · ')}</span>`);
-      // A layer of the file: its selection label · a comment from the teammate who does it · a ruler of weeks.
-      expect(en).toContain(`<span class="mono">${s.name} · ${s.size}</span>`);
+      // The name is the big type: a selected layer with a grip and its size · the row's own words under it.
+      expect(en).toContain(`<span class="sv-name"><span data-word>${s.name}</span><span class="sv-sel" aria-hidden="true"><i></i><i></i><i></i><i></i><b data-grip></b><span class="mono" data-size>${s.name} · ${s.size}</span>`);
+      expect(en).toContain(`<span class="sv-desc">${s.pitch}</span><span class="sv-dl mono">${s.dl.join(' · ')}</span>`);
       expect(en).toContain(`<span>${s.note}</span></span></span>`);
       expect(en).toContain(`<b>${s.time}</b>`);
     }
@@ -172,7 +172,7 @@ describe('Services · the overview', async () => {
     expect(en).toContain('<rect x="60" y="2" width="60" height="6">');
     expect(en.match(/\[PRICE\]/g)).toHaveLength(4);
     expect(tr.match(/\[FİYAT\]/g)).toHaveLength(4);
-    expect(tr).toContain('<h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">Dört şey yaparız.<br>İyi yaparız.</h1>');
+    expect(tr).toContain('<h1 class="ttl" data-rest="design" data-rest-at="end 12 -6">Dört şey yaparız.<br>İyi yaparız.</h1>');
   });
 
   it('links every row to its page in its language · each row names the teammate who shows it', () => {
@@ -180,6 +180,9 @@ describe('Services · the overview', async () => {
       expect(en).toContain(`href="/en/services/${SERVICE_SLUGS[k].en}" data-row="${k}"`);
       expect(tr).toContain(`href="/tr/hizmetler/${SERVICE_SLUGS[k].tr}" data-row="${k}"`);
     }
+    // One row is open when the page arrives: the first.
+    expect(en.match(/class="svr t-\w+ on"/g)).toHaveLength(1);
+    expect(en).toContain('class="svr t-web on"');
     expect(en.match(/data-by="(design|code|motion)"/g)).toEqual(['data-by="code"', 'data-by="code"', 'data-by="design"', 'data-by="motion"']);
   });
 
