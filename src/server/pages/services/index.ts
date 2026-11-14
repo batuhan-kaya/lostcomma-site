@@ -6,10 +6,12 @@ import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
 
 /**
- * Services · "Pick a tool". The hero is a drawing board with one tool per service: drag out a
- * website frame · place a phone · draw a mark with the pen · draw a path and watch it move. The
- * inspector describes the tool in hand. Below: the four tools · the combinations we like · fair
- * questions. Without JS the board is a picture and everything else reads top to bottom.
+ * Services. A calm page that answers three things at a glance: what we make · how long it takes ·
+ * where it starts. The hero is the list itself: four rows (number · a small drawing · name and
+ * what it is · what you get · time and starting price) · each one leads to its detail page. The
+ * team shows its own work: a cursor comes to a row and its drawing plays (so does hover and
+ * focus). Below: the combinations we like · fair questions. (The drawing board that used to be
+ * the hero is gone: Batuhan found no reason for it.)
  */
 
 /** Short keys used in class names (.t-web · .t-app · .t-id · .t-mo). */
@@ -21,10 +23,7 @@ export const TOOL_ICON: Record<ServiceKey, Safe> = {
   identity: raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l6 8.5-6 9.5-6-9.5z"></path><circle cx="12" cy="12" r="1.6"></circle></svg>'),
   motion: raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19c7 0 7-14 16-14"></path><circle cx="4" cy="19" r="2"></circle><circle cx="20" cy="5" r="2"></circle></svg>'),
 };
-const UNDO = raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6L4 11l5 5M4 11h10a5 5 0 0 1 0 10h-3"></path></svg>');
-const BIN = raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>');
-
-/** The drawings on the four tiles. They come alive on hover. */
+/** The small drawing of each row. It plays on hover · on focus · when a teammate points at it (.play). */
 const TILE_ART: Record<ServiceKey, Safe> = {
   web: raw('<span class="br"><i></i><i></i><i></i><i></i></span>'),
   app: raw('<span class="ph"><em></em><i></i><i></i><i></i></span>'),
@@ -36,70 +35,36 @@ const TILE_ART: Record<ServiceKey, Safe> = {
   ),
 };
 
-const lines = (s: string): Safe => html`${s.split('\n').map((l, i) => html`${i ? html`<br>` : ''}${l}`)}`;
 const serviceHref = (ctx: Ctx, k: ServiceKey) => href(ctx.lang, 'service', { slug: SERVICE_SLUGS[k][ctx.lang] });
+
+/** Who shows which row: the teammate whose work it mostly is. */
+const SHOWS: Record<ServiceKey, string> = { web: 'code', app: 'code', identity: 'design', motion: 'motion' };
 
 function hero(ctx: Ctx): Safe {
   const { t, lang } = ctx;
   const { overview: o, services: s } = SERVICES[lang];
   return html`<section class="shero" data-sec="hero" id="top"><div class="wrap">
 <p class="kick mono"><i class="fi" aria-hidden="true"></i><span>${t('Hizmetler')}</span><span aria-hidden="true">·</span><span class="url">lostcomma.co${ctx.path}</span></p>
-<h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">${o.title}</h1>
-<p class="lede">${o.lede} <b>${o.try}</b> ${o.after}</p>
-<div class="board" data-board>
-<div class="stage t-web" data-stage role="img" aria-label="${t('Çizim tahtası')}" data-rest="motion" data-rest-at="0.07 0.88" data-rest-at-m="0.06 0.64">
-<p class="empty" data-empty aria-hidden="true">${t('Buraya çiz')}</p>
-</div>
-<p class="tbh mono" data-hint aria-hidden="true">${s.web.hint}</p>
-<div class="tb" role="toolbar" aria-label="${t('Araçlar')}">
-${SERVICE_KEYS.map(
-  (k, i) => html`<button type="button" class="tl t-${TOOL_CLASS[k]}${i === 0 ? ' on' : ''}" data-tool="${k}" aria-pressed="${String(i === 0)}" aria-label="${s[k].tool}">${TOOL_ICON[k]}<span class="tt mono" aria-hidden="true">${s[k].tool}</span></button>`,
-)}
-<i class="sep" aria-hidden="true"></i>
-<button type="button" class="tl" data-undo aria-label="${t('Geri al')}">${UNDO}<span class="tt mono" aria-hidden="true">${t('Geri al')}</span></button>
-<button type="button" class="tl" data-clear aria-label="${t('Tahtayı temizle')}">${BIN}<span class="tt mono" aria-hidden="true">${t('Temizle')}</span></button>
-</div>
-<aside class="insp" aria-label="${t('Denetçi')}">
-<p class="ih mono" aria-hidden="true"><span>${t('Denetçi')}</span><span data-itag>${s.web.tag}</span></p>
-${SERVICE_KEYS.map(
-  (k, i) => html`<div class="ib t-${TOOL_CLASS[k]}" data-ib="${k}"${i ? html` hidden` : ''}>
-<b>${s[k].name}</b>
-<p>${s[k].desc}</p>
-<ul class="dl">${s[k].dl.map((d) => html`<li>${d}</li>`)}</ul>
-<div class="ir"><span class="mono">${t('Genelde')}</span><b>${s[k].time}</b></div>
-<div class="ir"><span class="mono">${t('Başlangıç fiyatı')}</span><b>${ctx.settings.text(priceKey(k, 0), ctx.lang) ?? t('[FİYAT]')}</b></div>
-<a class="ilink" href="${serviceHref(ctx, k)}"${k === 'web' ? html` data-rest="code" data-rest-at="0.82 1 0 16"` : ''}><span>${s[k].more}</span><span aria-hidden="true">→</span></a>
-</div>`,
-)}
-</aside>
-</div>
-</div></section>`;
-}
-
-function tools(ctx: Ctx): Safe {
-  const { t, lang } = ctx;
-  const { overview: o, services: s } = SERVICES[lang];
-  return html`<section class="tools" data-sec="tools"><div class="wrap">
-<div class="thd"><div><p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Dört araç')}</p><h2 class="h2">${lines(o.toolsH)}</h2></div><p data-rest="host" data-rest-at="0.6 -0.6">${o.toolsP}</p></div>
-<div class="tg">${SERVICE_KEYS.map(
-    (k) => html`<a class="tile t-${TOOL_CLASS[k]}" href="${serviceHref(ctx, k)}">
-<span class="tnum mono"><span>${s[k].no} · ${s[k].tag}</span><span>${s[k].size}</span></span>
-<span class="tart" aria-hidden="true">${TILE_ART[k]}</span>
-<b class="tname">${s[k].name}</b>
-<p>${s[k].desc}</p>
-<span class="tdl mono">${s[k].dl.join(' · ')}</span>
-<span class="tfoot"><span class="mono">${s[k].time}</span><span class="tgo">${s[k].see} <span aria-hidden="true">→</span></span></span>
-</a>`,
-  )}</div>
+<div class="shd"><h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">${o.title}</h1><p class="lede" data-rest="motion" data-rest-at="end 12 4">${o.lede}</p></div>
+<ol class="sl">${SERVICE_KEYS.map(
+    (k) => html`<li><a class="svr t-${TOOL_CLASS[k]}" href="${serviceHref(ctx, k)}" data-row="${k}" data-by="${SHOWS[k]}">
+<span class="sv-no mono"><i aria-hidden="true"></i>${s[k].no}</span>
+<span class="sv-art" aria-hidden="true"${k === 'web' ? html` data-rest="code" data-rest-at="1 1 4 2"` : ''}><span class="tart">${TILE_ART[k]}</span></span>
+<span class="sv-main"><b class="sv-name">${s[k].name}</b><span class="sv-desc">${s[k].desc}</span><span class="sv-dl mono">${s[k].dl.join(' · ')}</span></span>
+<span class="sv-facts"><span><span class="mono">${t('Genelde')}</span><b>${s[k].time}</b></span><span><span class="mono">${t('Başlangıç fiyatı')}</span><b>${ctx.settings.text(priceKey(k, 0), ctx.lang) ?? t('[FİYAT]')}</b></span></span>
+<span class="sv-go"><span class="sr">${s[k].see}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"></path></svg></span>
+</a></li>`,
+  )}</ol>
+<p class="sl-note">${o.toolsP}</p>
 </div></section>`;
 }
 
 function combos(ctx: Ctx): Safe {
   const { t, lang } = ctx;
   const { overview: o, services: s } = SERVICES[lang];
-  const pill = (k: ServiceKey) => html`<span class="pl t-${TOOL_CLASS[k]}">${TOOL_ICON[k]}${s[k].tool}</span>`;
+  const pill = (k: ServiceKey) => html`<span class="pl t-${TOOL_CLASS[k]}">${TOOL_ICON[k]}${s[k].name}</span>`;
   return html`<section class="combo" data-sec="combo"><div class="wrap">
-<p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Birlikte daha iyi · bir satırın üstüne gel')}</p>
+<p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Birlikte daha iyi')}</p>
 <h2 class="h2">${t('Sevdiğimiz matematik.')}</h2>
 <ul class="eqs">${o.combos.map(
     (c, i) => html`<li class="eq"><span class="pills">${pill(c.a)}<span class="plus" aria-hidden="true">+</span>${pill(c.b)}</span><span class="eqs-q" aria-hidden="true">=</span><b class="res"${i === 0 ? html` data-rest="host" data-rest-at="end 18 -6"` : ''}>${c.is}</b></li>`,
@@ -128,13 +93,7 @@ export const servicesPage: Page = {
   title: (t) => t('Hizmetler'),
   description: (t) => t('Web siteleri · uygulamalar · kimlik ve hareket.'),
   body: (ctx) => html`${hero(ctx)}
-${tools(ctx)}
 ${combos(ctx)}
 ${faq(ctx)}`,
-  /** The board needs each tool's name · tag · hint and how drawn things are labelled. */
-  data: (ctx) => {
-    const s = SERVICES[ctx.lang].services;
-    return { tools: Object.fromEntries(SERVICE_KEYS.map((k) => [k, { tag: s[k].tag, hint: s[k].hint }])) };
-  },
   next: { to: 'process', kick: msg('Sonraki sayfa'), big: msg('Süreç'), tone: 'night' },
 };

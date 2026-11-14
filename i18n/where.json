@@ -166,8 +166,7 @@
  ],
  "Araçlar": [
   "chrome",
-  "other",
-  "services"
+  "other"
  ],
  "Araçlar.": [
   "other"
@@ -351,7 +350,7 @@
  "Birinci tutamaç": [
   "service"
  ],
- "Birlikte daha iyi · bir satırın üstüne gel": [
+ "Birlikte daha iyi": [
   "services"
  ],
  "bitir": [
@@ -453,9 +452,6 @@
  "Burası haritada yok.": [
   "notFound"
  ],
- "Buraya çiz": [
-  "services"
- ],
  "Bütçe: kare başına {n} ms": [
   "lab"
  ],
@@ -506,9 +502,6 @@
  "çıkar.": [
   "service"
  ],
- "Çizim tahtası": [
-  "services"
- ],
  "Daha eski": [
   "note"
  ],
@@ -528,8 +521,7 @@
   "service"
  ],
  "Denetçi": [
-  "process",
-  "services"
+  "process"
  ],
  "Deneyleri süz": [
   "lab"
@@ -581,9 +573,6 @@
  ],
  "Dördüncü bir imleç": [
   "studio"
- ],
- "Dört araç": [
-  "services"
  ],
  "Dört biçim. Tek stüdyo.": [
   "home"
@@ -710,9 +699,6 @@
  ],
  "Gerçek teslim tarihi ne?": [
   "process"
- ],
- "Geri al": [
-  "services"
  ],
  "Geri dön": [
   "service"
@@ -1696,9 +1682,6 @@
  "Tablet": [
   "service"
  ],
- "Tahtayı temizle": [
-  "services"
- ],
  "Takip et": [
   "chrome"
  ],
@@ -1745,9 +1728,6 @@
  ],
  "Telefon": [
   "service"
- ],
- "Temizle": [
-  "services"
  ],
  "Tipografi": [
   "lab",

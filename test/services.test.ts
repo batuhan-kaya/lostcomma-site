@@ -153,24 +153,29 @@ describe('Services · the overview', async () => {
   const en = (await get('/en/services')).body;
   const tr = (await get('/tr/hizmetler')).body;
 
-  it('has its sections in order', () => {
-    expect(secs(en)).toEqual(['hero', 'tools', 'combo', 'faq', 'next', 'ft']);
+  it('has its sections in order · no drawing board · no colour tiles', () => {
+    expect(secs(en)).toEqual(['hero', 'combo', 'faq', 'next', 'ft']);
+    expect(en).not.toMatch(/data-board|data-tool=|class="tile /);
   });
 
-  it('has a tool and an inspector for each service · only the first one showing', () => {
-    expect(en.match(/data-tool="\w+"/g)).toEqual(['data-tool="web"', 'data-tool="app"', 'data-tool="identity"', 'data-tool="motion"']);
-    expect(en).toContain('data-tool="web" aria-pressed="true"');
-    expect(en.match(/data-ib="\w+" hidden/g)).toHaveLength(3);
-    expect(en).toContain('[PRICE]');
-    expect(tr).toContain('[FİYAT]');
-  });
-
-  it('links every tile to its page in its language', () => {
+  it('lists the four services in one row each: name · what it is · what you get · time · starting price', () => {
+    expect(en.match(/data-row="\w+"/g)).toEqual(['data-row="web"', 'data-row="app"', 'data-row="identity"', 'data-row="motion"']);
     for (const k of SERVICE_KEYS) {
-      expect(en).toContain(`<a class="tile t-`);
-      expect(en).toContain(`href="/en/services/${SERVICE_SLUGS[k].en}"`);
-      expect(tr).toContain(`href="/tr/hizmetler/${SERVICE_SLUGS[k].tr}"`);
+      const s = SERVICES.en.services[k];
+      expect(en).toContain(`<b class="sv-name">${s.name}</b><span class="sv-desc">${s.desc}</span><span class="sv-dl mono">${s.dl.join(' · ')}</span>`);
+      expect(en).toContain(`<b>${s.time}</b>`);
     }
+    expect(en.match(/\[PRICE\]/g)).toHaveLength(4);
+    expect(tr.match(/\[FİYAT\]/g)).toHaveLength(4);
+    expect(tr).toContain('<h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">Ne yapıyoruz.</h1>');
+  });
+
+  it('links every row to its page in its language · each row names the teammate who shows it', () => {
+    for (const k of SERVICE_KEYS) {
+      expect(en).toContain(`href="/en/services/${SERVICE_SLUGS[k].en}" data-row="${k}"`);
+      expect(tr).toContain(`href="/tr/hizmetler/${SERVICE_SLUGS[k].tr}" data-row="${k}"`);
+    }
+    expect(en.match(/data-by="(design|code|motion)"/g)).toEqual(['data-by="code"', 'data-by="code"', 'data-by="design"', 'data-by="motion"']);
   });
 
   it('opens the first question · the rest are buttons with regions', () => {

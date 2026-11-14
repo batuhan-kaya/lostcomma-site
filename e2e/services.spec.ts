@@ -29,52 +29,28 @@ async function drag(page: Page, a: { x: number; y: number }, b: { x: number; y: 
 test.describe('Services · desktop', () => {
   test.skip(({ isMobile, hasTouch }) => isMobile || hasTouch, 'pointer devices');
 
-  test('the team draws one website · one app · one path', async ({ page }) => {
+  test('the list: four rows · a teammate comes and a drawing plays · hover plays it too', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/en/services');
-    await expect(page.locator('[data-stage] .it.done')).toHaveCount(3, { timeout: 20_000 });
-    await expect(page.locator('[data-stage] .k-web')).toHaveCount(1);
-    await expect(page.locator('[data-stage] .k-app')).toHaveCount(1);
-    await expect(page.locator('[data-stage] .k-mo .mdot')).toHaveCount(3);
-    await expect(page.locator('[data-tool="identity"]')).toHaveAttribute('aria-pressed', 'true', { timeout: 6000 });
+    await expect(page.locator('h1')).toHaveText('What we do.');
+    await expect(page.locator('[data-row]')).toHaveCount(4);
+    // Nobody waits for a board: the page is the list.
+    await expect(page.locator('[data-board], [data-tool]')).toHaveCount(0);
+    // The team shows its own work: a row on screen plays while a cursor points at it.
+    await expect(page.locator('[data-row].play')).toHaveCount(1, { timeout: 15_000 });
+    const who = await page.locator('[data-row].play').getAttribute('data-by');
+    expect(await visibleCursors(page)).toContain(who);
+    // Hover is the visitor's turn: the row's edge shows and nobody else plays meanwhile.
+    await page.locator('[data-row="app"]').hover();
+    await expect.poll(() => page.locator('[data-row="app"]').evaluate((el) => getComputedStyle(el, '::before').transform), { timeout: 3000 }).toMatch(/none|matrix\(1, 0, 0, 1, 0, 0\)/);
+    await expect(page.locator('[data-row].play')).toHaveCount(0, { timeout: 6000 });
     expect(errors).toEqual([]);
   });
 
-  test('pick a tool · draw · the inspector follows · undo and clear', async ({ page }) => {
-    await page.goto('/en/services');
-    await page.locator('[data-tool="app"]').click();
-    await expect(page.locator('[data-ib="app"]')).toBeVisible();
-    await expect(page.locator('[data-ib="web"]')).toBeHidden();
-    await expect(page.locator('[data-itag]')).toHaveText('App tool');
-    await expect(page.locator('[data-hint]')).toHaveText('App tool · click to place a phone');
-
-    await page.locator('[data-tool="web"]').click();
-    const box = (await page.locator('[data-stage]').boundingBox())!;
-    await drag(page, { x: box.x + 80, y: box.y + 80 }, { x: box.x + 420, y: box.y + 300 });
-    const web = page.locator('[data-stage] .k-web').last();
-    await expect(web).toHaveClass(/done/);
-    await expect(web.locator('.lab')).toHaveText(/^Website · \d+ × \d+$/);
-
-    await page.locator('[data-tool="identity"]').click();
-    await drag(page, { x: box.x + 500, y: box.y + 300 }, { x: box.x + 700, y: box.y + 120 });
-    await expect(page.locator('[data-stage] .k-id.done .anc')).toHaveCount(5);
-    await expect(page.locator('[data-empty]')).toHaveClass(/off/);
-
-    // The demo stepped aside once the visitor drew.
-    const count = await page.locator('[data-stage] .it').count();
-    await page.locator('[data-undo]').click();
-    await expect(page.locator('[data-stage] .it')).toHaveCount(count - 1);
-    await page.locator('[data-clear]').click();
-    await expect(page.locator('[data-stage] .it')).toHaveCount(0);
-    await expect(page.locator('[data-empty]')).not.toHaveClass(/off/);
-  });
-
-  test('keyboard: picking a tool stamps one on the board', async ({ page }) => {
-    await page.goto('/en/services');
-    await page.locator('[data-tool="motion"]').focus();
-    await page.keyboard.press('Enter');
-    await expect(page.locator('[data-stage] .k-mo.done')).toHaveCount(1);
-    await expect(page.locator('[data-tool="motion"]')).toHaveAttribute('aria-pressed', 'true');
+  test('the combinations fit their rows', async ({ page }) => {
+    await page.goto('/tr/hizmetler');
+    const over = await page.locator('.eq').evaluateAll((rows) => rows.filter((r) => r.scrollHeight > r.clientHeight + 1 || [...r.children].some((c) => c.getBoundingClientRect().bottom > r.getBoundingClientRect().bottom + 1)).length);
+    expect(over).toBe(0);
   });
 
   test('one answer open at a time', async ({ page }) => {
@@ -89,9 +65,9 @@ test.describe('Services · desktop', () => {
     await expect(q.nth(2)).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test('tiles lead to the detail pages', async ({ page }) => {
+  test('rows lead to the detail pages', async ({ page }) => {
     await page.goto('/tr/hizmetler');
-    await page.locator('.tile.t-mo').click();
+    await page.locator('[data-row="motion"]').click();
     await expect(page).toHaveURL(/\/tr\/hizmetler\/hareket$/);
     await expect(page.locator('h1')).toHaveText('Hareket');
   });
@@ -281,12 +257,12 @@ test.describe('Service pages · desktop', () => {
 });
 
 test.describe('Services · reduced motion', () => {
-  test('the board starts drawn · nobody performs', async ({ page }) => {
+  test('the list is simply there · nobody performs', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/en/services');
-    await expect(page.locator('[data-stage] .it.done')).toHaveCount(3);
-    await expect(page.locator('[data-tool="identity"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-row]')).toHaveCount(4);
     await page.waitForTimeout(3500);
+    await expect(page.locator('[data-row].play')).toHaveCount(0);
     await expect(page.locator('.cur.say')).toHaveCount(0);
   });
 });

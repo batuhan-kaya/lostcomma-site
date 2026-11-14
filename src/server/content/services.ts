@@ -62,9 +62,7 @@ export interface ServiceCopy {
 export interface OverviewCopy {
   title: string;
   lede: string;
-  try: string;
-  after: string;
-  toolsH: string;
+  /** The line under the list: why one team does all four. */
   toolsP: string;
   combos: { a: ServiceKey; b: ServiceKey; is: string }[];
   faq: { q: string; a: string }[];
@@ -72,12 +70,9 @@ export interface OverviewCopy {
 
 const en: { overview: OverviewCopy; services: Record<ServiceKey, ServiceCopy> } = {
   overview: {
-    title: 'Pick a tool.',
-    lede: 'We make four kinds of things and each one has its own tool.',
-    try: 'Pick one and draw on the board.',
-    after: 'That is roughly what we do all day.',
-    toolsH: 'Four tools.\nOne studio.',
-    toolsP: 'Every project uses at least two of these. The same people hold every tool so nothing gets lost between them.',
+    title: 'What we do.',
+    lede: 'Websites and apps and identity and motion. The same team designs and builds all four. Each row says what it is · how long it takes and where it starts.',
+    toolsP: 'Most projects need at least two of these. The same people do all of them so nothing gets lost in between.',
     combos: [
       { a: 'identity', b: 'web', is: 'a launch.' },
       { a: 'web', b: 'app', is: 'one login everywhere.' },
@@ -295,12 +290,9 @@ const en: { overview: OverviewCopy; services: Record<ServiceKey, ServiceCopy> } 
 
 const tr: typeof en = {
   overview: {
-    title: 'Bir araç seç.',
-    lede: 'Dört tür şey yapıyoruz ve her birinin kendi aracı var.',
-    try: 'Birini seç ve panoya çiz.',
-    after: 'Aşağı yukarı bütün gün yaptığımız şey bu.',
-    toolsH: 'Dört araç.\nTek stüdyo.',
-    toolsP: 'Her proje bunlardan en az ikisini kullanır. Her aracı aynı insanlar tutar ki aralarda hiçbir şey kaybolmasın.',
+    title: 'Ne yapıyoruz.',
+    lede: 'Web siteleri ve uygulamalar ve kimlik ve hareket. Dördünü de aynı ekip tasarlar ve kodlar. Her satır ne olduğunu · ne kadar sürdüğünü ve nereden başladığını söyler.',
+    toolsP: 'Çoğu proje bunlardan en az ikisini ister. Hepsini aynı insanlar yapar ki arada hiçbir şey kaybolmasın.',
     combos: [
       { a: 'identity', b: 'web', is: 'bir lansman.' },
       { a: 'web', b: 'app', is: 'her yerde tek giriş.' },
