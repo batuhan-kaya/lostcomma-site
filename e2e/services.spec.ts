@@ -32,7 +32,7 @@ test.describe('Services · desktop', () => {
   test('the list: four rows · a teammate comes and a drawing plays · hover plays it too', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/en/services');
-    await expect(page.locator('h1')).toHaveText('What we do.');
+    await expect(page.locator('h1')).toHaveText(/We do four things\.\s*We do them well\./);
     await expect(page.locator('[data-row]')).toHaveCount(4);
     // Nobody waits for a board: the page is the list.
     await expect(page.locator('[data-board], [data-tool]')).toHaveCount(0);
@@ -40,9 +40,11 @@ test.describe('Services · desktop', () => {
     await expect(page.locator('[data-row].play')).toHaveCount(1, { timeout: 15_000 });
     const who = await page.locator('[data-row].play').getAttribute('data-by');
     expect(await visibleCursors(page)).toContain(who);
-    // Hover is the visitor's turn: the row's edge shows and nobody else plays meanwhile.
+    // Hover is the visitor's turn: the row is selected like a layer and nobody else plays meanwhile.
     await page.locator('[data-row="app"]').hover();
-    await expect.poll(() => page.locator('[data-row="app"]').evaluate((el) => getComputedStyle(el, '::before').transform), { timeout: 3000 }).toMatch(/none|matrix\(1, 0, 0, 1, 0, 0\)/);
+    await expect(page.locator('[data-row="app"] .sv-sel')).toBeVisible();
+    await expect(page.locator('[data-row="app"] .sv-sel .mono')).toHaveText('Apps · 390 × 844');
+    await expect(page.locator('[data-row="web"] .sv-sel')).toBeHidden();
     await expect(page.locator('[data-row].play')).toHaveCount(0, { timeout: 6000 });
     expect(errors).toEqual([]);
   });

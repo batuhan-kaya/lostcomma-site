@@ -10,7 +10,7 @@
 .shero { position: relative; padding: calc(var(--head) + 30px) 0 110px; }
 .shd { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 460px); gap: 28px 60px; align-items: end; margin-top: 4px; }
 .ttl {
-  margin: 0 0 0 -6px; font-family: var(--display); font-size: clamp(60px, 9.4vw, 136px); font-weight: 400; line-height: .92;
+  margin: 0 0 0 -6px; font-family: var(--display); font-size: clamp(46px, 7.2vw, 104px); font-weight: 400; line-height: .94;
   letter-spacing: -.05em; font-variation-settings: 'wdth' 80, 'wght' 840;
 }
 .shero .lede { max-width: none; margin: 0 0 12px; color: var(--pfg); font-size: 20px; line-height: 1.42; }
@@ -21,8 +21,17 @@
   position: relative; display: grid; grid-template-columns: 56px 200px minmax(0, 1fr) 230px 56px; gap: 0 36px; align-items: center;
   padding: 30px 0; border-bottom: 1px solid var(--rule); color: var(--pfg); text-decoration: none;
 }
-.svr::before { content: ''; position: absolute; left: calc(var(--gut) * -1 + 12px); top: 30px; bottom: 30px; width: 3px; border-radius: 2px; background: var(--tc); transform: scaleY(0); transform-origin: 50% 0; transition: transform .5s var(--ease-roll); }
-:is(.svr:hover, .svr:focus-visible, .svr.play)::before { transform: none; }
+/* A row is a layer of the file: hover · focus or a teammate selects it. The frame is there at once
+   (a selection does not fade in) with its four handles and the layer's name and size. */
+.sv-sel { position: absolute; inset: 10px -14px; border: 1.5px solid var(--blue); pointer-events: none; visibility: hidden; }
+.sv-sel i { position: absolute; width: 9px; height: 9px; border: 1.5px solid var(--blue); background: #FFFFFF; }
+.sv-sel i:nth-child(1) { left: -5px; top: -5px; }
+.sv-sel i:nth-child(2) { right: -5px; top: -5px; }
+.sv-sel i:nth-child(3) { left: -5px; bottom: -5px; }
+.sv-sel i:nth-child(4) { right: -5px; bottom: -5px; }
+.sv-sel .mono { position: absolute; left: -1.5px; bottom: 100%; padding: 3px 7px 2px; border-radius: 3px 3px 0 0; background: var(--blue); color: var(--milk); font-size: 10.5px; white-space: nowrap; }
+:is(.svr:hover, .svr:focus-visible, .svr.play) .sv-sel { visibility: visible; }
+.svr:focus-visible { outline: none; }
 .sv-no { display: flex; align-items: center; gap: 9px; align-self: start; padding-top: 10px; color: var(--pmu); }
 .sv-no i { width: 9px; height: 9px; border-radius: 50%; background: var(--tc); box-shadow: inset 0 0 0 1px rgba(14,14,15,.28); }
 .sv-art { display: block; width: 200px; height: 180px; }
@@ -32,6 +41,12 @@
 :is(.svr:hover, .svr:focus-visible) .sv-name { transform: translateX(10px); }
 .sv-desc { max-width: 560px; font-size: 18px; line-height: 1.4; }
 .sv-dl { color: var(--pmu); }
+.sv-note { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 9px; margin-top: 6px; font-size: 15.5px; }
+.sv-note .av { display: grid; place-items: center; width: 22px; height: 22px; margin: 0; border: 0; border-radius: 50% 50% 50% 3px; background: var(--c); color: var(--on); font: 600 10.5px/1 var(--sans); font-style: normal; }
+.sv-note .mono { color: var(--pmu); }
+.sv-rule { display: block; width: 100%; max-width: 200px; height: 8px; margin-top: 7px; overflow: visible; }
+.sv-rule path { fill: none; stroke: var(--pfg); stroke-width: 1; opacity: .35; }
+.sv-rule rect { fill: var(--tc); stroke: var(--ink); stroke-width: 1; }
 .sv-facts { display: grid; gap: 14px; }
 .sv-facts > span { display: grid; gap: 3px; }
 .sv-facts .mono { color: var(--pmu); }
@@ -156,7 +171,7 @@
   .shero .lede { font-size: 18px; }
   .sl { margin-top: 44px; }
   .svr { grid-template-columns: minmax(0, 1fr) 48px; gap: 14px 16px; padding: 26px 0; }
-  .svr::before { display: none; }
+  .sv-sel { inset: 8px -8px; }
   .sv-no { grid-column: 1; padding: 0; }
   .sv-go { grid-column: 2; grid-row: 1; width: 48px; height: 48px; }
   .sv-art { grid-column: 1 / -1; width: 150px; height: 135px; }
@@ -168,5 +183,5 @@
   .qa p { font-size: 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .svr *, .svr::before { animation: none !important; transition: none !important; }
+  .svr * { animation: none !important; transition: none !important; }
 }

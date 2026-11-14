@@ -8,8 +8,10 @@ import { href } from '../../routes';
 /**
  * Services. A calm page that answers three things at a glance: what we make · how long it takes ·
  * where it starts. The hero is the list itself: four rows (number · a small drawing · name and
- * what it is · what you get · time and starting price) · each one leads to its detail page. The
- * team shows its own work: a cursor comes to a row and its drawing plays (so does hover and
+ * what it is · what you get · time and starting price) · each one leads to its detail page. A row
+ * is a layer of the file: hover or focus selects it (the selection frame with its handles and size
+ * label) · the teammate who does the work left a comment on it · the usual length is a small ruler
+ * of weeks. The team shows its own work: a cursor comes to a row and its drawing plays (so does hover and
  * focus). Below: the combinations we like · fair questions. (The drawing board that used to be
  * the hero is gone: Batuhan found no reason for it.)
  */
@@ -40,18 +42,30 @@ const serviceHref = (ctx: Ctx, k: ServiceKey) => href(ctx.lang, 'service', { slu
 /** Who shows which row: the teammate whose work it mostly is. */
 const SHOWS: Record<ServiceKey, string> = { web: 'code', app: 'code', identity: 'design', motion: 'motion' };
 
+/** The longest job we take on: the ruler's full width (weeks). */
+const RULE_WEEKS = 20;
+
+/** "6 to 12 weeks" as a small ruler: a tick per week · the span we usually take filled in. */
+export function weeksRule(time: string): Safe {
+  const [a, b] = (time.match(/\d+/g) ?? []).map(Number);
+  if (!a || !b || b < a) return html``;
+  const ticks = Array.from({ length: RULE_WEEKS + 1 }, (_, i) => `M${i * 10} ${i % 4 === 0 ? 0 : 3}V8`).join('');
+  return html`<svg class="sv-rule" viewBox="-1 0 202 8" aria-hidden="true"><path d="${ticks}"></path><rect x="${a * 10}" y="2" width="${(Math.min(b, RULE_WEEKS) - a) * 10}" height="6"></rect></svg>`;
+}
+
 function hero(ctx: Ctx): Safe {
   const { t, lang } = ctx;
   const { overview: o, services: s } = SERVICES[lang];
   return html`<section class="shero" data-sec="hero" id="top"><div class="wrap">
 <p class="kick mono"><i class="fi" aria-hidden="true"></i><span>${t('Hizmetler')}</span><span aria-hidden="true">·</span><span class="url">lostcomma.co${ctx.path}</span></p>
-<div class="shd"><h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">${o.title}</h1><p class="lede" data-rest="motion" data-rest-at="end 12 4">${o.lede}</p></div>
+<div class="shd"><h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">${o.title.split('\n').map((l, i) => html`${i ? html`<br>` : ''}${l}`)}</h1><p class="lede" data-rest="motion" data-rest-at="0.86 0 0 -40" data-rest-at-m="0.8 1 0 10">${o.lede}</p></div>
 <ol class="sl">${SERVICE_KEYS.map(
     (k) => html`<li><a class="svr t-${TOOL_CLASS[k]}" href="${serviceHref(ctx, k)}" data-row="${k}" data-by="${SHOWS[k]}">
+<span class="sv-sel" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="mono">${s[k].name} · ${s[k].size}</span></span>
 <span class="sv-no mono"><i aria-hidden="true"></i>${s[k].no}</span>
 <span class="sv-art" aria-hidden="true"${k === 'web' ? html` data-rest="code" data-rest-at="1 1 4 2"` : ''}><span class="tart">${TILE_ART[k]}</span></span>
-<span class="sv-main"><b class="sv-name">${s[k].name}</b><span class="sv-desc">${s[k].desc}</span><span class="sv-dl mono">${s[k].dl.join(' · ')}</span></span>
-<span class="sv-facts"><span><span class="mono">${t('Genelde')}</span><b>${s[k].time}</b></span><span><span class="mono">${t('Başlangıç fiyatı')}</span><b>${ctx.settings.text(priceKey(k, 0), ctx.lang) ?? t('[FİYAT]')}</b></span></span>
+<span class="sv-main"><b class="sv-name">${s[k].name}</b><span class="sv-desc">${s[k].pitch}</span><span class="sv-dl mono">${s[k].dl.join(' · ')}</span><span class="sv-note c-${SHOWS[k]}"><i class="av" aria-hidden="true">${SHOWS[k][0]!.toUpperCase()}</i><span class="mono" lang="en">${SHOWS[k]}</span><span>${s[k].note}</span></span></span>
+<span class="sv-facts"><span><span class="mono">${t('Genelde')}</span><b>${s[k].time}</b>${weeksRule(s[k].time)}</span><span><span class="mono">${t('Başlangıç fiyatı')}</span><b>${ctx.settings.text(priceKey(k, 0), ctx.lang) ?? t('[FİYAT]')}</b></span></span>
 <span class="sv-go"><span class="sr">${s[k].see}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"></path></svg></span>
 </a></li>`,
   )}</ol>

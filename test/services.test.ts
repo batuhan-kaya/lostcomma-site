@@ -162,12 +162,17 @@ describe('Services · the overview', async () => {
     expect(en.match(/data-row="\w+"/g)).toEqual(['data-row="web"', 'data-row="app"', 'data-row="identity"', 'data-row="motion"']);
     for (const k of SERVICE_KEYS) {
       const s = SERVICES.en.services[k];
-      expect(en).toContain(`<b class="sv-name">${s.name}</b><span class="sv-desc">${s.desc}</span><span class="sv-dl mono">${s.dl.join(' · ')}</span>`);
+      expect(en).toContain(`<b class="sv-name">${s.name}</b><span class="sv-desc">${s.pitch}</span><span class="sv-dl mono">${s.dl.join(' · ')}</span>`);
+      // A layer of the file: its selection label · a comment from the teammate who does it · a ruler of weeks.
+      expect(en).toContain(`<span class="mono">${s.name} · ${s.size}</span>`);
+      expect(en).toContain(`<span>${s.note}</span></span></span>`);
       expect(en).toContain(`<b>${s.time}</b>`);
     }
+    expect(en.match(/class="sv-rule"/g)).toHaveLength(4);
+    expect(en).toContain('<rect x="60" y="2" width="60" height="6">');
     expect(en.match(/\[PRICE\]/g)).toHaveLength(4);
     expect(tr.match(/\[FİYAT\]/g)).toHaveLength(4);
-    expect(tr).toContain('<h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">Ne yapıyoruz.</h1>');
+    expect(tr).toContain('<h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">Dört şey yaparız.<br>İyi yaparız.</h1>');
   });
 
   it('links every row to its page in its language · each row names the teammate who shows it', () => {

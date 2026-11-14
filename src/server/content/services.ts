@@ -45,6 +45,9 @@ export interface ServiceCopy {
   /** The bold sentence at the end of the lede: what to do with the hero. */
   try: string;
   desc: string;
+  /** The overview row: what it is in our own words (two short sentences) · and a remark from the teammate who does it. */
+  pitch: string;
+  note: string;
   dl: string[];
   time: string;
   hint: string;
@@ -70,9 +73,9 @@ export interface OverviewCopy {
 
 const en: { overview: OverviewCopy; services: Record<ServiceKey, ServiceCopy> } = {
   overview: {
-    title: 'What we do.',
-    lede: 'Websites and apps and identity and motion. The same team designs and builds all four. Each row says what it is · how long it takes and where it starts.',
-    toolsP: 'Most projects need at least two of these. The same people do all of them so nothing gets lost in between.',
+    title: 'We do four things.\nWe do them well.',
+    lede: 'Websites · apps · identity · motion. All four leave the same table. Ask us for a fifth and we will send you to someone good.',
+    toolsP: 'Most jobs need two of these. The same people do both so neither one waits for the other.',
     combos: [
       { a: 'identity', b: 'web', is: 'a launch.' },
       { a: 'web', b: 'app', is: 'one login everywhere.' },
@@ -99,6 +102,8 @@ const en: { overview: OverviewCopy; services: Record<ServiceKey, ServiceCopy> } 
       lede: 'Fast and accessible and easy for your team to edit. And right at every width.',
       try: 'Grab the handle and see for yourself.',
       desc: 'Marketing sites and web apps that load fast and feel alive. Built so your team can edit them after we leave.',
+      pitch: 'Sites that open on a phone at a bus stop. You change the words yourself and never have to call us for it.',
+      note: 'A slow page never ships. The build will not let it.',
       dl: ['Strategy', 'Design', 'Development', 'CMS', 'Hosting'],
       time: '6 to 12 weeks',
       hint: 'Website tool · drag out a frame',
@@ -148,6 +153,8 @@ const en: { overview: OverviewCopy; services: Record<ServiceKey, ServiceCopy> } 
       lede: 'Native on iOS and Android and quick on a five year old phone. Designed for the hand that holds it.',
       try: 'Drag the thumb and see what it can reach.',
       desc: 'iOS and Android apps with a native feel and real performance. Interfaces people open every day.',
+      pitch: 'The button is where the thumb already is. We work for the review that says so fast.',
+      note: 'It is not done until it runs on a real phone.',
       dl: ['Product design', 'Prototypes', 'iOS', 'Android', 'Launch'],
       time: '10 to 20 weeks',
       hint: 'App tool · click to place a phone',
@@ -197,6 +204,8 @@ const en: { overview: OverviewCopy; services: Record<ServiceKey, ServiceCopy> } 
       lede: 'Names and marks and type and voice. Systems that hold up from a favicon to a billboard.',
       try: 'Drag the scale and watch the mark change its shape.',
       desc: 'Names and marks and type and voice. Systems that hold up from a favicon to a billboard.',
+      pitch: 'An identity that holds on a business card and on a bus shelter. The logo is only the part you see.',
+      note: 'No logos in week one. Only questions.',
       dl: ['Naming', 'Logo', 'Type', 'Colour', 'Guidelines'],
       time: '4 to 8 weeks',
       hint: 'Pen tool · draw a mark',
@@ -246,6 +255,8 @@ const en: { overview: OverviewCopy; services: Record<ServiceKey, ServiceCopy> } 
       lede: 'Interface motion and brand films. The small details that make people smile without knowing why.',
       try: 'Bend the curve and feel the difference.',
       desc: 'Interface motion and brand films. The small details that make people smile without knowing why.',
+      pitch: 'The half seconds nobody notices and everybody feels. And a brand film now and then.',
+      note: 'I once spent half a day on one curve. Worth it.',
       dl: ['UI motion', 'Brand films', 'Micro interactions', 'Rive'],
       time: '2 to 8 weeks',
       hint: 'Path tool · draw a path and watch it move',
@@ -290,9 +301,9 @@ const en: { overview: OverviewCopy; services: Record<ServiceKey, ServiceCopy> } 
 
 const tr: typeof en = {
   overview: {
-    title: 'Ne yapıyoruz.',
-    lede: 'Web siteleri ve uygulamalar ve kimlik ve hareket. Dördünü de aynı ekip tasarlar ve kodlar. Her satır ne olduğunu · ne kadar sürdüğünü ve nereden başladığını söyler.',
-    toolsP: 'Çoğu proje bunlardan en az ikisini ister. Hepsini aynı insanlar yapar ki arada hiçbir şey kaybolmasın.',
+    title: 'Dört şey yaparız.\nİyi yaparız.',
+    lede: 'Web sitesi · uygulama · kimlik · hareket. Dördü de aynı masadan çıkar. Beşincisini isteyene iyi birini öneririz.',
+    toolsP: 'Çoğu iş bunlardan ikisini ister. Aynı insanlar yaptığı için biri diğerini beklemez.',
     combos: [
       { a: 'identity', b: 'web', is: 'bir lansman.' },
       { a: 'web', b: 'app', is: 'her yerde tek giriş.' },
@@ -319,6 +330,8 @@ const tr: typeof en = {
       lede: 'Hızlı ve erişilebilir ve ekibinin kolayca düzenleyebileceği. Üstelik her genişlikte doğru.',
       try: 'Tutamacı tut ve kendin gör.',
       desc: 'Hızlı açılan ve canlı hissettiren tanıtım siteleri ve web uygulamaları. Biz gittikten sonra ekibin düzenleyebilsin diye kuruluyor.',
+      pitch: 'Durakta otobüs beklerken telefonda da açılan siteler. Yazıları kendin değiştirirsin ve bunun için bizi aramazsın.',
+      note: 'Yavaş açılan sayfa bizden çıkmaz. Derleme izin vermiyor.',
       dl: ['Strateji', 'Tasarım', 'Geliştirme', 'CMS', 'Barındırma'],
       time: '6 ile 12 hafta',
       hint: 'Web sitesi aracı · bir çerçeve sürükle',
@@ -368,6 +381,8 @@ const tr: typeof en = {
       lede: 'iOS ve Android’de doğal ve beş yıllık bir telefonda bile hızlı. Onu tutan el için tasarlanmış.',
       try: 'Başparmağı sürükle ve nereye uzandığını gör.',
       desc: 'Doğal hissettiren ve gerçekten hızlı iOS ve Android uygulamaları. İnsanların her gün açtığı arayüzler.',
+      pitch: 'Başparmak neredeyse düğme orada. Yorumlara çok hızlı yazılsın diye uğraşıyoruz.',
+      note: 'Gerçek telefonda denemeden bitti demiyoruz.',
       dl: ['Ürün tasarımı', 'Prototip', 'iOS', 'Android', 'Yayın'],
       time: '10 ile 20 hafta',
       hint: 'Uygulama aracı · telefon koymak için tıkla',
@@ -417,6 +432,8 @@ const tr: typeof en = {
       lede: 'İsimler ve işaretler ve yazı ve ses tonu. Favicon’dan reklam panosuna kadar ayakta duran sistemler.',
       try: 'Ölçeği sürükle ve işaretin nasıl şekil değiştirdiğini izle.',
       desc: 'İsimler ve işaretler ve yazı ve ses tonu. Favicon’dan reklam panosuna kadar ayakta duran sistemler.',
+      pitch: 'Kartvizitte de otobüs durağında da aynı duran bir kimlik. Logo işin sadece görünen kısmı.',
+      note: 'İlk hafta logo çizmiyoruz. Soru soruyoruz.',
       dl: ['İsim', 'Logo', 'Yazı', 'Renk', 'Kılavuz'],
       time: '4 ile 8 hafta',
       hint: 'Kalem · bir işaret çiz',
@@ -466,6 +483,8 @@ const tr: typeof en = {
       lede: 'Arayüz hareketleri ve marka filmleri. İnsanları nedenini bilmeden gülümseten küçük detaylar.',
       try: 'Eğriyi bük ve farkı hisset.',
       desc: 'Arayüz hareketleri ve marka filmleri. İnsanları nedenini bilmeden gülümseten küçük detaylar.',
+      pitch: 'Kimsenin fark etmediği ama herkesin hissettiği yarım saniyeler. Arada bir de marka filmi.',
+      note: 'Bir eğriyle yarım gün geçirdiğim oldu. Değdi.',
       dl: ['Arayüz hareketi', 'Marka filmi', 'Mikro etkileşim', 'Rive'],
       time: '2 ile 8 hafta',
       hint: 'Yol aracı · bir yol çiz ve hareketini izle',
