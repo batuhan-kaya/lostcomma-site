@@ -71,7 +71,7 @@ export interface Page<D = undefined> {
   scripts?: string[];
   /** Extra CSS entries besides app.css. */
   styles?: string[];
-  /** Pages like 404 have no footer or next band. */
+  /** The 404 has no next band and no preloader. The footer is on every page: this one too. */
   bare?: boolean;
   /** Keep out of search engines (404 · panel). Drops canonical and hreflang. */
   noindex?: boolean;

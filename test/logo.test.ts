@@ -83,7 +83,8 @@ describe('the mark', () => {
 describe('the footer', () => {
   it('is the same on every page: a way to start · the whole site · the sign-off · the small print', async () => {
     for (const lang of ['tr', 'en'] as const) {
-      for (const page of [href(lang, 'home'), href(lang, 'work'), href(lang, 'privacy')]) {
+      // Every page: the 404 too.
+      for (const page of [href(lang, 'home'), href(lang, 'work'), href(lang, 'lab'), href(lang, 'privacy'), `/${lang}/no-such-page`]) {
         const doc = (await get(page)).body;
         const ft = doc.slice(doc.indexOf('<footer class="ft th-ink" data-sec="ft" data-ft>'));
         expect(ft.length, page).toBeGreaterThan(100);
