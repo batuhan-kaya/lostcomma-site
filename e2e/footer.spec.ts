@@ -3,37 +3,34 @@ import { watchErrors } from './checks';
 
 /**
  * The footer on every page (layout/chrome.ts) and the mark beside the name (src/shared/logo.ts):
- * the sign-off is drawn with a pen once it shows · every link in it leads somewhere · the mark is
- * one size with the name.
+ * the sign-off is the logo · the team · the way back up · every link in it
+ * leads somewhere · the mark is one size with the name.
  */
 
 test.describe('footer', () => {
-  test('draws the sign-off when it comes into view · not before', async ({ page }) => {
+  test('signs off with the logo · the team and a place for you · the way back up', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/en/work');
-    const ft = page.locator('[data-ft]');
-    await expect(ft).toHaveAttribute('data-draw', 'wait');
-    const corner = page.locator('.ft-mk .lc-t');
-    expect(await corner.evaluate((el) => getComputedStyle(el).fillOpacity)).toBe('0');
-    await page.locator('.ft-lock').scrollIntoViewIfNeeded();
-    await expect(ft).toHaveAttribute('data-draw', 'go');
-    // Drawn · then filled: the corner and the comma end up solid · the letters in place.
-    await expect.poll(() => corner.evaluate((el) => getComputedStyle(el).fillOpacity), { timeout: 5000 }).toBe('1');
-    await expect.poll(() => page.locator('.ft-mk .lc-c').evaluate((el) => getComputedStyle(el).fillOpacity), { timeout: 5000 }).toBe('1');
-    await expect.poll(() => page.locator('.ft-w > span').last().evaluate((el) => getComputedStyle(el).opacity), { timeout: 5000 }).toBe('1');
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    const base = page.locator('.ft-base');
+    await expect(base.locator('.ft-logo')).toHaveAttribute('href', '/en');
+    await expect(base.locator('.ft-team .av')).toHaveText(['D', 'C', 'M', 'Y']);
+    await expect(base.locator('.ft-team p')).toHaveText('Three of us · you are the fourth');
+    // The logo is two plain words: nothing between them · nothing blinks.
+    await expect(base.locator('.ft-logo .lc-lock')).toHaveText('lost comma');
+    expect(await page.locator('.hd .logo .lc-lock > *').count()).toBe(3);
+    await expect(base.locator('.ft-up')).toHaveAttribute('href', '#top');
+    // Nothing waits for a script or an animation: it is simply there · and fits the screen.
+    expect(await base.evaluate((el) => el.getBoundingClientRect().right)).toBeLessThanOrEqual(await page.evaluate(() => document.documentElement.clientWidth));
     expect(errors).toEqual([]);
   });
 
-  test('is simply there with reduced motion and without JavaScript', async ({ page, browser }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/tr/studyo');
-    await expect(page.locator('[data-ft]')).not.toHaveAttribute('data-draw', /./);
-    expect(await page.locator('.ft-mk .lc-t').evaluate((el) => getComputedStyle(el).fillOpacity)).toBe('1');
+  test('is the same without JavaScript', async ({ browser }) => {
     const ctx = await browser.newContext({ javaScriptEnabled: false });
     const plain = await ctx.newPage();
-    await plain.goto('/en/notes');
-    await expect(plain.locator('[data-ft]')).not.toHaveAttribute('data-draw', /./);
-    expect(await plain.locator('.ft-mk .lc-t').evaluate((el) => getComputedStyle(el).fillOpacity)).toBe('1');
+    await plain.goto('/tr/notes');
+    await expect(plain.locator('.ft-team p')).toHaveText('Üç kişiyiz · dördüncü sensin');
+    await expect(plain.locator('.ft-up')).toBeVisible();
     await ctx.close();
   });
 

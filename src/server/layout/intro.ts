@@ -10,7 +10,7 @@ import { MARK } from '../../shared/logo';
  *
  * Only when someone arrives from outside: a typed address · a bookmark · a link on another site.
  * The server decides from the browser's Sec-Fetch headers so nothing is stored on the device
- * (the privacy page promises three localStorage keys and no more). A page reached from our own
+ * (the privacy page promises two localStorage keys and no more). A page reached from our own
  * pages never has it · neither do old browsers without the headers.
  */
 export function arrivesFromOutside(req: Pick<FastifyRequest, 'headers'>): boolean {

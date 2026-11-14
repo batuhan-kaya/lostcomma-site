@@ -6,10 +6,14 @@ import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
 
 /**
- * Services · "Pick a tool". The hero is a drawing board with one tool per service: drag out a
- * website frame · place a phone · draw a mark with the pen · draw a path and watch it move. The
- * inspector describes the tool in hand. Below: the four tools · the combinations we like · fair
- * questions. Without JS the board is a picture and everything else reads top to bottom.
+ * Services. The list is the page's big type: four names as tall as the screen allows · one of them
+ * open. The open name is set wide and the others narrow and faint (Anybody's width axis: the type
+ * itself makes room · like a frame being resized). Its selection frame counts the real size while
+ * it stretches. Under it: a small drawing · what it is in our words · what you get · a comment from
+ * the teammate who does it · a ruler of weeks · the starting price. Hover or focus opens a row ·
+ * and the team does it too: a cursor takes the handle of its own service and pulls the name open.
+ * One row is always open and every panel is the same height: nothing below ever moves. Touch
+ * screens and no JS: every row open. Below: the combinations · fair questions.
  */
 
 /** Short keys used in class names (.t-web · .t-app · .t-id · .t-mo). */
@@ -21,10 +25,7 @@ export const TOOL_ICON: Record<ServiceKey, Safe> = {
   identity: raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l6 8.5-6 9.5-6-9.5z"></path><circle cx="12" cy="12" r="1.6"></circle></svg>'),
   motion: raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19c7 0 7-14 16-14"></path><circle cx="4" cy="19" r="2"></circle><circle cx="20" cy="5" r="2"></circle></svg>'),
 };
-const UNDO = raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6L4 11l5 5M4 11h10a5 5 0 0 1 0 10h-3"></path></svg>');
-const BIN = raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>');
-
-/** The drawings on the four tiles. They come alive on hover. */
+/** The small drawing of each row. It plays on hover · on focus · when a teammate points at it (.play). */
 const TILE_ART: Record<ServiceKey, Safe> = {
   web: raw('<span class="br"><i></i><i></i><i></i><i></i></span>'),
   app: raw('<span class="ph"><em></em><i></i><i></i><i></i></span>'),
@@ -36,70 +37,49 @@ const TILE_ART: Record<ServiceKey, Safe> = {
   ),
 };
 
-const lines = (s: string): Safe => html`${s.split('\n').map((l, i) => html`${i ? html`<br>` : ''}${l}`)}`;
 const serviceHref = (ctx: Ctx, k: ServiceKey) => href(ctx.lang, 'service', { slug: SERVICE_SLUGS[k][ctx.lang] });
+
+/** Who shows which row: the teammate whose work it mostly is. */
+const SHOWS: Record<ServiceKey, string> = { web: 'code', app: 'code', identity: 'design', motion: 'motion' };
+
+/** The longest job we take on: the ruler's full width (weeks). */
+const RULE_WEEKS = 20;
+
+/** "6 to 12 weeks" as a small ruler: a tick per week · the span we usually take filled in. */
+export function weeksRule(time: string): Safe {
+  const [a, b] = (time.match(/\d+/g) ?? []).map(Number);
+  if (!a || !b || b < a) return html``;
+  const ticks = Array.from({ length: RULE_WEEKS + 1 }, (_, i) => `M${i * 10} ${i % 4 === 0 ? 0 : 3}V8`).join('');
+  return html`<svg class="sv-rule" viewBox="-1 0 202 8" aria-hidden="true"><path d="${ticks}"></path><rect x="${a * 10}" y="2" width="${(Math.min(b, RULE_WEEKS) - a) * 10}" height="6"></rect></svg>`;
+}
 
 function hero(ctx: Ctx): Safe {
   const { t, lang } = ctx;
   const { overview: o, services: s } = SERVICES[lang];
   return html`<section class="shero" data-sec="hero" id="top"><div class="wrap">
 <p class="kick mono"><i class="fi" aria-hidden="true"></i><span>${t('Hizmetler')}</span><span aria-hidden="true">·</span><span class="url">lostcomma.co${ctx.path}</span></p>
-<h1 class="ttl" data-rest="design" data-rest-at="end 14 -12">${o.title}</h1>
-<p class="lede">${o.lede} <b>${o.try}</b> ${o.after}</p>
-<div class="board" data-board>
-<div class="stage t-web" data-stage role="img" aria-label="${t('Çizim tahtası')}" data-rest="motion" data-rest-at="0.07 0.88" data-rest-at-m="0.06 0.64">
-<p class="empty" data-empty aria-hidden="true">${t('Buraya çiz')}</p>
-</div>
-<p class="tbh mono" data-hint aria-hidden="true">${s.web.hint}</p>
-<div class="tb" role="toolbar" aria-label="${t('Araçlar')}">
-${SERVICE_KEYS.map(
-  (k, i) => html`<button type="button" class="tl t-${TOOL_CLASS[k]}${i === 0 ? ' on' : ''}" data-tool="${k}" aria-pressed="${String(i === 0)}" aria-label="${s[k].tool}">${TOOL_ICON[k]}<span class="tt mono" aria-hidden="true">${s[k].tool}</span></button>`,
-)}
-<i class="sep" aria-hidden="true"></i>
-<button type="button" class="tl" data-undo aria-label="${t('Geri al')}">${UNDO}<span class="tt mono" aria-hidden="true">${t('Geri al')}</span></button>
-<button type="button" class="tl" data-clear aria-label="${t('Tahtayı temizle')}">${BIN}<span class="tt mono" aria-hidden="true">${t('Temizle')}</span></button>
-</div>
-<aside class="insp" aria-label="${t('Denetçi')}">
-<p class="ih mono" aria-hidden="true"><span>${t('Denetçi')}</span><span data-itag>${s.web.tag}</span></p>
-${SERVICE_KEYS.map(
-  (k, i) => html`<div class="ib t-${TOOL_CLASS[k]}" data-ib="${k}"${i ? html` hidden` : ''}>
-<b>${s[k].name}</b>
-<p>${s[k].desc}</p>
-<ul class="dl">${s[k].dl.map((d) => html`<li>${d}</li>`)}</ul>
-<div class="ir"><span class="mono">${t('Genelde')}</span><b>${s[k].time}</b></div>
-<div class="ir"><span class="mono">${t('Başlangıç fiyatı')}</span><b>${ctx.settings.text(priceKey(k, 0), ctx.lang) ?? t('[FİYAT]')}</b></div>
-<a class="ilink" href="${serviceHref(ctx, k)}"${k === 'web' ? html` data-rest="code" data-rest-at="0.82 1 0 16"` : ''}><span>${s[k].more}</span><span aria-hidden="true">→</span></a>
-</div>`,
-)}
-</aside>
-</div>
-</div></section>`;
-}
-
-function tools(ctx: Ctx): Safe {
-  const { t, lang } = ctx;
-  const { overview: o, services: s } = SERVICES[lang];
-  return html`<section class="tools" data-sec="tools"><div class="wrap">
-<div class="thd"><div><p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Dört araç')}</p><h2 class="h2">${lines(o.toolsH)}</h2></div><p data-rest="host" data-rest-at="0.6 -0.6">${o.toolsP}</p></div>
-<div class="tg">${SERVICE_KEYS.map(
-    (k) => html`<a class="tile t-${TOOL_CLASS[k]}" href="${serviceHref(ctx, k)}">
-<span class="tnum mono"><span>${s[k].no} · ${s[k].tag}</span><span>${s[k].size}</span></span>
-<span class="tart" aria-hidden="true">${TILE_ART[k]}</span>
-<b class="tname">${s[k].name}</b>
-<p>${s[k].desc}</p>
-<span class="tdl mono">${s[k].dl.join(' · ')}</span>
-<span class="tfoot"><span class="mono">${s[k].time}</span><span class="tgo">${s[k].see} <span aria-hidden="true">→</span></span></span>
-</a>`,
-  )}</div>
+<div class="shd"><h1 class="ttl" data-rest="design" data-rest-at="end 12 -6">${o.title.split('\n').map((l, i) => html`${i ? html`<br>` : ''}${l}`)}</h1><p class="lede" data-rest="motion" data-rest-at="0.86 0 0 -40" data-rest-at-m="0.8 1 0 10">${o.lede}</p></div>
+<ol class="sl" data-sl data-rest="code" data-rest-at="0.9 1 0 22" data-rest-at-m="0.8 0 0 -26">${SERVICE_KEYS.map(
+    (k, i) => html`<li><a class="svr t-${TOOL_CLASS[k]}${i === 0 ? ' on' : ''}" href="${serviceHref(ctx, k)}" data-row="${k}" data-by="${SHOWS[k]}">
+<span class="sv-head"><span class="sv-no mono"><i aria-hidden="true"></i>${s[k].no}</span><span class="sv-name"><span data-word>${s[k].name}</span><span class="sv-sel" aria-hidden="true"><i></i><i></i><i></i><i></i><b data-grip></b><span class="mono" data-size>${s[k].name} · ${s[k].size}</span></span></span><span class="sv-time mono">${s[k].time}</span></span>
+<span class="sv-more"><span class="sv-in">
+<span class="sv-art" aria-hidden="true"><span class="tart">${TILE_ART[k]}</span></span>
+<span class="sv-main"><span class="sv-desc">${s[k].pitch}</span><span class="sv-dl mono">${s[k].dl.join(' · ')}</span><span class="sv-note c-${SHOWS[k]}"><i class="av" aria-hidden="true">${SHOWS[k][0]!.toUpperCase()}</i><span class="mono" lang="en">${SHOWS[k]}</span><span>${s[k].note}</span></span></span>
+<span class="sv-facts"><span><span class="mono">${t('Genelde')}</span><b>${s[k].time}</b>${weeksRule(s[k].time)}</span><span><span class="mono">${t('Başlangıç fiyatı')}</span><b>${ctx.settings.text(priceKey(k, 0), ctx.lang) ?? t('[FİYAT]')}</b></span></span>
+<span class="sv-go"><span class="sr">${s[k].see}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"></path></svg></span>
+</span></span>
+</a></li>`,
+  )}</ol>
+<p class="sl-note">${o.toolsP}</p>
 </div></section>`;
 }
 
 function combos(ctx: Ctx): Safe {
   const { t, lang } = ctx;
   const { overview: o, services: s } = SERVICES[lang];
-  const pill = (k: ServiceKey) => html`<span class="pl t-${TOOL_CLASS[k]}">${TOOL_ICON[k]}${s[k].tool}</span>`;
+  const pill = (k: ServiceKey) => html`<span class="pl t-${TOOL_CLASS[k]}">${TOOL_ICON[k]}${s[k].name}</span>`;
   return html`<section class="combo" data-sec="combo"><div class="wrap">
-<p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Birlikte daha iyi · bir satırın üstüne gel')}</p>
+<p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Birlikte daha iyi')}</p>
 <h2 class="h2">${t('Sevdiğimiz matematik.')}</h2>
 <ul class="eqs">${o.combos.map(
     (c, i) => html`<li class="eq"><span class="pills">${pill(c.a)}<span class="plus" aria-hidden="true">+</span>${pill(c.b)}</span><span class="eqs-q" aria-hidden="true">=</span><b class="res"${i === 0 ? html` data-rest="host" data-rest-at="end 18 -6"` : ''}>${c.is}</b></li>`,
@@ -128,13 +108,7 @@ export const servicesPage: Page = {
   title: (t) => t('Hizmetler'),
   description: (t) => t('Web siteleri · uygulamalar · kimlik ve hareket.'),
   body: (ctx) => html`${hero(ctx)}
-${tools(ctx)}
 ${combos(ctx)}
 ${faq(ctx)}`,
-  /** The board needs each tool's name · tag · hint and how drawn things are labelled. */
-  data: (ctx) => {
-    const s = SERVICES[ctx.lang].services;
-    return { tools: Object.fromEntries(SERVICE_KEYS.map((k) => [k, { tag: s[k].tag, hint: s[k].hint }])) };
-  },
   next: { to: 'process', kick: msg('Sonraki sayfa'), big: msg('Süreç'), tone: 'night' },
 };

@@ -4,31 +4,11 @@
 
 .cur { position: absolute; left: 0; top: 0; display: block; transform: translate3d(-300px,-300px,0); transition: opacity .618s; will-change: transform; }
 .cur.zz { opacity: 0; }
-.cur .dr { position: relative; display: block; }
-
 /*
- * The resting drift: ±6 px across and ±5 px down on two slow waves (about 16 s and 13 s).
- * Each wave starts at zero so it can begin at any moment without a jump · crew.ts folds the
- * offset into the cursor's position when it is sent somewhere else. Compositor only: a
- * resting team costs no JavaScript.
+ * A cursor at rest is still (a hand off the mouse does not float). What moves it is a hand
+ * (src/shared/hand.ts · crew.ts): reaches on soft arcs and now and then a fidget. `.resting`
+ * marks a cursor that is still at its resting spot.
  */
-@keyframes cur-dx {
-  0% { translate: 0 0; animation-timing-function: cubic-bezier(.33, .67, .67, 1); }
-  25% { translate: 6px 0; animation-timing-function: cubic-bezier(.37, 0, .63, 1); }
-  75% { translate: -6px 0; animation-timing-function: cubic-bezier(.33, 0, .67, .33); }
-  100% { translate: 0 0; }
-}
-@keyframes cur-dy {
-  0% { transform: translateY(0); animation-timing-function: cubic-bezier(.33, .67, .67, 1); }
-  25% { transform: translateY(5px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); }
-  75% { transform: translateY(-5px); animation-timing-function: cubic-bezier(.33, 0, .67, .33); }
-  100% { transform: translateY(0); }
-}
-.cur.drifting .dr { animation: cur-dx 15.7s infinite, cur-dy 12.6s infinite; }
-.c-code.drifting .dr { animation-duration: 14.1s, 11.3s; animation-direction: reverse, normal; }
-.c-motion.drifting .dr { animation-duration: 17.3s, 13.9s; animation-direction: normal, reverse; }
-html.still .cur .dr { animation: none; }
-@media (prefers-reduced-motion: reduce) { .cur .dr { animation: none; } }
 .cur .arw {
   display: block;
   width: 24px;
@@ -36,10 +16,11 @@ html.still .cur .dr { animation: none; }
   overflow: visible;
   filter: drop-shadow(0 3px 5px rgba(14,14,15,.28));
   transform-origin: 3px 2px;
-  transition: transform .14s cubic-bezier(.3,1.6,.4,1);
+  transition: transform .16s cubic-bezier(.3,1.4,.4,1);
 }
 .cur .arw path { fill: var(--c); stroke: #FFFFFF; stroke-width: 1.6; stroke-linejoin: round; }
-.cur.pr .arw { transform: scale(.8); }
+/* A click: down at once (the button gives) · back up with a little spring. */
+.cur.pr .arw { transform: translateY(1px) scale(.84); transition-duration: .05s; transition-timing-function: ease-out; }
 .cur .tag {
   position: absolute;
   left: 18px;

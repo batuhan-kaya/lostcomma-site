@@ -54,6 +54,7 @@ Sitenin bütün içeriğini kod açmadan yönetmek için tek kişilik bir yönet
 | **Gelen kutusu** | Ana sayfadaki brief formundan gelenler. Durum: yeni · okundu · yanıtlandı · arşiv. Açınca okundu olur. "Yanıtla" e-posta programını konu satırıyla açar. Silme. |
 | **Görüşmeler** | Yaklaşan ve geçmiş görüşmeler (İstanbul saati ve kişinin kendi saati) · not · iptal (saat yeniden açılır · istenirse kişiye kendi dilinde iptal e-postası gider). **Kapalı günler ve saatler:** tatil ya da dolu bir öğleden sonra. O saatler Başla sayfasında görünmez ve alınamaz. |
 | **E-postalar** | Giden kutusu: gönderildi · bekliyor · gönderilemedi (hatasıyla). Tekrar dene · içeriğini gör. E-posta ayarlı mı · deneme e-postası gönder. |
+| **Metinler** | Sitedeki cümleler kod açmadan değişir. **Ana sayfa · bölümler:** hero başlığının satırları (`{w}` değişen kelimenin kutusu) · değişen kelimeler · manifesto (silinen · yazılan · yorumlar) · hizmetler · pano notları · süreç adımları · proje başlat başlığı ve seçenekleri. **Diğer her şey:** sunucunun yazdığı bütün cümleler sayfa sayfa (Ana sayfa · Header ve footer · İşler · Hizmetler · … · Yasal sayfalar) · iki dilde yan yana · arama. Alan sitenin şu an söylediğini gösterir · boşaltıp kaydedince koddaki hâline döner · değişen satır "değişti" diye işaretlenir ve koddaki hâli altında yazar. Virgül ve `{n}` gibi yer tutucular denetlenir. Her kayıt Kayıt'a düşer ve "Bu hale dön" ile geri alınır. Kapsam dışı: sadece tarayıcının söylediği cümleler (imleç baloncukları) · diğer sayfaların yapılı içeriği (hizmet listeleri · süreç haftaları) · yasal metinler · e-postalar. |
 | **Site ayarları** | Panelden doldurulan yer tutucular: dört hizmetin üçer basamak fiyatı (iki dilde · virgülsüz) · Süreç sayfasındaki iki planın fiyatı · bir sonraki boş yer ayı (İşler sayfası ve footer) · stüdyo adresi · telefon · yasal sayfaların bilgileri · sosyal hesaplar (footer'daki Takip et sütunu · https ve hesabın kendi sitesi · boş olan görünmez). Boş kalan yer tutucu olarak görünmeye devam eder ve yayına hazırlık listesinde çıkar. |
 | **Yönlendirmeler** | Bir işin ya da notun adresi değişince eski adres yeni adrese otomatik yönlenir (301 · zincir oluşmaz). Elle eklenebilir ve silinebilir. Kaç kez kullanıldığı görünür. |
 | **Kayıt** | Kim · ne · ne zaman · hangi IP: her kayıt · silme · durum değişikliği · giriş. İçerik değişikliklerinde önce ve sonra hali saklanır · iki hal yan yana görülür · **"Bu hale dön"** ile geri alınır (silinen bir iş ya da not da geri getirilebilir). |
@@ -74,6 +75,7 @@ Sitenin bütün içeriğini kod açmadan yönetmek için tek kişilik bir yönet
 - `settings`: anahtar → değer (jsonb).
 - `closures`: gün · başlangıç ve bitiş saati (boşsa bütün gün) · sebep.
 - `redirects`: eski adres → yeni adres · kullanım sayısı.
+- `settings` içinde dört satır daha (yeni tablo yok): `texts.t.tr` · `texts.t.en` (cümleler) · `texts.home.tr` · `texts.home.en` (ana sayfa içeriği).
 - `bookings.staff_note`: görüşmeye panelden not.
 - `briefs.note`: brief'e panelden not.
 
@@ -127,5 +129,6 @@ Sitenin bütün içeriğini kod açmadan yönetmek için tek kişilik bir yönet
 ## 8. Sonraya kalanlar
 
 - Birden fazla kullanıcı ve yetki.
+- Metinler: diğer sayfaların yapılı içeriği (hizmet listeleri · süreç · stüdyo · lab) ve imleç baloncukları.
 - Görsel kırpma.
 - Projeleri sürükleyerek sıralama (sıra numaradan gelir).

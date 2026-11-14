@@ -64,6 +64,24 @@ Far jumps | Fade out and fade in near the new spot. No flights.
 
 If the host has to travel far it fades out and appears again near the new section.[^2] Long flights across the page were the main source of the swarm feeling.
 
+## Then we gave them a hand
+
+The spring made the cursors smooth. It did not make them alive. A spring glides in a straight line at the same pace every time and then it floats on the spot. Nobody moves a mouse like that.
+
+So we watched our own hands and wrote down what they do.
+
+~~~figure
+A reach | One sweep of the arm. It sets off gently and is fastest a little before half way and takes its time to slow down.
+An arc | The path bends a little. An arm turns around an elbow. It does not slide on a rail.
+A miss | A long reach lands a few pixels off. Then a beat. Then a short slow move fixes it.
+Stillness | A hand at rest does not float. It is still. Every few seconds it moves the mouse a little.
+Manners | Come close with your pointer and the cursor steps out of your way.
+~~~
+
+Time now grows with the root of the distance. A spot twice as far away does not take twice as long. And each of us has a temper. Design is careful. Code goes straight and quick. Motion sweeps in wide arcs.
+
+The spring is not gone. It still runs the playground above and it draws the ways on our 404 page. The team just stopped riding it.
+
 ## When motion should stop
 
 If your system asks for \`prefers-reduced-motion\` the cursors snap to their places and stay still. Nothing on this site should need movement to make sense. The Studio page has a switch that does the same for this site only.
@@ -130,6 +148,24 @@ Uzak atlayışlar | Kaybol ve yeni yerin yakınında yeniden belir. Uçuş yok.
 ~~~
 
 Ev sahibinin uzağa gitmesi gerekirse kayboluyor ve yeni bölümün yakınında yeniden beliriyor.[^2] Sürü hissinin asıl kaynağı sayfa boyunca yapılan uzun uçuşlardı.
+
+## Sonra onlara bir el verdik
+
+Yay imleçleri akıcı yaptı. Canlı yapmadı. Yay her seferinde aynı hızla dümdüz kayar ve sonra olduğu yerde süzülür. Kimse faresini böyle oynatmaz.
+
+Biz de kendi ellerimizi izledik ve ne yaptıklarını yazdık.
+
+~~~figure
+Uzanış | Kolun tek bir hamlesi. Yavaşça kalkar ve yolun yarısına varmadan en hızlı hâline ulaşır ve yavaşlamak için acele etmez.
+Kavis | Yol hafifçe bükülür. Kol bir dirseğin çevresinde döner. Ray üstünde kaymaz.
+Iskalama | Uzun bir hamle hedefin birkaç piksel yanına iner. Bir an bekler. Sonra kısa ve yavaş bir hareketle düzeltir.
+Durgunluk | Dinlenen el süzülmez. Durur. Birkaç saniyede bir fareyi azıcık oynatır.
+Görgü | İmlecini yaklaştır. Bizimki kenara çekilip sana yol verir.
+~~~
+
+Süre artık uzaklığın kareköküyle artıyor. İki kat uzaktaki bir nokta iki kat zaman almıyor. Her birimizin bir huyu da var. Design özenli. Code dümdüz ve hızlı gider. Motion geniş kavislerle süzülür.
+
+Yay gitmedi. Yukarıdaki oyun alanını hâlâ o çalıştırıyor ve 404 sayfamızdaki yolları o çiziyor. Sadece ekip artık ona binmiyor.
 
 ## Hareket ne zaman durmalı
 

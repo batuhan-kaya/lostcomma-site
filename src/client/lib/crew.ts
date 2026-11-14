@@ -15,11 +15,17 @@
  *
  * Pages add little scripted moments per section with crew.addScenes({ hero: async (c, signal) => … }).
  *
- * Cost: the spring runs in requestAnimationFrame only while someone is moving. A settled team
- * stops the loop · the resting drift is a CSS animation (compositor only) · a slow watch notices
- * when the page moves under a resting cursor (content opened · images arrived · a resize).
+ * How they move is a hand's way (src/shared/hand.ts): a reach on a soft arc · a long one lands a
+ * little off and is fixed after a beat · everyone has their own temper. A cursor at rest is still.
+ * Now and then a hand moves its mouse (fidget: a nudge · a new spot · a look around) and it steps
+ * aside when the visitor's pointer comes close.
+ *
+ * Cost: the loop runs in requestAnimationFrame only while someone is moving. A settled team stops
+ * it · a slow watch notices when the page moves under a resting cursor (content opened · images
+ * arrived · a resize) and starts the next fidget.
  */
-import { between, clampPoint, clearSpot, Clock, fitShift, HOP_DIST, parseRestAt, pickSection, probeLine, SECTION_SETTLE_MS, settled, shouldFlip, step, TEAM, type Box, type Name } from './crew-math';
+import { arrivedHand, hand, place, reach, settledHand, shift, steer, stepHand, TEMPERS, type Hand } from '../../shared/hand';
+import { between, clampPoint, clearSpot, Clock, fitShift, HOP_DIST, overlap, parseRestAt, pickSection, probeLine, SECTION_SETTLE_MS, shouldFlip, STEP_MS, TEAM, type Box, type Name } from './crew-math';
 import { reducedMotion } from './motion';
 import { t } from './t';
 
@@ -36,32 +42,37 @@ export interface Target {
   fy?: number;
   dx?: number;
   dy?: number;
-  /** Resting spots get the idle drift. Scene targets do not. */
+  /** A resting spot: kept off the words · the hand fidgets there. Scene targets are neither. */
   rest?: boolean;
+  /** Follow the point closely as it moves (a drag · a pen · a line being typed): set by aim(). */
+  track?: boolean;
 }
 
 export type Scene = (crew: Crew, signal: AbortSignal) => Promise<void>;
 
-interface Cursor {
+/** A cursor is a hand (where it is drawn · where it means to be: src/shared/hand.ts) and its tag and bubble. */
+interface Cursor extends Hand {
   name: Name;
   el: HTMLElement;
-  /** The inner wrapper that carries the CSS drift. */
-  dr: HTMLElement;
   tag: HTMLElement;
   bub: HTMLElement;
-  x: number;
-  y: number;
   /** Where it was one step ago: frames between two steps are drawn in between. */
   px: number;
   py: number;
-  vx: number;
-  vy: number;
   target: Target | null;
   arrived: boolean;
   /** Arrived and still: the loop can stop for this one. */
   still: boolean;
-  /** The CSS drift is on. */
+  /** Still at its resting spot (.resting · tests look for it). */
   resting: boolean;
+  /** How far it sits from its resting spot right now (a fidget · a step aside). */
+  wx: number;
+  wy: number;
+  /** Away from its spot for a moment: looking around or out of the visitor's way. */
+  away: '' | 'look' | 'aside';
+  awayAt: number;
+  /** The next move is a lazy one (a fidget): slower than a move with a purpose. */
+  slow: number;
   hidden: boolean;
   born: boolean;
   flipped: boolean;
@@ -82,6 +93,15 @@ const HOST_SPOT: [number, number] = [0.8, 0.38];
 const ARROW = 'M3 2 L3 19.5 L7.8 15.2 L11 22 L14.2 20.6 L11.1 13.9 L17.6 13.7 Z';
 /** How often the watch looks for a page that moved under a resting cursor. */
 const WATCH_MS = 700;
+/** Room kept clear of words around a resting spot: a fidget stays inside it. */
+const ROOM = 10;
+/** A hand at rest moves its mouse a little every few seconds (ms after the last move · one cursor at a time). */
+const FIDGET = { min: 2600, more: 3600 } as const;
+/** The visitor's pointer this close to a resting cursor: it steps aside. */
+const NEAR = 46;
+/** Aimed targets closer than this are followed directly · farther ones are reached first. */
+const TRACK_DIST = 60;
+const rnd = Math.random;
 /** Text at least this large is a display headline: the arrow may point into it · the tag keeps off. */
 const BIG_TEXT = 40;
 
@@ -116,6 +136,9 @@ export class Crew {
   private idleOn = false;
   private idle = false;
   private lastActive = 0;
+  /** When the next fidget is due (set each time the loop falls asleep). */
+  private fidgetAt = Infinity;
+  private mindedAt = 0;
 
   constructor(root: HTMLElement, opts: { reduce?: boolean; touch?: boolean } = {}) {
     this.root = root;
@@ -130,24 +153,25 @@ export class Crew {
       const el = document.createElement('div');
       el.className = `cur c-${name} zz`;
       el.dataset.cur = name;
-      el.innerHTML = `<span class="dr"><svg class="arw" viewBox="0 0 24 24"><path d="${ARROW}"></path></svg><span class="tag">${name}</span><span class="bub"></span></span>`;
+      el.innerHTML = `<svg class="arw" viewBox="0 0 24 24"><path d="${ARROW}"></path></svg><span class="tag">${name}</span><span class="bub"></span>`;
       this.layer.append(el);
       return {
+        ...hand(-300, -300),
         name,
         el,
-        dr: el.firstElementChild as HTMLElement,
         tag: el.querySelector('.tag') as HTMLElement,
         bub: el.querySelector('.bub') as HTMLElement,
-        x: -300,
-        y: -300,
         px: -300,
         py: -300,
-        vx: 0,
-        vy: 0,
         target: null,
         arrived: false,
         still: false,
         resting: false,
+        wx: 0,
+        wy: 0,
+        away: '',
+        awayAt: 0,
+        slow: 1,
         hidden: true,
         born: false,
         flipped: false,
@@ -196,6 +220,7 @@ export class Crew {
         this.lastActive = performance.now();
         if (this.idle) this.wakeFromIdle();
         this.placeYou();
+        this.mind();
       }, { passive: true });
       document.documentElement.addEventListener('pointerleave', () => {
         this.pointer = null;
@@ -228,7 +253,9 @@ export class Crew {
       for (const n of TEAM) {
         const c = this.cursors[n];
         this.hush(c);
-        this.unrest(c, false);
+        this.unrest(c);
+        c.wx = c.wy = 0;
+        c.away = '';
       }
       document.documentElement.classList.add('still');
     } else document.documentElement.classList.remove('still');
@@ -295,11 +322,24 @@ export class Crew {
     while (!c.arrived && performance.now() - t0 < maxMs) await this.sleep(50, signal);
   }
 
-  /** Point a cursor somewhere without waiting (typing along a line of text). */
+  /**
+   * Point a cursor somewhere without waiting and keep it on that point as it moves (a handle being
+   * dragged · a pen · a line being typed). A point far away is reached like any other first.
+   */
   aim(name: Name, target: Target): void {
     const c = this.cursors[name];
     if (c.hidden) return;
-    this.send(c, target);
+    this.send(c, { ...target, track: true });
+  }
+
+  /**
+   * Leave the mouse where it is (hands on the keyboard: nobody moves a mouse while they type).
+   * `dx dy` lets it slide off what it just clicked first.
+   */
+  stay(name: Name, dx = 0, dy = 0): void {
+    const c = this.cursors[name];
+    if (c.hidden || !c.placed) return;
+    this.send(c, { at: { x: c.x + dx, y: c.y + dy } });
   }
 
   /** Where a cursor's arrow tip is right now in viewport coordinates · null when it is off stage. */
@@ -345,7 +385,7 @@ export class Crew {
   press(name: Name): void {
     const el = this.cursors[name].el;
     el.classList.add('pr');
-    window.setTimeout(() => el.classList.remove('pr'), 180);
+    window.setTimeout(() => el.classList.remove('pr'), 90 + rnd() * 60);
   }
 
   sleep(ms: number, signal: AbortSignal): Promise<void> {
@@ -487,6 +527,15 @@ export class Crew {
     if (!p) return tg;
     const lines = this.linesOf(sec, S);
     if (!lines.length) return tg;
+    // Room for the fidgets (a hand at rest moves its mouse a few pixels) so they never wander onto the words either.
+    const boxesAt = (dx: number, dy: number): Box[] => this.boxes(c, p.x + dx, p.y + dy, ROOM);
+    const [dx, dy] = clearSpot(boxesAt, lines, this.root.getBoundingClientRect().left + this.root.clientWidth);
+    if (!dx && !dy) return tg;
+    return { ...tg, dx: (tg.dx ?? (tg.end ? 10 : 0)) + dx, dy: (tg.dy ?? 0) + dy };
+  }
+
+  /** The arrow and the tag of a cursor at a point in root coordinates (viewport boxes · `pad` px of room around them). */
+  private boxes(c: Cursor, px: number, py: number, pad = 0): Box[] {
     if (!c.tagW) c.tagW = c.tag.offsetWidth;
     const rr = this.root.getBoundingClientRect();
     const W = this.root.clientWidth;
@@ -494,33 +543,40 @@ export class Crew {
     const L = this.touch ? 15 : 18;
     const T = this.touch ? 18 : 21;
     const H = c.tag.offsetHeight || 21;
-    // Room for the resting drift (±6 · ±5) so the drift never wanders onto the words either.
-    const px = 6;
-    const py = 5;
-    const boxesAt = (dx: number, dy: number): Box[] => {
-      const { x, y } = clampPoint(p.x + dx, p.y + dy, W);
-      const vx = rr.left + x;
-      const vy = rr.top + y;
-      const flip = shouldFlip(x, W, c.tagW);
-      const tl = flip ? vx + A - 4 - c.tagW : vx + L;
-      return [
-        { left: vx + 2 - px, top: vy + 1 - py, right: vx + A * 0.72 + px, bottom: vy + A - 1 + py },
-        { left: tl - px, top: vy + T - py, right: tl + c.tagW + px, bottom: vy + T + H + py, strict: true },
-      ];
-    };
-    const [dx, dy] = clearSpot(boxesAt, lines, rr.left + W);
-    if (!dx && !dy) return tg;
-    return { ...tg, dx: (tg.dx ?? (tg.end ? 10 : 0)) + dx, dy: (tg.dy ?? 0) + dy };
+    const { x, y } = clampPoint(px, py, W);
+    const vx = rr.left + x;
+    const vy = rr.top + y;
+    const flip = shouldFlip(x, W, c.tagW);
+    const tl = flip ? vx + A - 4 - c.tagW : vx + L;
+    return [
+      { left: vx + 2 - pad, top: vy + 1 - pad, right: vx + A * 0.72 + pad, bottom: vy + A - 1 + pad },
+      { left: tl - pad, top: vy + T - pad, right: tl + c.tagW + pad, bottom: vy + T + H + pad, strict: true },
+    ];
+  }
+
+  /** Could a cursor stand at this point for a moment: on the page · inside its section · on no words? */
+  private free(c: Cursor, sec: string, x: number, y: number): boolean {
+    const S = this.sec(sec);
+    if (!S) return false;
+    const boxes = this.boxes(c, x, y, 2);
+    const b = S.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    for (const box of boxes) if (box.left < 6 || box.right > vw - 6 || box.top < b.top + 6 || box.bottom > b.bottom - 6) return false;
+    for (const l of this.linesOf(sec, S)) for (const box of boxes) if ((box.strict || !l.big) && overlap(box, l) > 0) return false;
+    return true;
   }
 
   /* ---------------- appearing and hopping ---------------- */
 
   /** A new target for a cursor that is on stage. */
   private send(c: Cursor, target: Target): void {
-    this.unrest(c, true);
+    this.unrest(c);
     c.target = target;
     c.arrived = false;
     c.still = false;
+    c.wx = c.wy = 0;
+    c.away = '';
+    c.slow = 1;
     this.wake();
   }
 
@@ -536,7 +592,9 @@ export class Crew {
     c.placed = false;
     c.target = null;
     clearTimeout(c.timer);
-    this.unrest(c, false);
+    this.unrest(c);
+    c.wx = c.wy = 0;
+    c.away = '';
     c.el.classList.add('zz');
     this.hush(c);
   }
@@ -568,9 +626,10 @@ export class Crew {
         sx = p.x;
         sy = p.y;
       }
-      this.unrest(c, false);
+      this.unrest(c);
       c.tagW = c.tag.offsetWidth;
-      Object.assign(c, { x: sx, y: sy, px: sx, py: sy, vx: 0, vy: 0, target: tg, arrived: false, still: false, placed: true });
+      place(c, sx, sy);
+      Object.assign(c, { px: sx, py: sy, target: tg, arrived: false, still: false, placed: true, wx: 0, wy: 0, away: '', slow: 1 });
       this.render(c);
       c.el.classList.remove('zz');
       this.wake();
@@ -581,42 +640,138 @@ export class Crew {
   private hop(c: Cursor, target: Target): void {
     c.el.classList.add('zz');
     c.target = null;
-    this.unrest(c, false);
+    this.unrest(c);
     clearTimeout(c.timer);
+    c.placed = false;
     c.timer = window.setTimeout(() => {
       if (c.hidden) return;
-      const p = this.point(target);
+      // A scene may already have sent it somewhere while it was gone: come back near there.
+      const tg = c.target ?? target;
+      const p = this.point(tg);
       if (!p) return;
-      Object.assign(c, { x: p.x - 50, y: p.y - 34, px: p.x - 50, py: p.y - 34, vx: 0, vy: 0, target, arrived: false, still: false, placed: true });
+      place(c, p.x - 50, p.y - 34);
+      Object.assign(c, { px: c.x, py: c.y, target: tg, arrived: false, still: false, placed: true, wx: 0, wy: 0, away: '', slow: 1 });
       this.render(c);
       c.el.classList.remove('zz');
       this.wake();
     }, 618);
   }
 
-  /** Start the resting drift (CSS) once a cursor is still at a resting spot. */
+  /** Still at its resting spot (not while it looks around or stands aside). */
   private rest(c: Cursor): void {
-    if (c.resting || this.reduce || !c.target?.rest) return;
+    if (c.resting || this.reduce || !c.target?.rest || c.away) return;
     c.resting = true;
-    c.el.classList.add('drifting');
+    c.el.classList.add('resting');
+  }
+
+  private unrest(c: Cursor): void {
+    if (!c.resting) return;
+    c.resting = false;
+    c.el.classList.remove('resting');
+  }
+
+  /* ---------------- a hand at rest ---------------- */
+
+  /** Where a cursor's resting spot is right now (root coordinates) · null when it has none. */
+  private base(c: Cursor): { x: number; y: number } | null {
+    return c.target?.rest ? this.point(c.target) : null;
+  }
+
+  /** Move a resting cursor to an offset from its spot. */
+  private wander(c: Cursor, wx: number, wy: number, away: Cursor['away'], slow: number): void {
+    c.wx = wx;
+    c.wy = wy;
+    c.away = away;
+    c.awayAt = performance.now();
+    c.slow = slow;
+    c.still = false;
+    this.unrest(c);
+    this.wake();
+  }
+
+  /** A few pixels from the resting spot: where a hand leaves the mouse when it comes back. */
+  private nearby(max = ROOM - 2): [number, number] {
+    const a = rnd() * Math.PI * 2;
+    const d = 2 + rnd() * (max - 2);
+    return [Math.cos(a) * d, Math.sin(a) * d * 0.8];
   }
 
   /**
-   * Stop the drift. With `keep` the drifted offset becomes the cursor's real position so it
-   * glides on from exactly where it is (no jump back to the centre of the drift).
+   * A hand at rest is still · and every few seconds it moves the mouse a little. One cursor at a
+   * time: a nudge of a few pixels · a new spot a little to the side · a look around (toward the
+   * visitor's pointer when it is near) and back. Never onto the words.
    */
-  private unrest(c: Cursor, keep: boolean): void {
-    if (!c.resting) return;
-    if (keep && c.placed) {
-      const a = c.dr.getBoundingClientRect();
-      const b = c.el.getBoundingClientRect();
-      c.x += a.left - b.left;
-      c.y += a.top - b.top;
-      c.px = c.x;
-      c.py = c.y;
+  private fidget(): void {
+    const sec = this.section;
+    if (!sec || this.reduce || this.idle) return;
+    const now = performance.now();
+    const pool = TEAM.map((n) => this.cursors[n]).filter((c) => !c.hidden && c.placed && c.still && !c.saying && !!c.target?.rest && this.seen(c));
+    // Someone who looked around or stepped aside comes back first.
+    const back = pool.find((c) => c.away && now - c.awayAt > (c.away === 'look' ? 700 : 1800) && !(c.away === 'aside' && this.close(c, 150)));
+    if (back) return this.wander(back, ...this.nearby(), '', 1.3);
+    const rest = pool.filter((c) => !c.away);
+    const c = rest[Math.floor(rnd() * rest.length)];
+    if (!c) return;
+    const p = this.base(c);
+    if (!p) return;
+    const r = rnd();
+    if (r > 0.68) {
+      // A look around: toward the visitor when they are near · else mostly sideways.
+      const rr = this.root.getBoundingClientRect();
+      const m = this.pointer && rnd() < 0.6 ? { x: this.pointer.x - rr.left - p.x, y: this.pointer.y - rr.top - p.y } : null;
+      const a = m && Math.hypot(m.x, m.y) < 700 ? Math.atan2(m.y, m.x) + (rnd() - 0.5) * 0.5 : (rnd() < 0.5 ? 0 : Math.PI) + (rnd() - 0.5) * 1.1;
+      const d = 26 + rnd() * 48;
+      const wx = Math.cos(a) * d;
+      const wy = Math.sin(a) * d;
+      if (this.free(c, sec, p.x + wx, p.y + wy)) return this.wander(c, wx, wy, 'look', 1.15);
     }
-    c.resting = false;
-    c.el.classList.remove('drifting');
+    // A nudge (the hand shifts on the mouse) or a new spot inside the room kept clear for it.
+    this.wander(c, ...this.nearby(r < 0.4 ? 6 : ROOM - 1), '', 1.4);
+  }
+
+  /** Is the cursor in the window right now? Nobody fidgets off screen. */
+  private seen(c: Cursor): boolean {
+    const rr = this.root.getBoundingClientRect();
+    const y = rr.top + c.y;
+    return y > -20 && y < innerHeight - 10;
+  }
+
+  /** Is the visitor's pointer within `d` px of the cursor's resting spot? */
+  private close(c: Cursor, d: number): boolean {
+    const p = this.base(c);
+    if (!p || !this.pointer) return false;
+    const rr = this.root.getBoundingClientRect();
+    return Math.hypot(this.pointer.x - rr.left - p.x - 12, this.pointer.y - rr.top - p.y - 14) < d;
+  }
+
+  /** The visitor's pointer came close to a resting cursor: it steps out of the way (and comes back later). */
+  private mind(): void {
+    const now = performance.now();
+    if (now - this.mindedAt < 120 || !this.pointer || this.reduce || this.idle || !this.section) return;
+    this.mindedAt = now;
+    const rr = this.root.getBoundingClientRect();
+    const mx = this.pointer.x - rr.left;
+    const my = this.pointer.y - rr.top;
+    for (const n of TEAM) {
+      const c = this.cursors[n];
+      if (c.hidden || !c.placed || !c.still || c.saying || !c.target?.rest) continue;
+      // The middle of the arrow and its tag.
+      const ox = c.x + 14 - mx;
+      const oy = c.y + 16 - my;
+      const dist = Math.hypot(ox, oy);
+      if (dist > NEAR || now - c.awayAt < 900) continue;
+      const p = this.base(c);
+      if (!p) continue;
+      const a0 = dist > 1 ? Math.atan2(oy, ox) : rnd() * Math.PI * 2;
+      const d = 52 + rnd() * 26;
+      for (const turn of [0, 0.7, -0.7, 1.4, -1.4]) {
+        const x = c.x + Math.cos(a0 + turn) * d;
+        const y = c.y + Math.sin(a0 + turn) * d;
+        if (!this.free(c, this.section, x, y)) continue;
+        this.wander(c, x - p.x, y - p.y, 'aside', 0.8);
+        break;
+      }
+    }
   }
 
   /* ---------------- geometry ---------------- */
@@ -729,12 +884,19 @@ export class Crew {
     for (const n of TEAM) {
       const c = this.cursors[n];
       if (c.hidden || !c.placed || !c.target) continue;
-      const p = this.point(c.target);
+      const p = this.spot(c);
       if (p && Math.hypot(p.x - c.x, p.y - c.y) > 1) {
-        this.unrest(c, true);
+        this.unrest(c);
         c.still = false;
         return this.wake();
       }
+    }
+    if (performance.now() >= this.fidgetAt) {
+      this.fidgetAt = Infinity;
+      this.fidget();
+      if (this.raf) return;
+      // Nobody could move: try again in a while.
+      this.fidgetAt = performance.now() + FIDGET.min;
     }
     // Every other second: did words appear under a resting cursor (a scene changed a panel)?
     // Then it steps aside to the nearest clear spot.
@@ -757,26 +919,36 @@ export class Crew {
     for (const name of TEAM) {
       const c = this.cursors[name];
       if (c.hidden || !c.placed || !c.target) continue;
-      const p = this.point(c.target);
+      const p = this.spot(c);
       if (!p) continue;
       if (this.reduce) {
-        c.x = c.px = p.x;
-        c.y = c.py = p.y;
+        place(c, p.x, p.y);
+        c.px = p.x;
+        c.py = p.y;
         c.arrived = c.still = true;
       } else {
         if (c.still && Math.hypot(p.x - c.x, p.y - c.y) > 0.5) {
-          // The spot moved under a resting cursor (a scene changed the text · a late image).
-          this.unrest(c, true);
+          // The spot moved under a resting cursor (a scene changed the text · a late image · a fidget).
+          this.unrest(c);
           c.still = false;
         }
         if (!c.still) {
+          if (c.target.track && !c.queue.length && Math.hypot(p.x - c.cx, p.y - c.cy) <= TRACK_DIST) {
+            // On the point already: stay on it as it moves (the follower keeps the line smooth).
+            shift(c, p.x - c.gx, p.y - c.gy);
+          } else {
+            const rest = !!c.target.rest;
+            steer(c, p, TEMPERS[c.name], rnd, { precise: !rest && !c.target.track, lead: rest ? 60 + rnd() * 200 : rnd() * 90, slow: c.slow, plain: c.slow > 1.2 });
+          }
           for (let i = 0; i < steps; i++) {
             c.px = c.x;
             c.py = c.y;
-            c.arrived = step(c, p.x, p.y);
+            stepHand(c, STEP_MS);
           }
-          if (settled(c, p.x, p.y)) {
-            Object.assign(c, { x: p.x, y: p.y, px: p.x, py: p.y, vx: 0, vy: 0, arrived: true, still: true });
+          c.arrived = arrivedHand(c);
+          if (settledHand(c)) {
+            place(c, p.x, p.y);
+            Object.assign(c, { px: p.x, py: p.y, arrived: true, still: true, slow: 1 });
             this.rest(c);
           } else moving = true;
         }
@@ -785,9 +957,18 @@ export class Crew {
     }
     if (this.pointer) this.placeYou();
     // Keep ticking only while someone is moving or a section change is pending.
-    // Everyone settled: the loop stops · the drift is CSS · scroll · resize and the watch wake it.
+    // Everyone settled: the loop stops · scroll · resize and the watch wake it · the next fidget is a few seconds away.
     const pending = this.candidate !== this.section;
     if ((moving || pending) && !document.hidden) this.raf = requestAnimationFrame(this.tick);
+    else this.fidgetAt = now + FIDGET.min + rnd() * FIDGET.more;
+  }
+
+  /** Where a cursor should be right now: its target · plus the few pixels a resting hand has wandered. */
+  private spot(c: Cursor): { x: number; y: number } | null {
+    if (!c.target) return null;
+    const p = this.point(c.target);
+    if (!p || !c.target.rest || (!c.wx && !c.wy)) return p;
+    return clampPoint(p.x + c.wx, p.y + c.wy, this.root.clientWidth);
   }
 
   private render(c: Cursor): void {

@@ -1,6 +1,5 @@
 import { html, type Safe } from '../../html';
 import type { Ctx } from '../../page';
-import { HOME } from '../../content/home';
 
 /**
  * 02 · Manifesto. The team edits a generic agency manifesto with tracked changes.
@@ -9,7 +8,7 @@ import { HOME } from '../../content/home';
  */
 export function manifesto(ctx: Ctx): Safe {
   const { t, lang } = ctx;
-  const c = HOME[lang];
+  const c = ctx.texts.home(lang);
   let n = 0;
   const doc = c.manifesto.map((seg) => {
     if (typeof seg === 'string') return seg;

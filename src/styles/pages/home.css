@@ -7,7 +7,6 @@
   --dots: radial-gradient(rgba(14,14,15,.13) 1px, transparent 1.6px);
   --kc: #8F8BFF;
 }
-.c-comma { --c: #FF5A2B; --on: #0E0E0F; }
 
 .btn {
   display: inline-flex;
@@ -33,9 +32,6 @@
 .pres { position: relative; }
 .pres .avs button.av { padding: 0; cursor: pointer; transition: transform .35s var(--ease-pop); }
 .pres .avs button.av:hover { transform: translateY(-4px); }
-.av.ghost { border: 2px dashed var(--dim); background: var(--pbg); color: var(--dim); }
-.found .av.ghost { display: none; }
-.av.c-comma { animation: pop .7s var(--ease-pop) both; }
 .popv {
   position: absolute;
   left: 0;
@@ -639,22 +635,13 @@
 .again:hover { background: var(--ink); color: var(--milk); }
 .tfoot .mono { color: var(--grey); }
 
-/* ================= the shy comma ================= */
-.cur.c-comma { pointer-events: none; }
-.cur.c-comma.in { pointer-events: auto; cursor: pointer; }
-.cur.c-comma .tag { font-weight: 600; }
-.cur.c-comma.in:not(.team) .arw { animation: shy 2.4s ease-in-out infinite; }
-button.cur { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; }
-
 /* ================= motion ================= */
 @keyframes lnIn { from { opacity: 0; transform: translateY(.32em); } to { opacity: 1; transform: none; } }
-@keyframes pop { 0% { opacity: 0; transform: scale(.3); } 60% { opacity: 1; transform: scale(1.25); } 100% { transform: scale(1); } }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes zin { from { opacity: 0; transform: translate(-50%, -46%) scale(.92); } to { opacity: 1; transform: translate(-50%, -50%); } }
 @keyframes flash { 0% { background-color: rgba(205,242,58,.9); } 100% { background-color: transparent; } }
 @keyframes boing { 0% { transform: none; } 18% { transform: scale(1.25, .7); } 42% { transform: translateY(-.5em) scale(.88, 1.14); } 66% { transform: translateY(0) scale(1.14, .86); } 82% { transform: translateY(-.08em); } 100% { transform: none; } }
-@keyframes shy { 0%, 100% { transform: rotate(0); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(6deg); } }
 @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
 /* The ball and the playhead travel by transform (compositor) · cqw is the stage's width. */
 @keyframes mball { from { transform: translateX(0); } to { transform: translateX(calc(100cqw - 124px)); } }
@@ -738,11 +725,6 @@ button.cur { padding: 0; border: 0; background: none; color: inherit; font: inhe
   .send { justify-self: end; width: 96px; height: 96px; }
   .stp > span { font-size: 11px; letter-spacing: 0; }
 }
-
-/* the egg layer sits above the crew */
-.egglayer { position: absolute; inset: 0; z-index: 62; overflow: clip; pointer-events: none; }
-.cur.c-comma { opacity: 0; transition: opacity .35s; }
-.cur.c-comma.in { opacity: 1; }
 
 /* Section headings on the homepage follow the Live board (80 px). */
 [data-page="home"] .h2 { font-size: clamp(44px, 5.6vw, 80px); line-height: .94; letter-spacing: -.04em; font-variation-settings: 'wdth' 80, 'wght' 760; }

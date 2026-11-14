@@ -1,6 +1,5 @@
 import { html, type Safe } from '../../html';
 import type { Ctx } from '../../page';
-import { HOME } from '../../content/home';
 import type { ProjectCard } from '../../data/content';
 import { loopVideo } from '../../media/video';
 import { FRAME_ART } from './art';
@@ -11,7 +10,7 @@ import { FRAME_ART } from './art';
  */
 export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
   const { t, lang } = ctx;
-  const sv = HOME[lang].services;
+  const sv = ctx.texts.home(lang).services;
   const first = sv[0]!;
   return html`<section class="svc" data-sec="svc" id="services" data-host="motion">
 <span class="rest" data-rest="motion" data-rest-at="0.3 0.92" data-rest-at-m="0.8 0.5"></span>

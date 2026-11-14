@@ -211,7 +211,7 @@ export async function drawOg(spec: OgSpec, src: FontSource): Promise<Buffer> {
       '</g>',
   );
 
-  // Footer: rule · the mark and the wordmark with its caret (one size: the corner is as tall as
+  // Footer: rule · the mark and the wordmark (one size: the corner is as tall as
   // the l · the comma hangs under the baseline) · the three team dots.
   const fy = OG_H - PAD;
   out.push(`<rect x="${PAD}" y="${fy - 58}" width="${OG_W - PAD * 2}" height="1.5" fill="${c.rule}"/>`);
@@ -222,8 +222,7 @@ export async function drawOg(spec: OgSpec, src: FontSource): Promise<Buffer> {
   const lost = shape('lost', mark, WM, -0.02);
   const comma = shape('comma', mark, WM, -0.02);
   out.push(at(lost, wx, fy, c.fg));
-  out.push(`<rect x="${(wx + lost.width + 6).toFixed(1)}" y="${fy - 27}" width="3" height="28" fill="${c.fg}"/>`);
-  out.push(at(comma, wx + lost.width + 15, fy, c.fg));
+  out.push(at(comma, wx + lost.width + 0.24 * WM, fy, c.fg));
   (['design', 'code', 'motion'] as const).forEach((n, i) => {
     const ring = CREW[n].toLowerCase() === c.bg.toLowerCase() ? ` stroke="${c.fg}" stroke-width="1.5"` : '';
     out.push(`<circle cx="${OG_W - PAD - 9 - (2 - i) * 26}" cy="${fy - 11}" r="9" fill="${CREW[n]}"${ring}/>`);

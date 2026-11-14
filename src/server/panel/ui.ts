@@ -44,6 +44,7 @@ const NAV: ({ key: string; label: string; href: string; count?: keyof Counts } |
   { key: 'bookings', label: 'Görüşmeler', href: '/panel/bookings', count: 'calls' },
   { key: 'mail', label: 'E-postalar', href: '/panel/mail', count: 'mail' },
   null,
+  { key: 'texts', label: 'Metinler', href: '/panel/texts' },
   { key: 'settings', label: 'Site ayarları', href: '/panel/settings' },
   { key: 'redirects', label: 'Yönlendirmeler', href: '/panel/redirects' },
   { key: 'log', label: 'Kayıt', href: '/panel/log' },
@@ -55,6 +56,7 @@ export const FLASH: Record<string, string> = {
   created: 'Oluşturuldu.',
   deleted: 'Silindi.',
   restored: 'Eski hali geri geldi.',
+  same: 'Değişen bir şey yok.',
   uploaded: 'Yüklendi.',
   cancelled: 'Görüşme iptal edildi.',
   retried: 'Tekrar deneniyor.',
@@ -97,7 +99,7 @@ ${js ? html`<script type="module" src="${js}"></script>` : ''}
 <a class="p-skip" href="#main">İçeriğe geç</a>
 <div class="p-shell">
 <header class="p-side">
-<a class="p-logo" href="/panel"><span class="lc-lock">${mark('lc-mark')}<span>lost</span><i aria-hidden="true">|</i><span>comma</span></span><small class="mono">panel</small></a>
+<a class="p-logo" href="/panel"><span class="lc-lock">${mark('lc-mark')}<span>lost</span> <span>comma</span></span><small class="mono">panel</small></a>
 <details class="p-menu"><summary class="mono">Menü</summary><nav aria-label="Panel">${navList(s.section, s.counts)}</nav></details>
 <nav class="p-navd" aria-label="Panel">${navList(s.section, s.counts)}</nav>
 <div class="p-sidefoot">

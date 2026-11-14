@@ -81,9 +81,10 @@ describe('the mark', () => {
 });
 
 describe('the footer', () => {
-  it('is the same on every page: a way to start · the whole site · the drawn sign-off · the small print', async () => {
+  it('is the same on every page: a way to start · the whole site · the sign-off · the small print', async () => {
     for (const lang of ['tr', 'en'] as const) {
-      for (const page of [href(lang, 'home'), href(lang, 'work'), href(lang, 'privacy')]) {
+      // Every page: the 404 too.
+      for (const page of [href(lang, 'home'), href(lang, 'work'), href(lang, 'lab'), href(lang, 'privacy'), `/${lang}/no-such-page`]) {
         const doc = (await get(page)).body;
         const ft = doc.slice(doc.indexOf('<footer class="ft th-ink" data-sec="ft" data-ft>'));
         expect(ft.length, page).toBeGreaterThan(100);
@@ -93,7 +94,12 @@ describe('the footer', () => {
         expect(ft).toContain(`href="${href(lang, 'start')}#book"`);
         expect(ft).toContain(`href="${href(lang, 'home')}#contact"`);
         expect(ft).toContain('href="mailto:hello@lostcomma.co"');
-        expect(ft).toMatch(/<svg class="lc-mark ft-mk"[^>]*><path class="lc-t" pathLength="1"/);
+        // The sign-off: the logo · the team and the visitor · the way back up.
+        expect(ft).toMatch(/<a class="ft-logo" href="\/(tr|en)" aria-label="Lost Comma"><span class="lc-lock"><svg class="lc-mark"/);
+        expect(ft).toContain(lang === 'tr' ? 'Üç kişiyiz · dördüncü sensin' : 'Three of us · you are the fourth');
+        expect(ft).toContain('<span>lost</span> <span>comma</span></span></a>');
+        expect(ft).toMatch(/<a class="ft-up" href="#top" aria-label="[^"]+">/);
+        expect(doc).not.toContain('class="caret"> </span>');
         expect(ft).toContain('href="#top"');
       }
     }
