@@ -100,11 +100,21 @@ describe('POST /api/brief (form without JS)', () => {
 
   it('renders the sent state and the error state on the homepage', async () => {
     const sent = await app.inject('/tr?brief=sent');
-    expect(sent.body).toMatch(/<form class="fb" data-fb method="post" action="\/api\/brief" hidden>/);
-    expect(sent.body).toMatch(/<div class="thread" data-thread>/);
+    expect(sent.body).toMatch(/<form class="sf" data-sf method="post" action="\/api\/brief" hidden>/);
+    expect(sent.body).toMatch(/<div class="sdone" data-sdone>/);
+    expect(sent.body).toContain('İletin bize ulaştı. Bir gün içinde yazıyoruz.');
     const err = await app.inject('/en?brief=error');
     expect(err.body).toContain('fnote mono err');
     expect(err.body).toContain('That did not go through.');
+    // The address blank carries the selection and says what is wrong.
+    expect(err.body).toMatch(/<span class="bw on bad" data-bw="mail">/);
+    expect(err.body).toContain('This address looks incomplete');
+  });
+
+  it('the sentence posts a name · a topic · an address (the topic is the message)', async () => {
+    const res = await post(null, {}, 'lang=tr&name=Deniz&message=yeni+bir+web+sitesi&email=deniz%40example.com&company=');
+    expect(res.statusCode).toBe(303);
+    expect((await stored())[0]).toMatchObject({ name: 'Deniz', message: 'yeni bir web sitesi', types: [], time: null, budget: null });
   });
 });
 

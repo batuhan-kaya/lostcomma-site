@@ -5,9 +5,8 @@ export interface HomeData {
   words: string[];
   notes: string[];
   services: { lab: string; size: string; code: string; say: string }[];
-  types: { p: string; n: string; who: Name; say: string }[];
-  times: { p: string; n: string; who: Name; say: string }[];
-  budgets: { n: string; say: string }[];
+  /** 06 · the contact sentence: topics the blank suggests in turn · the thanks after sending. */
+  sentence: { ideas: string[]; thanks: string; will: [string, string]; plain: string };
   doing: Record<Name, string>;
 }
 

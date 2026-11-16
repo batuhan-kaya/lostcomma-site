@@ -124,6 +124,12 @@
  "Açık": [
   "studio"
  ],
+ "ad": [
+  "home"
+ ],
+ "adın": [
+  "home"
+ ],
  "Adın": [
   "home",
   "start"
@@ -132,6 +138,7 @@
   "legal"
  ],
  "Adresi kopyala": [
+  "home",
   "start"
  ],
  "Aklında başka bir şey mi var?": [
@@ -229,9 +236,6 @@
  "Başka bir şey yok. Bakmak için tarayıcının geliştirici araçlarını açabilirsin.": [
   "legal"
  ],
- "Başka yerler": [
-  "home"
- ],
  "Başka yollar": [
   "start"
  ],
@@ -288,9 +292,6 @@
   "start"
  ],
  "Bilgilerini sadece sana dönmek için kullanırız.": [
-  "home"
- ],
- "Bilmemiz gereken başka bir şey": [
   "home"
  ],
  "bir dosya bırak": [
@@ -377,20 +378,11 @@
  "Brief gönder": [
   "chrome"
  ],
- "Brief’in bize ulaştı": [
-  "home"
- ],
- "Brief’in bize ulaştı.": [
-  "home"
- ],
- "Brief’ini okuyoruz": [
+ "Bu adres eksik gibi": [
   "home"
  ],
  "Bu adreste bir sayfa yok.": [
   "notFound"
- ],
- "Bu arada sırada ne var bir bak.": [
-  "home"
  ],
  "Bu ay neyle uğraşıyoruz.": [
   "other"
@@ -402,7 +394,6 @@
   "start"
  ],
  "Bu hafta": [
-  "home",
   "service"
  ],
  "Bu kaydı sil": [
@@ -421,12 +412,8 @@
   "other"
  ],
  "Bugün": [
-  "home",
   "legal",
   "process"
- ],
- "Bugün okuyup bir gün içinde dönüyoruz.": [
-  "home"
  ],
  "bulunan virgül": [
   "studio"
@@ -457,6 +444,9 @@
  ],
  "Bütün araçlar": [
   "service"
+ ],
+ "Bütün ekip okur ve genelde bir gün içinde döneriz.": [
+  "home"
  ],
  "bütün filtreleri temizle": [
   "notes"
@@ -565,9 +555,6 @@
  "Dosyaya kim dokundu.": [
   "case"
  ],
- "Dosyayı doldurmaya başla. Brief’i sen yazdıkça biz yazacağız.": [
-  "home"
- ],
  "Döngüler.": [
   "service"
  ],
@@ -589,9 +576,14 @@
  "Düzen": [
   "service"
  ],
+ "e-posta": [
+  "home"
+ ],
  "E-posta": [
-  "home",
   "start"
+ ],
+ "E-posta adresin": [
+  "home"
  ],
  "editör": [
   "service"
@@ -675,18 +667,12 @@
  "Geçmişi oynat": [
   "case"
  ],
- "Gelecek hafta": [
-  "home"
- ],
  "Gelen kutusu": [
   "service"
  ],
  "Genelde": [
   "services",
   "studio"
- ],
- "Genelde bir gün içinde döneriz": [
-  "home"
  ],
  "Geniş tabak": [
   "service"
@@ -702,6 +688,9 @@
  ],
  "Geri dön": [
   "service"
+ ],
+ "Gerisini sohbette konuşuruz.": [
+  "home"
  ],
  "Gezin · virgüller seni izliyor": [
   "lab"
@@ -720,9 +709,6 @@
   "home"
  ],
  "Gönderemedik. E-posta adresini kontrol edip tekrar dene.": [
-  "home"
- ],
- "Gönderildi · az önce": [
   "home"
  ],
  "Görünüm": [
@@ -896,9 +882,6 @@
  "İlk ekran": [
   "other"
  ],
- "İlk eskizler dosyanda": [
-  "home"
- ],
  "İlk not": [
   "note"
  ],
@@ -911,9 +894,6 @@
  "İngilizcesi de var": [
   "note"
  ],
- "İsimsiz brief": [
-  "home"
- ],
  "İskele 1": [
   "service"
  ],
@@ -924,9 +904,6 @@
   "home",
   "start",
   "studio"
- ],
- "İstanbul · her yerden ekiplerle çalışıyoruz": [
-  "home"
  ],
  "İstanbul · şimdi": [
   "studio"
@@ -939,9 +916,6 @@
  ],
  "İstanbul’un çizilmiş bir haritası. Stüdyo Kadıköy’de vapur iskelesinin yanında.": [
   "studio"
- ],
- "İstediğin kadar seç": [
-  "home"
  ],
  "İş başına": [
   "process"
@@ -964,9 +938,6 @@
  ],
  "JS kapalıyken seni hiç saymıyoruz. Bugün hakkında bir kaydımız yok.": [
   "legal"
- ],
- "Kabaca bütçe": [
-  "home"
  ],
  "Kadıköy’de bir seramik atölyesi": [
   "service"
@@ -1047,12 +1018,6 @@
  "Kendi manifestomuzu düzenledik.": [
   "home"
  ],
- "Kesin olması gerekmiyor": [
-  "home"
- ],
- "Kısa bir tanışma görüşmesi": [
-  "home"
- ],
  "Kısa sürede çok fazla deneme oldu. Biraz sonra tekrar dene ya da bize yaz.": [
   "start"
  ],
@@ -1098,6 +1063,9 @@
  "Kontrastıyla renk çiftleri": [
   "service"
  ],
+ "konu": [
+  "home"
+ ],
  "Konu": [
   "start"
  ],
@@ -1117,7 +1085,6 @@
   "case"
  ],
  "Kopyala": [
-  "home",
   "other",
   "service"
  ],
@@ -1226,6 +1193,9 @@
  "Nasıl çalıştığımızın tıklanabilir bir prototipi. Herhangi bir ekranda İleri’ye bas ya da ekibe bırak.": [
   "home"
  ],
+ "Ne hakkında konuşmak istiyorsun": [
+  "home"
+ ],
  "Ne istiyorsun": [
   "legal"
  ],
@@ -1239,12 +1209,6 @@
   "legal"
  ],
  "Ne yapıyoruz": [
-  "home"
- ],
- "Ne yaptığını anlat. Bütün ekip her brief’i okur ve dosyana katılır. Genelde bir gün içinde döneriz.": [
-  "home"
- ],
- "Ne zaman yayına çıksın": [
   "home"
  ],
  "Neden ve nasıl kullandığınızı öğrenmek istiyorum": [
@@ -1393,8 +1357,7 @@
   "service"
  ],
  "S": [
-  "chrome",
-  "home"
+  "chrome"
  ],
  "Saat": [
   "service",
@@ -1427,9 +1390,6 @@
  "Sakin · şimdi": [
   "other"
  ],
- "Sana dönebilmemiz için": [
-  "home"
- ],
  "Sana kalan": [
   "home"
  ],
@@ -1454,11 +1414,7 @@
  "Seçimini yap.": [
   "service"
  ],
- "Selam. Brief için teşekkürler.": [
-  "home"
- ],
  "sen": [
-  "home",
   "notFound"
  ],
  "Sen": [
@@ -1476,12 +1432,6 @@
   "studio"
  ],
  "sen@sirket.com": [
-  "home"
- ],
- "Senin brief’in": [
-  "home"
- ],
- "Senin hakkında": [
   "home"
  ],
  "Senin kaydın": [
@@ -1516,9 +1466,6 @@
  ],
  "sıcak · el yapımı · yavaş": [
   "process"
- ],
- "Sırada ne var": [
-  "home"
  ],
  "Sıradaki": [
   "service"
@@ -1593,7 +1540,6 @@
  ],
  "Stüdyo": [
   "chrome",
-  "home",
   "notFound",
   "other",
   "process",
@@ -1633,9 +1579,6 @@
  "Sürükle ve gez": [
   "home"
  ],
- "Sürükle ya da dokun": [
-  "home"
- ],
  "Sürüm": [
   "case"
  ],
@@ -1651,9 +1594,6 @@
  ],
  "Şimdi.": [
   "other"
- ],
- "Şimdiye kadarki brief": [
-  "home"
  ],
  "Şu an açığız": [
   "start"
@@ -1716,9 +1656,6 @@
  ],
  "Tasarladığımız ve kodladığımız projeler.": [
   "work"
- ],
- "Taslak": [
-  "home"
  ],
  "tek çizik": [
   "service"
@@ -1788,6 +1725,9 @@
  "Üç şekil.": [
   "service"
  ],
+ "Üçümüz de okuyoruz": [
+  "home"
+ ],
  "Vakayı oku": [
   "home"
  ],
@@ -1826,6 +1766,9 @@
  ],
  "Web siteleri ve uygulamalar ve kimlikler ve filmler. Gerçek şeyler üreten insanlarla.": [
   "work"
+ ],
+ "ya da doğrudan yaz": [
+  "home"
  ],
  "Yakında bir sayfa yok": [
   "notFound"
@@ -1889,16 +1832,13 @@
  "Yazılar": [
   "process"
  ],
- "yazıyor": [
-  "home"
- ],
  "Yedide": [
   "service"
  ],
  "Yeni": [
   "work"
  ],
- "Yeni bir brief başlat": [
+ "Yeni bir ileti yaz": [
   "home"
  ],
  "Yeni notlar okuyucuna gelsin.": [

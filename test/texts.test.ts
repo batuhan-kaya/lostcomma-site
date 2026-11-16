@@ -59,6 +59,8 @@ describe('the homepage leaves', () => {
     expect(leafError(leaf('headline'), 'Virgülü kaybettik.')).toMatch(/\{w\}/);
     expect(leafError(leaf('headline'), '{w} ve {w}')).toMatch(/\{w\}/);
     expect(leafError(leaf('words'), 'Detayı')).toMatch(/iki kelime/);
+    expect(leafError(leaf('sentence.mail'), 'Bana yazın.')).toMatch(/\{b\}/);
+    expect(leafError(leaf('sentence.mail'), 'Bana {b} adresinden yazın.')).toBeNull();
     expect(placeholders('Yayında · v{n}')).toEqual(['{n}']);
   });
 });
@@ -86,7 +88,7 @@ describe('Metinler in the panel', () => {
       [homeField('words', 'tr')]: 'Detayı\nPikseli\nRitmi',
       [homeField('headline', 'en')]: 'We lost the comma.\nNever the {w}',
       [homeField('words', 'en')]: 'detail\npixel\nplot',
-      [homeField('contactWord', 'tr')]: 'senden',
+      [homeField('sentence.name', 'tr')]: 'Selam ben {b}.',
     });
     expect(res.statusCode).toBe(303);
     expect(res.headers.location).toBe('/panel/texts?m=saved');
@@ -95,7 +97,7 @@ describe('Metinler in the panel', () => {
     expect(tr).toContain('data-word>Detayı</span>');
     expect(tr).toMatch(/<\/button> asla<button type="button" class="dot"/);
     expect(tr).toContain('"words":["Detayı","Pikseli","Ritmi"]');
-    expect(tr).toContain('<span class="stx">senden</span>');
+    expect(tr).toContain('data-rest-at="end 20 -8">Selam ben <span class="bw on"');
     const en = (await get('/en')).body;
     expect(en).toContain('<span class="ln">We lost the comma.</span>');
     expect(en).toContain('data-word>detail</span>');

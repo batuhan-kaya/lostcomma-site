@@ -4,7 +4,7 @@
  *   lines     every sentence the server renders through t() · keyed by its Turkish source · one
  *             override per language (Turkish replaces the source · English replaces i18n/en.json)
  *   home      the homepage's structured content (src/server/content/home.ts): headline · words ·
- *             manifesto · services · steps · brief choices · one override per leaf
+ *             manifesto · services · steps · the contact sentence · one override per leaf
  *
  * Everything lives in four rows of the `settings` table (texts.t.tr · texts.t.en · texts.home.tr ·
  * texts.home.en). An override equal to the default is not kept. Pages read through ctx.t and
@@ -87,15 +87,17 @@ export function homeLeaves(c: HomeContent = HOME.tr): Leaf[] {
   c.steps.forEach((_, i) => {
     for (const [k, l] of [['name', 'ad'], ['time', 'süre'], ['text', 'metin'], ['get', 'sana kalan']] as const) out.push({ path: `steps.${i}.${k}`, label: `Adım ${i + 1} · ${l}`, group: 'Süreç' });
   });
-  out.push({ path: 'contact', label: 'Başlık satırları', group: 'Proje başlat', lines: true, hint: '{w} seçili kelimenin kutusu (bir kez).' }, { path: 'contactWord', label: 'Seçili kelime', group: 'Proje başlat' });
-  for (const [key, name] of [['types', 'Tür'], ['times', 'Zaman']] as const) {
-    c[key].forEach((_, i) => {
-      for (const [k, l] of [['n', 'etiket'], ['p', 'cümledeki hâli'], ['say', 'baloncuk']] as const) out.push({ path: `${key}.${i}.${k}`, label: `${name} ${i + 1} · ${l}`, group: 'Proje başlat' });
-    });
-  }
-  c.budgets.forEach((_, i) => {
-    for (const [k, l] of [['n', 'etiket'], ['say', 'baloncuk']] as const) out.push({ path: `budgets.${i}.${k}`, label: `Bütçe ${i + 1} · ${l}`, group: 'Proje başlat' });
-  });
+  // The contact sentence: {b} is the blank of each line. (The choices of the earlier brief form only label old briefs.)
+  const blank = '{b} boşluğun yeri (bir kez).';
+  out.push(
+    { path: 'sentence.name', label: 'Cümle · ad satırı', group: 'Proje başlat', hint: blank },
+    { path: 'sentence.what', label: 'Cümle · konu satırı', group: 'Proje başlat', hint: blank },
+    { path: 'sentence.mail', label: 'Cümle · e-posta satırı', group: 'Proje başlat', hint: blank },
+    { path: 'sentence.ideas', label: 'Konu önerileri', group: 'Proje başlat', lines: true, hint: 'Satır başına bir öneri. İlki sayfa açılınca görünür.' },
+    { path: 'sentence.thanks', label: 'Gönderince · teşekkür', group: 'Proje başlat', hint: 'Ziyaretçinin adı arkasına eklenir.' },
+    { path: 'sentence.will', label: 'Gönderince · ne zaman yazacağız', group: 'Proje başlat', hint: '{b} ziyaretçinin e-posta adresi (bir kez).' },
+    { path: 'sentence.plain', label: 'Gönderince · JS yokken', group: 'Proje başlat' },
+  );
   for (const who of ['design', 'code', 'motion'] as const) out.push({ path: `doing.${who}`, label: `${who} ne yapıyor`, group: 'Header' });
   return out;
 }
@@ -138,10 +140,12 @@ function isList(c: HomeContent, path: string): boolean {
 /** What is wrong with a new value for a homepage leaf · null when it is fine. */
 export function leafError(leaf: Leaf, value: string): string | null {
   const lines = value.split('\n').map((s) => s.trim()).filter(Boolean);
-  if (leaf.path === 'headline' || leaf.path === 'contact') {
+  if (leaf.path === 'headline') {
     if (lines.length < 1 || lines.length > 4) return 'Bir ile dört satır arası olmalı.';
     if (value.split('{w}').length !== 2) return '{w} tam bir kez geçmeli (kelime kutusunun yeri).';
   }
+  if (['sentence.name', 'sentence.what', 'sentence.mail', 'sentence.will'].includes(leaf.path) && value.trim() && value.split('{b}').length !== 2) return '{b} tam bir kez geçmeli (boşluğun yeri).';
+  if (leaf.path === 'sentence.ideas' && lines.length < 1) return 'En az bir öneri gerekli.';
   if (leaf.path === 'words' && lines.length < 2) return 'En az iki kelime gerekli (ekip birini silip diğerini yazıyor).';
   if (leaf.path === 'notes' && lines.length < 1) return 'En az bir not gerekli.';
   if (!leaf.lines && !value.trim()) return null;
