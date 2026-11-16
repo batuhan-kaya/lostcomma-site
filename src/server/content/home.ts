@@ -42,8 +42,13 @@ export interface Choice {
 }
 
 export interface HomeContent {
+  /** The hero headline line by line. {w} is the word box (the variable word) · the bouncing period follows the last line. */
+  headline: string[];
   /** Variable word in the headline. The first one is rendered by the server. */
   words: string[];
+  /** The contact headline line by line. {w} is the selected word (`contactWord`) · the period follows the last line. */
+  contact: string[];
+  contactWord: string;
   manifesto: Seg[];
   comments: { who: Who; text: string }[];
   services: Service[];
@@ -65,7 +70,10 @@ const CODE = {
 };
 
 const en: HomeContent = {
+  headline: ['We design and build', 'websites and apps', 'people {w}'],
   words: ['remember', 'screenshot', 'fall for', 'talk about', 'come back to'],
+  contact: ['Let’s open', 'a {w}'],
+  contactWord: 'new file',
   manifesto: [
     'We are a ',
     { who: 'design', del: 'full-service digital agency', ins: 'small design and engineering studio' },
@@ -124,7 +132,10 @@ const en: HomeContent = {
 };
 
 const tr: HomeContent = {
+  headline: ['{w}', 'web siteleri ve', 'uygulamalar yapıyoruz'],
   words: ['Akılda kalan', 'Konuşulan', 'Paylaşılan', 'Âşık olunan', 'Tekrar açılan'],
+  contact: ['Yeni bir', '{w}', 'açalım'],
+  contactWord: 'dosya',
   manifesto: [
     'İstanbul’da ',
     { who: 'design', del: 'tam hizmet veren bir dijital ajansız', ins: 'küçük bir tasarım ve yazılım stüdyosuyuz' },

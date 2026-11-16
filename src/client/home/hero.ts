@@ -134,8 +134,6 @@ export class Hero {
       design: () => ['design', (doing.design ?? this.data.doing.design) + '.'],
       code: () => ['code', (doing.code ?? this.data.doing.code) + '.'],
       motion: () => ['motion', (doing.motion ?? this.data.doing.motion) + '.'],
-      comma: () => ['comma', t('Ait olduğu yere döndü. Bulduğun için teşekkürler.')],
-      ghost: () => [t('biri'), t('Küçük biri dosyadan çıkıp duruyor. Mercan rengi. Çok utangaç.')],
       you: () => [t('sen'), t('Bu sensin. Dosyaya hoş geldin.')],
     };
     for (const b of $$<HTMLButtonElement>('[data-pop]')) {
@@ -171,6 +169,8 @@ export class Hero {
       }
       if (!this.typing) {
         this.box.classList.add('sel');
+        // Hands on the keyboard: the mouse slides off the word and stays where it is left.
+        c.stay('design', 10 + Math.random() * 10, 8 + Math.random() * 8);
         await c.sleep(650, signal);
         await this.typeNext(signal);
         this.setLive(false);

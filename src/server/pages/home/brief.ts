@@ -1,6 +1,7 @@
 import { html, raw, type Safe } from '../../html';
 import type { Ctx } from '../../page';
-import { BRIEF_BUDGETS, BRIEF_TIMES, BRIEF_TYPES, HOME } from '../../content/home';
+import { BRIEF_BUDGETS, BRIEF_TIMES, BRIEF_TYPES } from '../../content/home';
+import { SOCIAL } from '../../data/settings';
 import { istanbulTime } from '../../layout/chrome';
 import { href } from '../../routes';
 
@@ -28,8 +29,10 @@ export function studioOpen(d: Date): boolean {
  */
 export function brief(ctx: Ctx, opts: { theme: ContactTheme; sent: boolean; error?: boolean }): Safe {
   const { t, lang } = ctx;
-  const c = HOME[lang];
+  const c = ctx.texts.home(lang);
   const open = studioOpen(ctx.now);
+  // The accounts filled in the panel (Site ayarları · Sosyal hesaplar) · an empty one does not show.
+  const social = SOCIAL.map((s) => ({ ...s, url: ctx.settings.text(s.key, lang) })).filter((s) => s.url);
   const tick = html`<i class="ck" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3.5 8.5 L6.5 11.5 L12.5 4.5"></path></svg></i>`;
 
   const form = html`<form class="fb" data-fb method="post" action="/api/brief"${opts.sent ? html` hidden` : ''}>
@@ -94,12 +97,15 @@ ${c.times.map(
 <div class="wrap">
 <div class="ctop mono"><span class="k"><span>(06)</span><span>${t('Proje başlat')}</span></span><span class="clock"><i class="${open ? '' : 'off'}" data-cdot></i><span>${t('İstanbul')}</span><b data-clock>${istanbulTime(ctx.now)}</b><span data-copen>· ${open ? t('stüdyo açık') : t('mesai dışı · sabah hepsini okuyoruz')}</span></span></div>
 <div class="cl">
-<h2 class="ch">${lang === 'tr' ? html`<span class="ln">Yeni bir</span><span class="ln">${sbox(t('dosya'), t)}</span><span class="ln">açalım<span class="pd">.</span></span>` : html`<span class="ln">Let’s open</span><span class="ln">a ${sbox('new file', t)}<span class="pd">.</span></span>`}</h2>
+<h2 class="ch">${c.contact.map((line, i) => {
+    const [before, after] = line.split('{w}');
+    return html`<span class="ln">${after === undefined ? line : html`${before}${sbox(c.contactWord, t)}${after}`}${i === c.contact.length - 1 ? html`<span class="pd">.</span>` : ''}</span>`;
+  })}</h2>
 <p class="cp">${t('Ne yaptığını anlat. Bütün ekip her brief’i okur ve dosyana katılır. Genelde bir gün içinde döneriz.')}</p>
 <div class="info">
 <div class="row"><span class="mono">${t('E-posta')}</span><a class="mail" href="mailto:hello@lostcomma.co">hello@lostcomma.co</a><button type="button" class="copy mono" data-copy>${t('Kopyala')}</button></div>
 <div class="row"><span class="mono">${t('Stüdyo')}</span><span class="val">${t('İstanbul · her yerden ekiplerle çalışıyoruz')}</span><span></span></div>
-<div class="row"><span class="mono">${t('Başka yerler')}</span><span class="soc"><a href="#contact">Instagram</a><a href="#contact">LinkedIn</a><a href="#contact">Behance</a></span><span></span></div>
+${social.length ? html`<div class="row"><span class="mono">${t('Başka yerler')}</span><span class="soc">${social.map((s) => html`<a href="${s.url!}" rel="me noopener">${s.label}</a>`)}</span><span></span></div>` : ''}
 </div>
 </div>
 <div class="file" data-file>

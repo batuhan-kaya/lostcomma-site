@@ -1,7 +1,7 @@
 /**
- * The spring behind every cursor on the site. The cursors (src/client/lib/crew-math.ts) and the
- * playground in the note "How our cursors move" run this same function · the server draws its
- * first graph with it too.
+ * The spring. It moved the team cursors until they got a hand (src/shared/hand.ts). It still runs
+ * the playground in the note "How our cursors move" (the server draws its first graph with it) ·
+ * the ways on the 404 page · the Work preview · the Lab chain.
  */
 export interface Body {
   x: number;
@@ -24,7 +24,7 @@ export interface Spring {
 }
 
 /**
- * Moves like a hand (phase 15): it sets off slowly (it may gain only .618 px per frame of speed
+ * The calm spring (phase 15): it sets off slowly (it may gain only .618 px per frame of speed
  * each frame) · cruises at 14.8 px per frame at most (24 / φ · about 890 px/s) · lands softly with
  * an overshoot of a pixel or two. A 300 px move reads in about .6 s and is still at .85 s.
  * The steps are a fixed 60 a second on every screen (crew-math.ts `stepsFor`).

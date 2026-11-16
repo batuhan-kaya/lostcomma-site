@@ -92,7 +92,6 @@ function jar(ctx: Ctx): Safe {
   const { t } = ctx;
   const items = [
     { k: 'lang', kind: 'cookie', label: msg('Dil seçimin') },
-    { k: 'lc-comma', kind: 'local', label: msg('Virgülü buldun') },
     { k: 'lc-saved-notes', kind: 'local', label: msg('Kaydettiğin notlar') },
     { k: 'lc-stats-off', kind: 'local', label: msg('Beni sayma tercihin') },
   ];

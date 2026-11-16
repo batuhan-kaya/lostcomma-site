@@ -1,12 +1,11 @@
 import { html, type Safe } from '../../html';
 import type { Ctx } from '../../page';
-import { HOME } from '../../content/home';
 import { stepArt } from './art';
 
 /** 05 · How a project moves: a clickable prototype of five screens joined by noodles. */
 export function process(ctx: Ctx): Safe {
   const { t, lang } = ctx;
-  const steps = HOME[lang].steps;
+  const steps = ctx.texts.home(lang).steps;
   const chat = { ask: t('Peki bu aslında kimin için?'), answer: t('Pazar günü yelken açanlar.'), live: t('Yayında · v1.0') };
   const NOODLES = [
     ['M136 256 C226 256 205 220 289 220', 'M281 214 L289 220 L281 226'],

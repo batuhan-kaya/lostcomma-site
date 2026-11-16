@@ -4,7 +4,6 @@ import { cx, html, type Safe } from '../html';
 import { msg } from '../msg';
 import type { Ctx, NextBand } from '../page';
 import { href, type RouteId } from '../routes';
-import { MARK } from '../../shared/logo';
 import { lockup } from './logo';
 
 const NAV: [RouteId, string][] = [
@@ -51,7 +50,7 @@ function presence(ctx: Ctx, home: boolean): Safe {
   return html`<div class="pres mono" data-pres>
 <i></i>${roll(ctx, msg('Canlı'))}<span class="avs">${TEAM.map(
     ([n, l]) => html`<button type="button" class="av c-${n}" data-av="${n}" data-pop="${n}" aria-label="${t('{name} burada', { name: n })}">${l}</button>`,
-  )}<button type="button" class="av c-comma egg" data-av="comma" data-pop="comma" aria-label="${t('virgül burada')}" hidden>,</button><button type="button" class="av ghost" data-pop="ghost" aria-label="${t('Biri dosyadan çıktı')}">?</button><button type="button" class="av c-you" data-pop="you" aria-label="${t('Sen')}">${t('S')}</button></span>
+  )}<button type="button" class="av c-you" data-pop="you" aria-label="${t('Sen')}">${t('S')}</button></span>
 <div class="popv" data-popv role="status" hidden><b></b><span></span></div>
 </div>`;
 }
@@ -96,15 +95,24 @@ function fl(ctx: Ctx, to: string, label: string, o: { rel?: string } = {}): Safe
   return html`<li><a class="ft-l" href="${to}"${here ? html` aria-current="page"` : ''}${o.rel ? html` rel="${o.rel}"` : ''}>${label}</a></li>`;
 }
 
-/** The big sign-off: the mark is drawn with a pen (src/client/lib/footer.ts) · the name rises after it. */
-function signature(): Safe {
-  const letters = (w: string) => w.split('').map((ch) => html`<span>${ch}</span>`);
-  return html`<p class="ft-lock" data-rest="host" data-rest-at="end 18 -10"><svg class="lc-mark ft-mk" viewBox="0 0 ${MARK.w} ${MARK.h}" aria-hidden="true" focusable="false"><path class="lc-t" pathLength="1" d="${MARK.top}"></path><path class="lc-c" pathLength="1" d="${MARK.comma}"></path><path class="lc-r" pathLength="1" d="${MARK.top}"></path></svg><span class="ft-w">${letters('lost')}</span><b class="lgc egg" aria-hidden="true">,</b><span class="ft-gap"> </span><span class="ft-w">${letters('comma')}</span></p>`;
+/**
+ * The sign-off: who we are · who is in the file · the way back up. The site's own language (a
+ * live file and the people in it) said once more and quietly: the logo at reading size · the
+ * team's avatars with a place for the visitor · a round arrow that takes you to the top (the
+ * same drawn arrow as the next band's). Nothing waits for a script.
+ */
+function signature(ctx: Ctx): Safe {
+  const { t, lang } = ctx;
+  return html`<div class="ft-base">
+<div class="ft-who"><a class="ft-logo" href="${href(lang, 'home')}" aria-label="Lost Comma">${lockup()}</a><p>${t('Tasarım ve yazılım stüdyosu · İstanbul')}</p></div>
+<div class="ft-team"><span class="avs" aria-hidden="true">${TEAM.map(([n, l]) => html`<span class="av c-${n}">${l}</span>`)}<span class="av c-you">${t('S')}</span></span><p class="mono" data-rest="host" data-rest-at="end 14 2">${t('Üç kişiyiz · dördüncü sensin')}</p></div>
+<a class="ft-up" href="#top" aria-label="${t('Başa dön')}"><span class="mono" aria-hidden="true">${t('Başa dön')}</span><svg viewBox="-22 -22 92 92" aria-hidden="true"><path d="M24 40V9M12 21l12-12 12 12"></path></svg></a>
+</div>`;
 }
 
 /**
- * The footer of every page (the homepage too): a way to start · the whole site · the drawn
- * sign-off · the small print. Always on ink · lime is its one accent. Social links come from the
+ * The footer of every page (the homepage too): a way to start · the whole site · the sign-off
+ * (logo · team · back to top) · the small print. Always on ink · lime is its one accent. Social links come from the
  * panel (Site ayarları · Sosyal) and an empty one does not show · so do an empty phone and address.
  */
 export function footer(ctx: Ctx): Safe {
@@ -133,14 +141,11 @@ export function footer(ctx: Ctx): Safe {
 <div class="ft-col"><h3 class="mono">${t('İletişim')}</h3><ul>${fl(ctx, `mailto:${EMAIL}`, EMAIL)}${phone ? fl(ctx, `tel:${phone.replace(/[^\d+]/g, '')}`, phone) : ''}${fl(ctx, `${href(lang, 'home')}#contact`, t('Brief gönder'))}${address ? html`<li><span class="ft-addr">${address} · Kadıköy</span></li>` : ''}</ul></div>
 ${social.length ? html`<div class="ft-col"><h3 class="mono">${t('Takip et')}</h3><ul>${social.map((s) => html`<li><a class="ft-l" href="${s.url!}" rel="me noopener">${s.label} <span aria-hidden="true">↗</span></a></li>`)}</ul></div>` : ''}
 </nav>
-<div class="ft-sign">
-${signature()}
-<p class="ft-note mono"><span>${t('Üç kişi ve bir yerlerde bir virgül')}</span><span>${t('İstanbul')} <time data-clock>${istanbulTime(ctx.now)}</time></span></p>
-</div>
+${signature(ctx)}
 <div class="ft-bar mono">
 <span>© ${ctx.now.getFullYear()} Lost Comma</span>
 <nav aria-label="${t('Yasal')}"><a href="${href(lang, 'privacy')}">${t('Gizlilik')}</a><a href="${href(lang, 'kvkk')}">KVKK</a><a href="${href(lang, 'cookies')}">${t('Çerezler')}</a></nav>
-<div class="ft-end">${langSwitch(ctx, msg('Sayfanın dili'))}<a class="ft-up" href="#top">${t('Başa dön')} <span aria-hidden="true">↑</span></a></div>
+<div class="ft-end">${langSwitch(ctx, msg('Sayfanın dili'))}</div>
 </div>
 </div>
 </footer>`;

@@ -158,13 +158,6 @@ test.describe('Studio · desktop', () => {
     await expect(page.locator('.cur.c-motion.say .bub')).toHaveText('heyyy', { timeout: 4000 });
   });
 
-  test('the comma you found counts', async ({ page }) => {
-    await page.addInitScript(() => localStorage.setItem('lc-comma', '1'));
-    await page.goto('/en/studio');
-    await expect(page.locator('[data-commas]')).toHaveText('1');
-    await expect(page.locator('[data-yfound]')).toBeVisible();
-  });
-
   test('the ferry sits on the map', async ({ page }) => {
     await page.goto('/tr/studyo');
     await expect(page.locator('[data-boat]')).toHaveAttribute('transform', /^translate\(/);
