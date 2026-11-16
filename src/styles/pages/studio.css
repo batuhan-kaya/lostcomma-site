@@ -129,7 +129,6 @@ html.st-hc .pane > p, html.st-hc .row .d, html.st-hc .ver { color: #26262A; }
 .n b { display: block; font-family: var(--display); font-size: clamp(90px, 11.8vw, 170px); font-weight: 400; line-height: .86; letter-spacing: -.05em; font-variation-settings: 'wdth' 80, 'wght' 840; }
 .n > span { display: block; margin-top: 12px; color: var(--pmu); font-size: calc(18px * var(--fs)); }
 .n.z b::after { content: ''; display: inline-block; width: .14em; height: .14em; margin-left: .06em; border-radius: 50%; background: var(--pink); }
-.n .you { margin-top: 6px; color: var(--pfg); }
 
 /* ================= Istanbul ================= */
 .city { position: relative; padding: 100px 0 150px; }

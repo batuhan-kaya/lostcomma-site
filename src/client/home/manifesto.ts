@@ -108,11 +108,11 @@ export class Manifesto {
         }
         ch.classList.remove('typing');
         this.comment(i);
-        this.step = i + 1;
+        this.step = Math.max(this.step, i + 1);
         c.home(who);
         await c.sleep(420, signal);
       }
-      // A visitor who pressed Accept all or Reject all mid-scene keeps their status line.
+      // Accept all or Reject all in the middle of the typing: their line stays.
       if (this.mode === 'track') this.status(t('5 öneri · 3 kişi'));
       c.cast(c.hostOf('mf'));
       await c.sleep(1600, signal);

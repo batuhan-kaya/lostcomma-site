@@ -2,7 +2,6 @@
 import { getCrew } from './lib/crew';
 import { Board } from './home/board';
 import { Brief } from './home/brief';
-import { Comma } from './home/comma';
 import { Hero } from './home/hero';
 import { Manifesto } from './home/manifesto';
 import { Process } from './home/process';
@@ -19,8 +18,6 @@ const services = new Services(data);
 const board = new Board(data);
 const process = new Process();
 const brief = new Brief(data, crew);
-const root = document.querySelector<HTMLElement>('[data-root]');
-if (root) new Comma(root, crew);
 
 crew?.enableIdle();
 crew?.addScenes({

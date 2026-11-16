@@ -5,7 +5,9 @@
  *   run     .go · CSS plays the search and the drop on golden ratio steps (intro.css · 2.618 s) ·
  *           the count eases to 100 as the comma is found (2.382 s)
  *   exit    once the run is over and the fonts are in (never later than 3.618 s): the mark flies onto
- *           the header logo (.786 s) · the ground fades with it · the overlay is removed
+ *           the header logo (.786 s) · the ground fades with it · the overlay is removed.
+ *           The logo's own mark is hidden while the overlay is there (intro.css): the flying mark
+ *           lands in an empty place and becomes the logo in the frame the overlay goes
  *   skip    a click · a key · the wheel or a touch: everything settles and the exit comes at once
  *
  * Reduced motion · coming back with the back button: removed at once. Resolves when the page is
@@ -84,8 +86,8 @@ export function playIntro(): Promise<void> {
         const s = to.height / r.height;
         const from = 'translate(0px, 0px) translate(-50%, -56%) scale(1)';
         const end = `translate(${(to.left - r.left).toFixed(1)}px, ${(to.top - r.top).toFixed(1)}px) translate(-50%, -56%) scale(${s.toFixed(4)})`;
+        // It stays solid to the end: its place in the header is empty until the overlay goes.
         moves.push(mark.animate([{ transform: from }, { transform: end }], { duration: ms, easing: EASE, fill: 'forwards' }));
-        moves.push(mark.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 146, delay: ms - 90, fill: 'forwards' }));
       } else if (mark) {
         // No header logo on screen: the mark simply goes.
         moves.push(mark.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms * 0.6, fill: 'forwards' }));

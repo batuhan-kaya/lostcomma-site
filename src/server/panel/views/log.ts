@@ -7,7 +7,7 @@ import { back, log, send, type Kit } from '../kit';
 import { briefSnap, noteSnap, personSnap, projectSnap, restore, RestoreError, RESTORABLE, type Snap } from '../snapshot';
 import { actionForm, empty, section, timeTag, when } from '../ui';
 
-const ENTITY: Record<string, string> = { project: 'İş', note: 'Not', person: 'Ekip', media: 'Görsel', video: 'Döngü', brief: 'Brief', booking: 'Görüşme', closure: 'Kapalı zaman', outbox: 'E-posta', settings: 'Ayarlar', redirect: 'Yönlendirme', account: 'Hesap' };
+const ENTITY: Record<string, string> = { project: 'İş', note: 'Not', person: 'Ekip', media: 'Görsel', video: 'Döngü', brief: 'Brief', booking: 'Görüşme', closure: 'Kapalı zaman', outbox: 'E-posta', settings: 'Ayarlar', texts: 'Metinler', redirect: 'Yönlendirme', account: 'Hesap' };
 const PAGE = 50;
 
 /** Flat key → value pairs of a snapshot (texts become tr.name · en.slug …). */
@@ -95,6 +95,12 @@ ${a.before || a.after ? section('Değişiklik', a.before && a.after ? diff(a.bef
       for (const key of new Set([...Object.keys(was), ...Object.keys(snap)])) await k.settings.set(key, (snap[key] as never) ?? null).catch(() => undefined);
       await log(k, req, { action: 'restore', entity: 'settings', summary: `Ayarlar geri alındı (kayıt #${a.id})`, before: was, after: k.settings.snapshot() });
       return back(reply, '/panel/settings', 'restored');
+    }
+    if (a.entity === 'texts') {
+      const was = k.texts.snapshot();
+      await k.texts.restore(a.before as Parameters<typeof k.texts.restore>[0]);
+      await log(k, req, { action: 'restore', entity: 'texts', summary: `Metinler geri alındı (kayıt #${a.id})`, before: was, after: k.texts.snapshot() });
+      return back(reply, '/panel/texts', 'restored');
     }
     if (!RESTORABLE.has(a.entity)) return reply.callNotFound();
     const snap = a.before as Snap;

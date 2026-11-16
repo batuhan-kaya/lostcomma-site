@@ -15,6 +15,7 @@ import { caseSlugs, noteSlugs, notesIn } from './data/content';
 import { findRedirect } from './data/redirects';
 import { pruneRecords } from './data/retention';
 import { SettingsStore } from './data/settings';
+import { TextStore } from './data/texts';
 import { openDatabase, safeUrl, type Database, type Db } from './db';
 import { seedIfEmpty } from './db/seed';
 import { isLang, LANGS, negotiate, translator, type Lang } from './i18n';
@@ -95,6 +96,9 @@ export async function buildApp({ config, now = () => new Date(), database, maile
   const settings = new SettingsStore(db);
   await settings.load();
   app.decorate('settings', settings);
+  // Copy rewritten in the panel (Metinler): lines through t() and the homepage's content.
+  const texts = new TextStore(db);
+  await texts.load();
 
   // One canonical form per URL: no trailing slash (except the root).
   app.addHook('onRequest', async (req, reply) => {
@@ -212,8 +216,8 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     return {
       query: q,
       lang,
-      t: translator(lang),
-      tAlt: translator(lang === 'tr' ? 'en' : 'tr'),
+      t: translator(lang, undefined, texts.over(lang)),
+      tAlt: translator(lang === 'tr' ? 'en' : 'tr', undefined, texts.over(lang === 'tr' ? 'en' : 'tr')),
       site: config.SITE_URL,
       path,
       alt,
@@ -221,6 +225,7 @@ export async function buildApp({ config, now = () => new Date(), database, maile
       now: now(),
       db,
       settings,
+      texts,
     };
   }
 
@@ -289,7 +294,7 @@ export async function buildApp({ config, now = () => new Date(), database, maile
       return reply
         .type('application/rss+xml; charset=utf-8')
         .header('cache-control', 'public, max-age=600')
-        .send(rssXml(config.SITE_URL, lang, translator(lang), list, at));
+        .send(rssXml(config.SITE_URL, lang, translator(lang, undefined, texts.over(lang)), list, at));
     });
   }
 
@@ -366,6 +371,7 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     config,
     now,
     settings,
+    texts,
     postman,
     dirs: media,
     assets,

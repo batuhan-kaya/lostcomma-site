@@ -1,6 +1,5 @@
-/** Shared behaviour on every page: team cursors · footer clock and drawn sign-off · language switch roll · mobile menu. */
+/** Shared behaviour on every page: team cursors · footer clock and the clock · language switch roll · mobile menu. */
 import { getCrew } from './lib/crew';
-import { drawFooter } from './lib/footer';
 import { playIntro } from './lib/intro';
 import { reducedMotion } from './lib/motion';
 import { startStats, track } from './lib/stats';
@@ -56,15 +55,6 @@ function menu(): void {
   });
 }
 
-/** The shy comma was found on the homepage once: the logo keeps its comma everywhere. */
-function comma(): void {
-  try {
-    if (localStorage.getItem('lc-comma') === '1') document.documentElement.classList.add('found');
-  } catch {
-    /* storage blocked: no comma */
-  }
-}
-
 /**
  * Images from the pipeline carry their dominant colour (data-c). It fills the box while the image
  * loads and is removed afterwards. Set through the CSSOM: the CSP allows no style attributes.
@@ -96,14 +86,12 @@ function offscreen(): void {
   for (const el of document.querySelectorAll('[data-sec]')) io.observe(el);
 }
 
-comma();
 offscreen();
 startStats();
 startClock();
 langSwitch();
 menu();
 placeholders();
-drawFooter();
 
 // Page modules run after this one and register their scenes before DOMContentLoaded: the team
 // starts after that event. With the preloader they also wait until the page is free (born from

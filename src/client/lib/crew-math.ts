@@ -1,7 +1,7 @@
 /**
- * Pure maths behind the team cursors. No DOM here so it runs under vitest.
- * Numbers come from the approved drafts: calm spring (src/shared/spring.ts) · 24 px per frame cap.
- * The ±6 px idle drift is a CSS animation (styles/crew.css) so a resting team costs no JavaScript at all.
+ * Pure maths around the team cursors: sections · resting spots · keeping off the words · the fixed
+ * 60 Hz clock. No DOM here so it runs under vitest. How a cursor moves is src/shared/hand.ts ·
+ * the spring (src/shared/spring.ts) is re-exported for the pages that still ride it.
  */
 export type Name = 'design' | 'code' | 'motion';
 export const TEAM: readonly Name[] = ['design', 'code', 'motion'];

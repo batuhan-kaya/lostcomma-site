@@ -5,7 +5,7 @@ import { horizontalOverflow } from './checks';
 
 /**
  * Guards from the motion and responsive audit (phase 12):
- *  - a settled team costs nothing (no animation frames · the drift is CSS)
+ *  - a settled team costs nothing (no animation frames between two fidgets)
  *  - resting cursors keep off the words people read · cursors and bubbles stay on the page
  *  - no sideways scroll at the in-between widths the three projects do not cover
  *  - nothing jumps while a page loads
@@ -50,10 +50,10 @@ function coveringCursors(page: Page): Promise<string[]> {
     }
     const hit = (a: DOMRect, b: DOMRect) => Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
     const out: string[] = [];
-    for (const c of document.querySelectorAll<HTMLElement>('.cur.drifting[data-cur]')) {
+    for (const c of document.querySelectorAll<HTMLElement>('.cur.resting[data-cur]')) {
       const arw = c.querySelector('.arw')!.getBoundingClientRect();
       const tag = c.querySelector('.tag')!.getBoundingClientRect();
-      // A few pixels of the drift are fine: the spot is chosen with the drift in mind.
+      // A few pixels are fine: the spot is chosen with the fidgets in mind.
       for (const l of lines) if (hit(tag, l.r) > 30 || (!l.big && hit(arw, l.r) > 30)) out.push(`${c.dataset.cur} on "${l.s}"`);
     }
     return out;
@@ -78,19 +78,28 @@ function cursorsOffPage(page: Page): Promise<string[]> {
 }
 
 test.describe('motion · cursors', () => {
-  test('a settled team stops the animation loop · the drift runs in CSS', async ({ page }) => {
+  test('a settled team stops the animation loop · a resting hand still moves its mouse now and then', async ({ page }) => {
     await instrument(page);
     await page.goto('/en/uses');
-    // The stub's host says one line in the hero and then everyone rests.
-    await expect.poll(() => page.locator('.cur.drifting').count(), { timeout: 12_000 }).toBeGreaterThan(0);
-    await page.waitForTimeout(3000);
-    const before = await frames(page);
-    await page.waitForTimeout(1500);
-    expect(await frames(page)).toBe(before);
-    // Still alive: the resting drift is a CSS animation on the compositor.
-    const drift = await page.evaluate(() => document.getAnimations().filter((a) => (a as CSSAnimation).animationName === 'cur-dx').length);
-    expect(drift).toBeGreaterThan(0);
+    const spots = () =>
+      page.evaluate(() => [...document.querySelectorAll<HTMLElement>('.cur[data-cur]:not(.zz)')].map((c) => c.style.transform).join(' '));
+    // Everyone at rest: no frame for more than a second (the next fidget is at least 2.6 s after the last move).
+    const quiet = async () => {
+      await expect.poll(() => page.locator('.cur.resting').count(), { timeout: 15_000, intervals: [50] }).toBe(3);
+      const before = await frames(page);
+      await page.waitForTimeout(1200);
+      return (await frames(page)) === before;
+    };
+    await expect.poll(quiet, { timeout: 30_000, intervals: [200] }).toBe(true);
+    // No endless CSS animation keeps a cursor floating either: at rest it is still.
+    const floating = await page.evaluate(() => document.getAnimations().filter((a) => a instanceof CSSAnimation && !!(a.effect as KeyframeEffect | null)?.target?.closest('.crew')).length);
+    expect(floating).toBe(0);
+    // Still alive: within a few seconds one of them moves a little by itself · then rests again.
+    const was = await spots();
+    await expect.poll(spots, { timeout: 12_000, intervals: [100] }).not.toBe(was);
+    await expect.poll(() => page.locator('.cur.resting').count(), { timeout: 8000, intervals: [50] }).toBeGreaterThan(1);
     // A scroll wakes the loop up again.
+    const before = await frames(page);
     await page.evaluate(() => window.scrollBy(0, 600));
     await expect.poll(() => frames(page), { timeout: 3000 }).toBeGreaterThan(before);
   });

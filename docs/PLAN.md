@@ -65,7 +65,8 @@ Her aşama aynı şekilde kapanır: kod + testler yeşil + iki dilde ekran gör�
 | 13 | İstatistik ve yasal sayfalar | Çerezsiz anonim istatistik (panelde canlı · özet · ziyaret akışı · tıklama haritası · brief ve görüşmenin "nasıl geldi" izi) · Gizlilik · KVKK aydınlatma metni · Çerezler (iki dil) · saklama süreleri | Bitti |
 | 14 | Footer ve logo | Her sayfada aynı footer (çağrı · site haritası · çizilerek gelen logo ve isim · yasal · dil · başa dön) · logo her yerde (header · panel · paylaşım görselleri · favicon · telefon ikonları · RSS · arama verisi) · sosyal hesaplar panelden · Codespaces önizlemesinde panel ve formlar | Bitti |
 | 15 | Preloader | Kayıp virgül aranıyor (beş fikirden Batuhan'ın seçtiği 1. fikir): sadece dışarıdan gelene · yaklaşık 3,4 sn (her adım okunabilsin · yollar tek kavis) · tıklayınca geçilir · hareket azaltmada ve JS yokken hiç yok · logo header'daki yerine iner · ekip imleçleri yumuşak kalkıyor ve her ekranda (60 · 120 · 144 Hz) aynı hızda akıyor | Bitti |
-| 16 | İletişim | Ana sayfadaki iletişim tek cümle oldu (1. turdaki 3. seçenek): ad · konu · e-posta boşlukları cümlenin içinde · fiyat · tarih · hizmet seçimi yok · seçili boşlukta tasarım aracının seçim kutusu · konu boşluğu sırayla fikir önerir · gönderince cümle teşekküre döner · JS yokken de form · zemin süt (mavi fazla patlıyordu) | Onay bekliyor |
+| 15a | Canlı imleçler · footer · preloader düzeltmeleri | İmleçler el gibi hareket ediyor (kavisli yol · ıskalayıp düzeltme · herkesin kendi huyu · dururken gerçekten duruyor · arada fareyi oynatıyor · ziyaretçinin imlecine yol veriyor) · turuncu virgül yumurtası iptal · footer büyük logo yerine sakin bir kapanış (logo · ekip · İstanbul saati) · preloader'da herkes ekran dışından giriyor ve logo yeri iniş anına kadar boş · ana sayfa metin önerileri (ayrı onay) · panelde **Metinler** bölümü (bütün cümleler ve ana sayfa içeriği kod açmadan değişir) · ana sayfadaki sosyal bağlantılar Site ayarları'ndan | Bitti |
+| 16 | İletişim | Ana sayfadaki iletişim tek cümle oldu (1. turdaki 3. seçenek): ad · konu · e-posta boşlukları cümlenin içinde · fiyat · tarih · hizmet seçimi yok · seçili boşlukta tasarım aracının seçim kutusu · konu boşluğu sırayla fikir önerir · gönderince cümle teşekküre döner · JS yokken de form · zemin süt (mavi fazla patlıyordu) | Bitti |
 | 17 | Sayfa geçişleri | 91.99.4.44'teki sitenin geçişinin aynısı (kodu Batuhan'dan gelecek) | Kod bekliyor |
 | 18 | Yayın | Staging · Compose + Caddy · yedekleme · izleme · `GEOIP_DB` (DB-IP Lite şehir · ayda bir güncelleme) · sunucu günlükleri 30 gün (gizlilik metni böyle söylüyor) | |
 
@@ -98,7 +99,7 @@ Gerçek görsel gelmesi gereken her yer `docs/GORSELLER.md` dosyasında tutulur 
 - Bütün sayfalar için renk turu (Batuhan'ın isteğiyle sonraya bırakıldı)
 - E-posta gönderimi için SMTP sağlayıcısı (9. aşama)
 - Panel şifresi: ilk girişte Batuhan kendisi belirler · sunucuda sadece hash'i durur (11. aşama)
-- Sunucudaki mevcut ters vekil düzeni: Caddy ortak mı · ağ adı · port (17. aşama)
+- Sunucudaki mevcut ters vekil düzeni: Caddy ortak mı · ağ adı · port (18. aşama)
 - Veri sorumlusunun adı ve adresi · başvuru e-postası · e-posta servisinin adı (13. aşama · panelde Site ayarları · Yasal sayfalar)
 - Yayından önce: Hetzner ve e-posta servisiyle KVKK standart sözleşmesi · imzadan sonra beş iş günü içinde Kurul'a bildirim (yurt dışı aktarım · 13. aşama metinleri buna dayanıyor)
 - Sayfa geçişinin kodu (91.99.4.44 · 17. aşama)

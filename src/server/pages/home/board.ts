@@ -3,7 +3,6 @@ import { html, type Safe } from '../../html';
 import { picture } from '../../media/picture';
 import type { Ctx } from '../../page';
 import { href } from '../../routes';
-import { HOME } from '../../content/home';
 import { BOARD_ART } from './art';
 
 /** Frame 7 is always the Lab. Frames 0–6 belong to projects (projects.board_slot). */
@@ -23,7 +22,7 @@ interface Frame {
 }
 
 function frames(ctx: Ctx, projects: BoardProject[]): Frame[] {
-  const lab = HOME[ctx.lang].lab;
+  const lab = ctx.texts.home(ctx.lang).lab;
   return [
     ...projects.map((p) => ({
       slot: p.slot,

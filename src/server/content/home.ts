@@ -42,22 +42,24 @@ export interface Choice {
 }
 
 /**
- * 06 · The contact sentence: the form is one sentence with three blanks. Each line is the text
- * before and after its blank (the blank sits in a different place in each language).
+ * 06 · The contact sentence: the form is one sentence with three blanks. Each line holds its
+ * blank as {b} (it sits in a different place in each language · the panel's Metinler can move it).
  */
 export interface Sentence {
-  name: [string, string];
-  what: [string, string];
-  mail: [string, string];
+  name: string;
+  what: string;
+  mail: string;
   /** What the topic blank suggests in turn (free text · never a choice). The first one is the server's. */
   ideas: string[];
-  /** After sending: the thanks · the line with their address (before and after it) · the line without JS. */
+  /** After sending: the thanks · the line with their address ({b}) · the line without JS. */
   thanks: string;
-  will: [string, string];
+  will: string;
   plain: string;
 }
 
 export interface HomeContent {
+  /** The hero headline line by line. {w} is the word box (the variable word) · the bouncing period follows the last line. */
+  headline: string[];
   /** Variable word in the headline. The first one is rendered by the server. */
   words: string[];
   manifesto: Seg[];
@@ -83,6 +85,7 @@ const CODE = {
 };
 
 const en: HomeContent = {
+  headline: ['We design and build', 'websites and apps', 'people {w}'],
   words: ['remember', 'screenshot', 'fall for', 'talk about', 'come back to'],
   manifesto: [
     'We are a ',
@@ -140,17 +143,18 @@ const en: HomeContent = {
   ],
   doing: { design: 'Looking around the file', code: 'Reading the codebase', motion: 'Tweaking an easing curve' },
   sentence: {
-    name: ['Hi I’m ', '.'],
-    what: ['I’d like to talk about ', '.'],
-    mail: ['Write to me at ', '.'],
+    name: 'Hi I’m {b}.',
+    what: 'I’d like to talk about {b}.',
+    mail: 'Write to me at {b}.',
     ideas: ['a new website', 'a mobile app', 'our brand identity', 'a launch film'],
     thanks: 'Thank you',
-    will: ['We’ll write to ', ' within a day.'],
+    will: 'We’ll write to {b} within a day.',
     plain: 'Your note reached us. We’ll write within a day.',
   },
 };
 
 const tr: HomeContent = {
+  headline: ['{w}', 'web siteleri ve', 'uygulamalar yapıyoruz'],
   words: ['Akılda kalan', 'Konuşulan', 'Paylaşılan', 'Âşık olunan', 'Tekrar açılan'],
   manifesto: [
     'İstanbul’da ',
@@ -208,15 +212,21 @@ const tr: HomeContent = {
   ],
   doing: { design: 'Dosyaya göz atıyor', code: 'Kodu okuyor', motion: 'Bir yumuşatma eğrisiyle uğraşıyor' },
   sentence: {
-    name: ['Merhaba ben ', '.'],
-    what: ['', ' hakkında konuşmak istiyorum.'],
-    mail: ['Bana ', ' adresinden yazın.'],
+    name: 'Merhaba ben {b}.',
+    what: '{b} hakkında konuşmak istiyorum.',
+    mail: 'Bana {b} adresinden yazın.',
     ideas: ['yeni bir web sitesi', 'yeni bir uygulama', 'markamızın kimliği', 'bir lansman filmi'],
     thanks: 'Teşekkürler',
-    will: ['Bir gün içinde ', ' adresine yazıyoruz.'],
+    will: 'Bir gün içinde {b} adresine yazıyoruz.',
     plain: 'İletin bize ulaştı. Bir gün içinde yazıyoruz.',
   },
 };
+
+/** A sentence line around its blank: the text before {b} and after it. */
+export function aroundBlank(line: string): [string, string] {
+  const i = line.indexOf('{b}');
+  return i < 0 ? [line, ''] : [line.slice(0, i), line.slice(i + 3)];
+}
 
 export const HOME: Record<Lang, HomeContent> = { tr, en };
 

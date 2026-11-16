@@ -1,6 +1,5 @@
 import { html, type Safe } from '../../html';
 import type { Ctx } from '../../page';
-import { HOME } from '../../content/home';
 
 /**
  * 01 · Hero. The team is live in the file: design rewrites a word of the headline,
@@ -8,14 +7,17 @@ import { HOME } from '../../content/home';
  */
 export function hero(ctx: Ctx): Safe {
   const { t, lang } = ctx;
-  const word = HOME[lang].words[0] ?? '';
+  const c = ctx.texts.home(lang);
+  const word = c.words[0] ?? '';
   const box = html`<button type="button" class="wbox" data-wbox title="${t('Kelimeyi değiştir')}"><span class="wtx" data-word>${word}</span><i class="tc" aria-hidden="true"></i><i class="hh hA" aria-hidden="true"></i><i class="hh hB" aria-hidden="true"></i><i class="hh hC" aria-hidden="true"></i><i class="hh hD" aria-hidden="true"></i><span class="sz mono" aria-hidden="true">${t('Metin')} · 146</span></button>`;
   const dot = html`<button type="button" class="dot" data-dot title="${t('Noktayı zıplat')}">.</button>`;
+  // The lines come from the content (panel · Metinler): {w} is the word box · the period ends the last line.
   // Turkish puts the variable word first · English at the end.
-  const lines =
-    lang === 'tr'
-      ? html`<span class="ln">${box}</span><span class="ln">web siteleri ve</span><span class="ln">uygulamalar yapıyoruz${dot}</span>`
-      : html`<span class="ln">We design and build</span><span class="ln">websites and apps</span><span class="ln">people ${box}${dot}</span>`;
+  const lines = c.headline.map((line, i) => {
+    const [before, after] = line.split('{w}');
+    const last = i === c.headline.length - 1;
+    return html`<span class="ln">${after === undefined ? line : html`${before}${box}${after}`}${last ? dot : ''}</span>`;
+  });
 
   return html`<section class="hero" data-sec="hero" id="top">
 <span class="rest" data-rest="design" data-rest-at="0.85 0.52" data-rest-at-m="0.8 0.34"></span>

@@ -1,6 +1,6 @@
 import { html, type Safe } from '../../html';
 import type { Ctx } from '../../page';
-import { HOME } from '../../content/home';
+import { aroundBlank } from '../../content/home';
 import { istanbulTime } from '../../layout/chrome';
 import { href } from '../../routes';
 
@@ -35,7 +35,7 @@ function blank(o: { key: 'name' | 'what' | 'mail'; input: Safe; label: string; o
  */
 export function brief(ctx: Ctx, opts: { theme: ContactTheme; sent: boolean; error?: boolean }): Safe {
   const { t, lang } = ctx;
-  const s = HOME[lang].sentence;
+  const s = ctx.texts.home(lang).sentence;
   const open = studioOpen(ctx.now);
   const longest = Math.max(...s.ideas.map((i) => i.length));
   const namePh = t('adın');
@@ -45,7 +45,7 @@ export function brief(ctx: Ctx, opts: { theme: ContactTheme; sent: boolean; erro
   const what = html`<input class="blank what" data-in="what" type="text" name="message" maxlength="200" autocomplete="off" placeholder="${s.ideas[0] ?? ''}" size="${blankSize('', '', longest)}" aria-label="${t('Ne hakkında konuşmak istiyorsun')}">`;
   const mail = html`<input class="blank" data-in="mail" type="email" name="email" required maxlength="200" autocomplete="email" placeholder="${mailPh}" size="${blankSize('', mailPh)}" aria-label="${t('E-posta adresin')}">`;
   // The host rests after the first line's words (the crew skips it once the thanks replace the form).
-  const line = (parts: [string, string], b: Safe, rest = false) =>
+  const line = (text: string, b: Safe, rest = false, parts = aroundBlank(text)) =>
     html`<span class="sl"${rest ? html` data-rest="design" data-rest-at="end 20 -8"` : ''}>${parts[0]}${b}${parts[1]}</span>`;
 
   const form = html`<form class="sf" data-sf method="post" action="/api/brief"${opts.sent ? html` hidden` : ''}>

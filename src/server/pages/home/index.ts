@@ -3,8 +3,8 @@ import { SOCIAL } from '../../data/settings';
 import { html, raw, type Safe } from '../../html';
 import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
-import { HOME } from '../../content/home';
 import { board } from './board';
+import { aroundBlank } from '../../content/home';
 import { brief, type ContactTheme } from './brief';
 import { hero } from './hero';
 import { manifesto } from './manifesto';
@@ -68,12 +68,12 @@ ${process(ctx)}
 ${brief(ctx, { theme: CONTACT_THEME, sent: !!opts.sent, error: !!opts.error })}`,
     head: (ctx) => organization(ctx),
     data: (ctx) => {
-      const c = HOME[ctx.lang];
+      const c = ctx.texts.home(ctx.lang);
       return {
         words: c.words,
         notes: c.notes,
         services: c.services.map((s) => ({ lab: s.lab, size: s.size, code: s.code, say: s.say })),
-        sentence: { ideas: c.sentence.ideas, thanks: c.sentence.thanks, will: c.sentence.will, plain: c.sentence.plain },
+        sentence: { ideas: c.sentence.ideas, thanks: c.sentence.thanks, will: aroundBlank(c.sentence.will), plain: c.sentence.plain },
         doing: c.doing,
       };
     },

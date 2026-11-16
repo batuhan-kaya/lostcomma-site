@@ -125,7 +125,7 @@ function numbers(ctx: Ctx, d: StudioData): Safe {
 <div class="n"><b>${d.people.length}</b><span>${t('her şeyi yapan insan')}</span></div>
 <div class="n"><b>2</b><span>${t('her sitede dil')}</span></div>
 <div class="n"><b>${d.projects}</b><span>${t('{y} yılından beri proje', { y: d.since })}</span></div>
-<div class="n z" data-rest="host" data-rest-at="0.5 0.1"><b data-commas>0</b><span>${t('bulunan virgül')}</span><span class="you mono" data-yfound hidden>${t('biri sendin')}</span></div>
+<div class="n z" data-rest="host" data-rest-at="0.5 0.1"><b>0</b><span>${t('bulunan virgül')}</span></div>
 </div></section>`;
 }
 
