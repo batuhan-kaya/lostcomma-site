@@ -101,7 +101,7 @@ describe('03 · the service frames', () => {
 
   it('a real motion loop plays inside the editor preview', () => {
     const mo = frameArt({ value: '<video data-x></video>' } as never)[3]!.value;
-    expect(mo).toContain('<div class="mcomp"><div class="fc-vid"><video data-x></video></div></div>');
+    expect(mo).toContain('<div class="mcomp"><div class="fc-vid"><video data-x></video></div><i class="msafe"></i></div>');
     expect(mo).not.toContain('class="mcomma"');
   });
 

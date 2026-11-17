@@ -157,18 +157,32 @@ test.describe('homepage · desktop interactions', () => {
     expect(errors).toEqual([]);
   });
 
-  test('services: the automation frame ends where the list on its left ends · in both languages', async ({ page }) => {
+  test('services: the website · identity · motion and automation frames end where the list on their left ends · in both languages', async ({ page }) => {
     for (const lang of ['tr', 'en']) {
       await page.goto(`/${lang}`);
       await toSection(page, 'svc');
-      await page.locator('[data-opt="4"]').click();
-      await expect(page.locator('[data-frm]')).toHaveClass(/v4/);
       const gap = () =>
         page.evaluate(() => document.querySelector('[data-frm]')!.getBoundingClientRect().bottom - document.querySelector('.opts')!.getBoundingClientRect().bottom);
-      await expect.poll(async () => Math.abs(await gap()), { timeout: 4000 }).toBeLessThan(3);
-      // Thirteen steps on show and more: groups · a parallel row · a lane for later · the trace.
+      // Measured once the fonts are in (the list's height depends on its letters).
+      await page.evaluate(() => document.fonts.ready);
+      const stageH = () => page.locator('[data-stage]').evaluate((e) => Math.round(e.getBoundingClientRect().height));
+      let stage = 0;
+      for (const i of [0, 2, 3, 4]) {
+        await page.locator(`[data-opt="${i}"]`).click();
+        await expect(page.locator('[data-frm]')).toHaveClass(new RegExp(`v${i}`));
+        await expect.poll(async () => Math.abs(await gap()), { timeout: 4000, message: `frame ${i} · ${lang}` }).toBeLessThan(3);
+        // The stage keeps one height whichever frame is on show: nothing below moves.
+        if (!stage) stage = await stageH();
+        expect(await stageH()).toBe(stage);
+      }
+      // Automation: fifteen steps in groups · a parallel row · a lane for later · the trace.
       await expect(page.locator('.fc-auto .an')).toHaveCount(15);
       await expect(page.locator('.fc-auto .tr')).toHaveCount(10);
+      // Motion: a full editor · the bin · the effect controls · a timeline of layers and the sound.
+      await expect(page.locator('.fc-mo .mbin')).toHaveCount(11);
+      await expect(page.locator('.fc-mo .mrow')).toHaveCount(16);
+      // Identity: Clay's board (the photo) with the selection going over it.
+      await expect(page.locator('.fc-id.photo img')).toHaveCount(1);
     }
   });
 

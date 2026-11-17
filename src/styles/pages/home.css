@@ -194,14 +194,15 @@
 .odi { display: block; min-height: 0; overflow: hidden; }
 .odd { display: block; padding-top: 10px; font-size: 16px; line-height: 1.45; color: #3A3A38; }
 .odl { display: block; margin-top: 10px; color: var(--grey); }
-.stage { position: relative; height: 780px; padding: 64px 0 0 70px; overflow: visible; }
+.stage { position: relative; height: 850px; padding: 64px 0 0 70px; overflow: visible; }
 .sscale { transform-origin: 0 0; transform: scale(var(--k, 1)); }
 .frm { position: relative; width: var(--w); height: var(--h); border-radius: var(--r); background: #FFFFFF; box-shadow: 0 0 0 2px var(--blue), 0 50px 80px -40px rgba(14,14,15,.45); transition: width .95s var(--ease-roll), height .95s var(--ease-roll), border-radius .95s var(--ease-roll); }
-.frm.v0 { --w: 780px; --h: 488px; --r: 10px; }
+.frm.v0 { --w: 780px; --h: var(--hl, 720px); --r: 10px; }
 .frm.v1 { --w: 282px; --h: 610px; --r: 44px; }
 .frm.v2 { --w: 520px; --h: 520px; --r: 8px; }
-.frm.v3 { --w: 820px; --h: 350px; --r: 10px; }
-.frm.v4 { --w: 760px; --h: var(--h4, 720px); --r: 12px; }
+.frm.v2:has(.fc-id.photo) { --w: var(--hl, 720px); --h: var(--hl, 720px); }
+.frm.v3 { --w: 820px; --h: var(--hl, 720px); --r: 10px; }
+.frm.v4 { --w: 760px; --h: var(--hl, 720px); --r: 12px; }
 .clip { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
 /*
  * The frame's own tools (label · inspect · size · CSS) stay at reading size when a small stage
