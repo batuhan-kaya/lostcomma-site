@@ -57,7 +57,7 @@ export class Process {
     // Keep the active screen in view in the phone swipe row.
     const card = this.cards[i];
     const row = card?.parentElement;
-    if (card && row && row.scrollWidth > row.clientWidth + 4) row.scrollTo({ left: card.offsetLeft - 16, behavior: 'smooth' });
+    if (card && row && row.scrollWidth > row.clientWidth + 4) row.scrollTo({ left: card.offsetLeft - (parseFloat(getComputedStyle(row).paddingLeft) || 16), behavior: 'smooth' });
   }
 
   /** Next: a dot travels along the noodle · then the next screen lights up. */

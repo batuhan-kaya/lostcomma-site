@@ -50,6 +50,8 @@
 .nd:hover .dot, .nd:focus-visible .dot, .nd.peek .dot { fill: var(--lime); }
 .nd:hover text, .nd:focus-visible text, .nd.peek text { fill: var(--lime); opacity: 1; }
 .nd:focus-visible .halo { opacity: 1; stroke-width: 1; }
+/* Focus is more than "closest": the closest star already wears its halo · a focused one also gets a dashed ring. */
+.nd:focus-visible .hit { stroke: var(--lime); stroke-width: .5; stroke-dasharray: 1.2 1; }
 
 /* the lost comma */
 .me .cm { fill: var(--lime); }

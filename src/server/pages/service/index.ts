@@ -65,10 +65,10 @@ function get(ctx: Ctx, key: ServiceKey, s: ServiceCopy, host: CrewName): Safe {
   const n = ticks.filter(Boolean).length;
   return html`<section class="get" data-sec="get" data-host="${host}"><div class="wrap">
 <div class="ghd"><div><p class="kick mono"><i class="fi" aria-hidden="true"></i>${t('Neler var · ihtiyacın olanı işaretle')}</p><h2 class="h2">${t('On iki şey.')}<br>${t('Seçimini yap.')}</h2></div><p data-rest="host" data-rest-at="0.5 -0.5">${s.getText}</p></div>
-<ul class="chk" data-chk>${s.checks.map(
+<div class="chkw"><ul class="chk" data-chk>${s.checks.map(
     (c, i) => html`<li><button type="button" class="ci${c.on ? ' on' : ''}" data-ck="${i}" aria-pressed="${String(!!c.on)}"><span class="box" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9"></path></svg></span><b>${c.t}<span class="mono" aria-hidden="true">${pad(i + 1)}</span></b><span class="d">${c.d}</span></button></li>`,
   )}</ul>
-<div class="sumbar"><p role="status">${slot(t('{n} / 12 seçili', { n: '\u0000' }), html`<b data-picked>${n}</b>`)} · <span data-verdict>${s.verdict[tier]}</span><span class="sr"> · </span><span class="mono" data-weeks>${s.weeks[tier]}</span></p><a href="${href(lang, 'start')}">${t('Bu listeyle başla')} <span aria-hidden="true">↗</span></a></div>
+<div class="sumbar"><p role="status">${slot(t('{n} / 12 seçili', { n: '\u0000' }), html`<b data-picked>${n}</b>`)} · <span data-verdict>${s.verdict[tier]}</span><span class="sr"> · </span><span class="mono" data-weeks>${s.weeks[tier]}</span></p><a href="${href(lang, 'start')}">${t('Bu listeyle başla')} <span aria-hidden="true">↗</span></a></div></div>
 </div></section>`;
 }
 

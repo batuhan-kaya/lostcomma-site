@@ -32,6 +32,10 @@ export class Board {
   private drag: { lx: number; ly: number; sx: number; sy: number; moved: boolean; id: number } | null = null;
   private dragEnd = 0;
   private hover = false;
+  /** A frame has keyboard focus: the drift waits so it stays where the visitor is looking. */
+  private focused = false;
+  /** A short glide that brings a focused frame into the middle of the board. */
+  private glide: { fx: number; fy: number; tx: number; ty: number; t0: number } | null = null;
   private inView = false;
   private raf = 0;
   private readonly reduce = reducedMotion();
@@ -57,6 +61,15 @@ export class Board {
           this.open(i);
         }
       });
+      f.addEventListener('focus', () => {
+        // Keyboard focus only: a click opens the frame and the drift carries on afterwards.
+        this.focused = f.matches(':focus-visible');
+        if (this.focused) this.reveal(f);
+      });
+      f.addEventListener('blur', () => {
+        this.focused = false;
+        this.wake();
+      });
     });
     for (const b of $$('[data-close]')) b.addEventListener('click', () => this.close());
     document.addEventListener('keydown', (e) => e.key === 'Escape' && this.close());
@@ -75,6 +88,7 @@ export class Board {
   private down(e: PointerEvent): void {
     if (e.button !== 0 || this.isOpen) return;
     this.drag = { lx: e.clientX, ly: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, id: e.pointerId };
+    this.glide = null;
     this.vx = 0;
     this.vy = 0;
   }
@@ -165,6 +179,36 @@ export class Board {
     return this.hover;
   }
 
+  /**
+   * Tab moves through the frames but the board is endless and most frames sit outside it:
+   * glide the focused one to the middle (a snap with reduced motion) and keep the page on it.
+   */
+  private reveal(f: HTMLElement): void {
+    const B = this.board;
+    if (!B) return;
+    const bb = B.getBoundingClientRect();
+    const r = f.getBoundingClientRect();
+    const pad = 48;
+    const inside = r.left >= bb.left + pad && r.right <= bb.right - pad && r.top >= bb.top + pad && r.bottom <= bb.bottom - pad;
+    if (inside) return;
+    const k = this.scale();
+    const dx = (bb.left + bb.width / 2 - (r.left + r.width / 2)) / k;
+    const dy = (bb.top + bb.height / 2 - (r.top + r.height / 2)) / k;
+    this.vx = 0;
+    this.vy = 0;
+    this.auto = null;
+    if (this.reduce) {
+      this.px += dx;
+      this.py += dy;
+      this.render();
+      B.scrollIntoView({ block: 'nearest' });
+      return;
+    }
+    this.glide = { fx: this.px, fy: this.py, tx: this.px + dx, ty: this.py + dy, t0: performance.now() };
+    B.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    this.wake();
+  }
+
   private wake(): void {
     if (!this.raf) this.raf = requestAnimationFrame((n) => this.tick(n));
   }
@@ -173,7 +217,16 @@ export class Board {
     this.raf = 0;
     const dragging = !!this.drag?.moved;
     let moving = dragging;
-    if (!dragging) {
+    const g = this.glide;
+    if (g && !dragging) {
+      // .618 s ease out on the clock (the same pace on every refresh rate).
+      const p = Math.min(1, (now - g.t0) / 618);
+      const e = 1 - (1 - p) ** 3;
+      this.px = g.fx + (g.tx - g.fx) * e;
+      this.py = g.fy + (g.ty - g.fy) * e;
+      if (p < 1) moving = true;
+      else this.glide = null;
+    } else if (!dragging) {
       this.px += this.vx;
       this.py += this.vy;
       this.vx *= 0.94;
@@ -184,7 +237,7 @@ export class Board {
         this.px += a.vx;
         this.py += a.vy;
         moving = true;
-      } else if (!this.hover && !this.isOpen && !this.reduce && this.inView) {
+      } else if (!this.hover && !this.focused && !this.isOpen && !this.reduce && this.inView) {
         // The slow drift that makes the board feel endless.
         this.px -= 0.28;
         this.py -= 0.1;
