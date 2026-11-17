@@ -1,6 +1,7 @@
 /** 03 · Services: one frame that changes shape · an inspector that shows its CSS. */
 import type { Crew } from '../lib/crew';
 import { Loop } from '../lib/loops';
+import { LiveMocks } from './live';
 import { t } from '../lib/t';
 import { $, $$, doing, type HomeData } from './shared';
 
@@ -18,6 +19,11 @@ export class Services {
     const v = $<HTMLVideoElement>('.fc-vid video');
     return v ? new Loop(v, false) : null;
   })();
+
+  /** Lodos and Pocket work under the visitor's pointer (live.ts). */
+  private readonly live = new LiveMocks(() => {
+    this.manualAt = Date.now();
+  });
 
   constructor(private readonly data: HomeData) {
     this.opts.forEach((o, i) =>
@@ -74,6 +80,7 @@ export class Services {
     });
     this.frm.className = 'frm v' + i;
     $$('[data-fc]').forEach((f, j) => f.classList.toggle('on', j === i));
+    this.live.shown(i);
     this.loop?.set(i === 3);
     const lab = $('[data-frmlab]');
     if (lab) lab.textContent = sv.lab;
@@ -94,7 +101,7 @@ export class Services {
     const host = c.hostOf('svc');
     await c.sleep(1500, signal);
     for (let n = 0; ; n++) {
-      if (this.recentlyTouched) {
+      if (this.recentlyTouched || this.live.holding) {
         await c.sleep(900, signal);
         continue;
       }

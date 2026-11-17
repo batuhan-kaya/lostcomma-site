@@ -34,6 +34,7 @@ export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
 <pre class="code" data-code hidden>${first.code}</pre>
 <i class="hd2 a" aria-hidden="true"></i><i class="hd2 b" aria-hidden="true"></i><i class="hd2 c" aria-hidden="true"></i><i class="hd2 d" aria-hidden="true"></i>
 <span class="szb mono" data-frmsize>${first.size}</span>
+<span class="ftry mono" aria-hidden="true"><i></i><span class="tw">${t('Canlı · bir gün ve saat seç')}</span><span class="ta">${t('Canlı · tutar yaz ve gönder')}</span><span class="tl">${t('Kontrol sende')}</span></span>
 </div>
 </div>
 </div>

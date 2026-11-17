@@ -36,6 +36,7 @@
 .fc-web .warr i { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #E1DFD8; border-radius: 50%; }
 .fc-web .warr svg { width: 13px; height: 13px; stroke-width: 2.2; }
 .fc-web .warr .on { border-color: var(--navy); background: var(--navy); color: #FFFFFF; }
+.fc-web .warr i:first-child:not(.on) { opacity: .38; }
 
 /* the nav: clear over the photo · the solid one fades in once the page moves */
 .fc-web .wnav { position: absolute; left: 0; right: 0; top: 0; z-index: 3; height: 56px; }
@@ -195,28 +196,28 @@
 .fc-web .wsoc svg { width: 13px; height: 13px; color: rgba(255,255,255,.82); }
 
 /* the visitor's pointer (screen coordinates: the page scrolls under it) */
-.fc-web .wptr { position: absolute; left: 0; top: 0; z-index: 5; width: 17px; height: 17px; opacity: 0; transform: translate(560px, 300px); transform-origin: 3px 2px; }
+.fc-web .wptr { position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none; width: 17px; height: 17px; opacity: 0; transform: translate(560px, 300px); transform-origin: 3px 2px; }
 .fc-web .wptr svg { width: 17px; height: 17px; overflow: visible; }
 .fc-web .wptr path { fill: #111114; stroke: #FFFFFF; stroke-width: 1.4; stroke-linejoin: round; }
 
-.fc.on .fc-web .wpage { animation: w-scroll 20s infinite; }
-.fc.on .fc-web .wn-b { animation: w-navsh 20s infinite; }
+.fc.on:not(.live) .fc-web .wpage { animation: w-scroll 20s infinite; }
+.fc.on:not(.live) .fc-web .wn-b { animation: w-navsh 20s infinite; }
 .fc.on .fc-web .wh.has-pic .wh-pic { animation: w-kb 16s ease-in-out infinite alternate; }
 .fc.on .fc-web .wsun { animation: w-sun 6s ease-in-out infinite alternate; }
 .fc.on .fc-web .wb1 { animation: w-bob 3.6s ease-in-out infinite alternate; }
 .fc.on .fc-web .wb2 { animation: w-bob 4.4s ease-in-out -1.2s infinite alternate; }
 .fc.on .fc-web .wsh { animation: w-shim 3s ease-in-out infinite alternate; }
 .fc.on .fc-web .wwa svg { animation: w-vane 2.6s ease-in-out infinite alternate; }
-.fc.on .fc-web article.hov { animation: w-hov 20s infinite; }
-.fc.on .fc-web article.hov .wimg::after, .fc.on .fc-web article.hov .wbtn::after { animation: w-hovsh 20s infinite; }
-.fc.on .fc-web article.hov .wpic > * { animation: w-zoom 20s infinite; }
-.fc.on .fc-web .wptr { animation: w-ptr 20s infinite; }
-.fc.on .fc-web .wgrid .pick::before { animation: w-date 20s infinite; }
-.fc.on .fc-web .wslots .pick::after { animation: w-slot 20s infinite; }
-.fc.on .fc-web .wsum .s0 { animation: w-sum0 20s infinite; }
-.fc.on .fc-web .wsum .s1 { animation: w-slot 20s infinite; }
-.fc.on .fc-web .r1 { animation: w-reserve 20s infinite; }
-.fc.on .fc-web .r2 { animation: w-booked 20s infinite; }
+.fc.on:not(.live) .fc-web article.hov { animation: w-hov 20s infinite; }
+.fc.on:not(.live) .fc-web article.hov .wimg::after, .fc.on:not(.live) .fc-web article.hov .wbtn::after { animation: w-hovsh 20s infinite; }
+.fc.on:not(.live) .fc-web article.hov .wpic > * { animation: w-zoom 20s infinite; }
+.fc.on:not(.live) .fc-web .wptr { animation: w-ptr 20s infinite; }
+.fc.on:not(.live) .fc-web .wgrid .pick::before { animation: w-date 20s infinite; }
+.fc.on:not(.live) .fc-web .wslots .pick::after { animation: w-slot 20s infinite; }
+.fc.on:not(.live) .fc-web .wsum .s0 { animation: w-sum0 20s infinite; }
+.fc.on:not(.live) .fc-web .wsum .s1 { animation: w-slot 20s infinite; }
+.fc.on:not(.live) .fc-web .r1 { animation: w-reserve 20s infinite; }
+.fc.on:not(.live) .fc-web .r2 { animation: w-booked 20s infinite; }
 
 /* top 0–12 % · the fleet 18.5–36 % · booking 42.5–64.5 % · the footer 69.5–80 % · back up by 88.5 % */
 @keyframes w-scroll {
@@ -266,6 +267,56 @@
 /* the button turns over: Reserve leaves upward · Booked comes up from under it */
 @keyframes w-reserve { 0%, 59% { transform: none; animation-timing-function: cubic-bezier(.5, 0, .2, 1); } 60.6%, 86% { transform: translateY(-100%); } 86.5%, 100% { transform: none; } }
 @keyframes w-booked { 0%, 59% { transform: translateY(100%); animation-timing-function: cubic-bezier(.5, 0, .2, 1); } 60.6%, 86% { transform: none; } 86.5%, 100% { transform: translateY(100%); } }
+
+/* in the visitor's hands (src/client/home/live.ts): the story stops · the page scrolls natively ·
+   the nav turns solid past the hero · cards lift · a day and a time book a sail */
+.fc.live .fc-web .wptr { display: none; }
+.fc.live .fc-web .wv { scrollbar-width: none; }
+.fc.live .fc-web .wv::-webkit-scrollbar { display: none; }
+/* the wheel scrolls the page inside once the pointer has rested on it (live.ts · can-scroll) */
+@media (hover: hover) { .fc.live.can-scroll .fc-web .wv { overflow-y: auto; } }
+.fc.live .fc-web .wn-b { transition: opacity .25s; }
+.fc.live .fc-web.solid .wn-b { opacity: 1; }
+.fc.live .fc-web :is(.wlogo, .wl > span, .wnb, .wgo, .wf, .wnews:not(.done), .wbtn, .wchips i, .wfav, .wgrid .free, .wgrid .pick, .wslots i:not(.full), .wres:not(.off)) { cursor: pointer; }
+.fc.live .fc-web :is(.wl > span, .wnr > span:not(.wnb)) { transition: opacity .2s; }
+.fc.live .fc-web article { transition: transform .45s cubic-bezier(.2, .8, .3, 1), opacity .3s; }
+.fc.live .fc-web article.dim { opacity: .28; }
+.fc.live .fc-web :is(.wf, .wgo) { transition: background-color .2s; }
+.fc.live .fc-web .wf { border-radius: 10px; }
+.fc.live .fc-web .wnews b { transition: background-color .25s; }
+.fc.live .fc-web .wnews.done b { background: #1A9C70; }
+.fc.live .fc-web .wnews.done i { color: rgba(255,255,255,.75); }
+.fc.live .fc-web .wimg::after, .fc.live .fc-web .wbtn::after { transition: opacity .3s; }
+.fc.live .fc-web .wpic > * { transition: transform .6s cubic-bezier(.2, .7, .3, 1); }
+.fc.live .fc-web .wfav svg { transition: transform .2s; }
+.fc.live .fc-web .wfav.faved svg { fill: var(--coral); stroke: var(--coral); transform: scale(1.12); }
+.fc.live .fc-web .wgrid i { z-index: 0; }
+.fc.live .fc-web .wgrid :is(.free, .pick)::before { content: ''; position: absolute; left: 50%; top: 1px; z-index: -1; width: 24px; height: 24px; margin-left: -12px; border-radius: 50%; background: var(--navy); opacity: 0; transform: scale(.6); transition: opacity .2s, transform .3s cubic-bezier(.2, 1.4, .4, 1); }
+.fc.live .fc-web .wgrid .sel { color: #FFFFFF; font-weight: 650; }
+.fc.live .fc-web .wgrid .sel::before { opacity: 1; transform: none; }
+.fc.live .fc-web .wgrid .sel::after { background: rgba(255,255,255,.8); }
+.fc.live .fc-web .wslots i { transition: background-color .2s, border-color .2s, color .2s; }
+.fc.live .fc-web .wslots .pick::after { display: none; }
+.fc.live .fc-web .wslots .sel { border-color: var(--navy); background: var(--navy); color: #FFFFFF; }
+.fc.live .fc-web .wsum > span { transition: opacity .25s; }
+.fc.live .fc-web .wsum .s1 { opacity: 0; }
+.fc.live .fc-web .wsum.has .s0 { opacity: 0; }
+.fc.live .fc-web .wsum.has .s1 { opacity: 1; }
+.fc.live .fc-web .wres { transition: opacity .25s; }
+.fc.live .fc-web .wres.off { opacity: .45; }
+.fc.live .fc-web .wres > span { transition: transform .45s cubic-bezier(.5, 0, .2, 1); }
+.fc.live .fc-web .wres.booked .r1 { transform: translateY(-100%); }
+.fc.live .fc-web .wres.booked .r2 { transform: none; }
+@media (hover: hover) {
+  .fc.live .fc-web :is(.wl > span, .wnr > span:not(.wnb)):hover { opacity: .6; }
+  .fc.live .fc-web article:not(.dim):hover { transform: translateY(-5px); }
+  .fc.live .fc-web article:not(.dim):hover .wimg::after, .fc.live .fc-web article:not(.dim):hover .wbtn::after { opacity: 1; }
+  .fc.live .fc-web article:not(.dim):hover .wpic > * { transform: scale(1.06); }
+  .fc.live .fc-web .wgrid :is(.free, .pick):not(.sel):hover::before { opacity: .1; transform: none; }
+  .fc.live .fc-web .wslots i:not(.full):not(.sel):hover { border-color: var(--navy); }
+  .fc.live .fc-web .wf:hover { background: #F6F4EF; }
+  .fc.live .fc-web .wgo:hover { background: #DB6A4D; }
+}
 
 /* =========================================================================================
    app · Pocket (iOS) · drawn at 390 × 844 and fitted to the frame
@@ -383,10 +434,10 @@
 .fc-app .atab .on svg { fill: var(--ink); stroke-width: 1.6; }
 
 /* the send flow (a sheet over home): recipient · amount · sent */
-.fc-app .aflow { inset: 0; z-index: 6; }
+.fc-app .aflow { inset: 0; z-index: 6; pointer-events: none; }
 .fc-app .asend, .fc-app .aamt, .fc-app .aok { inset: 0; background: #FFFFFF; }
-.fc-app .asend, .fc-app .aamt { transform: translateX(100%); }
-.fc-app .aok { opacity: 0; }
+.fc-app .asend, .fc-app .aamt { transform: translateX(100%); pointer-events: auto; }
+.fc-app .aok { opacity: 0; pointer-events: none; }
 .fc-app .anav { left: 0; right: 0; top: 54px; height: 46px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; }
 .fc-app .anav > i { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #F2F1EC; }
 .fc-app .anav > i svg { width: 20px; height: 20px; stroke-width: 2.2; }
@@ -458,7 +509,7 @@
 .fc-app .adone { left: 20px; right: 20px; bottom: 34px; height: 56px; display: grid; place-items: center; border-radius: 18px; background: var(--ink); color: #FFFFFF; font-size: 17px; font-weight: 650; }
 
 /* a finger's touch */
-.fc-app .atap { z-index: 8; width: 44px; height: 44px; border-radius: 50%; background: rgba(14,14,16,.16); opacity: 0; }
+.fc-app .atap { z-index: 8; width: 44px; height: 44px; border-radius: 50%; background: rgba(14,14,16,.16); opacity: 0; pointer-events: none; }
 .fc-app .t1 { left: 36px; top: 344px; } .fc-app .t2 { left: 37px; top: 283px; } .fc-app .t3 { left: 173px; top: 510px; } .fc-app .t4 { left: 173px; top: 570px; } .fc-app .t5 { left: 173px; top: 690px; } .fc-app .t6, .fc-app .t7 { left: 173px; top: 760px; }
 
 .fc.on .fc-app .m1 { animation: a-m1 9s ease-in-out infinite alternate; }
@@ -466,38 +517,38 @@
 .fc.on .fc-app .abars i { animation: a-bar .9s cubic-bezier(.2, .9, .3, 1.15) both; }
 .fc.on .fc-app .abars .d2 { animation-delay: .05s; } .fc.on .fc-app .abars .d3 { animation-delay: .1s; } .fc.on .fc-app .abars .d4 { animation-delay: .15s; } .fc.on .fc-app .abars .d5 { animation-delay: .2s; } .fc.on .fc-app .abars .d6 { animation-delay: .25s; } .fc.on .fc-app .abars .d7 { animation-delay: .3s; }
 .fc.on .fc-app .atip { animation: a-tip 1.2s cubic-bezier(.2, .9, .3, 1.2) both; }
-.fc.on .fc-app .ahome { animation: a-home 20s infinite; }
-.fc.on .fc-app .aflow { animation: a-flow 20s infinite; }
-.fc.on .fc-app .asend { animation: a-send 20s infinite; }
-.fc.on .fc-app .aamt { animation: a-amt 20s infinite; }
-.fc.on .fc-app .aok { animation: a-ok 20s infinite; }
-.fc.on .fc-app .aokb { animation: a-okc 20s infinite; }
-.fc.on .fc-app .rg1 { animation: a-rg1 20s infinite; }
-.fc.on .fc-app .rg2 { animation: a-rg2 20s infinite; }
-.fc.on .fc-app .arec .ece .fce::after { animation: a-pick 20s infinite; }
-.fc.on .fc-app .aval .v0 { animation: a-v0 20s infinite; }
-.fc.on .fc-app .aval .v1 { animation: a-v1 20s infinite; }
-.fc.on .fc-app .aval .v2 { animation: a-v2 20s infinite; }
-.fc.on .fc-app .aval .v3, .fc.on .fc-app .achips .c250::after { animation: a-v3 20s infinite; }
-.fc.on .fc-app .asendb::before { animation: a-dim 20s infinite; }
-.fc.on .fc-app .akeys .k1::before { animation: a-k1 20s infinite; }
-.fc.on .fc-app .akeys .k4::before { animation: a-k4 20s infinite; }
-.fc.on .fc-app .akeys .k10::before { animation: a-k10 20s infinite; }
-.fc.on .fc-app .asendb .l1 { animation: a-l1 20s infinite; }
-.fc.on .fc-app .asendb .l2 { animation: a-l2 20s infinite; }
-.fc.on .fc-app .asendb .spin { animation: a-spinon 20s infinite, a-spin .7s linear infinite; }
-.fc.on .fc-app .arow.rnew { animation: a-new 20s infinite; }
-.fc.on .fc-app .arow.r1, .fc.on .fc-app .arow.r2 { animation: a-down 20s infinite; }
-.fc.on .fc-app .arow.r3 { animation: a-down-out 20s infinite; }
-.fc.on .fc-app .abal .bal1 { animation: a-b1 20s infinite; }
-.fc.on .fc-app .abal .bal2 { animation: a-b2 20s infinite; }
-.fc.on .fc-app .t1 { animation: a-t1 20s infinite; }
-.fc.on .fc-app .t2 { animation: a-t2 20s infinite; }
-.fc.on .fc-app .t3 { animation: a-t3 20s infinite; }
-.fc.on .fc-app .t4 { animation: a-t4 20s infinite; }
-.fc.on .fc-app .t5 { animation: a-t5 20s infinite; }
-.fc.on .fc-app .t6 { animation: a-t6 20s infinite; }
-.fc.on .fc-app .t7 { animation: a-t7 20s infinite; }
+.fc.on:not(.live) .fc-app .ahome { animation: a-home 20s infinite; }
+.fc.on:not(.live) .fc-app .aflow { animation: a-flow 20s infinite; }
+.fc.on:not(.live) .fc-app .asend { animation: a-send 20s infinite; }
+.fc.on:not(.live) .fc-app .aamt { animation: a-amt 20s infinite; }
+.fc.on:not(.live) .fc-app .aok { animation: a-ok 20s infinite; }
+.fc.on:not(.live) .fc-app .aokb { animation: a-okc 20s infinite; }
+.fc.on:not(.live) .fc-app .rg1 { animation: a-rg1 20s infinite; }
+.fc.on:not(.live) .fc-app .rg2 { animation: a-rg2 20s infinite; }
+.fc.on:not(.live) .fc-app .arec .ece .fce::after { animation: a-pick 20s infinite; }
+.fc.on:not(.live) .fc-app .aval .v0 { animation: a-v0 20s infinite; }
+.fc.on:not(.live) .fc-app .aval .v1 { animation: a-v1 20s infinite; }
+.fc.on:not(.live) .fc-app .aval .v2 { animation: a-v2 20s infinite; }
+.fc.on:not(.live) .fc-app .aval .v3, .fc.on:not(.live) .fc-app .achips .c250::after { animation: a-v3 20s infinite; }
+.fc.on:not(.live) .fc-app .asendb::before { animation: a-dim 20s infinite; }
+.fc.on:not(.live) .fc-app .akeys .k1::before { animation: a-k1 20s infinite; }
+.fc.on:not(.live) .fc-app .akeys .k4::before { animation: a-k4 20s infinite; }
+.fc.on:not(.live) .fc-app .akeys .k10::before { animation: a-k10 20s infinite; }
+.fc.on:not(.live) .fc-app .asendb .l1 { animation: a-l1 20s infinite; }
+.fc.on:not(.live) .fc-app .asendb .l2 { animation: a-l2 20s infinite; }
+.fc.on:not(.live) .fc-app .asendb .spin { animation: a-spinon 20s infinite, a-spin .7s linear infinite; }
+.fc.on:not(.live) .fc-app .arow.rnew { animation: a-new 20s infinite; }
+.fc.on:not(.live) .fc-app .arow.r1, .fc.on:not(.live) .fc-app .arow.r2 { animation: a-down 20s infinite; }
+.fc.on:not(.live) .fc-app .arow.r3 { animation: a-down-out 20s infinite; }
+.fc.on:not(.live) .fc-app .abal .bal1 { animation: a-b1 20s infinite; }
+.fc.on:not(.live) .fc-app .abal .bal2 { animation: a-b2 20s infinite; }
+.fc.on:not(.live) .fc-app .t1 { animation: a-t1 20s infinite; }
+.fc.on:not(.live) .fc-app .t2 { animation: a-t2 20s infinite; }
+.fc.on:not(.live) .fc-app .t3 { animation: a-t3 20s infinite; }
+.fc.on:not(.live) .fc-app .t4 { animation: a-t4 20s infinite; }
+.fc.on:not(.live) .fc-app .t5 { animation: a-t5 20s infinite; }
+.fc.on:not(.live) .fc-app .t6 { animation: a-t6 20s infinite; }
+.fc.on:not(.live) .fc-app .t7 { animation: a-t7 20s infinite; }
 
 @keyframes a-m1 { from { transform: translate(0, 0); } to { transform: translate(-34px, 22px); } }
 @keyframes a-m2 { from { transform: translate(0, 0); } to { transform: translate(30px, -18px); } }
@@ -538,6 +589,60 @@
 @keyframes a-t5 { 0%, 31.6% { opacity: 0; transform: scale(.4); } 32.1% { opacity: 1; } 33.6%, 100% { opacity: 0; transform: scale(1.4); } }
 @keyframes a-t6 { 0%, 35.8% { opacity: 0; transform: scale(.4); } 36.3% { opacity: 1; } 38%, 100% { opacity: 0; transform: scale(1.4); } }
 @keyframes a-t7 { 0%, 54% { opacity: 0; transform: scale(.4); } 54.5% { opacity: 1; } 56.3%, 100% { opacity: 0; transform: scale(1.4); } }
+
+/* in the visitor's hands (src/client/home/live.ts): screens push and pop on transitions · the keypad
+   types · Send · the receipt · Done puts the row on the list */
+.fc.live .fc-app .atap { display: none; }
+.fc.live .fc-app :is(.ahome, .asend, .aamt) { transition: transform .45s cubic-bezier(.3, 0, .1, 1); }
+.fc.live .fc-app .aok { transition: opacity .3s; }
+.fc.live .fc-app .aflow { transition: transform .48s cubic-bezier(.5, 0, .2, 1); }
+.fc.live .fc-app .ap:is(.s-send, .s-amt, .s-ok) .ahome { transform: translateX(-80px); }
+.fc.live .fc-app .ap.s-send .asend { transform: none; }
+.fc.live .fc-app .ap:is(.s-amt, .s-ok) .asend { transform: translateX(-30%); }
+.fc.live .fc-app .ap:is(.s-amt, .s-ok) .aamt { transform: none; }
+.fc.live .fc-app .ap.s-ok .aok { opacity: 1; pointer-events: auto; }
+.fc.live .fc-app .ap.closing .aflow { transform: translateY(100%); }
+.fc.live .fc-app .ap.instant, .fc.live .fc-app .ap.instant * { transition: none !important; }
+.fc.live .fc-app .ap.s-ok .aokb { animation: a-pop .55s cubic-bezier(.2, 1.6, .4, 1) both; }
+.fc.live .fc-app .ap.s-ok .rg1 { animation: a-ring 1.1s .12s cubic-bezier(.2, .7, .3, 1) both; }
+.fc.live .fc-app .ap.s-ok .rg2 { animation: a-ring2 1.3s .3s cubic-bezier(.2, .7, .3, 1) both; }
+.fc.live .fc-app :is(.aacts .send, .aic, .anav > i, .acr, .arec > span, .akeys i, .achips i, .asendb, .ashare, .adone) { cursor: pointer; }
+.fc.live .fc-app :is(.aacts i, .aic, .anav > i, .acr, .arec .fce, .aiban, .achips i, .asendb, .ashare, .adone) { transition: transform .18s, background-color .2s, border-color .2s, color .2s; }
+.fc.live .fc-app :is(.aacts i, .aic, .anav > i, .achips i, .asendb, .ashare, .adone).dn { transform: scale(.94); }
+.fc.live .fc-app :is(.acr, .arec > span, .aiban).dn { transform: scale(.98); }
+.fc.live .fc-app .akeys i::before { transition: opacity .3s; }
+.fc.live .fc-app .akeys i.dn::before { opacity: 1; transition: none; }
+.fc.live .fc-app .aval b { opacity: 0; }
+.fc.live .fc-app .aval .v0 { opacity: 1; }
+.fc.live .fc-app .aval.long b { font-size: 50px; }
+.fc.live .fc-app .ap.s-amt .aval .v0::after { content: ''; display: inline-block; width: 3px; height: .78em; margin-left: 5px; border-radius: 2px; background: #3B35FF; vertical-align: -.04em; animation: blink 1.1s steps(1) infinite; }
+.fc.live .fc-app .aleft { transition: color .2s; }
+.fc.live .fc-app .aleft.over { color: #D9483B; }
+.fc.live .fc-app .achips .c250::after { display: none; }
+.fc.live .fc-app .achips i.on { border-color: var(--ink); background: var(--ink); color: #FFFFFF; }
+.fc.live .fc-app .asendb::before { opacity: .62; transition: opacity .2s; }
+.fc.live .fc-app .asendb.has::before { opacity: 0; }
+.fc.live .fc-app .asendb b { transition: opacity .15s; }
+.fc.live .fc-app .asendb .l1 { opacity: 1; }
+.fc.live .fc-app .asendb .l2 { opacity: 0; }
+.fc.live .fc-app .asendb.has .l1 { opacity: 0; }
+.fc.live .fc-app .asendb.has .l2 { opacity: 1; }
+.fc.live .fc-app .asendb.busy :is(.l1, .l2) { opacity: 0; }
+.fc.live .fc-app .asendb.busy .spin { opacity: 1; animation: a-spin .7s linear infinite; }
+.fc.live .fc-app .abal .bal1 { opacity: 1; }
+.fc.live .fc-app .abal .bal2 { opacity: 0; }
+.fc.live .fc-app .arows { padding-top: 4px; }
+.fc.live .fc-app .arow { position: relative; top: auto; opacity: 1; transition: transform .45s cubic-bezier(.3, 0, .2, 1); }
+.fc.live .fc-app .arow.fresh { animation: a-in .5s .15s cubic-bezier(.2, .8, .3, 1) both; }
+@media (hover: hover) {
+  .fc.live .fc-app :is(.acr, .aiban):hover { background: #FAFAF8; }
+  .fc.live .fc-app :is(.aacts .send i, .asendb.has, .adone):hover { background: #26262A; }
+  .fc.live .fc-app .akeys i:hover::before { opacity: .55; }
+}
+@keyframes a-pop { from { transform: scale(.4); } to { transform: none; } }
+@keyframes a-ring { 0% { opacity: .9; transform: scale(1.04); } 100% { opacity: 0; transform: scale(1.75); } }
+@keyframes a-ring2 { 0% { opacity: .6; transform: scale(1.04); } 100% { opacity: 0; transform: scale(2.1); } }
+@keyframes a-in { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
 
 /* =========================================================================================
    identity · Clay (a ceramics studio's brand book) · four pages of five seconds

@@ -98,6 +98,60 @@ test.describe('homepage · desktop interactions', () => {
     expect(errors).toEqual([]);
   });
 
+  test('services: Lodos works under the pointer · the wheel scrolls it once the pointer rests · a day and a time book a sail', async ({ page }) => {
+    const errors = watchErrors(page);
+    await page.goto('/en');
+    await toSection(page, 'svc');
+    await page.locator('[data-opt="0"]').click();
+    const fc = page.locator('[data-fc="0"]');
+    const box = (await page.locator('[data-frm]').boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(fc).toHaveClass(/live/);
+    await expect(page.locator('.ftry .tl')).toBeVisible();
+    await expect(fc).toHaveClass(/can-scroll/);
+    await page.mouse.wheel(0, 300);
+    await expect.poll(() => fc.locator('.wv').evaluate((e) => e.scrollTop)).toBeGreaterThan(0);
+    // A card's Book takes its boat to the booking widget.
+    await fc.locator('article').nth(1).locator('.wbtn').click();
+    await expect(fc.locator('.wmon small')).toHaveText('Laser Standard · two hour sail');
+    await expect(fc.locator('.wres')).toHaveClass(/off/);
+    await fc.locator('.wgrid i', { hasText: /^26$/ }).click();
+    await fc.locator('.wslots i', { hasText: '15:00' }).click();
+    await expect(fc.locator('.wsum .s1 b')).toHaveText('Thu 26 Nov · 15:00 to 17:00');
+    await expect(fc.locator('.wtot')).toHaveText('₺900');
+    await fc.locator('.wres').click();
+    await expect(fc.locator('.wres')).toHaveClass(/booked/);
+    expect(errors).toEqual([]);
+  });
+
+  test('services: Pocket sends money · keypad and keyboard · the receipt · the row and the balance', async ({ page }) => {
+    const errors = watchErrors(page);
+    await page.goto('/en');
+    await toSection(page, 'svc');
+    await page.locator('[data-opt="1"]').click();
+    const ap = page.locator('[data-fc="1"] .ap');
+    await ap.locator('.aacts .send').click();
+    await expect(ap).toHaveClass(/s-send/);
+    await ap.locator('.arec > span', { hasText: 'Mert' }).click();
+    await expect(ap).toHaveClass(/s-amt/);
+    await expect(ap.locator('.ato b')).toHaveText('Mert Aksoy');
+    await expect(ap.locator('.asendb')).not.toHaveClass(/has/);
+    for (const k of ['1', '2']) await ap.locator('.akeys i', { hasText: new RegExp(`^${k}$`) }).click();
+    await page.keyboard.press('5');
+    await page.keyboard.press('0');
+    await expect(ap.locator('.aval .v0')).toHaveText('₺1 250');
+    await expect(ap.locator('.asendb .l2')).toHaveText('Send ₺1 250');
+    await ap.locator('.asendb').click();
+    await expect(ap).toHaveClass(/s-ok/);
+    await expect(ap.locator('.aokt')).toHaveText('₺1 250 sent');
+    await ap.locator('.adone').click();
+    await expect(ap).toHaveClass(/s-home/);
+    await expect(ap.locator('.arow').first()).toContainText('Mert Aksoy');
+    await expect(ap.locator('.arow').first()).toContainText('−₺1 250');
+    await expect(ap.locator('.abal .bal1')).toHaveText('₺46 960.50');
+    expect(errors).toEqual([]);
+  });
+
   test('board: drag pans · Enter opens a frame · Escape closes and returns focus', async ({ page }) => {
     await page.goto('/tr');
     await toSection(page, 'work');
@@ -180,6 +234,23 @@ test.describe('homepage · phone', () => {
     await expect(page.locator('[data-pf="1"]')).toHaveClass(/act/);
     const gut = await page.locator('[data-pf="1"]').evaluate((c) => parseFloat(getComputedStyle(c.parentElement!).paddingLeft));
     await expect.poll(() => page.locator('[data-pf="1"]').evaluate((c) => Math.round(c.getBoundingClientRect().left))).toBe(Math.round(gut));
+  });
+
+  test('services: a finger works the mocks · Lodos never traps the page scroll', async ({ page }) => {
+    const errors = watchErrors(page);
+    await page.goto('/en');
+    await toSection(page, 'svc');
+    await page.locator('[data-opt="1"]').tap();
+    const ap = page.locator('[data-fc="1"] .ap');
+    await ap.locator('.aacts .send').tap();
+    await expect(ap).toHaveClass(/s-send/);
+    await page.locator('[data-opt="0"]').tap();
+    const fc = page.locator('[data-fc="0"]');
+    await fc.locator('.wn-b .wl span', { hasText: 'Fleet' }).tap();
+    await expect(fc).toHaveClass(/live/);
+    await expect.poll(() => fc.locator('.wv').evaluate((e) => e.scrollTop)).toBeGreaterThan(400);
+    expect(await fc.locator('.wv').evaluate((e) => getComputedStyle(e).overflowY)).toBe('hidden');
+    expect(errors).toEqual([]);
   });
 });
 
