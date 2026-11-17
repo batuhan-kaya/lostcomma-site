@@ -83,7 +83,7 @@ test.describe('homepage · desktop interactions', () => {
     await page.locator('[data-opt="4"]').click();
     await expect(page.locator('[data-frm]')).toHaveClass(/v4/);
     await expect(page.locator('[data-frmlab]')).toHaveText('Otomasyon & entegrasyon');
-    await expect(page.locator('[data-frmsize]')).toHaveText('1280 × 800');
+    await expect(page.locator('[data-frmsize]')).toHaveText('1280 × 1200');
     // The mock products are English: upper-case labels keep their dotless i on a Turkish page.
     await expect(page.locator('.fc-auto')).toHaveAttribute('lang', 'en');
     const playing = () =>
@@ -145,11 +145,28 @@ test.describe('homepage · desktop interactions', () => {
     await expect(ap).toHaveClass(/s-ok/);
     await expect(ap.locator('.aokt')).toHaveText('₺1 250 sent');
     await ap.locator('.adone').click();
+    // Home slides back in under the sheet as it goes down: it is not left waiting shifted left.
+    await expect.poll(() => ap.locator('.ahome').evaluate((h) => new DOMMatrixReadOnly(getComputedStyle(h).transform).m41), { timeout: 700 }).toBe(0);
     await expect(ap).toHaveClass(/s-home/);
     await expect(ap.locator('.arow').first()).toContainText('Mert Aksoy');
     await expect(ap.locator('.arow').first()).toContainText('−₺1 250');
     await expect(ap.locator('.abal .bal1')).toHaveText('₺46 960.50');
     expect(errors).toEqual([]);
+  });
+
+  test('services: the automation frame ends where the list on its left ends · in both languages', async ({ page }) => {
+    for (const lang of ['tr', 'en']) {
+      await page.goto(`/${lang}`);
+      await toSection(page, 'svc');
+      await page.locator('[data-opt="4"]').click();
+      await expect(page.locator('[data-frm]')).toHaveClass(/v4/);
+      const gap = () =>
+        page.evaluate(() => document.querySelector('[data-frm]')!.getBoundingClientRect().bottom - document.querySelector('.opts')!.getBoundingClientRect().bottom);
+      await expect.poll(async () => Math.abs(await gap()), { timeout: 4000 }).toBeLessThan(3);
+      // Thirteen steps on show and more: groups · a parallel row · a lane for later · the trace.
+      await expect(page.locator('.fc-auto .an')).toHaveCount(15);
+      await expect(page.locator('.fc-auto .tr')).toHaveCount(10);
+    }
   });
 
   test('services: Pocket on Android stands beside the iPhone · plays in step · answers on its own', async ({ page }) => {
@@ -160,8 +177,8 @@ test.describe('homepage · desktop interactions', () => {
     await expect(page.locator('.frm2')).toBeHidden();
     await page.locator('[data-opt="1"]').click();
     await expect(page.locator('.frm2')).toBeVisible();
-    // Upper case on a Turkish page keeps the dotless i (lang="en" on the label).
-    expect(await page.locator('.flab3 span').first().innerText()).toBe('ANDROID');
+    // The platforms keep their own spelling (iOS · Android) · no upper case.
+    expect(await page.locator('.flab3 span').first().innerText()).toBe('Android');
     await expect(and).toHaveClass(/on/);
     await expect.poll(() => and.evaluate((fc) => fc.getAnimations({ subtree: true }).length)).toBeGreaterThan(0);
     // The visitor takes Android: the iPhone keeps its story.
@@ -307,6 +324,24 @@ test.describe('homepage · phone', () => {
 });
 
 test.describe('homepage · contact sentence', () => {
+  test('a blank shrinks to its words from the first letter (smoothly) · and grows at once while typing', async ({ page }) => {
+    await page.goto('/tr');
+    await toSection(page, 'ctc');
+    const mail = page.locator('[data-in="mail"]');
+    const width = async () => (await mail.boundingBox())!.width;
+    const empty = await width();
+    await mail.click();
+    await page.keyboard.type('b');
+    // Not at once: the placeholder's room goes in a short glide.
+    expect(await width()).toBeGreaterThan(empty * 0.5);
+    await expect.poll(width).toBeLessThan(empty * 0.3);
+    await page.keyboard.type('@lc.co');
+    expect(await mail.evaluate((e) => e.scrollWidth <= e.clientWidth + 1)).toBe(true);
+    // Empty again: back to the placeholder's room.
+    await mail.fill('');
+    await expect.poll(width).toBeGreaterThan(empty * 0.95);
+  });
+
   test('the sentence is the form: blanks grow · needs an email · sends and thanks you by name', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/en');

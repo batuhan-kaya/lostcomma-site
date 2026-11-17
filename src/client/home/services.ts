@@ -59,6 +59,8 @@ export class Services {
     });
     this.fit();
     addEventListener('resize', () => this.fit(), { passive: true });
+    // The list's height depends on its letters: measure again once the fonts are in.
+    void document.fonts?.ready.then(() => this.align());
     if (this.viewer.ok) {
       const fxp = $<HTMLButtonElement>('[data-fxp]');
       if (fxp) {
@@ -103,7 +105,31 @@ export class Services {
     this.scaler.style.setProperty('--k', k.toFixed(3));
     this.narrow = k < 0.75;
     this.stage.classList.toggle('nw', this.narrow);
-    this.stage.style.height = k < 1 ? `${Math.round(700 * k + 90)}px` : '';
+    this.align(k);
+  }
+
+  /**
+   * Automation's frame ends where the list on its left ends (with its own row open): --h4 in frame
+   * pixels. Only side by side · else 720. The stage is tall enough for it whichever frame is on show,
+   * so nothing below moves when the frames change.
+   */
+  private align(k = Number(this.scaler?.style.getPropertyValue('--k')) || 1): void {
+    const frm = this.frm;
+    const stage = this.stage;
+    const opts = this.opts[0]?.parentElement;
+    const auto = this.opts[4];
+    if (!frm || !stage || !opts || !auto) return;
+    let h = 720;
+    if (opts.getBoundingClientRect().right <= stage.getBoundingClientRect().left + 1) {
+      // The list as it is once Automation's own row is open (the open rows may be mid transition).
+      const open = $$<HTMLElement>('.od', opts).reduce((s, od) => s + od.offsetHeight, 0);
+      const mine = $<HTMLElement>('.odi', auto)?.scrollHeight ?? 0;
+      const bottom = opts.getBoundingClientRect().bottom - open + mine;
+      h = (bottom - frm.getBoundingClientRect().top) / k;
+    }
+    h = Math.round(Math.min(860, Math.max(700, h)));
+    frm.style.setProperty('--h4', `${h}px`);
+    stage.style.height = `${Math.round(Math.max(k < 1 ? 700 * k + 90 : 780, 64 + h * k + 56))}px`;
   }
 
   get current(): number {
@@ -134,6 +160,7 @@ export class Services {
     if (size) size.textContent = sv.size;
     if (this.code) this.code.textContent = sv.code;
     this.inspect(false);
+    this.align();
   }
 
   inspect(on: boolean): void {

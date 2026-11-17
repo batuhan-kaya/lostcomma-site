@@ -69,7 +69,7 @@ describe('03 · the service frames', () => {
 
   it('one real looking product per service · five of them · the products speak English', () => {
     expect(HOME.tr.services.map((s) => s.name)).toEqual(['Web siteleri', 'Uygulamalar', 'Kimlik', 'Hareket', 'Otomasyon']);
-    expect(HOME.en.services[4]).toMatchObject({ name: 'Automation', lab: 'Automation & integration', size: '1280 × 800' });
+    expect(HOME.en.services[4]).toMatchObject({ name: 'Automation', lab: 'Automation & integration', size: '1280 × 1200' });
     expect(art).toHaveLength(HOME.en.services.length);
     expect(art.map((a) => /^<div class="fc-(\w+)" lang="en">/.exec(a)?.[1])).toEqual(['web', 'app', 'id', 'mo', 'auto']);
   });

@@ -201,7 +201,7 @@
 .frm.v1 { --w: 282px; --h: 610px; --r: 44px; }
 .frm.v2 { --w: 520px; --h: 520px; --r: 8px; }
 .frm.v3 { --w: 820px; --h: 350px; --r: 10px; }
-.frm.v4 { --w: 760px; --h: 470px; --r: 12px; }
+.frm.v4 { --w: 760px; --h: var(--h4, 720px); --r: 12px; }
 .clip { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
 /*
  * The frame's own tools (label · inspect · size · CSS) stay at reading size when a small stage
@@ -231,6 +231,8 @@
 .frm.v1 + .frm2 { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .5s .85s, visibility 0s .85s; }
 .clip2 { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; background: #F2F1EC; box-shadow: 0 0 0 1px rgba(14,14,15,.14), 0 50px 80px -40px rgba(14,14,15,.45); }
 .flab3 { position: absolute; left: 0; bottom: calc(100% + 12px); width: calc(100% * var(--k, 1)); min-height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--grey); scale: calc(1 / var(--k, 1)); transform-origin: 0 100%; }
+/* the platforms keep their own spelling: iOS · Android (never upper case) */
+.frm.v1 [data-frmlab], .flab3 > span:first-child { text-transform: none; letter-spacing: .01em; }
 /* Narrow screens: Lodos and Pocket open full screen (client/home/viewer.ts) · the button takes the hint's place */
 .fxp { position: absolute; left: 0; top: calc(100% + 14px + 40px / var(--k, 1)); display: none; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border: 1.5px solid var(--blue); border-radius: 999px; background: var(--paper); color: var(--blue); font-size: 12px; letter-spacing: .04em; cursor: pointer; scale: calc(1 / var(--k, 1)); transform-origin: 0 0; }
 .fxp svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -482,13 +484,16 @@ html.fv-open { overflow: hidden; }
 .bw { position: relative; display: inline-block; margin: 0 .05em; vertical-align: baseline; }
 /* the script measures words here (the blanks are sized to them) */
 .bprobe { position: absolute; left: 0; top: 0; visibility: hidden; white-space: pre; pointer-events: none; }
-.blank { box-sizing: content-box; max-width: calc(100vw - 2 * var(--gut) - 32px); margin: 0; padding: 0 .06em; border: 0; border-bottom: 3px dashed var(--ul); border-radius: 0; outline: none; background: transparent; color: var(--fg); caret-color: var(--sel); font: inherit; font-variation-settings: inherit; letter-spacing: inherit; line-height: 1.08; text-overflow: ellipsis; transition: border-color .25s; }
+.blank { box-sizing: content-box; max-width: calc(100vw - 2 * var(--gut) - 32px); margin: 0; padding: 0 .06em; border: 0; border-bottom: 3px dashed var(--ul); border-radius: 0; outline: none; background: transparent; color: var(--fg); caret-color: var(--sel); font: inherit; font-variation-settings: inherit; letter-spacing: inherit; line-height: 1.08; text-overflow: ellipsis; transition: border-color .25s, width .5s cubic-bezier(.2, .8, .3, 1); }
+/* typing makes a blank grow at once (the letters never wait) · it shrinks smoothly (the first letter · a deletion) */
+.blank.grow { transition: border-color .25s; }
 .blank::placeholder { color: var(--ph); opacity: 1; }
 .blank:focus { border-bottom-style: solid; border-bottom-color: var(--sel); }
 /* Sized by what is in it where the browser can (the size attribute is the fallback · the script keeps it right). */
 @supports (field-sizing: content) {
   .blank { field-sizing: content; min-width: 2ch; }
   .blank.what { min-width: var(--wmin, 12ch); }
+  .blank.what:not(:placeholder-shown) { min-width: 2ch; }
 }
 /* The selection the design tool draws round the blank in use · its size label above it. */
 .bsel { position: absolute; inset: .02em -.2em -.06em; border: 2px solid var(--sel); opacity: 0; transition: opacity .2s; pointer-events: none; }

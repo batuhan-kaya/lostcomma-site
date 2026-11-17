@@ -6,7 +6,7 @@
  *   app         282 × 610   20 s   (390 × 844 inside) send ₺250 to Ece · a receipt · the list and the balance update
  *   identity    520 × 520   20 s   four pages of a brand book · five seconds each
  *   motion      820 × 350    4 s   our logo sting · the playhead · the graph · the frame counter
- *   automation  760 × 470   10 s   a booking runs node by node · the run log follows
+ *   automation  760 × 720*  10 s   thirteen steps in four groups · the run log and its trace follow (*as tall as the list)
  *
  * Rules (motion budget): every endless loop moves transform and opacity only · only the frame on
  * show plays (.fc.on) · a section off screen pauses (base.css · data-off) · reduced motion and the
@@ -602,6 +602,8 @@
 .fc.live .fc-app .ap:is(.s-amt, .s-ok) .aamt { transform: none; }
 .fc.live .fc-app .ap.s-ok .aok { opacity: 1; pointer-events: auto; }
 .fc.live .fc-app .ap.closing .aflow { transform: translateY(100%); }
+/* Done: home slides back in under the sheet as it goes down (as in the story) · never waits shifted left */
+.fc.live .fc-app .ap.closing .ahome { transform: none; transition-duration: .48s; }
 .fc.live .fc-app .ap.instant, .fc.live .fc-app .ap.instant * { transition: none !important; }
 .fc.live .fc-app .ap.s-ok .aokb { animation: a-pop .55s cubic-bezier(.2, 1.6, .4, 1) both; }
 .fc.live .fc-app .ap.s-ok .rg1 { animation: a-ring 1.1s .12s cubic-bezier(.2, .7, .3, 1) both; }
@@ -850,66 +852,139 @@
 @keyframes m-fr { from { transform: translateY(0); } to { transform: translateY(-312px); } }
 
 /* =========================================================================================
-   automation · a booking runs through calendar · payment · mail and chat (10 s)
+   automation · a booking runs through fifteen steps in five groups (10 s · one second is 10 %)
+   new booking · the customer in the CRM (a branch: new or known) · calendar · payment (a branch:
+   paid or a reminder) · three steps in parallel · a lane for later · an error path on the side. The run
+   log follows · its trace draws each step's bar as it runs. The frame is as tall as the list on
+   its left (client/home/services.ts · --h4): the canvas and the panel grow with it.
    ========================================================================================= */
 .fc-auto { background: #F7F7F5; color: #17171A; }
 .fc-auto > * { position: absolute; }
 .fc-auto svg { overflow: visible; }
-.fc-auto .xbar { left: 0; right: 0; top: 0; height: 44px; display: flex; align-items: center; gap: 12px; padding: 0 14px; border-bottom: 1px solid #E8E7E3; background: #FFFFFF; }
-.fc-auto .xlogo { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; background: #111114; }
+.fc-auto .xbar { left: 0; right: 0; top: 0; height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 12px 0 14px; border-bottom: 1px solid #E8E7E3; background: #FFFFFF; }
+.fc-auto .xlogo { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 7px; background: #111114; }
 .fc-auto .xlogo svg { width: 14px; height: 14px; fill: #CDF23A; }
 .fc-auto .xcrumb small { font-size: 11px; color: #8A8A90; }
 .fc-auto .xcrumb b { margin-left: 4px; font-size: 12.5px; font-weight: 600; }
-.fc-auto .xon { position: relative; display: flex; align-items: center; gap: 6px; margin-left: auto; padding: 4px 9px; border-radius: 999px; background: #EAF8F1; color: #0E7A52; font-size: 11px; font-weight: 600; }
+.fc-auto .xver { padding: 2px 6px; border-radius: 5px; background: #F0EFEB; font-family: var(--mono); font-size: 9px; color: #6A6A70; }
+.fc-auto .xppl { display: flex; margin-left: auto; }
+.fc-auto .xppl i { display: grid; place-items: center; width: 22px; height: 22px; margin-left: -6px; border: 2px solid #FFFFFF; border-radius: 50%; font-size: 8px; font-weight: 700; color: #111114; }
+.fc-auto .xppl .u1 { margin-left: 0; background: #FFB8DA; } .fc-auto .xppl .u2 { background: #BFE3D0; } .fc-auto .xppl .u3 { background: #C9D6FF; }
+.fc-auto .xon { position: relative; display: flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px; background: #EAF8F1; color: #0E7A52; font-size: 11px; font-weight: 600; }
 .fc-auto .xon i { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #1FB884; }
 .fc-auto .xon i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #1FB884; opacity: 0; }
-.fc-auto .xlast { font-size: 11px; color: #8A8A90; }
 .fc-auto .xtest { display: flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 7px; background: #111114; color: #FFFFFF; font-size: 11.5px; font-weight: 600; }
 .fc-auto .xtest svg { width: 9px; height: 9px; fill: #FFFFFF; }
-.fc-auto .xcanvas { left: 0; top: 44px; width: 540px; bottom: 0; background-image: radial-gradient(#D6D5D0 1px, transparent 1.3px); background-size: 16px 16px; background-position: 8px 8px; }
+.fc-auto .xtabs { left: 0; top: 44px; width: 540px; height: 32px; display: flex; align-items: stretch; gap: 16px; padding: 0 14px; border-bottom: 1px solid #ECEBE7; background: #FBFBFA; font-size: 11px; color: #8A8A90; }
+.fc-auto .xtabs > span { display: flex; align-items: center; }
+.fc-auto .xtabs .on { color: #17171A; font-weight: 600; box-shadow: inset 0 -2px 0 #17171A; }
+.fc-auto .xmeta { gap: 5px; margin-left: auto; font-size: 10px; }
+.fc-auto .xmeta svg { width: 12px; height: 12px; fill: none; stroke: #1FB884; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.fc-auto .xcanvas { left: 0; top: 76px; width: 540px; bottom: 0; overflow: hidden; background-image: radial-gradient(#D6D5D0 1px, transparent 1.3px); background-size: 16px 16px; background-position: 8px 8px; }
 .fc-auto .xcanvas > * { position: absolute; }
-.fc-auto .xwires { left: 0; top: 0; width: 540px; height: 426px; fill: none; stroke: #C9C8C2; stroke-width: 1.6; stroke-linejoin: round; }
+.fc-auto .xgrp { border: 1.5px dashed #D3D2CB; border-radius: 14px; background: rgba(255,255,255,.4); }
+.fc-auto .xgrp b { position: absolute; left: 10px; top: -8px; padding: 0 5px; background: #F7F7F5; font-family: var(--mono); font-size: 8.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: #8A8A90; }
+.fc-auto .ge { left: 12px; top: 72px; width: 160px; height: 134px; }
+.fc-auto .gc { left: 190px; top: 72px; width: 338px; height: 134px; }
+.fc-auto .gp { left: 12px; top: 270px; width: 338px; height: 132px; }
+.fc-auto .gn { left: 12px; top: 420px; width: 516px; height: 66px; }
+.fc-auto .gl { left: 12px; top: 510px; width: 338px; height: 66px; border-style: dotted; }
+.fc-auto .gc b { left: auto; right: 10px; }
+.fc-auto .xwires { left: 0; top: 0; width: 540px; height: 580px; fill: none; stroke: #C2C1BA; stroke-width: 1.6; stroke-linejoin: round; }
 .fc-auto .xwires .no { stroke-dasharray: 4 4; }
-.fc-auto .xlbl { padding: 2px 7px; border-radius: 999px; font-family: var(--mono); font-size: 9px; }
-.fc-auto .xlbl.yes { left: 448px; top: 220px; background: #EAF8F1; color: #0E7A52; }
-.fc-auto .xlbl.nope { left: 341px; top: 160px; background: #EFEEEA; color: #8A8A90; }
-.fc-auto .an { width: 136px; height: 54px; display: flex; align-items: center; gap: 9px; padding: 0 10px; border: 1px solid #E4E3DF; border-radius: 11px; background: #FFFFFF; box-shadow: 0 8px 16px -12px rgba(17,17,20,.35); }
-.fc-auto .an::after { content: ''; position: absolute; inset: -4px; border: 2px solid #3B35FF; border-radius: 14px; opacity: 0; }
-.fc-auto .an .tile { display: grid; flex: none; place-items: center; width: 30px; height: 30px; border-radius: 8px; }
-.fc-auto .an .tile svg { width: 16px; height: 16px; fill: none; stroke: #FFFFFF; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.fc-auto .xwires .ins { stroke: #8F8BFF; stroke-dasharray: 2 3; }
+.fc-auto .xlbl { padding: 1px 6px; border-radius: 999px; background: #EAF8F1; font-family: var(--mono); font-size: 8.5px; color: #0E7A52; }
+.fc-auto .xlbl.nope { background: #EFEEEA; color: #8A8A90; }
+.fc-auto .l1 { left: 345px; top: 155px; } .fc-auto .l2 { left: 230px; top: 196px; } .fc-auto .l3 { left: 276px; top: 395px; } .fc-auto .l4 { left: 166px; top: 352px; }
+.fc-auto .an { width: 140px; height: 46px; display: flex; align-items: center; gap: 8px; padding: 0 9px; border: 1px solid #E4E3DF; border-radius: 10px; background: #FFFFFF; box-shadow: 0 8px 16px -12px rgba(17,17,20,.35); }
+.fc-auto .an::after { content: ''; position: absolute; inset: -4px; border: 2px solid #3B35FF; border-radius: 13px; opacity: 0; }
+.fc-auto .an > span:not(.ast) { min-width: 0; }
+.fc-auto .an .tile { display: grid; flex: none; place-items: center; width: 27px; height: 27px; border-radius: 7px; }
+.fc-auto .an .tile svg { width: 15px; height: 15px; fill: none; stroke: #FFFFFF; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .fc-auto .g1 { background: #3B35FF; } .fc-auto .g2 { background: #FF9BD2; } .fc-auto .g3 { background: #111114; } .fc-auto .g4 { background: #E0A54A; } .fc-auto .g5 { background: #1FB884; } .fc-auto .g6 { background: #8F8BFF; } .fc-auto .g7 { background: #B9B8B2; }
-.fc-auto .g2 svg, .fc-auto .g4 svg { stroke: #111114 !important; }
-.fc-auto .an b { display: block; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
-.fc-auto .an small { display: block; margin-top: 1px; font-size: 9.5px; color: #8A8A90; white-space: nowrap; }
-.fc-auto .an em { position: absolute; right: 4px; bottom: -15px; font-family: var(--mono); font-size: 9px; font-style: normal; color: #9A9AA0; }
+.fc-auto .g8 { background: #CDF23A; } .fc-auto .g9 { background: #FFD9A8; } .fc-auto .g10 { background: #3EE0A8; }
+.fc-auto :is(.g2, .g4, .g8, .g9, .g10) svg { stroke: #111114 !important; }
+.fc-auto .an b { display: block; overflow: hidden; font-size: 11px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.fc-auto .an small { display: block; overflow: hidden; margin-top: 1px; font-size: 9px; color: #8A8A90; text-overflow: ellipsis; white-space: nowrap; }
+.fc-auto .an em { position: absolute; right: 4px; bottom: -14px; font-family: var(--mono); font-size: 8.5px; font-style: normal; color: #9A9AA0; }
+.fc-auto .an.idle { opacity: .55; box-shadow: none; }
+.fc-auto .an.idle .ast { display: none; }
+.fc-auto .an.later { opacity: .72; border-style: dashed; }
 .fc-auto .ast { position: absolute; right: -7px; top: -7px; width: 18px; height: 18px; }
 .fc-auto .ast i, .fc-auto .xs i { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 50%; }
 .fc-auto .ast .run, .fc-auto .xs .run { border: 2px solid #DAD9FF; border-top-color: #3B35FF; background: #FFFFFF; opacity: 0; }
 .fc-auto .ast .ok, .fc-auto .xs .ok { background: #1FB884; box-shadow: 0 0 0 2px #FFFFFF; }
 .fc-auto .ok svg { width: 11px; height: 11px; fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.fc-auto .n1 { left: 20px; top: 26px; } .fc-auto .n2 { left: 196px; top: 26px; } .fc-auto .n3 { left: 372px; top: 26px; } .fc-auto .n4 { left: 372px; top: 150px; } .fc-auto .n7 { left: 196px; top: 150px; } .fc-auto .n5 { left: 372px; top: 270px; } .fc-auto .n6 { left: 196px; top: 270px; }
-.fc-auto .an.idle { opacity: .55; box-shadow: none; }
-.fc-auto .an.idle .ast { display: none; }
+.fc-auto .n1 { left: 200px; top: 16px; }
+.fc-auto .n2 { left: 200px; top: 82px; }
+.fc-auto .n3 { left: 200px; top: 148px; }
+.fc-auto .n4 { left: 378px; top: 148px; }
+.fc-auto .n5 { left: 200px; top: 214px; }
+.fc-auto .n6 { left: 200px; top: 280px; }
+.fc-auto .n7 { left: 200px; top: 346px; }
+.fc-auto .n8 { left: 22px; top: 346px; }
+.fc-auto .n9 { left: 22px; top: 82px; }
+.fc-auto .n10 { left: 22px; top: 148px; }
+.fc-auto .n11 { left: 22px; top: 430px; }
+.fc-auto .n12 { left: 200px; top: 430px; }
+.fc-auto .n13 { left: 378px; top: 430px; }
+.fc-auto .n14 { left: 22px; top: 520px; }
+.fc-auto .n15 { left: 200px; top: 520px; }
+.fc-auto .xout { left: 378px; top: 258px; width: 140px; padding: 8px 10px; border: 1px solid #E4E3DF; border-left: 3px solid #8F8BFF; border-radius: 9px; background: #FFFFFF; box-shadow: 0 10px 20px -14px rgba(17,17,20,.4); }
+.fc-auto .xout small { display: block; margin-bottom: 4px; font-size: 8.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #6A6A70; }
+.fc-auto .xout code { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 8.5px; line-height: 14px; color: #17171A; }
+.fc-auto .xout code i { color: #8F8BFF; }
+.fc-auto .xnote { left: 382px; top: 350px; width: 132px; padding: 8px 10px; border-radius: 4px; background: #FFF1B8; box-shadow: 0 8px 14px -10px rgba(17,17,20,.35); font-size: 9.5px; line-height: 1.35; color: #4A3F12; rotate: 1.5deg; }
+.fc-auto .xnote b { display: block; margin-bottom: 2px; font-family: var(--mono); font-size: 8px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #8A7520; }
 .fc-auto .pk { left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; background: #3B35FF; box-shadow: 0 0 0 4px rgba(59,53,255,.18); opacity: 0; }
 .fc-auto .xmini { left: 14px; bottom: 14px; display: flex; align-items: center; gap: 2px; padding: 4px; border: 1px solid #E4E3DF; border-radius: 8px; background: #FFFFFF; }
 .fc-auto .xmini i { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 5px; background: #F2F1EE; font-size: 13px; line-height: 1; color: #6A6A70; }
 .fc-auto .xmini .zo::after { content: '−'; } .fc-auto .xmini .zi::after { content: '+'; }
 .fc-auto .xmini b { padding: 0 6px; font-family: var(--mono); font-size: 9.5px; font-weight: 400; color: #6A6A70; }
+.fc-auto .xmap { right: 14px; bottom: 14px; width: 98px; height: 90px; border: 1px solid #E4E3DF; border-radius: 8px; background: #FFFFFF; }
+.fc-auto .xmap i { position: absolute; width: 22px; height: 7px; border-radius: 2px; background: #D9D8D2; }
+.fc-auto .xmap b { position: absolute; left: 4px; top: 4px; width: 88px; height: 72px; border: 1.5px solid #3B35FF; border-radius: 3px; background: rgba(59,53,255,.05); }
+.fc-auto .xmap i:nth-child(1) { left: 37px; top: 7.56px; }
+.fc-auto .xmap i:nth-child(2) { left: 37px; top: 18.12px; }
+.fc-auto .xmap i:nth-child(3) { left: 8.52px; top: 18.12px; }
+.fc-auto .xmap i:nth-child(4) { left: 37px; top: 28.68px; }
+.fc-auto .xmap i:nth-child(5) { left: 65.48px; top: 28.68px; }
+.fc-auto .xmap i:nth-child(6) { left: 8.52px; top: 28.68px; }
+.fc-auto .xmap i:nth-child(7) { left: 37px; top: 39.24px; }
+.fc-auto .xmap i:nth-child(8) { left: 37px; top: 49.8px; }
+.fc-auto .xmap i:nth-child(9) { left: 37px; top: 60.36px; }
+.fc-auto .xmap i:nth-child(10) { left: 8.52px; top: 60.36px; }
+.fc-auto .xmap i:nth-child(11) { left: 8.52px; top: 73.8px; }
+.fc-auto .xmap i:nth-child(12) { left: 37px; top: 73.8px; }
+.fc-auto .xmap i:nth-child(13) { left: 65.48px; top: 73.8px; }
+.fc-auto .xmap i:nth-child(14) { left: 8.52px; top: 88.2px; }
+.fc-auto .xmap i:nth-child(15) { left: 37px; top: 88.2px; }
 .fc-auto .xlog { left: 540px; right: 0; top: 44px; bottom: 0; padding: 12px; border-left: 1px solid #E8E7E3; background: #FFFFFF; }
-.fc-auto .xlog header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.fc-auto .xlog header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .fc-auto .xlog header b { font-size: 12.5px; font-weight: 600; }
 .fc-auto .xf { display: flex; gap: 2px; padding: 2px; border-radius: 999px; background: #F2F1EE; }
 .fc-auto .xf i { padding: 3px 8px; border-radius: 999px; font-size: 10px; color: #6A6A70; }
 .fc-auto .xf .on { background: #111114; color: #FFFFFF; }
-.fc-auto .xrun, .fc-auto .xrow { position: relative; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 9px 0; border-bottom: 1px solid #F0EFEB; }
+.fc-auto .xrun, .fc-auto .xrow { position: relative; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 8px 0; border-bottom: 1px solid #F0EFEB; }
 .fc-auto .xs { position: relative; width: 18px; height: 18px; }
 .fc-auto .xs .re { background: #FCEBD0; color: #A8650E; font-size: 11px; font-weight: 700; }
-.fc-auto .xrun b, .fc-auto .xrow b { display: block; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
-.fc-auto .xrun small, .fc-auto .xrow small { display: block; margin-top: 1px; font-size: 10px; color: #8A8A90; white-space: nowrap; }
-.fc-auto .xrun > span { position: relative; }
-.fc-auto .xrun small.r { display: none; position: absolute; left: 0; bottom: 0; }
-.fc-auto .xrun em:not(.xt) { display: inline-block; font-style: normal; }
-.fc-auto .xt { font-family: var(--mono); font-size: 10px; font-style: normal; color: #8A8A90; }
+.fc-auto .xrun b, .fc-auto .xrow b { display: block; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.fc-auto .xrun small, .fc-auto .xrow small { display: block; margin-top: 1px; font-size: 9.5px; color: #8A8A90; white-space: nowrap; }
+.fc-auto .xrun > span:nth-child(2) { position: relative; }
+.fc-auto .xrun small.r { display: none; position: absolute; left: 0; bottom: 0; color: #3B35FF; }
+.fc-auto .xt { font-family: var(--mono); font-size: 9.5px; font-style: normal; color: #8A8A90; }
+.fc-auto .xprog { position: absolute; left: 27px; right: 0; bottom: -1px; height: 2px; overflow: hidden; background: #F0EFEB; }
+.fc-auto .xprog i { position: absolute; inset: 0; background: #3B35FF; transform-origin: 0 50%; }
+.fc-auto .xtrace { margin-top: 10px; padding: 9px 10px 8px; border-radius: 12px; background: #F7F7F5; }
+.fc-auto .xtrace header { margin-bottom: 5px !important; }
+.fc-auto .xtrace header b { font-size: 11px !important; }
+.fc-auto .xtrace header small { font-family: var(--mono); font-size: 8.5px; color: #8A8A90; }
+.fc-auto .tr { display: grid; grid-template-columns: 78px minmax(0, 1fr); align-items: center; gap: 6px; height: 15px; }
+.fc-auto .tr small { overflow: hidden; font-size: 8.5px; color: #6A6A70; text-overflow: ellipsis; white-space: nowrap; }
+.fc-auto .tr > i { position: relative; height: 7px; border-radius: 3px; background: #ECEBE6; }
+.fc-auto .tr b { position: absolute; top: 0; bottom: 0; min-width: 2px; border-radius: 3px; background: #3B35FF; transform-origin: 0 50%; }
+.fc-auto .tr:is(.r3, .r7) b { background: #E0A54A; }
+.fc-auto .xaxis { display: flex; justify-content: space-between; margin: 3px 0 0 84px; font-family: var(--mono); font-size: 7.5px; color: #A2A2A8; }
 .fc-auto .xstat { position: absolute; left: 12px; right: 12px; bottom: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 8px; padding: 12px; border-radius: 12px; background: #F7F7F5; }
 .fc-auto .xstat > small { grid-column: 1 / -1; font-size: 10px; color: #8A8A90; }
 .fc-auto .xstat > span b { display: block; font-size: 16px; font-weight: 650; letter-spacing: -.02em; }
@@ -917,64 +992,110 @@
 .fc-auto .xspark { grid-column: 1 / -1; display: grid !important; grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; gap: 3px; height: 26px; margin-top: 6px; }
 .fc-auto .xspark i { display: block; border-radius: 2px; background: #D6D5D0; }
 .fc-auto .xspark i:nth-child(1) { height: 30%; } .fc-auto .xspark i:nth-child(2) { height: 46%; } .fc-auto .xspark i:nth-child(3) { height: 38%; } .fc-auto .xspark i:nth-child(4) { height: 60%; } .fc-auto .xspark i:nth-child(5) { height: 52%; } .fc-auto .xspark i:nth-child(6) { height: 70%; } .fc-auto .xspark i:nth-child(7) { height: 58%; } .fc-auto .xspark i:nth-child(8) { height: 76%; } .fc-auto .xspark i:nth-child(9) { height: 66%; } .fc-auto .xspark i:nth-child(10) { height: 84%; } .fc-auto .xspark i:nth-child(11) { height: 78%; } .fc-auto .xspark i:nth-child(12) { height: 100%; background: #3B35FF; }
+.fc-auto .tr.r1 b { left: 0px; width: 2px; }
+.fc-auto .tr.r2 b { left: 0.71px; width: 12.72px; }
+.fc-auto .tr.r3 b { left: 13.43px; width: 2px; }
+.fc-auto .tr.r4 b { left: 13.5px; width: 16.96px; }
+.fc-auto .tr.r5 b { left: 30.46px; width: 5.94px; }
+.fc-auto .tr.r6 b { left: 36.39px; width: 45.23px; }
+.fc-auto .tr.r7 b { left: 81.62px; width: 2px; }
+.fc-auto .tr.r8 b { left: 81.69px; width: 14.84px; }
+.fc-auto .tr.r9 b { left: 81.69px; width: 6.78px; }
+.fc-auto .tr.r10 b { left: 81.69px; width: 22.61px; }
 
-/* with motion the current run starts from nothing: its status counts the steps (a still shows it done) */
+/* with motion the current run starts from nothing: its status says running (a still shows it done) */
 @media (prefers-reduced-motion: no-preference) {
   html:not(.still) .fc.on .fc-auto .xrun small.r { display: block; }
   html:not(.still) .fc.on .fc-auto .xrun small.d { animation: x-d 10s infinite both; }
 }
-.fc-auto .xrun small.r em { position: relative; width: .65em; height: 1em; vertical-align: -1px; }
-.fc-auto .xrun small.r em + em { margin-left: -.65em; }
 
 .fc.on .fc-auto .xon i::after { animation: x-ping 2s ease-out infinite; }
 .fc.on .fc-auto .xrun { animation: x-row 10s infinite both; }
 .fc.on .fc-auto .xrun .run { animation: x-runrow 10s infinite both, a-spin .8s linear infinite; }
-.fc.on .fc-auto .xrun .ok { animation: x-okrow 10s infinite both; }
+.fc.on .fc-auto .xrun .ok, .fc.on .fc-auto .xrun .xt { animation: x-okrow 10s infinite both; }
 .fc.on .fc-auto .xrun small.r { animation: x-r 10s infinite both; }
-.fc.on .fc-auto .xrun .xt { animation: x-okrow 10s infinite both; }
-.fc.on .fc-auto .xrun .st1 { animation: x-st1 10s infinite both; } .fc.on .fc-auto .xrun .st2 { animation: x-st2 10s infinite both; } .fc.on .fc-auto .xrun .st3 { animation: x-st3 10s infinite both; } .fc.on .fc-auto .xrun .st4 { animation: x-st4 10s infinite both; }
-.fc.on .fc-auto .n1 .run { animation: x-run1 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n1 .ok { animation: x-ok1 10s infinite both; } .fc.on .fc-auto .n1::after { animation: x-run1 10s infinite both; }
-.fc.on .fc-auto .n2 .run { animation: x-run2 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n2 .ok { animation: x-ok2 10s infinite both; } .fc.on .fc-auto .n2::after { animation: x-run2 10s infinite both; }
-.fc.on .fc-auto .n3 .run { animation: x-run3 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n3 .ok { animation: x-ok3 10s infinite both; } .fc.on .fc-auto .n3::after { animation: x-run3 10s infinite both; }
-.fc.on .fc-auto .n4 .run { animation: x-run4 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n4 .ok { animation: x-ok4 10s infinite both; } .fc.on .fc-auto .n4::after { animation: x-run4 10s infinite both; }
-.fc.on .fc-auto .n5 .run { animation: x-run5 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n5 .ok { animation: x-ok5 10s infinite both; } .fc.on .fc-auto .n5::after { animation: x-run5 10s infinite both; }
-.fc.on .fc-auto .n6 .run { animation: x-run6 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n6 .ok { animation: x-ok6 10s infinite both; } .fc.on .fc-auto .n6::after { animation: x-run6 10s infinite both; }
-.fc.on .fc-auto .p1 { animation: x-p1 10s infinite both; }
-.fc.on .fc-auto .p2 { animation: x-p2 10s infinite both; }
-.fc.on .fc-auto .p3 { animation: x-p3 10s infinite both; }
-.fc.on .fc-auto .p4 { animation: x-p4 10s infinite both; }
-.fc.on .fc-auto .p5 { animation: x-p5 10s infinite both; }
+.fc.on .fc-auto .xprog i { animation: x-prog 10s infinite both; }
+.fc.on .fc-auto .xout { animation: x-out 10s infinite both; }
+.fc.on .fc-auto .n1 .run { animation: x-r1 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n1 .ok { animation: x-o1 10s infinite both; } .fc.on .fc-auto .n1::after { animation: x-r1 10s infinite both; }
+.fc.on .fc-auto .n2 .run { animation: x-r2 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n2 .ok { animation: x-o2 10s infinite both; } .fc.on .fc-auto .n2::after { animation: x-r2 10s infinite both; }
+.fc.on .fc-auto .n3 .run { animation: x-r3 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n3 .ok { animation: x-o3 10s infinite both; } .fc.on .fc-auto .n3::after { animation: x-r3 10s infinite both; }
+.fc.on .fc-auto .n4 .run { animation: x-r4 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n4 .ok { animation: x-o4 10s infinite both; } .fc.on .fc-auto .n4::after { animation: x-r4 10s infinite both; }
+.fc.on .fc-auto .n5 .run { animation: x-r5 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n5 .ok { animation: x-o5 10s infinite both; } .fc.on .fc-auto .n5::after { animation: x-r5 10s infinite both; }
+.fc.on .fc-auto .n6 .run { animation: x-r6 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n6 .ok { animation: x-o6 10s infinite both; } .fc.on .fc-auto .n6::after { animation: x-r6 10s infinite both; }
+.fc.on .fc-auto .n7 .run { animation: x-r7 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n7 .ok { animation: x-o7 10s infinite both; } .fc.on .fc-auto .n7::after { animation: x-r7 10s infinite both; }
+.fc.on .fc-auto .n11 .run { animation: x-r11 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n11 .ok { animation: x-o11 10s infinite both; } .fc.on .fc-auto .n11::after { animation: x-r11 10s infinite both; }
+.fc.on .fc-auto .n12 .run { animation: x-r12 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n12 .ok { animation: x-o12 10s infinite both; } .fc.on .fc-auto .n12::after { animation: x-r12 10s infinite both; }
+.fc.on .fc-auto .n13 .run { animation: x-r13 10s infinite both, a-spin .8s linear infinite; } .fc.on .fc-auto .n13 .ok { animation: x-o13 10s infinite both; } .fc.on .fc-auto .n13::after { animation: x-r13 10s infinite both; }
+.fc.on .fc-auto .p1 { animation: x-p1 10s linear infinite both; }
+.fc.on .fc-auto .p2 { animation: x-p2 10s linear infinite both; }
+.fc.on .fc-auto .p3 { animation: x-p3 10s linear infinite both; }
+.fc.on .fc-auto .p4 { animation: x-p4 10s linear infinite both; }
+.fc.on .fc-auto .p5 { animation: x-p5 10s linear infinite both; }
+.fc.on .fc-auto .p6 { animation: x-p6 10s linear infinite both; }
+.fc.on .fc-auto .p7 { animation: x-p7 10s linear infinite both; }
+.fc.on .fc-auto .p8 { animation: x-p8 10s linear infinite both; }
+.fc.on .fc-auto .p9 { animation: x-p9 10s linear infinite both; }
+.fc.on .fc-auto .tr.r1 b { animation: x-b1 10s infinite both; }
+.fc.on .fc-auto .tr.r2 b { animation: x-b2 10s infinite both; }
+.fc.on .fc-auto .tr.r3 b { animation: x-b3 10s infinite both; }
+.fc.on .fc-auto .tr.r4 b { animation: x-b4 10s infinite both; }
+.fc.on .fc-auto .tr.r5 b { animation: x-b5 10s infinite both; }
+.fc.on .fc-auto .tr.r6 b { animation: x-b6 10s infinite both; }
+.fc.on .fc-auto .tr.r7 b { animation: x-b7 10s infinite both; }
+.fc.on .fc-auto .tr.r8 b { animation: x-b11 10s infinite both; }
+.fc.on .fc-auto .tr.r9 b { animation: x-b12 10s infinite both; }
+.fc.on .fc-auto .tr.r10 b { animation: x-b13 10s infinite both; }
 
 @keyframes x-ping { from { opacity: .6; transform: scale(1); } to { opacity: 0; transform: scale(2.6); } }
-/* node by node: running (a ring and a spinner) · done (a check) · all reset for the next booking */
-@keyframes x-run1 { 0%, 1% { opacity: 0; } 2%, 6% { opacity: 1; } 7%, 100% { opacity: 0; } }
-@keyframes x-ok1 { 0%, 6% { opacity: 0; transform: scale(.5); } 8%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
-@keyframes x-run2 { 0%, 10% { opacity: 0; } 11%, 20% { opacity: 1; } 21%, 100% { opacity: 0; } }
-@keyframes x-ok2 { 0%, 20% { opacity: 0; transform: scale(.5); } 22%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
-@keyframes x-run3 { 0%, 24% { opacity: 0; } 25%, 40% { opacity: 1; } 41%, 100% { opacity: 0; } }
-@keyframes x-ok3 { 0%, 40% { opacity: 0; transform: scale(.5); } 42%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
-@keyframes x-run4 { 0%, 46% { opacity: 0; } 47%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
-@keyframes x-ok4 { 0%, 50% { opacity: 0; transform: scale(.5); } 52%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
-@keyframes x-run5 { 0%, 56% { opacity: 0; } 57%, 64% { opacity: 1; } 65%, 100% { opacity: 0; } }
-@keyframes x-ok5 { 0%, 64% { opacity: 0; transform: scale(.5); } 66%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
-@keyframes x-run6 { 0%, 60% { opacity: 0; } 61%, 66% { opacity: 1; } 67%, 100% { opacity: 0; } }
-@keyframes x-ok6 { 0%, 66% { opacity: 0; transform: scale(.5); } 68%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
-/* the data travels along the wires (canvas coordinates) */
-@keyframes x-p1 { 0%, 6% { opacity: 0; transform: translate(156px, 53px); } 7% { opacity: 1; transform: translate(156px, 53px); } 10% { opacity: 1; transform: translate(196px, 53px); } 11%, 100% { opacity: 0; transform: translate(196px, 53px); } }
-@keyframes x-p2 { 0%, 20% { opacity: 0; transform: translate(332px, 53px); } 21% { opacity: 1; transform: translate(332px, 53px); } 24% { opacity: 1; transform: translate(372px, 53px); } 25%, 100% { opacity: 0; transform: translate(372px, 53px); } }
-@keyframes x-p3 { 0%, 40% { opacity: 0; transform: translate(440px, 80px); } 41% { opacity: 1; transform: translate(440px, 80px); } 46% { opacity: 1; transform: translate(440px, 150px); } 47%, 100% { opacity: 0; transform: translate(440px, 150px); } }
-@keyframes x-p4 { 0%, 50% { opacity: 0; transform: translate(440px, 204px); } 51% { opacity: 1; transform: translate(440px, 204px); } 56% { opacity: 1; transform: translate(440px, 270px); } 57%, 100% { opacity: 0; transform: translate(440px, 270px); } }
-@keyframes x-p5 { 0%, 50% { opacity: 0; transform: translate(412px, 204px); } 51% { opacity: 1; transform: translate(412px, 204px); } 53% { transform: translate(412px, 236px); } 58% { transform: translate(264px, 236px); } 60% { opacity: 1; transform: translate(264px, 270px); } 61%, 100% { opacity: 0; transform: translate(264px, 270px); } }
-/* the run log: the current run comes in · counts its steps · finishes · makes room for the next */
+/* step by step: running (a ring and a spinner) · done (a check) · all reset for the next booking */
+@keyframes x-r1 { 0%, 1% { opacity: 0; } 2%, 6% { opacity: 1; } 7%, 100% { opacity: 0; } }
+@keyframes x-o1 { 0%, 6% { opacity: 0; transform: scale(.5); } 8%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-b1 { 0%, 2% { opacity: 1; transform: scaleX(0); } 6%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-r2 { 0%, 8% { opacity: 0; } 9%, 15% { opacity: 1; } 16%, 100% { opacity: 0; } }
+@keyframes x-o2 { 0%, 15% { opacity: 0; transform: scale(.5); } 17%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-b2 { 0%, 9% { opacity: 1; transform: scaleX(0); } 15%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-r3 { 0%, 16% { opacity: 0; } 17%, 19% { opacity: 1; } 20%, 100% { opacity: 0; } }
+@keyframes x-o3 { 0%, 19% { opacity: 0; transform: scale(.5); } 21%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-b3 { 0%, 17% { opacity: 1; transform: scaleX(0); } 19%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-r4 { 0%, 20% { opacity: 0; } 21%, 28% { opacity: 1; } 29%, 100% { opacity: 0; } }
+@keyframes x-o4 { 0%, 28% { opacity: 0; transform: scale(.5); } 30%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-b4 { 0%, 21% { opacity: 1; transform: scaleX(0); } 28%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-r5 { 0%, 30% { opacity: 0; } 31%, 35% { opacity: 1; } 36%, 100% { opacity: 0; } }
+@keyframes x-o5 { 0%, 35% { opacity: 0; transform: scale(.5); } 37%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-b5 { 0%, 31% { opacity: 1; transform: scaleX(0); } 35%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-r6 { 0%, 37% { opacity: 0; } 38%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+@keyframes x-o6 { 0%, 50% { opacity: 0; transform: scale(.5); } 52%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-b6 { 0%, 38% { opacity: 1; transform: scaleX(0); } 50%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-r7 { 0%, 51% { opacity: 0; } 52%, 54% { opacity: 1; } 55%, 100% { opacity: 0; } }
+@keyframes x-o7 { 0%, 54% { opacity: 0; transform: scale(.5); } 56%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-b7 { 0%, 52% { opacity: 1; transform: scaleX(0); } 54%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-r11 { 0%, 56% { opacity: 0; } 57%, 64% { opacity: 1; } 65%, 100% { opacity: 0; } }
+@keyframes x-o11 { 0%, 64% { opacity: 0; transform: scale(.5); } 66%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-b11 { 0%, 57% { opacity: 1; transform: scaleX(0); } 64%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-r12 { 0%, 56% { opacity: 0; } 57%, 60% { opacity: 1; } 61%, 100% { opacity: 0; } }
+@keyframes x-o12 { 0%, 60% { opacity: 0; transform: scale(.5); } 62%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-b12 { 0%, 57% { opacity: 1; transform: scaleX(0); } 60%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-r13 { 0%, 56% { opacity: 0; } 57%, 67% { opacity: 1; } 68%, 100% { opacity: 0; } }
+@keyframes x-o13 { 0%, 67% { opacity: 0; transform: scale(.5); } 69%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-b13 { 0%, 57% { opacity: 1; transform: scaleX(0); } 67%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+/* the data travels along the wires (canvas coordinates · at an even pace) */
+@keyframes x-p1 { 0%, 5.5% { opacity: 0; transform: translate(270px, 62px); } 6% { opacity: 1; transform: translate(270px, 62px); } 9% { opacity: 1; transform: translate(270px, 82px); } 9.5%, 100% { opacity: 0; transform: translate(270px, 82px); } }
+@keyframes x-p2 { 0%, 14.5% { opacity: 0; transform: translate(270px, 128px); } 15% { opacity: 1; transform: translate(270px, 128px); } 17% { opacity: 1; transform: translate(270px, 148px); } 17.5%, 100% { opacity: 0; transform: translate(270px, 148px); } }
+@keyframes x-p3 { 0%, 18.5% { opacity: 0; transform: translate(340px, 171px); } 19% { opacity: 1; transform: translate(340px, 171px); } 21% { opacity: 1; transform: translate(378px, 171px); } 21.5%, 100% { opacity: 0; transform: translate(378px, 171px); } }
+@keyframes x-p4 { 0%, 27.5% { opacity: 0; transform: translate(448px, 194px); } 28% { opacity: 1; transform: translate(448px, 194px); } 28.15% { opacity: 1; transform: translate(448px, 204px); } 30.85% { opacity: 1; transform: translate(270px, 204px); } 31% { opacity: 1; transform: translate(270px, 214px); } 31.5%, 100% { opacity: 0; transform: translate(270px, 214px); } }
+@keyframes x-p5 { 0%, 34.5% { opacity: 0; transform: translate(270px, 260px); } 35% { opacity: 1; transform: translate(270px, 260px); } 38% { opacity: 1; transform: translate(270px, 280px); } 38.5%, 100% { opacity: 0; transform: translate(270px, 280px); } }
+@keyframes x-p6 { 0%, 49.5% { opacity: 0; transform: translate(270px, 326px); } 50% { opacity: 1; transform: translate(270px, 326px); } 52% { opacity: 1; transform: translate(270px, 346px); } 52.5%, 100% { opacity: 0; transform: translate(270px, 346px); } }
+@keyframes x-p7 { 0%, 53.5% { opacity: 0; transform: translate(270px, 392px); } 54% { opacity: 1; transform: translate(270px, 392px); } 54.25% { opacity: 1; transform: translate(270px, 410px); } 56.72% { opacity: 1; transform: translate(92px, 410px); } 57% { opacity: 1; transform: translate(92px, 430px); } 57.5%, 100% { opacity: 0; transform: translate(92px, 430px); } }
+@keyframes x-p8 { 0%, 53.5% { opacity: 0; transform: translate(270px, 392px); } 54% { opacity: 1; transform: translate(270px, 392px); } 57% { opacity: 1; transform: translate(270px, 430px); } 57.5%, 100% { opacity: 0; transform: translate(270px, 430px); } }
+@keyframes x-p9 { 0%, 53.5% { opacity: 0; transform: translate(270px, 392px); } 54% { opacity: 1; transform: translate(270px, 392px); } 54.25% { opacity: 1; transform: translate(270px, 410px); } 56.72% { opacity: 1; transform: translate(448px, 410px); } 57% { opacity: 1; transform: translate(448px, 430px); } 57.5%, 100% { opacity: 0; transform: translate(448px, 430px); } }
+/* the run log: the current run comes in · runs (68 %) · done · makes room for the next */
 @keyframes x-row { 0% { opacity: 0; transform: translateY(-8px); animation-timing-function: cubic-bezier(.2, .8, .3, 1); } 3%, 94% { opacity: 1; transform: none; } 99%, 100% { opacity: 0; transform: none; } }
-@keyframes x-runrow { 0%, 66% { opacity: 1; } 67%, 100% { opacity: 0; } }
-@keyframes x-okrow { 0%, 66% { opacity: 0; transform: scale(.6); } 68%, 100% { opacity: 1; transform: none; } }
-@keyframes x-r { 0%, 66% { opacity: 1; } 67%, 100% { opacity: 0; } }
-@keyframes x-d { 0%, 66% { opacity: 0; } 68%, 100% { opacity: 1; } }
-@keyframes x-st1 { 0%, 20% { opacity: 1; } 20.5%, 100% { opacity: 0; } }
-@keyframes x-st2 { 0%, 20% { opacity: 0; } 20.5%, 40% { opacity: 1; } 40.5%, 100% { opacity: 0; } }
-@keyframes x-st3 { 0%, 40% { opacity: 0; } 40.5%, 50% { opacity: 1; } 50.5%, 100% { opacity: 0; } }
-@keyframes x-st4 { 0%, 50% { opacity: 0; } 50.5%, 100% { opacity: 1; } }
+@keyframes x-runrow { 0%, 67% { opacity: 1; } 68%, 100% { opacity: 0; } }
+@keyframes x-okrow { 0%, 67% { opacity: 0; transform: scale(.6); } 69%, 100% { opacity: 1; transform: none; } }
+@keyframes x-r { 0%, 67% { opacity: 1; } 68%, 100% { opacity: 0; } }
+@keyframes x-d { 0%, 67% { opacity: 0; } 69%, 100% { opacity: 1; } }
+@keyframes x-prog { 0%, 2% { opacity: 1; transform: scaleX(0); } 68%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+@keyframes x-out { 0%, 50% { opacity: 0; transform: translateY(4px); } 52%, 90% { opacity: 1; transform: none; } 93%, 100% { opacity: 0; transform: none; } }
 
 /* =========================================================================================
    full screen on a narrow screen (client/home/viewer.ts): Pocket at the size of a phone ·

@@ -322,27 +322,58 @@ ${LAYERS.map(([n, c]) => `<div class="mrow ${c}"><span class="mname"><i></i>${n}
 const NODE = (cls: string, icon: string, tile: string, title: string, sub: string, ms: string) =>
   `<div class="an ${cls}"><i class="tile ${tile}">${icon}</i><span><b>${title}</b><small>${sub}</small></span><span class="ast"><i class="run"></i><i class="ok">${I.check}</i></span><em>${ms}</em></div>`;
 
+/** The run's trace: when each step started and how long it took (ms of a 1 500 ms run · drawn as a bar). */
+const TRACE: [string, number, number][] = [
+  ['New booking', 0, 10],
+  ['Find customer', 10, 180],
+  ['If new customer', 190, 1],
+  ['Create contact', 191, 240],
+  ['Check calendar', 431, 84],
+  ['Take payment', 515, 640],
+  ['If paid', 1155, 1],
+  ['Send receipt', 1156, 210],
+  ['Tell the crew', 1156, 96],
+  ['Add to ledger', 1156, 320],
+];
+
+/** The minimap: every node as a speck (placed in _frames.css) · the view as a frame. */
+const MAP = '<i></i>'.repeat(15);
+
 const AUTO = `<div class="fc-auto" lang="en">
-<header class="xbar"><span class="xlogo">${I.bolt}</span><span class="xcrumb"><small>Workflows /</small><b>Booking to invoice</b></span><span class="xon"><i></i>Active</span><span class="xlast">Runs on every booking</span><span class="xtest">${I.play}Test run</span></header>
+<header class="xbar"><span class="xlogo">${I.bolt}</span><span class="xcrumb"><small>Workflows /</small><b>Booking to invoice</b></span><span class="xver">v14</span><span class="xppl"><i class="u1">SA</i><i class="u2">MK</i><i class="u3">BK</i></span><span class="xon"><i></i>Active</span><span class="xtest">${I.play}Test run</span></header>
+<div class="xtabs"><span class="on">Editor</span><span>Executions</span><span>Versions</span><span class="xmeta">${I.check}Saved · 15 steps · 7 apps</span></div>
 <div class="xcanvas">
-<svg class="xwires" viewBox="0 0 540 426"><path d="M156 53H196M332 53H372M440 80V150M440 204V270"/><path class="no" d="M372 177H332" /><path d="M412 204V236H264V270"/></svg>
-<span class="xlbl yes">yes</span><span class="xlbl nope">no</span>
-${NODE('n1', I.globe, 'g1', 'New booking', 'Website form', 'trigger')}
-${NODE('n2', I.cal, 'g2', 'Check calendar', '2 seats free', '84 ms')}
-${NODE('n3', I.pay, 'g3', 'Take payment', '₺1 800 · card', '640 ms')}
-${NODE('n4', I.branch, 'g4', 'If paid', 'Status is paid', '2 ms')}
-${NODE('n7 idle', I.clock, 'g7', 'Remind in 24 h', 'Waits for payment', '·')}
-${NODE('n5', I.mail, 'g5', 'Send receipt', 'E-mail · PDF invoice', '210 ms')}
-${NODE('n6', I.chat, 'g6', 'Tell the crew', 'Team chat · #bookings', '96 ms')}
-<i class="pk p1"></i><i class="pk p2"></i><i class="pk p3"></i><i class="pk p4"></i><i class="pk p5"></i>
+<span class="xgrp ge"><b>On error</b></span><span class="xgrp gc"><b>Customer · CRM</b></span><span class="xgrp gp"><b>Payment</b></span><span class="xgrp gn"><b>Notify · in parallel</b></span><span class="xgrp gl"><b>Later · after the sail</b></span>
+<svg class="xwires" viewBox="0 0 540 580"><path d="M270 62V82M270 128V148M340 171H378M270 194V214M448 194V204H270M270 260V280M270 326V346M270 392V430M92 430V410H448V430"/><path class="no" d="M200 369H162M92 128V148M92 476V520M162 543H200"/><path class="ins" d="M340 303H378"/></svg>
+<span class="xlbl l1">yes</span><span class="xlbl l2 nope">no</span><span class="xlbl l3">yes</span><span class="xlbl l4 nope">no</span>
+${NODE('n1', I.globe, 'g1', 'New booking', 'Website form · webhook', 'trigger')}
+${NODE('n2', I.db, 'g8', 'Find customer', 'CRM · by e-mail', '180 ms')}
+${NODE('n3', I.branch, 'g4', 'If new customer', 'Not in the CRM', '1 ms')}
+${NODE('n4', I.user, 'g2', 'Create contact', 'CRM · new person', '240 ms')}
+${NODE('n5', I.cal, 'g9', 'Check calendar', '2 seats free', '84 ms')}
+${NODE('n6', I.pay, 'g3', 'Take payment', '₺1 800 · card', '640 ms')}
+${NODE('n7', I.branch, 'g4', 'If paid', 'Status is paid', '1 ms')}
+${NODE('n8 idle', I.clock, 'g7', 'Remind in 24 h', 'Waits for payment', '·')}
+${NODE('n9 idle', I.bolt, 'g7', 'Catch errors', 'Any step fails', '·')}
+${NODE('n10 idle', I.bell, 'g7', 'Page the crew', 'On call · SMS', '·')}
+${NODE('n11', I.mail, 'g5', 'Send receipt', 'E-mail · PDF invoice', '210 ms')}
+${NODE('n12', I.chat, 'g6', 'Tell the crew', 'Team chat · #bookings', '96 ms')}
+${NODE('n13', I.chart, 'g10', 'Add to ledger', 'Accounting · VAT 20%', '320 ms')}
+${NODE('n14 idle later', I.clock, 'g9', 'Wait 2 h', 'Once the sail is over', 'scheduled')}
+${NODE('n15 idle later', I.star, 'g2', 'Ask for a review', 'E-mail · one to five stars', 'scheduled')}
+<span class="xout"><small>Output · Take payment</small><code><i>status</i>paid</code><code><i>amount</i>1800 TRY</code><code><i>card</i>•••• 4821</code><code><i>3ds</i>passed</code></span>
+<span class="xnote"><b>Selin</b>Retry the card twice before the reminder goes out.</span>
+${Array.from({ length: 9 }, (_, i) => `<i class="pk p${i + 1}"></i>`).join('')}
 <span class="xmini"><i class="zo"></i><i class="zi"></i><b>100%</b></span>
+<span class="xmap">${MAP}<b></b></span>
 </div>
 <aside class="xlog"><header><b>Executions</b><span class="xf"><i class="on">All</i><i>Failed</i></span></header>
-<div class="xrun"><span class="xs"><i class="run"></i><i class="ok">${I.check}</i></span><span><b>#2841 · Ece Yılmaz</b><small class="r">Running · step <em class="st1">1</em><em class="st2">2</em><em class="st3">3</em><em class="st4">4</em> of 5</small><small class="d">Booking · ₺1 800 · paid</small></span><em class="xt">1.2 s</em></div>
-<div class="xrow"><span class="xs"><i class="ok">${I.check}</i></span><span><b>#2840 · Mert Aksoy</b><small>Booking · ₺900 · paid</small></span><em class="xt">1.1 s</em></div>
-<div class="xrow warn"><span class="xs"><i class="re">↻</i></span><span><b>#2839 · Ada Bulut</b><small>Payment retried once</small></span><em class="xt">3.4 s</em></div>
-<div class="xrow"><span class="xs"><i class="ok">${I.check}</i></span><span><b>#2838 · Can Demir</b><small>Booking · ₺6 400 · paid</small></span><em class="xt">1.3 s</em></div>
-<div class="xrow"><span class="xs"><i class="ok">${I.check}</i></span><span><b>#2837 · Selin Aydın</b><small>Booking · ₺1 800 · paid</small></span><em class="xt">1.2 s</em></div>
+<div class="xrun"><span class="xs"><i class="run"></i><i class="ok">${I.check}</i></span><span><b>#2841 · Ece Yılmaz</b><small class="r">Running · 10 of 15 steps</small><small class="d">Booking · ₺1 800 · paid</small></span><em class="xt">1.5 s</em><span class="xprog"><i></i></span></div>
+<div class="xrow"><span class="xs"><i class="ok">${I.check}</i></span><span><b>#2840 · Mert Aksoy</b><small>Booking · ₺900 · paid</small></span><em class="xt">1.4 s</em></div>
+<div class="xrow warn"><span class="xs"><i class="re">↻</i></span><span><b>#2839 · Ada Bulut</b><small>Payment retried once</small></span><em class="xt">3.6 s</em></div>
+<div class="xrow"><span class="xs"><i class="ok">${I.check}</i></span><span><b>#2838 · Can Demir</b><small>New contact · ₺6 400</small></span><em class="xt">1.7 s</em></div>
+<div class="xrow"><span class="xs"><i class="ok">${I.check}</i></span><span><b>#2837 · Selin Aydın</b><small>Booking · ₺1 800 · paid</small></span><em class="xt">1.3 s</em></div>
+<div class="xtrace"><header><b>Trace</b><small>#2841 · 1 476 ms</small></header>${TRACE.map(([name], i) => `<span class="tr r${i + 1}"><small>${name}</small><i><b></b></i></span>`).join('')}<span class="xaxis"><small>0</small><small>0.5 s</small><small>1 s</small><small>1.5 s</small></span></div>
 <div class="xstat"><small>This month</small><span><b>1 284</b><small>runs</small></span><span><b>99.8%</b><small>succeeded</small></span><span><b>46 h</b><small>saved</small></span><span class="xspark"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
 </aside>
 </div>`;

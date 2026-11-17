@@ -108,15 +108,19 @@ export class Brief {
   }
 
   /**
-   * A blank is exactly as wide as what is in it (or its placeholder) · the topic never narrower
-   * than its longest idea (so the line does not jump while the ideas change). Without JS the
-   * browser sizes it (field-sizing · else the size attribute).
+   * An empty blank is as wide as its placeholder (the topic as its longest idea · so the line does
+   * not jump while the ideas change). Once a letter is in it, it is exactly as wide as the words:
+   * the first letter shrinks it smoothly · typing grows it at once (.grow drops the transition so
+   * no letter waits for room). Without JS the browser sizes it (field-sizing · else the size attribute).
    */
   private size(k: Key): void {
     const el = this.input(k);
     if (!el) return;
-    const w = Math.max(this.measure(el.value || el.placeholder), k === 'what' ? this.measure(this.longest) : 0);
-    if (w > 0) el.style.width = `${Math.ceil(w) + 2}px`;
+    const w = el.value ? this.measure(el.value) : Math.max(this.measure(el.placeholder), k === 'what' ? this.measure(this.longest) : 0);
+    if (w <= 0) return;
+    const next = Math.ceil(w) + 2;
+    el.classList.toggle('grow', next > (parseFloat(el.style.width) || 0));
+    el.style.width = `${next}px`;
   }
 
   /** The selection sits on the blank in use · else on the first empty one (an invitation) · else nowhere. */
