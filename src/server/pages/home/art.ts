@@ -1,6 +1,6 @@
 /**
- * Decorative artwork for the homepage: the fake client sites inside the service frame and
- * the board, and the little process illustrations. Pure markup we wrote ourselves (raw()).
+ * Decorative artwork for the homepage: the fake client sites on the board and the little process
+ * illustrations (the service frame's products live in frames.ts). Pure markup we wrote ourselves (raw()).
  * Everything here sits inside aria-hidden containers. The mock client copy stays as designed.
  */
 import { raw, type Safe } from '../../html';
@@ -22,14 +22,6 @@ export const BOARD_ART: Record<string, Safe> = {
   book: raw(`<span class="ar ar-book"><b class="tt">Read<br>slowly.</b><i class="bk k1"></i><i class="bk k2"></i><i class="bk k3"></i><i class="bk k4"></i><i class="bk k5"></i><span class="sh"></span></span>`),
   lab: raw(`<span class="ar ar-lab"><span>A</span><span>a</span><span>g</span><span>!</span><span class="mono">Lab · type that breathes</span></span>`),
 };
-
-/** The four things inside the service frame: website · app · identity · motion. */
-export const FRAME_ART: Safe[] = [
-  raw(`<div class="fc-web"><span class="wn"><b>LODOS</b><span class="wl"><span>Fleet</span><span>Lessons</span><span>Club</span></span><span class="wb">Join</span></span><span class="wh"><span class="wsun"></span><svg viewBox="0 0 752 286" preserveAspectRatio="xMidYMax slice"><path d="M250 92 L250 206 L314 206 Z" fill="#FBF4EA"></path><path d="M243 112 L243 206 L206 206 Z" fill="#EFE2D2"></path><path d="M196 209 L322 209 L308 221 L210 221 Z" fill="#0E1F40"></path><path d="M560 160 L560 214 L590 214 Z" fill="#FBF4EA"></path><path d="M546 216 L596 216 L590 222 L552 222 Z" fill="#0E1F40"></path><g fill="#FFE2C4" opacity=".55"><rect x="440" y="236" width="80" height="2"></rect><rect x="420" y="250" width="120" height="2"></rect><rect x="452" y="264" width="56" height="2"></rect></g></svg><b class="wt">Catch the<br>north wind.</b><span class="wcta">Book a sail</span></span><span class="wcards"><span><i></i><span><b>Moda</b><small>Sunday mornings</small></span></span><span><i></i><span><b>Caddebostan</b><small>Racing season</small></span></span><span><i></i><span><b>Kalamış</b><small>Night sails</small></span></span></span></div>`),
-  raw(`<div class="fc-app"><span class="ah mono">Balance</span><b class="abig">₺48 210</b><span class="adelta">+12.4% this month</span><svg viewBox="0 0 238 120" preserveAspectRatio="none"><defs><linearGradient id="lv-ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3EE0A8" stop-opacity=".35"></stop><stop offset="1" stop-color="#3EE0A8" stop-opacity="0"></stop></linearGradient></defs><path d="M0 98 L30 84 L58 92 L90 60 L120 68 L150 36 L182 44 L214 16 L238 22 L238 120 L0 120 Z" fill="url(#lv-ag)"></path><polyline points="0,98 30,84 58,92 90,60 120,68 150,36 182,44 214,16 238,22" fill="none" stroke="#1FB884" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline><circle cx="214" cy="16" r="5" fill="#0E0E0F"></circle></svg><span class="aseg"><i class="on">1W</i><i>1M</i><i>1Y</i></span><span class="abtns"><b>Send</b><b>Receive</b></span><span class="alist"><span><i></i>Coffee<em>−₺85</em></span><span><i></i>Studio rent<em>−₺9 400</em></span><span><i></i>Invoice paid<em>+₺22 000</em></span></span></div>`),
-  raw(`<div class="fc-id"><span class="im"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="72" fill="#C8643B"></circle><path d="M62 120 Q44 96 54 72 Q60 60 58 40 L92 40 Q90 60 96 72 Q106 96 88 120 Z" fill="#F7EFE4"></path><rect x="54" y="34" width="42" height="9" rx="4" fill="#F7EFE4"></rect></svg></span><b class="iw">Clay</b><span class="ity"><b>Aa</b><small class="mono">Anybody italic · 820</small></span><span class="isw"><i></i><i></i><i></i><i></i></span></div>`),
-  raw(`<div class="fc-mo"><span class="mstage"><i class="mball"></i><b class="mword">Hello</b></span><span class="mtc mono">00:04:12</span><span class="mtl"><span class="mtr"><em class="mono">Position</em><i class="kf l0"></i><i class="kf l46"></i><i class="kf l96"></i></span><span class="mtr"><em class="mono">Scale</em><i class="kf l12"></i><i class="kf l70"></i></span><span class="mtr"><em class="mono">Weight</em><i class="kf l4"></i><i class="kf l58"></i><i class="kf l88"></i></span><i class="mph"></i></span></div>`),
-];
 
 /** Process cards: listen · sketch · prototype · build · launch. Chat lines come in translated. */
 export function stepArt(i: number, chat: { ask: string; answer: string; live: string }): Safe {

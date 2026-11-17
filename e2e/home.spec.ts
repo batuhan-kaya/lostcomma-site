@@ -74,6 +74,30 @@ test.describe('homepage · desktop interactions', () => {
     await expect(page.locator('[data-code]')).toContainText('width: 1920px');
   });
 
+  test('services: five products · only the one on show plays · automation runs', async ({ page }) => {
+    const errors = watchErrors(page);
+    await page.goto('/tr');
+    await toSection(page, 'svc');
+    await expect(page.locator('[data-opt]')).toHaveCount(5);
+    await expect(page.locator('.svc .h2')).toHaveText('Beş biçim. Tek stüdyo.');
+    await page.locator('[data-opt="4"]').click();
+    await expect(page.locator('[data-frm]')).toHaveClass(/v4/);
+    await expect(page.locator('[data-frmlab]')).toHaveText('Otomasyon & entegrasyon');
+    await expect(page.locator('[data-frmsize]')).toHaveText('1280 × 800');
+    // The mock products are English: upper-case labels keep their dotless i on a Turkish page.
+    await expect(page.locator('.fc-auto')).toHaveAttribute('lang', 'en');
+    const playing = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll('[data-fc]')].map((fc) => document.getAnimations().filter((a) => fc.contains((a.effect as KeyframeEffect | null)?.target as Node)).length),
+      );
+    await expect.poll(async () => (await playing()).map((n) => n > 0), { timeout: 4000 }).toEqual([false, false, false, false, true]);
+    // A booking runs: the first node is done within a second or two.
+    await expect.poll(() => page.locator('.fc-auto .n1 .ok').evaluate((el) => Number(getComputedStyle(el).opacity)), { timeout: 4000 }).toBeGreaterThan(0.9);
+    await page.locator('[data-opt="1"]').click();
+    await expect.poll(async () => (await playing()).map((n) => n > 0), { timeout: 4000 }).toEqual([false, true, false, false, false]);
+    expect(errors).toEqual([]);
+  });
+
   test('board: drag pans · Enter opens a frame · Escape closes and returns focus', async ({ page }) => {
     await page.goto('/tr');
     await toSection(page, 'work');

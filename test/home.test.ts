@@ -1,7 +1,9 @@
 import { afterAll, describe, expect, it } from 'vitest';
 import { buildApp } from '../src/server/app';
 import { loadConfig } from '../src/server/config';
+import { readFileSync } from 'node:fs';
 import { HOME } from '../src/server/content/home';
+import { frameArt } from '../src/server/pages/home/frames';
 
 const app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: 'https://lostcomma.co' }), now: () => new Date('2026-10-28T10:00:00+03:00') });
 afterAll(() => app.close());
@@ -60,6 +62,48 @@ for (const lang of ['tr', 'en'] as const) {
     });
   });
 }
+
+describe('03 · the service frames', () => {
+  const art = frameArt().map((a) => a.value);
+
+  it('one real looking product per service · five of them · the products speak English', () => {
+    expect(HOME.tr.services.map((s) => s.name)).toEqual(['Web siteleri', 'Uygulamalar', 'Kimlik', 'Hareket', 'Otomasyon']);
+    expect(HOME.en.services[4]).toMatchObject({ name: 'Automation', lab: 'Automation & integration', size: '1280 × 800' });
+    expect(art).toHaveLength(HOME.en.services.length);
+    expect(art.map((a) => /^<div class="fc-(\w+)" lang="en">/.exec(a)?.[1])).toEqual(['web', 'app', 'id', 'mo', 'auto']);
+  });
+
+  it('keeps the comma rule in the mock copy too', () => {
+    for (const a of art) {
+      const text = a.replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ');
+      expect(text, text.slice(0, 80)).not.toContain(',');
+    }
+  });
+
+  it('a real motion loop plays inside the editor preview', () => {
+    const mo = frameArt({ value: '<video data-x></video>' } as never)[3]!.value;
+    expect(mo).toContain('<div class="mcomp"><div class="fc-vid"><video data-x></video></div></div>');
+    expect(mo).not.toContain('class="mcomma"');
+  });
+
+  it('every loop moves transform and opacity only (motion budget)', () => {
+    const css = readFileSync(new URL('../src/styles/pages/_frames.css', import.meta.url), 'utf8');
+    // Each @keyframes block by counting braces.
+    const blocks: [string, string][] = [];
+    for (const m of css.matchAll(/@keyframes ([\w-]+) \{/g)) {
+      let depth = 1;
+      let i = m.index + m[0].length;
+      const from = i;
+      for (; depth && i < css.length; i++) depth += css[i] === '{' ? 1 : css[i] === '}' ? -1 : 0;
+      blocks.push([m[1]!, css.slice(from, i)]);
+    }
+    expect(blocks.length).toBeGreaterThan(40);
+    for (const [name, body] of blocks) {
+      const props = new Set([...body.matchAll(/([a-z-]+)\s*:/g)].map((x) => x[1]));
+      for (const p of props) expect(['transform', 'opacity', 'animation-timing-function'], `${name} animates ${p}`).toContain(p);
+    }
+  });
+});
 
 describe('content', () => {
   it('both languages have the same shape', () => {

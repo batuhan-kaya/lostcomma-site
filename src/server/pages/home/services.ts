@@ -2,11 +2,12 @@ import { html, type Safe } from '../../html';
 import type { Ctx } from '../../page';
 import type { ProjectCard } from '../../data/content';
 import { loopVideo } from '../../media/video';
-import { FRAME_ART } from './art';
+import { frameArt } from './frames';
 
 /**
- * 03 · Services. One frame changes shape between website · app · identity · motion.
- * The motion frame plays a real loop once a live project has one (else the drawn timeline).
+ * 03 · Services. One frame changes shape between website · app · identity · motion · automation.
+ * Each shape plays a real looking product (frames.ts). The motion frame plays a real loop once a
+ * live project has one: inside the editor's preview.
  */
 export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
   const { t, lang } = ctx;
@@ -17,7 +18,7 @@ export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
 <div class="wrap">
 <div class="sl">
 <p class="kick mono"><span>(03)</span><span>${t('Ne yapıyoruz')}</span></p>
-<h2 class="h2">${t('Dört biçim. Tek stüdyo.')}</h2>
+<h2 class="h2">${t('Beş biçim. Tek stüdyo.')}</h2>
 <p class="ssub">${t('Her çerçeve boyutunda aynı ekip ve aynı özen. Birini seç ya da ekibin değiştirmesini izle.')}</p>
 <div class="opts" role="radiogroup" aria-label="${t('Hizmetler')}">${sv.map(
     (o, i) => html`<button type="button" role="radio" aria-checked="${i === 0 ? 'true' : 'false'}" class="opt${i === 0 ? ' act' : ''}" data-opt="${i}"><i class="rd" aria-hidden="true"></i><b>${o.name}</b><span class="os mono">${o.size}</span><span class="od"><span class="odi"><span class="odd">${o.desc}</span><span class="odl mono">${o.dl}</span></span></span></button>`,
@@ -27,9 +28,8 @@ export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
 <div class="sscale" data-sscale>
 <div class="frm v0" data-frm>
 <div class="flab2 mono"><span><i class="fi" aria-hidden="true"></i><span data-frmlab>${first.lab}</span></span><button type="button" class="ib2" data-inspb aria-pressed="false">&lt;/&gt; ${t('İncele')}</button></div>
-<div class="clip" aria-hidden="true">${FRAME_ART.map(
-    (art, i) =>
-      html`<div class="fc${i === 0 ? ' on' : ''}" data-fc="${i}">${i === 3 && loop?.loop ? html`<div class="fc-vid">${loopVideo(loop.loop, { lang, alt: '', posterWidth: 1280 })}</div>` : art}</div>`,
+<div class="clip" aria-hidden="true">${frameArt(loop?.loop ? loopVideo(loop.loop, { lang, alt: '', posterWidth: 1280 }) : null).map(
+    (art, i) => html`<div class="fc${i === 0 ? ' on' : ''}" data-fc="${i}">${art}</div>`,
   )}</div>
 <pre class="code" data-code hidden>${first.code}</pre>
 <i class="hd2 a" aria-hidden="true"></i><i class="hd2 b" aria-hidden="true"></i><i class="hd2 c" aria-hidden="true"></i><i class="hd2 d" aria-hidden="true"></i>

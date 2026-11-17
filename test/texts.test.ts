@@ -35,7 +35,7 @@ describe('where each line is said (i18n/where.json)', () => {
   it('files every server line under a group the panel shows · and leaves the browser only lines out', () => {
     const known = new Set(TEXT_GROUPS.map(([id]) => id));
     for (const [line, groups] of Object.entries(WHERE)) for (const g of groups) expect(known.has(g), `${g}: ${line}`).toBe(true);
-    expect(linesOf('home')).toContain('Dört biçim. Tek stüdyo.');
+    expect(linesOf('home')).toContain('Beş biçim. Tek stüdyo.');
     expect(linesOf('chrome')).toContain('Bir fikrin mi var?');
     // A cursor bubble lives in src/client only: compiled into the bundle.
     expect(WHERE['güzel kelime']).toBeUndefined();
@@ -107,7 +107,7 @@ describe('Metinler in the panel', () => {
   });
 
   it('rewrites a line in both languages · everywhere it is said', async () => {
-    const res = await post('/panel/texts', { g: 'home', [textField('Dört biçim. Tek stüdyo.', 'tr')]: 'Dört iş. Tek cümle.', [textField('Dört biçim. Tek stüdyo.', 'en')]: 'Four crafts. One sentence.' });
+    const res = await post('/panel/texts', { g: 'home', [textField('Beş biçim. Tek stüdyo.', 'tr')]: 'Dört iş. Tek cümle.', [textField('Beş biçim. Tek stüdyo.', 'en')]: 'Four crafts. One sentence.' });
     expect(res.headers.location).toBe('/panel/texts?g=home&m=saved');
     expect((await get('/tr')).body).toContain('<h2 class="h2">Dört iş. Tek cümle.</h2>');
     expect((await get('/en')).body).toContain('<h2 class="h2">Four crafts. One sentence.</h2>');
@@ -135,9 +135,9 @@ describe('Metinler in the panel', () => {
   });
 
   it('an empty field or the default itself takes the rewrite away', async () => {
-    await post('/panel/texts', { g: 'home', [textField('Dört biçim. Tek stüdyo.', 'tr')]: '', [textField('Dört biçim. Tek stüdyo.', 'en')]: 'Four shapes. One studio.' });
-    expect((await get('/tr')).body).toContain('<h2 class="h2">Dört biçim. Tek stüdyo.</h2>');
-    expect((await get('/en')).body).toContain('<h2 class="h2">Four shapes. One studio.</h2>');
+    await post('/panel/texts', { g: 'home', [textField('Beş biçim. Tek stüdyo.', 'tr')]: '', [textField('Beş biçim. Tek stüdyo.', 'en')]: 'Five shapes. One studio.' });
+    expect((await get('/tr')).body).toContain('<h2 class="h2">Beş biçim. Tek stüdyo.</h2>');
+    expect((await get('/en')).body).toContain('<h2 class="h2">Five shapes. One studio.</h2>');
     const rows = await app.db.select().from(settings).where(eq(settings.key, 'texts.t.tr'));
     expect(Object.keys(rows[0]!.value as object)).toEqual(['Bir fikrin mi var?']);
   });

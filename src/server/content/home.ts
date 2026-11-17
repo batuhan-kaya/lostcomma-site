@@ -82,6 +82,7 @@ const CODE = {
   app: '.app {\n  width: 390px;\n  height: 844px;\n  --fps: 120;\n}',
   id: '.identity {\n  width: 1080px;\n  height: 1080px;\n  --colours: 4;\n}',
   mo: '.motion {\n  width: 1920px;\n  height: 820px;\n  --duration: 12s;\n}',
+  auto: '.automation {\n  trigger: webhook;\n  steps: 6;\n  --runtime: 1.2s;\n}',
 };
 
 const en: HomeContent = {
@@ -111,6 +112,7 @@ const en: HomeContent = {
     { name: 'Apps', lab: 'App', size: '390 × 844', desc: 'iOS and Android apps with a native feel and real performance. Interfaces people open every day.', dl: 'Product design · prototypes · development', code: CODE.app, say: 'squish' },
     { name: 'Identity', lab: 'Identity', size: '1080 × 1080', desc: 'Names and marks and type and voice. Systems that hold up from a favicon to a billboard.', dl: 'Logo · type · colour · guidelines', code: CODE.id, say: 'perfect square' },
     { name: 'Motion', lab: 'Motion', size: '1920 × 820', desc: 'Interface motion and brand films. The small details that make people smile without knowing why.', dl: 'UI motion · brand films · micro interactions', code: CODE.mo, say: 'cinematic' },
+    { name: 'Automation', lab: 'Automation & integration', size: '1280 × 800', desc: 'Your tools talk to each other. Forms and payments and calendars and your CRM in one flow that keeps running while you sleep.', dl: 'Workflows · integrations · APIs · dashboards', code: CODE.auto, say: 'it runs itself' },
   ],
   lab: { name: 'Type that breathes', what: 'Experiment · ongoing' },
   notes: ['Still my favourite.', 'Look at that type.', 'Can we do this one again?', 'Pixel perfect. Finally.'],
@@ -180,6 +182,7 @@ const tr: HomeContent = {
     { name: 'Uygulamalar', lab: 'Uygulama', size: '390 × 844', desc: 'Doğal hissettiren ve gerçekten hızlı iOS ve Android uygulamaları. İnsanların her gün açtığı arayüzler.', dl: 'Ürün tasarımı · prototip · geliştirme', code: CODE.app, say: 'sıkış' },
     { name: 'Kimlik', lab: 'Kimlik', size: '1080 × 1080', desc: 'İsimler ve işaretler ve yazı ve ses tonu. Favicon’dan reklam panosuna kadar ayakta duran sistemler.', dl: 'Logo · yazı · renk · kılavuz', code: CODE.id, say: 'tam kare' },
     { name: 'Hareket', lab: 'Hareket', size: '1920 × 820', desc: 'Arayüz hareketleri ve marka filmleri. İnsanları nedenini bilmeden gülümseten küçük detaylar.', dl: 'Arayüz hareketi · marka filmi · mikro etkileşim', code: CODE.mo, say: 'sinematik' },
+    { name: 'Otomasyon', lab: 'Otomasyon & entegrasyon', size: '1280 × 800', desc: 'Araçların birbiriyle konuşur. Form ve ödeme ve takvim ve CRM tek bir akışta. Sen uyurken de çalışmaya devam eder.', dl: 'İş akışları · entegrasyonlar · API · paneller', code: CODE.auto, say: 'kendi kendine çalışıyor' },
   ],
   lab: { name: 'Nefes alan yazı', what: 'Deney · sürüyor' },
   notes: ['Hâlâ en sevdiğim.', 'Şu yazıya bak.', 'Bunu bir daha yapalım mı?', 'Piksel piksel. Sonunda.'],
