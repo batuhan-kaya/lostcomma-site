@@ -39,7 +39,7 @@
 /* The stack's shadow on the paper. */
 .ly-gr { position: absolute; left: -262px; top: -172px; width: 524px; height: 344px; border-radius: 28px; background: rgba(14,14,15,.2); filter: blur(26px); transform: translate(18px, 18px) translateZ(-10px); }
 
-.ly-p { position: absolute; left: -240px; top: -150px; width: 480px; height: 300px; border-radius: 10px; transform-style: preserve-3d; transform: translateZ(calc(var(--z) + var(--lift, 0px))); transition: transform .9s var(--ly-ease) calc(max(var(--j) - var(--i), var(--i) - var(--j)) * 45ms - 45ms); cursor: pointer; }
+.ly-p { position: absolute; left: -240px; top: -150px; width: 480px; height: 300px; border-radius: 10px; transform-style: preserve-3d; transform: translateZ(calc(var(--z) + var(--lift, 0px))); transition: transform .9s var(--ly-ease); cursor: pointer; }
 /* The sheet's edge (a thin card) · a dashed outline when it is tracing paper. */
 .ly-ed { position: absolute; inset: 0; border-radius: 10px; background: #C9C6BD; transform: translateZ(-4px); transition: opacity .6s; }
 /* Tracing paper: a frosted sheet with a dashed edge. */
@@ -64,14 +64,15 @@
 
 /* ---------- the notes on their leader lines ---------- */
 .ly-a { position: absolute; left: calc(var(--vx) * var(--k) + var(--lead)); right: 0; top: calc(var(--vy) * var(--k)); height: 0; margin: 0; padding: 0; list-style: none; }
-.ly-r { position: absolute; left: 0; right: 0; bottom: 0; height: 0; translate: 0 calc(var(--z) * -.81915 * var(--k)); transition: translate .9s var(--ly-ease) calc(max(var(--j) - var(--i), var(--i) - var(--j)) * 45ms - 45ms), opacity .6s; }
+.ly-r { position: absolute; left: 0; right: 0; bottom: 0; height: 0; translate: 0 calc(var(--z) * -.81915 * var(--k)); transition: translate .9s var(--ly-ease), opacity .6s; }
 .ly-r::before { content: ''; position: absolute; left: calc(-1 * var(--lead)); right: 0; top: 0; border-top: 1px dashed rgba(14,14,15,.3); }
 .ly-r::after { content: ''; position: absolute; left: calc(-1 * var(--lead) - 4px); top: -4px; width: 8px; height: 8px; box-sizing: border-box; border: 1.5px solid rgba(14,14,15,.4); border-radius: 50%; background: var(--paper); transition: background-color .4s, border-color .4s; }
 .ly-r.done::before { border-top-style: solid; border-top-color: rgba(14,14,15,.3); }
 .ly-r.on::before { border-top: 1.5px solid var(--ink); }
 .ly-r.on::after { border-color: var(--blue); background: var(--blue); }
 
-.ly-b { position: absolute; left: 0; right: 0; bottom: 7px; display: flex; align-items: baseline; gap: 14px; min-height: 36px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--grey); font: inherit; text-align: left; cursor: pointer; transition: translate .7s var(--ly-ease), color .4s; }
+/* The name rides with its row (same time · same curve): the two moves add up to one glide. */
+.ly-b { position: absolute; left: 0; right: 0; bottom: 7px; display: flex; align-items: baseline; gap: 14px; min-height: 36px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--grey); font: inherit; text-align: left; cursor: pointer; transition: translate .9s var(--ly-ease), color .4s; }
 .ly-n { flex: none; width: 44px; font-size: 12px; white-space: nowrap; }
 /* A step still ahead is faint but readable (3.7:1 on paper · large type) · a done one is grey · the open one ink. */
 .ly-t { color: #75756F; font-family: var(--display); font-size: 32px; line-height: 1; letter-spacing: -.02em; font-variation-settings: 'wdth' 80, 'wght' 760; transform-origin: 0 85%; transition: color .4s, scale .7s var(--ly-ease); }
@@ -85,7 +86,8 @@
 .ly-r.on .ly-b { translate: 0 calc(-1 * var(--D)); cursor: default; }
 
 .ly-d { position: absolute; left: 58px; right: 0; bottom: 14px; max-width: 560px; height: calc(var(--D) - 14px); opacity: 0; visibility: hidden; translate: 0 10px; transition: opacity .3s, translate .5s var(--ly-ease), visibility 0s .5s; }
-.ly-r.on .ly-d { opacity: 1; visibility: visible; translate: none; transition: opacity .5s .3s, translate .7s .25s var(--ly-ease), visibility 0s; }
+/* The words come in once the name has mostly cleared the way. */
+.ly-r.on .ly-d { opacity: 1; visibility: visible; translate: none; transition: opacity .45s .5s, translate .6s .45s var(--ly-ease), visibility 0s; }
 .ly-x { margin: 0; font-size: 17px; line-height: 1.5; }
 .ly-k, .ly-at { display: flex; flex-wrap: wrap; align-items: center; margin: 12px 0 0; color: var(--ink); font-size: 11px; }
 .ly-at { margin-top: 8px; }
@@ -110,7 +112,8 @@
   .ly:not(.in) .ly-p.fut::after, .ly:not(.in) .ly-hd { opacity: 0; }
   .ly:not(.in) .ly-r { opacity: 0; }
   .ly.in:not(.ready) .ly-p { transition-delay: calc(var(--j) * 90ms); }
-  .ly.in:not(.ready) .ly-r { transition-delay: calc(300ms + var(--j) * 90ms); }
+  /* A note rides with its sheet from the start (glued) and fades in a little later. */
+  .ly.in:not(.ready) .ly-r { transition-delay: calc(var(--j) * 90ms), calc(300ms + var(--j) * 90ms); }
 }
 
 /* ---------- each sheet's own moment when it opens (one shot · transitions only) ----------

@@ -123,8 +123,9 @@ export class Services {
     const opts = this.opts[0]?.parentElement;
     if (!frm || !stage || !opts) return;
     const side = opts.getBoundingClientRect().right <= stage.getBoundingClientRect().left + 1;
-    // The list as it is once a row is open (the open rows may be mid transition).
-    const open = $$<HTMLElement>('.od', opts).reduce((s, od) => s + od.offsetHeight, 0);
+    // The list as it is once a row is open (the open rows may be mid transition). Measured in the
+    // same fractional pixels as the list's edge (offsetHeight rounds: the stage drifted by a pixel).
+    const open = $$<HTMLElement>('.od', opts).reduce((s, od) => s + od.getBoundingClientRect().height, 0);
     const bottom = opts.getBoundingClientRect().bottom - open;
     const top = frm.getBoundingClientRect().top;
     this.tall = this.opts.map((o) => {

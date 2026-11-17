@@ -28,7 +28,7 @@ export function process(ctx: Ctx): Safe {
   // The team's names are English words (keep their i in upper case) · the visitor is in the page's language.
   const seat = (s: Seat) => (s === 'you' ? html`<span>${t('sen')}</span>` : html`<span lang="en">${s}</span>`);
   return html`<section class="prc" data-sec="prc" id="process" data-host="code">
-<span class="rest" data-rest="code" data-rest-at="0.9 0.2" data-rest-at-m="0.84 0.12"></span>
+<span class="rest" data-rest="code" data-rest-at="0.9 0.94" data-rest-at-m="0.84 0.97"></span>
 <div class="wrap">
 <div class="phead">
 <div><p class="kick mono"><span>(05)</span><span>${t('Süreç')}</span></p><h2 class="h2">${t('Katman katman.')}</h2></div>
