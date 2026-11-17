@@ -103,6 +103,9 @@
  "5 öneri · 3 kişi": [
   "home"
  ],
+ "800 ms yükleme": [
+  "home"
+ ],
  "9 dk sonra": [
   "service"
  ],
@@ -178,6 +181,9 @@
  "Araçlar.": [
   "other"
  ],
+ "Araştırma · Clay": [
+  "home"
+ ],
  "Asya": [
   "studio"
  ],
@@ -190,9 +196,15 @@
  "Aşmıyor · sürüklenmiş gibi": [
   "other"
  ],
+ "atölye.jpg": [
+  "home"
+ ],
  "Atölyeler": [
   "process",
   "service"
+ ],
+ "Atölyeye gelen herkes": [
+  "home"
  ],
  "Avrupa": [
   "studio"
@@ -264,9 +276,6 @@
  "Başparmak alanını göster": [
   "service"
  ],
- "Baştan ↺": [
-  "home"
- ],
  "Başvuruyu e-postada aç": [
   "legal"
  ],
@@ -323,9 +332,6 @@
  ],
  "Bir proje nasıl ilerler": [
   "service"
- ],
- "Bir proje nasıl ilerler.": [
-  "home"
  ],
  "Bir projenin ilk görüşmeden yayına kadar nasıl ilerlediği.": [
   "process"
@@ -464,6 +470,9 @@
   "note",
   "notes"
  ],
+ "büyük foto": [
+  "home"
+ ],
  "büyük küçük harf duyarlı": [
   "notes"
  ],
@@ -481,6 +490,9 @@
  ],
  "Cetveldeki saatler İstanbul saati": [
   "start"
+ ],
+ "Clay · Kadıköy’de bir seramik atölyesinin sitesi": [
+  "home"
  ],
  "comma · kayarak gelir": [
   "service"
@@ -627,6 +639,9 @@
  ],
  "El": [
   "service"
+ ],
+ "El yapımı hissettirmeli": [
+  "home"
  ],
  "Eline ne geçiyor": [
   "process"
@@ -826,6 +841,9 @@
  "Her nota dön": [
   "note"
  ],
+ "Her proje en alttan kurulur. Beş katman ve her biri bir sonrakinin zemini. Bir adım seç ya da ekibin katmanları kaldırmasını izle.": [
+  "home"
+ ],
  "Her projeyle gelen varsayılanlar.": [
   "studio"
  ],
@@ -881,9 +899,6 @@
  ],
  "İkinci tutamaç": [
   "service"
- ],
- "İleri →": [
-  "home"
  ],
  "İletişim": [
   "chrome"
@@ -1000,6 +1015,9 @@
  "Katman": [
   "work"
  ],
+ "Katman katman.": [
+  "home"
+ ],
  "Katmanlar": [
   "work"
  ],
@@ -1047,6 +1065,9 @@
  ],
  "Kilometre taşı": [
   "process"
+ ],
+ "Kim için?": [
+  "home"
  ],
  "Kim karar veriyor?": [
   "process"
@@ -1159,6 +1180,9 @@
  "Marmara Denizi": [
   "studio"
  ],
+ "Masada": [
+  "home"
+ ],
  "Masamızda ve kodumuzda kullandığımız araçlar.": [
   "other"
  ],
@@ -1204,9 +1228,6 @@
  ],
  "Nasıl çalışıyoruz · anahtarları dene": [
   "studio"
- ],
- "Nasıl çalıştığımızın tıklanabilir bir prototipi. Herhangi bir ekranda İleri’ye bas ya da ekibe bırak.": [
-  "home"
  ],
  "Ne hakkında konuşmak istiyorsun": [
   "home"
@@ -1326,6 +1347,9 @@
  "örnek proje": [
   "home"
  ],
+ "Örnek proje": [
+  "home"
+ ],
  "Örnekler · birinin üstüne gel": [
   "lab"
  ],
@@ -1338,14 +1362,8 @@
  "Panoya dön": [
   "home"
  ],
- "Pazar günü yelken açanlar.": [
-  "home"
- ],
  "Pazartesi ile cuma · 10:00 ile 18:00": [
   "studio"
- ],
- "Peki bu aslında kimin için?": [
-  "home"
  ],
  "Performans": [
   "other"
@@ -1429,7 +1447,11 @@
  "Seçimini yap.": [
   "service"
  ],
+ "Selin · kurucu": [
+  "home"
+ ],
  "sen": [
+  "home",
   "notFound"
  ],
  "Sen": [
@@ -1491,11 +1513,20 @@
  "Sil": [
   "legal"
  ],
+ "Sipariş +%38": [
+  "home"
+ ],
+ "Siparişler DM’den geliyor": [
+  "home"
+ ],
  "Site": [
   "case"
  ],
  "Site haritası": [
   "chrome"
+ ],
+ "Sitemiz atölyemiz kadar sıcak olsun.": [
+  "home"
  ],
  "Sitenin haritası": [
   "notFound"
@@ -1583,6 +1614,9 @@
  ],
  "Süre": [
   "service"
+ ],
+ "Süreci hafta hafta gör": [
+  "home"
  ],
  "Süreç": [
   "chrome",
@@ -1675,6 +1709,9 @@
  "Tasarladığımız ve kodladığımız projeler.": [
   "work"
  ],
+ "tek buton": [
+  "home"
+ ],
  "tek çizik": [
   "service"
  ],
@@ -1690,6 +1727,9 @@
  ],
  "Titriyor": [
   "other"
+ ],
+ "Toplam · yaklaşık on hafta · ilk görüşmeden yayına": [
+  "home"
  ],
  "Trendeki bir sürüm": [
   "service"
@@ -1826,12 +1866,10 @@
  ],
  "Yayında": [
   "case",
+  "home",
   "process"
  ],
  "Yayında · v{n}": [
-  "home"
- ],
- "Yayında · v1.0": [
   "home"
  ],
  "Yayından sonra": [

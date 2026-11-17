@@ -1,36 +1,51 @@
 import { html, type Safe } from '../../html';
 import type { Ctx } from '../../page';
-import { stepArt } from './art';
+import { href } from '../../routes';
+import { layerArt } from './layers';
 
-/** 05 · How a project moves: a clickable prototype of five screens joined by noodles. */
+type Seat = 'you' | 'design' | 'code' | 'motion';
+
+/** Who sits at the table in each step (small marks only · calm rule). */
+const AT: Seat[][] = [
+  ['you', 'design', 'code'],
+  ['design', 'motion'],
+  ['design', 'motion', 'code'],
+  ['code', 'design', 'motion'],
+  ['code', 'you'],
+];
+
+/**
+ * 05 · Process · "Layer by layer". One real project (Clay's website) as five sheets in an
+ * isometric stack · the first step at the bottom · the live site on top. Pick a step and the sheets
+ * above it lift away like tracing paper · its note opens beside it on a leader line. The stack is
+ * drawn in `layers.ts` · its geometry lives in home.css (`.ly`) · the client opens a step
+ * (`client/home/process.ts`). The first step is open on the server.
+ */
 export function process(ctx: Ctx): Safe {
   const { t, lang } = ctx;
   const steps = ctx.texts.home(lang).steps;
-  const chat = { ask: t('Peki bu aslında kimin için?'), answer: t('Pazar günü yelken açanlar.'), live: t('Yayında · v1.0') };
-  const NOODLES = [
-    ['M136 256 C226 256 205 220 289 220', 'M281 214 L289 220 L281 226'],
-    ['M431 336 C540 336 480 140 584 140', 'M576 134 L584 140 L576 146'],
-    ['M726 256 C816 256 795 220 879 220', 'M871 214 L879 220 L871 226'],
-    ['M1021 336 C1130 336 1070 140 1174 140', 'M1166 134 L1174 140 L1166 146'],
-  ];
+  const art = layerArt(ctx);
+  // The team's names are English words (keep their i in upper case) · the visitor is in the page's language.
+  const seat = (s: Seat) => (s === 'you' ? html`<span>${t('sen')}</span>` : html`<span lang="en">${s}</span>`);
   return html`<section class="prc" data-sec="prc" id="process" data-host="code">
-<span class="rest" data-rest="code" data-rest-at="0.88 0.26" data-rest-at-m="0.82 0.14"></span>
+<span class="rest" data-rest="code" data-rest-at="0.9 0.2" data-rest-at-m="0.84 0.12"></span>
 <div class="wrap">
 <div class="phead">
-<div><p class="kick mono"><span>(05)</span><span>${t('Süreç')}</span></p><h2 class="h2">${t('Bir proje nasıl ilerler.')}</h2></div>
-<p class="psub">${t('Nasıl çalıştığımızın tıklanabilir bir prototipi. Herhangi bir ekranda İleri’ye bas ya da ekibe bırak.')}</p>
+<div><p class="kick mono"><span>(05)</span><span>${t('Süreç')}</span></p><h2 class="h2">${t('Katman katman.')}</h2></div>
+<p class="psub">${t('Her proje en alttan kurulur. Beş katman ve her biri bir sonrakinin zemini. Bir adım seç ya da ekibin katmanları kaldırmasını izle.')}</p>
 </div>
-<div class="flowbox" data-flowbox>
-<div class="flow" data-flow>
+<div class="ly s0" data-ly>
+<p class="ly-cap mono"><b>${t('Örnek proje')}</b>${t('Clay · Kadıköy’de bir seramik atölyesinin sitesi')}</p>
+<div class="ly-v" aria-hidden="true"><div class="ly-s"><div class="ly-iso"><i class="ly-gr"></i>
+${art.map((a, i) => html`<div class="ly-p l${i}${i === 0 ? ' on' : ' fut'}" data-lp="${i}"><i class="ly-ed"></i>${a}<i class="ly-hd"><i></i><i></i><i></i><i></i></i></div>`)}
+</div></div></div>
+<ol class="ly-a">
 ${steps.map(
-  (s, i) => html`<div class="pf p${i}${i === 0 ? ' act' : ''}" data-pf="${i}"><span class="pl mono">${String(i + 1).padStart(2, '0')} · ${s.name}</span><span class="pc" aria-hidden="true">${stepArt(i, chat)}</span><button type="button" class="hot" data-hot="${i}">${i < 4 ? t('İleri →') : t('Baştan ↺')}</button></div>`,
+  (s, i) => html`<li class="ly-r r${i}${i === 0 ? ' on' : ' fut'}" data-lr="${i}"><button type="button" class="ly-b" id="ly-b${i}" aria-expanded="${i === 0 ? 'true' : 'false'}" aria-controls="ly-d${i}" data-lb="${i}"><span class="ly-n mono">${String(i + 1).padStart(2, '0')}</span><span class="ly-t">${s.name}</span><span class="ly-w mono">${s.time}</span></button><div class="ly-d" id="ly-d${i}" role="region" aria-labelledby="ly-b${i}"${i === 0 ? '' : html` aria-hidden="true"`}><p class="ly-x">${s.text}</p><p class="ly-k mono"><span>${t('Sana kalan')}</span>${s.get}</p><p class="ly-at mono"><span>${t('Masada')}</span>${AT[i]!.map((w) => html`<i class="c-${w}"></i>${seat(w)}`)}</p></div></li>`,
 )}
-<svg class="nood" viewBox="0 0 1360 400" aria-hidden="true">${NOODLES.map(([d, a], i) => html`<path class="nl${i === 0 ? ' act' : ''}" data-np="${i}" d="${d}"></path><path class="ah${i === 0 ? ' act' : ''}" data-ah="${i}" d="${a}"></path>`)}<circle class="pdot" data-pdot cx="0" cy="0" r="7"></circle></svg>
+</ol>
+<div class="ly-ft"><p class="mono">${t('Toplam · yaklaşık on hafta · ilk görüşmeden yayına')}</p><a class="ly-go" href="${href(lang, 'process')}">${t('Süreci hafta hafta gör')} <span aria-hidden="true">→</span></a></div>
 </div>
-</div>
-<div class="pdet" aria-live="polite">${steps.map(
-    (s, i) => html`<div class="pd${i === 0 ? ' act' : ''}" data-pd="${i}"${i === 0 ? '' : html` aria-hidden="true"`}><div><p class="pn">${s.name}</p><p class="pt mono">${s.time}</p></div><p class="px">${s.text}</p><p class="pget mono">${t('Sana kalan')}<span>${s.get}</span></p></div>`,
-  )}</div>
 </div>
 </section>`;
 }
