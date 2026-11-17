@@ -4,6 +4,7 @@ import { loadConfig } from '../src/server/config';
 import { readFileSync } from 'node:fs';
 import { HOME } from '../src/server/content/home';
 import { androidArt, frameArt } from '../src/server/pages/home/frames';
+import { layerArt } from '../src/server/pages/home/layers';
 import { PICTURES } from '../src/server/pages/home/pictures';
 
 const app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: 'https://lostcomma.co' }), now: () => new Date('2026-10-28T10:00:00+03:00') });
@@ -121,6 +122,35 @@ describe('03 · the service frames', () => {
       const props = new Set([...body.matchAll(/([a-z-]+)\s*:/g)].map((x) => x[1]));
       for (const p of props) expect(['transform', 'opacity', 'animation-timing-function'], `${name} animates ${p}`).toContain(p);
     }
+  });
+});
+
+describe('05 · process · layer by layer', async () => {
+  const doc = (await app.inject('/en')).body;
+  const sec = doc.slice(doc.indexOf('data-sec="prc"'), doc.indexOf('data-sec="ctc"'));
+
+  it('five sheets from the bottom up · five notes · the first step is open on the server', () => {
+    expect(sec.match(/class="ly-p l\d/g)).toHaveLength(5);
+    expect(sec.match(/class="ly-r r\d/g)).toHaveLength(5);
+    expect(sec).toContain('<div class="ly s0" data-ly>');
+    expect(sec).toContain('<div class="ly-p l0 on" data-lp="0">');
+    expect(sec).toContain('<div class="ly-p l4 fut" data-lp="4">');
+    expect(sec.match(/aria-expanded="true"/g)).toHaveLength(1);
+    expect(sec).toContain('aria-controls="ly-d0"');
+    // The stack is decorative: the notes say it in words.
+    expect(sec).toContain('<div class="ly-v" aria-hidden="true">');
+    expect(sec).toContain('href="/en/process"');
+    for (const s of HOME.en.steps) expect(sec).toContain(`>${s.name}</span>`);
+  });
+
+  it('keeps the comma rule on the sheets too · Clay speaks English · the team’s names keep their i', () => {
+    const ctx = { t: (s: string) => s } as never;
+    for (const a of layerArt(ctx)) {
+      const text = a.value.replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ');
+      expect(text, text.slice(0, 80)).not.toContain(',');
+    }
+    expect(layerArt(ctx)[3]!.value).toContain('<div class="ly-site" lang="en">');
+    expect(sec).toMatch(/<span lang="en">design<\/span>/);
   });
 });
 

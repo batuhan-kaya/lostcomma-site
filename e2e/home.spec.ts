@@ -270,28 +270,97 @@ test.describe('homepage · desktop interactions', () => {
     expect(errors).toEqual([]);
   });
 
-  test('process: Next moves the prototype on', async ({ page }) => {
+  test('process: a step lifts the sheets above it · its note opens · a sheet is a shortcut · launch raises the numbers', async ({ page }) => {
+    const errors = watchErrors(page);
     await page.goto('/en');
     await toSection(page, 'prc');
-    await page.locator('[data-hot="0"]').click();
-    await expect(page.locator('[data-pd="1"]')).toHaveClass(/act/);
-    await expect(page.locator('[data-pf="1"]')).toHaveClass(/act/);
-    await expect(page.locator('[data-pd="1"] .pn')).toHaveText('Sketch');
-    await page.locator('[data-hot="4"]').click();
-    await expect(page.locator('[data-pd="0"]')).toHaveClass(/act/);
+    const box = page.locator('[data-ly]');
+    await expect(box).toHaveClass(/\bin\b/);
+    await expect(page.locator('[data-lb="0"]')).toHaveAttribute('aria-expanded', 'true');
+    await page.locator('[data-lb="2"]').click();
+    await expect(box).toHaveClass(/\bs2\b/);
+    await expect(page.locator('[data-lp="2"]')).toHaveClass(/\bon\b/);
+    await expect(page.locator('[data-lp="1"]')).toHaveClass(/\bdone\b/);
+    await expect(page.locator('[data-lp="3"]')).toHaveClass(/\bfut\b/);
+    await expect(page.locator('[data-lb="2"]')).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('[data-lb="0"]')).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#ly-d2')).toBeVisible();
+    await expect(page.locator('#ly-d2')).toContainText('Clickable early');
+    await expect(page.locator('#ly-d0')).toBeHidden();
+    // The sheets above the open one lift away: the next sheet sits far above the open one.
+    await page.waitForTimeout(1200);
+    const y = (i: number) => page.locator(`[data-lp="${i}"] .ly-f`).evaluate((e) => e.getBoundingClientRect().top);
+    expect((await y(2)) - (await y(3))).toBeGreaterThan(150);
+    expect((await y(1)) - (await y(2))).toBeLessThan(70);
+    // A sheet opens its own step · launch closes the stack and the numbers rise.
+    await page.locator('[data-lp="4"] .ly-f').click({ force: true });
+    await expect(box).toHaveClass(/\bs4\b/);
+    await expect(page.locator('#ly-d4')).toContainText('We ship it');
+    await expect(page.locator('.ly-pin.p1 b')).toHaveText('Lighthouse 100');
+    await expect.poll(() => page.locator('.ly-pin.p1 > span').evaluate((e) => Number(getComputedStyle(e).opacity))).toBe(1);
+    expect(errors).toEqual([]);
+  });
+
+  test('process: every note hangs on its sheet: the leader line meets the sheet’s right corner · in both languages', async ({ page }) => {
+    for (const [lang, w] of [['en', 1440], ['tr', 1150]] as const) {
+      await page.setViewportSize({ width: w, height: 900 });
+      await page.goto(`/${lang}`);
+      await toSection(page, 'prc');
+      // The sheets have risen (the arrival is over).
+      await expect(page.locator('[data-ly]')).toHaveClass(/\bready\b/);
+      for (const step of [0, 3]) {
+        await page.locator(`[data-lb="${step}"]`).click();
+        await page.waitForTimeout(1300);
+        const off = await page.evaluate(() => {
+          const lead = parseFloat(getComputedStyle(document.querySelector('[data-ly]')!).getPropertyValue('--lead'));
+          return [...document.querySelectorAll<HTMLElement>('[data-lr]')].map((r, i) => {
+            const f = document.querySelector(`[data-lp="${i}"] .ly-f`)!.getBoundingClientRect();
+            // The diamond's right corner: its right edge · 121.7 / 316.4 of the way down.
+            const vx = f.right;
+            const vy = f.top + (f.height * 121.7) / 316.4;
+            const line = r.getBoundingClientRect();
+            return Math.max(Math.abs(line.left - lead - vx), Math.abs(line.top - vy));
+          });
+        });
+        for (const o of off) expect(o, `${lang} ${w} step ${step}`).toBeLessThan(2);
+      }
+    }
+  });
+
+  test('process: every open note fits its room · in both languages at the edges of the side by side layout', async ({ page }) => {
+    for (const lang of ['tr', 'en']) {
+      for (const w of [1100, 1240, 1440]) {
+        await page.setViewportSize({ width: w, height: 900 });
+        await page.goto(`/${lang}`);
+        await page.evaluate(() => document.fonts.ready);
+        const over = await page.evaluate(() =>
+          [...document.querySelectorAll<HTMLElement>('.ly-d')].map((d) => {
+            const a = d.firstElementChild!.getBoundingClientRect();
+            const b = d.lastElementChild!.getBoundingClientRect();
+            return Math.round(b.bottom - a.top - d.clientHeight);
+          }),
+        );
+        for (const o of over) expect(o, `${lang} ${w}`).toBeLessThanOrEqual(1);
+      }
+    }
   });
 });
 
 test.describe('homepage · phone', () => {
   test.skip(({ isMobile }) => !isMobile, 'phone layout');
 
-  test('process: the swipe row keeps the page gutter when a screen snaps in', async ({ page }) => {
+  test('process: the stack on top · the steps as a list · a tap opens one', async ({ page }) => {
     await page.goto('/en');
     await toSection(page, 'prc');
-    await page.locator('[data-hot="0"]').click();
-    await expect(page.locator('[data-pf="1"]')).toHaveClass(/act/);
-    const gut = await page.locator('[data-pf="1"]').evaluate((c) => parseFloat(getComputedStyle(c.parentElement!).paddingLeft));
-    await expect.poll(() => page.locator('[data-pf="1"]').evaluate((c) => Math.round(c.getBoundingClientRect().left))).toBe(Math.round(gut));
+    await page.locator('[data-lb="3"]').tap();
+    await expect(page.locator('[data-ly]')).toHaveClass(/\bs3\b/);
+    await expect(page.locator('#ly-d3')).toBeVisible();
+    await expect(page.locator('#ly-d0')).toBeHidden();
+    // The list flows under the stack (no leader lines).
+    const stack = await page.locator('.ly-v').boundingBox();
+    const first = await page.locator('[data-lr="0"]').boundingBox();
+    expect(first!.y).toBeGreaterThanOrEqual(stack!.y + stack!.height - 1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   });
 
   test('services: on a phone a tap opens the mock full screen · Lodos is its own mobile site · Pocket works · Close puts it back', async ({ page }) => {

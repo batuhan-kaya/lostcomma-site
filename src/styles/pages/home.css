@@ -3,6 +3,7 @@
    Desktop numbers follow the 1440 board · below 1100 px everything flows.
    ===================================================================== */
 @import './_frames.css';
+@import './_layers.css';
 
 [data-page="home"] {
   --dots: radial-gradient(rgba(14,14,15,.13) 1px, transparent 1.6px);
@@ -387,70 +388,13 @@ html.fv-open { overflow: hidden; }
 .ar-lab > span:nth-child(4) { animation-delay: -2.1s; }
 .ar-lab .mono { position: absolute; left: 5cqw; bottom: 5cqw; color: var(--dim); font-size: 11px; animation: none; }
 
-/* ================= 05 process ================= */
-.prc { position: relative; min-height: 960px; background-color: var(--paper); background-image: var(--dots); background-size: 26px 26px; background-position: 13px 13px; }
-.prc .wrap { padding: 120px var(--gut) 100px; }
+/* ================= 05 process: layer by layer (the stack lives in _layers.css) ================= */
+.prc { position: relative; background-color: var(--paper); background-image: var(--dots); background-size: 26px 26px; background-position: 13px 13px; }
+.prc .wrap { padding: 120px var(--gut) 96px; }
 .prc .kick { color: var(--grey); }
 .phead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; }
 .phead .h2 { margin-top: 20px; }
-.psub { max-width: 420px; margin: 0; color: var(--grey); font-size: 18px; }
-.flowbox { position: relative; height: calc(400px * var(--pk, 1)); margin-top: 84px; }
-.flow { position: relative; width: 1360px; height: 400px; transform-origin: 0 0; transform: scale(var(--pk, 1)); }
-.pf { position: absolute; top: 0; width: 180px; height: 280px; padding: 0; border-radius: 16px; background: var(--milk); cursor: pointer; box-shadow: 0 0 0 1.5px rgba(14,14,15,.14), 0 24px 40px -28px rgba(14,14,15,.5); transition: box-shadow .35s, transform .5s cubic-bezier(.2,1.4,.3,1); }
-.pf:hover { transform: translateY(-4px); }
-.pf.act { box-shadow: 0 0 0 2.5px var(--blue), 0 34px 50px -26px rgba(59,53,255,.45); transform: translateY(-6px); }
-.pf.p0 { left: 0; }
-.pf.p1 { left: 295px; top: 80px; }
-.pf.p2 { left: 590px; }
-.pf.p3 { left: 885px; top: 80px; }
-.pf.p4 { left: 1180px; }
-.pl { position: absolute; left: 2px; bottom: calc(100% + 10px); color: var(--grey); white-space: nowrap; scale: calc(1 / var(--pk, 1)); transform-origin: 0 100%; transition: color .3s; }
-.pf.act .pl { color: var(--blue); }
-.pc { position: absolute; left: 12px; right: 12px; top: 12px; height: 212px; overflow: hidden; border-radius: 10px; background: #FFFFFF; }
-.hot { position: absolute; right: 12px; bottom: 12px; scale: calc(1 / var(--pk, 1)); transform-origin: 100% 100%; min-height: 32px; padding: 0 12px; border: 1.5px dashed var(--blue); border-radius: 8px; background: rgba(59,53,255,.08); color: var(--blue); font: 600 12px/1 var(--sans); cursor: pointer; transition: background-color .3s, color .3s; }
-.hot:hover { background: var(--blue); color: var(--milk); }
-/* The prototype is scaled down on laptops: the hotspot scales back to full size (above) and keeps a pad. */
-.hot::before { content: ''; position: absolute; inset: -6px; }
-.pf.act .hot { border-style: solid; }
-.nood { position: absolute; inset: 0; z-index: 2; width: 1360px; height: 400px; overflow: visible; pointer-events: none; }
-.nood .nl { fill: none; stroke: rgba(14,14,15,.22); stroke-width: 2.5; stroke-dasharray: 5 6; transition: stroke .4s; }
-.nood .nl.act { stroke: var(--blue); stroke-dasharray: none; stroke-width: 3; }
-.nood .ah { fill: none; stroke: rgba(14,14,15,.3); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-.nood .ah.act { stroke: var(--blue); }
-.nood .pdot { fill: var(--blue); opacity: 0; }
-.il { position: absolute; inset: 0; }
-.il-ask .q1, .il-ask .q2 { position: absolute; display: block; padding: 10px 12px; border-radius: 12px; font-size: 12px; line-height: 1.3; }
-.il-ask .q1 { left: 12px; top: 22px; width: 110px; border-radius: 12px 12px 12px 3px; background: #ECEBE6; color: var(--ink); }
-.il-ask .q2 { right: 12px; top: 94px; width: 104px; border-radius: 12px 12px 3px 12px; background: var(--blue); color: var(--milk); }
-.il-ask .q3 { position: absolute; left: 12px; top: 160px; display: flex; gap: 5px; padding: 12px 14px; border-radius: 12px 12px 12px 3px; background: #ECEBE6; }
-.il-ask .q3 i { display: block; width: 7px; height: 7px; border-radius: 50%; background: var(--grey); animation: typing 1.2s ease-in-out infinite; }
-.il-ask .q3 i:nth-child(2) { animation-delay: .15s; }
-.il-ask .q3 i:nth-child(3) { animation-delay: .3s; }
-.il svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.sk { fill: none; stroke: #2A2A2C; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.sk.x { stroke-dasharray: 3 4; opacity: .6; }
-.il-build { padding: 16px 14px; background: #141416; }
-.il-build i { display: block; height: 7px; margin-bottom: 9px; border-radius: 4px; background: #3A3A40; }
-.il-build i.a { width: 56%; background: var(--kc); }
-.il-build i.b { width: 78%; margin-left: 14px; }
-.il-build i.c { width: 44%; margin-left: 14px; background: var(--lime); }
-.il-build i.d { width: 66%; margin-left: 28px; }
-.il-build i.e { width: 38%; margin-left: 28px; background: var(--pink); }
-.il-build i.f { width: 70%; margin-left: 14px; }
-.il-build i.g { width: 30%; background: var(--kc); }
-.il-build i.h { width: 62%; margin-left: 14px; background: var(--mint); }
-.il-build .cur2 { display: inline-block; width: 7px; height: 12px; margin-left: 14px; background: var(--milk); animation: blink .9s steps(1) infinite; }
-.il-ship .ts { position: absolute; left: 12px; right: 12px; top: 16px; display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; background: var(--ink); color: var(--milk); font-size: 12px; }
-.il-ship .ts i { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--mint); }
-.il-ship svg { top: 70px; height: 140px; }
-.pdet { display: grid; margin-top: 40px; }
-.pd { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr); gap: 48px; opacity: 0; transform: translateY(12px); visibility: hidden; transition: opacity .45s, transform .45s, visibility 0s .45s; }
-.pd.act { opacity: 1; transform: none; visibility: visible; transition: opacity .45s, transform .45s; }
-.pd .pn { margin: 0; font-family: var(--display); font-size: 56px; line-height: 1; letter-spacing: -.03em; font-variation-settings: 'wdth' 80, 'wght' 760; }
-.pd .pt { margin: 10px 0 0; color: var(--blue); }
-.pd .px { margin: 0; font-size: 20px; line-height: 1.5; }
-.pd .pget { margin: 0; color: var(--grey); }
-.pd .pget span { display: block; margin-top: 8px; color: var(--ink); }
+.psub { max-width: 440px; margin: 0; color: var(--grey); font-size: 18px; }
 
 /* ================= 06 contact: one sentence ================= */
 /*
@@ -549,7 +493,6 @@ html.fv-open { overflow: hidden; }
 @keyframes zin { from { opacity: 0; transform: translate(-50%, -46%) scale(.92); } to { opacity: 1; transform: translate(-50%, -50%); } }
 @keyframes flash { 0% { background-color: rgba(205,242,58,.9); } 100% { background-color: transparent; } }
 @keyframes boing { 0% { transform: none; } 18% { transform: scale(1.25, .7); } 42% { transform: translateY(-.5em) scale(.88, 1.14); } 66% { transform: translateY(0) scale(1.14, .86); } 82% { transform: translateY(-.08em); } 100% { transform: none; } }
-@keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
 /* The ball and the playhead travel by transform (compositor) · cqw is the stage's width. */
 @keyframes beat { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.12); } }
 @keyframes breathe { from { font-variation-settings: 'wdth' 50, 'wght' 140; } to { font-variation-settings: 'wdth' 150, 'wght' 900; } }
@@ -585,16 +528,6 @@ html.fv-open { overflow: hidden; }
   .ovc { grid-template-columns: minmax(0, 1fr); width: min(560px, calc(100% - 2 * var(--gut))); gap: 20px; }
   .ovc .ba { width: 100%; height: auto; aspect-ratio: 3 / 2; }
   .ovc h3 { font-size: 40px; }
-}
-
-@media (max-width: 900px) {
-  /* process: a swipeable row of screens · no noodles */
-  .flowbox { height: auto; margin-top: 56px; }
-  .flow { --pk: 1; display: flex; gap: 16px; width: auto; height: auto; padding: 34px var(--gut) 16px; margin: 0 calc(-1 * var(--gut)); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gut); transform: none; }
-  .pf { position: relative; left: auto !important; top: auto !important; flex: none; scroll-snap-align: start; }
-  .nood { display: none; }
-  .pd { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  .pd .pn { font-size: 44px; }
 }
 
 @media (max-width: 760px) {
