@@ -335,8 +335,8 @@ test.describe('homepage · contact sentence', () => {
     const empty = await width();
     await mail.click();
     await page.keyboard.type('b');
-    // Not at once: the placeholder's room goes in a short glide.
-    expect(await width()).toBeGreaterThan(empty * 0.5);
+    // Not at once: shrinking glides (a width transition · no .grow) · then it lands on the letter.
+    expect(await mail.evaluate((e) => !e.classList.contains('grow') && /width/.test(getComputedStyle(e).transitionProperty) && parseFloat(getComputedStyle(e).transitionDuration.split(',')[1] ?? '0') > 0.2)).toBe(true);
     await expect.poll(width).toBeLessThan(empty * 0.3);
     await page.keyboard.type('@lc.co');
     expect(await mail.evaluate((e) => e.scrollWidth <= e.clientWidth + 1)).toBe(true);
