@@ -10,6 +10,7 @@ Görsel hattı 3. aşamada kuruldu: her görsel sunucuda AVIF ve WebP'ye çevril
 - Her görsel için iki kısa açıklama (alt metin): Türkçe ve İngilizce · virgülsüz. Görme engelli ziyaretçiler ekran okuyucuda bunu duyar.
 - Dosya adı önemli değil · hangi yere gittiğini bu listedeki numarayla söylemen yeterli (A1 · No. 014 gibi).
 - Panel gelene kadar (11. aşama) görselleri ben eklerim: `npm run media -- cover 14 dosya.jpg --alt-tr "…" --alt-en "…"`.
+- Hizmetler çerçevesindeki ürün maketlerinin fotoğrafları (A3 · A4) panelden değil koddan gelir: `npm run mock -- <ad> <dosya>` fotoğrafı yuvasına göre kırpar ve `src/images/<ad>.webp` yazar (commit edilir · build içerik özetiyle kopyalar). `npm run mock -- list` hangi yuvaların dolu olduğunu gösterir. Yuvalar `src/server/pages/home/pictures.ts` içinde. Alt metin gerekmez: maketler ekran okuyucudan gizli.
 - Video (A6 ve hareket işleri): hazır dosya olarak teslim edilir (karar · 8. aşama). Sunucu dosyayı yeniden kodlamaz, sadece kontrol eder ve sunar. Nasıl hazırlanacağı aşağıda: **Döngü videoları nasıl hazırlanır**.
 
 Durum sütunu: **Hazır** = yer görsel almaya hazır · görsel gelene kadar çizim duruyor · **CSS** = şu an kodla çizilmiş bir illüstrasyon duruyor ve görseli alacak kod henüz yok · **Boş** = henüz yer tutucu · **Gerekmez** = kodla yapılan ve öyle kalacak bir şey.
@@ -22,8 +23,8 @@ Panodaki çerçevelerin şekli farklı (yatay ve dikey). Kapak çerçeveye göre
 |---|---|---|---|---|
 | A1 | Pano · 7 proje kapağı + Lab | Panodaki her proje için bir kapak (ekran görüntüsü · ürün fotoğrafı · afiş) · Lab çerçevesi kodla çizili kalabilir | 520×340 → 1040×680 · 300×400 → 600×800 · 340×440 → 680×880 · 460×300 → 920×600 · 540×340 → 1080×680 · 320×420 → 640×840 · 420×300 → 840×600 | Hazır: kapak eklenen proje görseli gösterir · eklenmeyen çizimini |
 | A2 | Pano · açılan proje kartı | A1 ile aynı kapak (ayrıca gerekmez) | 3:2 · 1200×800 | Hazır |
-| A3 | Hizmetler çerçevesi · Web sitesi | Gerçek bir sitenin masaüstü ekranı | 780×488 → 1560×976 | CSS (LODOS örneği) |
-| A4 | Hizmetler çerçevesi · Uygulama | Gerçek bir uygulama ekranı | 282×610 → 564×1220 | CSS |
+| A3 | Hizmetler çerçevesi · Web sitesi (Lodos yelken kulübü) | Beş fotoğraf: `web-hero` (Boğaz'da gün batımında yelkenli · sol taraf sakin) · `web-j70` · `web-laser` · `web-cruiser` (filo kartları) · `web-skipper` (kaptan Defne Arslan portresi) | hero 16:9 en az 2400×1350 · filo 3:2 en az 1500×1000 · portre 1:1 en az 800×800 | Hazır: fotoğraf gelene kadar çizim (Boğaz · tarihi yarımada · köprü · üç tekne) |
+| A4 | Hizmetler çerçevesi · Uygulama (Pocket cüzdan) | Sekiz portre: `app-deniz` (hesap sahibi) · `app-ece` · `app-mert` · `app-zeynep` · `app-can` · `app-ada` · `app-berk` · `app-cem` | 1:1 en az 800×800 · aynı ışık ve arka plan | Hazır: portre gelene kadar renkli daire içinde baş harfler (Elif · Kaan · Nil bilerek baş harfle kalır) |
 | A5 | Hizmetler çerçevesi · Kimlik | Logo · yazı · renk sayfası | 520×520 → 1040×1040 | CSS |
 | A6 | Hizmetler çerçevesi · Hareket | D5'teki döngülerden en yenisi otomatik oynar (ayrıca gerekmez) | Ortadaki geniş şerit görünür: önemli kısım ortada kalsın | Hazır: döngüsü olan bir hareket projesi yoksa çizim kalır |
 | A7 | Süreç · 5 ekran | İsteğe bağlı: atölye · eskiz · prototip · kod · yayın fotoğrafları | 156×212 → 624×848 | CSS |

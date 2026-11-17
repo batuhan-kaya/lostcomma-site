@@ -6,8 +6,9 @@
  * for its translation (scripts/lib/i18n.ts). CSS pulls the woff2 files out of node_modules
  * and gives them content hashes. Everything lands in dist/public/manifest.json.
  */
+import { createHash } from 'node:crypto';
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, dirname, join, relative, resolve } from 'node:path';
+import { basename, dirname, extname, join, relative, resolve } from 'node:path';
 import * as esbuild from 'esbuild';
 import { inlineTranslations, toJs } from './lib/i18n';
 
@@ -24,8 +25,9 @@ interface Manifest {
   css: Record<string, string>;
   js: Record<string, Partial<Record<Lang, string>>>;
   fonts: Record<string, string>;
+  images: Record<string, string>;
 }
-const manifest: Manifest = { css: {}, js: {}, fonts: {} };
+const manifest: Manifest = { css: {}, js: {}, fonts: {}, images: {} };
 
 const readEn = () => JSON.parse(readFileSync(join(root, 'i18n/en.json'), 'utf8')) as Record<string, string>;
 
@@ -123,10 +125,30 @@ function copyPublic() {
   if (existsSync(src)) cpSync(src, pub, { recursive: true });
 }
 
+/**
+ * Pictures inside the drawn product mocks (src/images · npm run mock). Copied with a content hash so
+ * they can be cached for a year · a mock without its picture keeps its drawing (pages/home/frames.ts).
+ */
+function copyImages() {
+  const src = join(root, 'src/images');
+  if (!existsSync(src)) return;
+  mkdirSync(join(assetsDir, 'img'), { recursive: true });
+  for (const f of readdirSync(src)) {
+    const ext = extname(f);
+    if (!['.webp', '.avif', '.jpg', '.png'].includes(ext)) continue;
+    const buf = readFileSync(join(src, f));
+    const hash = createHash('sha256').update(buf).digest('hex').slice(0, 10);
+    const out = join(assetsDir, 'img', `${basename(f, ext)}-${hash}${ext}`);
+    writeFileSync(out, buf);
+    manifest.images[basename(f, ext)] = url(out);
+  }
+}
+
 async function buildOnce() {
   rmSync(dist, { recursive: true, force: true });
   mkdirSync(assetsDir, { recursive: true });
   copyPublic();
+  copyImages();
 
   const [tr, en, css] = await Promise.all([
     esbuild.build(jsOptions('tr')),
@@ -162,11 +184,13 @@ async function buildOnce() {
   ];
   for (const [k, v] of rows) console.log(`${k?.padEnd(16)} ${String(size(join(pub, v ?? ''))).padStart(7)} B  ${v}`);
   console.log(`fonts            ${Object.keys(manifest.fonts).length} files`);
+  console.log(`images           ${Object.keys(manifest.images).length} files`);
 }
 
 async function buildWatch() {
   mkdirSync(assetsDir, { recursive: true });
   copyPublic();
+  copyImages();
   const onEnd = (record: (m: esbuild.Metafile) => void): esbuild.Plugin => ({
     name: 'manifest',
     setup(b) {

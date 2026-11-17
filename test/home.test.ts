@@ -4,6 +4,7 @@ import { loadConfig } from '../src/server/config';
 import { readFileSync } from 'node:fs';
 import { HOME } from '../src/server/content/home';
 import { frameArt } from '../src/server/pages/home/frames';
+import { PICTURES } from '../src/server/pages/home/pictures';
 
 const app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: 'https://lostcomma.co' }), now: () => new Date('2026-10-28T10:00:00+03:00') });
 afterAll(() => app.close());
@@ -78,6 +79,16 @@ describe('03 · the service frames', () => {
       const text = a.replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ');
       expect(text, text.slice(0, 80)).not.toContain(',');
     }
+  });
+
+  it('a mock photo replaces its drawing once its slot has one (pictures.ts · npm run mock)', () => {
+    const drawn = frameArt()[0]!.value;
+    expect(drawn).not.toContain('<img');
+    expect(drawn).toContain('id="lds-sky"');
+    const shot = (n: string) => `/assets/img/${n}-0123456789.webp`;
+    const all = frameArt(null, shot).map((a) => a.value).join('');
+    for (const n of Object.keys(PICTURES)) expect(all, n).toContain(`src="${shot(n)}"`);
+    expect(all).not.toMatch(/id="(lds-sky|lj-s|ll-s|lc-s)"/);
   });
 
   it('a real motion loop plays inside the editor preview', () => {

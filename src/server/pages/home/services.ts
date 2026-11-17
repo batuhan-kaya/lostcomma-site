@@ -28,7 +28,7 @@ export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
 <div class="sscale" data-sscale>
 <div class="frm v0" data-frm>
 <div class="flab2 mono"><span><i class="fi" aria-hidden="true"></i><span data-frmlab>${first.lab}</span></span><button type="button" class="ib2" data-inspb aria-pressed="false">&lt;/&gt; ${t('İncele')}</button></div>
-<div class="clip" aria-hidden="true">${frameArt(loop?.loop ? loopVideo(loop.loop, { lang, alt: '', posterWidth: 1280 }) : null).map(
+<div class="clip" aria-hidden="true">${frameArt(loop?.loop ? loopVideo(loop.loop, { lang, alt: '', posterWidth: 1280 }) : null, (n) => ctx.assets.image(n)).map(
     (art, i) => html`<div class="fc${i === 0 ? ' on' : ''}" data-fc="${i}">${art}</div>`,
   )}</div>
 <pre class="code" data-code hidden>${first.code}</pre>

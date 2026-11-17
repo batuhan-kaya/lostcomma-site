@@ -174,6 +174,8 @@ test.describe('Service pages · desktop', () => {
     await thumb.focus();
     for (let i = 0; i < 9; i++) await page.keyboard.press('Shift+ArrowDown');
     await page.locator('[data-phone]').scrollIntoViewIfNeeded();
+    // The actions glide to their new places (.6 s): on a fast machine the steps above take less. Measure where they land.
+    await page.locator('[data-act="0"]').evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
     const buy = (await page.locator('[data-act="0"]').boundingBox())!;
     const tb = (await thumb.boundingBox())!;
     await drag(page, { x: tb.x + tb.width / 2, y: tb.y + tb.height / 2 }, { x: buy.x + buy.width / 2, y: buy.y + buy.height / 2 });

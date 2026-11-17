@@ -7,9 +7,11 @@ export interface Manifest {
   css: Record<string, string>;
   js: Record<string, Record<Lang, string>>;
   fonts: Record<string, string>;
+  /** Pictures inside the drawn product mocks (src/images) by file name without the extension. */
+  images?: Record<string, string>;
 }
 
-const EMPTY: Manifest = { css: {}, js: {}, fonts: {} };
+const EMPTY: Manifest = { css: {}, js: {}, fonts: {}, images: {} };
 
 export class Assets {
   private cached: Manifest | null = null;
@@ -38,5 +40,9 @@ export class Assets {
 
   font(name: string): string | undefined {
     return this.manifest().fonts[name];
+  }
+
+  image(name: string): string | undefined {
+    return this.manifest().images?.[name];
   }
 }
