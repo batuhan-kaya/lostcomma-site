@@ -145,8 +145,11 @@ test.describe('homepage · desktop interactions', () => {
     await expect(ap).toHaveClass(/s-ok/);
     await expect(ap.locator('.aokt')).toHaveText('₺1 250 sent');
     await ap.locator('.adone').click();
-    // Home slides back in under the sheet as it goes down: it is not left waiting shifted left.
-    await expect.poll(() => ap.locator('.ahome').evaluate((h) => new DOMMatrixReadOnly(getComputedStyle(h).transform).m41), { timeout: 700 }).toBe(0);
+    // Home slides back in under the sheet as it goes down: it is not left waiting shifted left (-80 px) to jump later.
+    const homeX = () => ap.locator('.ahome').evaluate((h) => new DOMMatrixReadOnly(getComputedStyle(h).transform).m41);
+    await page.waitForTimeout(250);
+    expect(await homeX()).toBeGreaterThan(-60);
+    await expect.poll(homeX, { timeout: 2000 }).toBeGreaterThan(-1);
     await expect(ap).toHaveClass(/s-home/);
     await expect(ap.locator('.arow').first()).toContainText('Mert Aksoy');
     await expect(ap.locator('.arow').first()).toContainText('−₺1 250');

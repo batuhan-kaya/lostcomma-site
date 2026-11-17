@@ -75,7 +75,8 @@ test.describe('preloader', () => {
   test('a page reached from our own pages has none', async ({ page }, info) => {
     test.skip(info.project.name !== 'desktop', 'the header links are in the menu on smaller screens');
     await page.goto(`${base}/en`);
-    await expect(page.locator('[data-intro]')).toHaveCount(0, { timeout: 4000 });
+    // The run takes about 3.4 s after the page is up: wait as long as its own failsafe (6 s) so a busy machine does not fail it.
+    await expect(page.locator('[data-intro]')).toHaveCount(0, { timeout: 6000 });
     await page.locator('.hd .lk').first().click();
     await page.waitForURL('**/en/work');
     expect(await page.locator('[data-intro]').count()).toBe(0);
