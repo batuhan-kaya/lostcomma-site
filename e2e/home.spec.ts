@@ -236,22 +236,42 @@ test.describe('homepage · phone', () => {
     await expect.poll(() => page.locator('[data-pf="1"]').evaluate((c) => Math.round(c.getBoundingClientRect().left))).toBe(Math.round(gut));
   });
 
-  test('services: a finger works the mocks · Lodos never traps the page scroll', async ({ page }) => {
+  test('services: on a phone a tap opens the mock full screen · Lodos is its own mobile site · Pocket works · Close puts it back', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/en');
     await toSection(page, 'svc');
+    await expect(page.locator('[data-stage]')).toHaveClass(/nw/);
+    await expect(page.locator('[data-fxp]')).toBeVisible();
+    const dlg = page.locator('[data-fv]');
+    await page.locator('[data-frm]').tap({ position: { x: 40, y: 40 } });
+    await expect(dlg).toBeVisible();
+    const web = dlg.locator('[data-fc="0"]');
+    await expect(web).toHaveClass(/live/);
+    // Its own mobile layout: one card per row · the page scrolls under a finger.
+    const cards = await web.locator('.wcards article').evaluateAll((a) => a.map((e) => Math.round(e.getBoundingClientRect().left)));
+    expect(new Set(cards).size).toBe(1);
+    expect(await web.locator('.wv').evaluate((e) => getComputedStyle(e).overflowY)).toBe('auto');
+    await web.locator('.wn-b .wnb').tap();
+    await expect.poll(() => web.locator('.wv').evaluate((e) => e.scrollTop)).toBeGreaterThan(1000);
+    await web.locator('.wgrid i', { hasText: /^24$/ }).tap();
+    await web.locator('.wslots i', { hasText: '08:30' }).tap();
+    await web.locator('.wres').tap();
+    await expect(web.locator('.wres')).toHaveClass(/booked/);
+    await dlg.locator('[data-fvx]').tap();
+    await expect(dlg).toBeHidden();
+    await expect(page.locator('.clip [data-fc="0"]')).toHaveCount(1);
+    // Pocket from the button under the frame.
     await page.locator('[data-opt="1"]').tap();
-    const ap = page.locator('[data-fc="1"] .ap');
+    await page.locator('[data-fxp]').tap();
+    const ap = dlg.locator('[data-fc="1"] .ap');
     await ap.locator('.aacts .send').tap();
     await expect(ap).toHaveClass(/s-send/);
-    await page.locator('[data-opt="0"]').tap();
-    const fc = page.locator('[data-fc="0"]');
-    await fc.locator('.wn-b .wl span', { hasText: 'Fleet' }).tap();
-    await expect(fc).toHaveClass(/live/);
-    await expect.poll(() => fc.locator('.wv').evaluate((e) => e.scrollTop)).toBeGreaterThan(400);
-    expect(await fc.locator('.wv').evaluate((e) => getComputedStyle(e).overflowY)).toBe('hidden');
+    await page.keyboard.press('Escape');
+    await expect(dlg).toBeHidden();
+    expect(await page.evaluate(() => document.documentElement.classList.contains('fv-open'))).toBe(false);
     expect(errors).toEqual([]);
   });
+
 });
 
 test.describe('homepage · contact sentence', () => {

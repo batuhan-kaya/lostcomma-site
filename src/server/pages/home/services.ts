@@ -35,9 +35,15 @@ export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
 <i class="hd2 a" aria-hidden="true"></i><i class="hd2 b" aria-hidden="true"></i><i class="hd2 c" aria-hidden="true"></i><i class="hd2 d" aria-hidden="true"></i>
 <span class="szb mono" data-frmsize>${first.size}</span>
 <span class="ftry mono" aria-hidden="true"><i></i><span class="tw">${t('Canlı · bir gün ve saat seç')}</span><span class="ta">${t('Canlı · tutar yaz ve gönder')}</span><span class="tl">${t('Kontrol sende')}</span></span>
+<button type="button" class="fxp mono" data-fxp hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="tw">${t('Tam ekran dene')}</span></button>
 </div>
 </div>
 </div>
+<dialog class="fv" data-fv aria-labelledby="fv-t" tabindex="-1" autofocus>
+<div class="fv-bar"><span class="fv-t mono" id="fv-t" data-fvt>${first.lab}</span><button type="button" class="fv-x mono" data-fvx>${t('Kapat')}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="fv-box" data-fvbox></div>
+<p class="fv-hint mono"><span class="tw">${t('Kaydır ve dokun · gerçekten çalışıyor')}</span><span class="ta">${t('Dokun ve gönder · gerçekten çalışıyor')}</span></p>
+</dialog>
 </div>
 </section>`;
 }

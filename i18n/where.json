@@ -558,6 +558,9 @@
  "Doğrusal": [
   "service"
  ],
+ "Dokun ve gönder · gerçekten çalışıyor": [
+  "home"
+ ],
  "dolu": [
   "start"
  ],
@@ -1014,6 +1017,9 @@
  ],
  "Kaydır ↓": [
   "work"
+ ],
+ "Kaydır ve dokun · gerçekten çalışıyor": [
+  "home"
  ],
  "Kayıp virgül tuşu": [
   "other"
@@ -1642,6 +1648,9 @@
  ],
  "Takvime ekle": [
   "start"
+ ],
+ "Tam ekran dene": [
+  "home"
  ],
  "Tam şu an olduğu gibi.": [
   "home"

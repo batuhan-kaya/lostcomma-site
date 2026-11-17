@@ -50,7 +50,8 @@ function lodos(fc: HTMLElement): Mock | null {
 
   fc.classList.add('live');
   wv.scrollTop = y;
-  const nav = () => web.classList.toggle('solid', wv.scrollTop > 396);
+  // Solid once the hero has gone under the nav (its height differs in the full screen phone layout).
+  const nav = () => web.classList.toggle('solid', wv.scrollTop > ($('.wh', web)?.offsetHeight ?? 452) - NAV);
   nav();
   wv.addEventListener('scroll', nav, { passive: true });
 
@@ -357,13 +358,16 @@ function pocket(fc: HTMLElement): Mock | null {
 const MAKE: Record<string, (fc: HTMLElement) => Mock | null> = { '0': lodos, '1': pocket };
 
 export class LiveMocks {
-  private readonly frames = new Map<HTMLElement, { html: string; mock: Mock | null; over: boolean; last: number; timer: number }>();
+  private readonly frames = new Map<
+    HTMLElement,
+    { html: string; make: (fc: HTMLElement) => Mock | null; mock: Mock | null; over: boolean; held: boolean; last: number; timer: number }
+  >();
 
   constructor(private readonly touched: () => void) {
     for (const fc of $$('[data-fc]')) {
       const make = MAKE[fc.dataset.fc ?? ''];
       if (!make) continue;
-      const st = { html: fc.innerHTML, mock: null as Mock | null, over: false, last: 0, timer: 0 };
+      const st = { html: fc.innerHTML, make, mock: null as Mock | null, over: false, held: false, last: 0, timer: 0 };
       this.frames.set(fc, st);
       const take = () => {
         if (!fc.classList.contains('on')) return;
@@ -434,6 +438,18 @@ export class LiveMocks {
     return [...this.frames.values()].some((s) => s.mock);
   }
 
+  /** Full screen (viewer.ts): the frame is the visitor's for as long as it is open · no idle reset. */
+  hold(fc: HTMLElement, on: boolean): void {
+    const st = this.frames.get(fc);
+    if (!st) return;
+    st.held = on;
+    st.last = Date.now();
+    window.clearTimeout(st.timer);
+    fc.classList.remove('swap');
+    if (on && !st.mock) st.mock = st.make(fc);
+    if (!on) this.later(fc);
+  }
+
   /** The frame on show changed: the others go back to their stories once they have faded out. */
   shown(i: number): void {
     for (const [fc, st] of this.frames) if (fc.dataset.fc !== String(i) && st.mock) this.reset(fc, 450);
@@ -443,7 +459,7 @@ export class LiveMocks {
     const st = this.frames.get(fc);
     if (!st) return;
     window.clearTimeout(st.timer);
-    if (!st.mock || st.over) return;
+    if (!st.mock || st.over || st.held) return;
     st.timer = window.setTimeout(() => (st.over ? undefined : this.reset(fc, 0, true)), Math.max(0, st.last + IDLE - Date.now()));
   }
 

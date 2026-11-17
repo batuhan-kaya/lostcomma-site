@@ -2,6 +2,7 @@
 import type { Crew } from '../lib/crew';
 import { Loop } from '../lib/loops';
 import { LiveMocks } from './live';
+import { Viewer } from './viewer';
 import { t } from '../lib/t';
 import { $, $$, doing, type HomeData } from './shared';
 
@@ -24,6 +25,10 @@ export class Services {
   private readonly live = new LiveMocks(() => {
     this.manualAt = Date.now();
   });
+
+  /** Narrow screens: Lodos and Pocket open full screen (viewer.ts). */
+  private readonly viewer = new Viewer(this.live, (i) => `${this.data.services[i]?.lab ?? ''} · ${i === 0 ? 'Lodos' : 'Pocket'}`);
+  private narrow = false;
 
   constructor(private readonly data: HomeData) {
     this.opts.forEach((o, i) =>
@@ -50,6 +55,35 @@ export class Services {
     });
     this.fit();
     addEventListener('resize', () => this.fit(), { passive: true });
+    if (this.viewer.ok) {
+      const fxp = $<HTMLButtonElement>('[data-fxp]');
+      if (fxp) {
+        fxp.hidden = false;
+        fxp.addEventListener('click', () => this.expand());
+      }
+      // Too small to use in place: a tap opens it full screen (before the frame itself hears it).
+      const clip = $('.clip', this.frm ?? document);
+      const mine = () => this.narrow && this.v <= 1;
+      clip?.addEventListener('pointerdown', (e) => mine() && e.stopPropagation(), true);
+      clip?.addEventListener(
+        'click',
+        (e) => {
+          if (!mine()) return;
+          e.stopPropagation();
+          e.preventDefault();
+          this.expand();
+        },
+        true,
+      );
+    }
+  }
+
+  private expand(): void {
+    const fc = $(`[data-fc="${this.v}"]`);
+    if (fc && this.v <= 1) {
+      this.manualAt = Date.now();
+      this.viewer.open(fc);
+    }
   }
 
   /** The 1440 layout needs 890 px for the widest frame. Smaller stages scale it down. */
@@ -58,6 +92,8 @@ export class Services {
     const w = this.stage.clientWidth;
     const k = Math.min(1, w / 890);
     this.scaler.style.setProperty('--k', k.toFixed(3));
+    this.narrow = k < 0.75;
+    this.stage.classList.toggle('nw', this.narrow);
     this.stage.style.height = k < 1 ? `${Math.round(700 * k + 90)}px` : '';
   }
 
