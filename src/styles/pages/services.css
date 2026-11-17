@@ -112,7 +112,7 @@
 .svr .ez .bd { background: var(--tc); }
 
 /* ---------- the combinations ---------- */
-.combo { position: relative; padding: 120px 0 130px; background: var(--ink); color: var(--milk); }
+.combo { --ring: var(--lime); position: relative; padding: 120px 0 130px; background: var(--ink); color: var(--milk); }
 .combo .kick { color: var(--dim); }
 .combo .h2 { margin-top: 18px; }
 .eqs { margin: 52px 0 0; padding: 0; border-top: 1px solid rgba(242,241,236,.14); list-style: none; }

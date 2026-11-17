@@ -5,7 +5,7 @@
  */
 [data-page="lab"] { --tile: #1E1E21; }
 [data-page="lab"] .wrap { padding: 0 var(--gut); }
-[data-page="lab"] :focus-visible { outline-color: var(--lime); }
+[data-page="lab"] { --ring: var(--lime); }
 
 /* ================= hero ================= */
 .lhero { position: relative; min-height: clamp(640px, 60vw, 860px); overflow: hidden; }

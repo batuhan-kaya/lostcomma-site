@@ -63,7 +63,7 @@
 .snote .back { color: var(--acc); text-decoration: none; }
 
 /* code */
-.code { margin: 10px 0 30px; overflow: hidden; border-radius: 18px; background: #141416; color: #E8E7E1; box-shadow: 0 30px 50px -40px rgba(14,14,15,.6); }
+.code { --ring: var(--lime); margin: 10px 0 30px; overflow: hidden; border-radius: 18px; background: #141416; color: #E8E7E1; box-shadow: 0 30px 50px -40px rgba(14,14,15,.6); }
 .cbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 46px; padding: 0 8px 0 18px; background: #1C1C1F; color: var(--dim); }
 .cbar b { color: var(--milk); font-weight: 450; text-transform: none; }
 .copy { min-height: 34px; padding: 0 12px; border: 1px solid #333338; border-radius: 8px; background: transparent; color: var(--milk); cursor: pointer; transition: background-color .25s, color .25s, border-color .25s; }
