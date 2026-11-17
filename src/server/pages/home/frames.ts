@@ -4,7 +4,7 @@
  *
  *   website    Lodos · a sailing club. Hero · the fleet · a visitor books Sunday 10:00 · the footer
  *   app        Pocket · a wallet on iOS. Send ₺250 to Ece · a receipt · the list and the balance update
- *   identity   Clay · a ceramics studio's brand book. Mark · colour · type · in use
+ *   identity   Clay · a ceramics studio's brand board (a photo) · a selection goes over it part by part
  *   motion     a motion editor playing our own logo sting · the playhead runs the timeline
  *   automation a workflow builder · a booking runs through calendar · payment · mail and chat
  *
@@ -282,6 +282,15 @@ ${ROW('r3', `<i class="t tf">${I.ferry}</i>`, 'Ferry · Kadıköy', 'Transport �
 
 const CLAY_MARK = `<path d="M62 120 Q44 96 54 72 Q60 60 58 40 L92 40 Q90 60 96 72 Q106 96 88 120 Z"/><rect x="54" y="34" width="42" height="9" rx="4"/>`;
 
+/**
+ * Clay's brand board (the photo Batuhan sent · id-board): the whole board · a designer's selection
+ * goes over it quarter by quarter (mark · packaging · type · colour and print). Without the photo
+ * the drawn brand book below plays instead.
+ */
+const ID_BOARD = (src: string) => `<div class="fc-id photo" lang="en"><span class="ibd">${photo(src)}</span>
+<span class="isel"><i class="ihh a"></i><i class="ihh b"></i><i class="ihh c"></i><i class="ihh d"></i><b class="ilb l1">01 · Mark</b><b class="ilb l2">02 · Packaging</b><b class="ilb l3">03 · Type</b><b class="ilb l4">04 · Colour and print</b></span>
+</div>`;
+
 const ID = `<div class="fc-id" lang="en">
 <section class="is s1"><svg class="igrid" viewBox="0 0 150 150"><circle cx="75" cy="80" r="46"/><circle cx="75" cy="80" r="30"/><path d="M75 10V140M10 80H140M29 34L121 126M121 34L29 126"/><path d="M54 40H96M54 120H96"/></svg><svg class="imk" viewBox="0 0 150 150">${CLAY_MARK}</svg><b class="iwm">Clay</b><span class="icap"><b>01</b>Mark · drawn on a 12 unit grid</span></section>
 <section class="is s2"><div class="isw"><span class="c1"><b>Terracotta</b><small>#C8643B</small><small>PMS 7591</small></span><span class="c2"><b>Bosphorus</b><small>#1E5B5A</small><small>PMS 5473</small></span><span class="c3"><b>Ochre</b><small>#E0A54A</small><small>PMS 7409</small></span><span class="c4"><b>Slip</b><small>#F7EFE4</small><small>Paper white</small></span></div><span class="icap"><b>02</b>Colour · fired earth and sea</span></section>
@@ -293,28 +302,74 @@ const ID = `<div class="fc-id" lang="en">
 
 /* ---------------- motion · our own sting in an editor ---------------- */
 
-const LAYERS: [string, string][] = [
-  ['Comma', 'l-c'],
-  ['Corner', 'l-k'],
-  ['Wordmark', 'l-w'],
-  ['Shadow', 'l-s'],
-  ['Background', 'l-b'],
+/** The timeline's layers (top to bottom) · a class for each one's colour and keys (_frames.css). */
+const TRACKS: [string, string][] = [
+  ['Null · rig', 't-n'],
+  ['Camera', 't-cam'],
+  ['Comma', 't-c'],
+  ['Corner', 't-k'],
+  ['Wordmark', 't-w'],
+  ['Characters', 't-ch sub'],
+  ['Shadow', 't-s'],
+  ['Light leak', 't-l'],
+  ['Glow', 't-g'],
+  ['Shake', 't-sh sub'],
+  ['Tagline', 't-tg'],
+  ['Colour grade', 't-cg'],
+  ['Grain', 't-gr'],
+  ['Background', 't-b'],
 ];
+
+/** The project bin: folders · comps · assets (a kind for each icon). */
+const BIN: [string, string][] = [
+  ['Comps', 'fold'],
+  ['Logo sting', 'comp on'],
+  ['Social 1080', 'comp'],
+  ['Story 9 by 16', 'comp'],
+  ['Assets', 'fold'],
+  ['mark.svg', 'vec'],
+  ['comma.svg', 'vec'],
+  ['wordmark.svg', 'vec'],
+  ['grain.png', 'img'],
+  ['light leak.mov', 'mov'],
+  ['sting.wav', 'wav'],
+];
+
+/** The sting's sound as bars (the same every time: a drop at a quarter · a ring that fades). */
+const WAVE = Array.from({ length: 160 }, (_, i) => {
+  const t = i / 160;
+  const env = t < 0.24 ? 0.15 + t : t < 0.27 ? 1 : Math.max(0.08, 0.9 * Math.exp(-(t - 0.27) * 3.2));
+  const h = Math.max(0.6, env * 9 * (0.55 + 0.45 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.37))));
+  return `M${i * 2 + 1} ${(10 - h).toFixed(1)}V${(10 + h).toFixed(1)}`;
+}).join('');
 
 const FRAMES = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')).join('<br>');
 
+const TOOL = (d: string) => `<i>${ico(d)}</i>`;
+
 /** The editor · its preview plays our logo sting · or a real loop when a live motion project has one. */
 const MO = (loop: string | null) => `<div class="fc-mo" lang="en">
-<header class="mbar"><span class="mdots"><i></i><i></i><i></i></span><span class="mtab">Logo sting.comp</span><span class="mmeta">1920 × 820 · 24 fps · 4 s</span><span class="mrender">Render</span></header>
-<div class="mview"><div class="mcomp">${loop ? `<div class="fc-vid">${loop}</div>` : `<span class="mshadow"></span><svg class="mcorner" viewBox="0 0 ${MARK.w} ${MARK.base}"><path d="${MARK.top}"/></svg><span class="mcomma"><svg viewBox="34 586 247 283"><path d="${MARK.comma}"/></svg></span><b class="mword">${'lost comma'
-  .split('')
-  .map((ch, i) => `<i class="ch${i}">${ch === ' ' ? '&nbsp;' : ch}</i>`)
-  .join('')}</b>`}</div><span class="mzoom">Fit · 19%</span></div>
-<aside class="mgraph"><header><b>Graph</b><span>Comma · Position Y</span></header><svg viewBox="0 0 240 100" preserveAspectRatio="none"><path class="gg" d="M0 25H240M0 50H240M0 75H240M60 0V100M120 0V100M180 0V100"/><path class="gc" d="M0 92 C40 92 52 -8 84 6 C104 14 104 40 120 40 C134 40 138 26 150 28 C164 30 170 34 240 34"/><circle class="gh" cx="52" cy="2" r="3"/><circle class="gh" cx="40" cy="92" r="3"/><path class="gl" d="M40 92 L52 2"/></svg><i class="gph"></i><span class="gval"><span><small>Ease</small><b>Out back · 1.56</b></span><span><small>Value</small><b>412 px</b></span></span></aside>
-<div class="mtl"><div class="mhead"><span class="mtc"><b>00:00:0</b><span class="msec"><span><b>0<br>1<br>2<br>3</b></span></span><b>:</b><span class="mfr"><span><b>${FRAMES}</b></span></span></span><span class="mplay">${I.play}</span></div>
-<div class="mruler"><i>0s</i><i>1s</i><i>2s</i><i>3s</i><i>4s</i></div>
-${LAYERS.map(([n, c]) => `<div class="mrow ${c}"><span class="mname"><i></i>${n}</span><span class="mtrack"><i class="bar"></i><i class="k a"></i><i class="k b"></i><i class="k c"></i></span></div>`).join('')}
+<header class="mbar"><span class="mdots"><i></i><i></i><i></i></span><span class="mtab">Logo sting.comp</span><span class="mtab off">Social 1080.comp</span><span class="mmeta">1920 × 820 · 24 fps · 4 s</span><span class="mppl"><i class="u1">SA</i><i class="u2">MK</i></span><span class="mrender">Render</span></header>
+<div class="mtbar">${TOOL('<path d="M6 3l12 9-5.5 1.2L15 19l-2.6 1.2-2.6-5.8L6 18z"/>')}${TOOL('<path d="M8 11V5.5a1.5 1.5 0 0 1 3 0V10m0-4.5a1.5 1.5 0 0 1 3 0V10m0-3a1.5 1.5 0 0 1 3 0v6.5A6.5 6.5 0 0 1 10.5 20 6 6 0 0 1 5 16.5L3.6 13a1.4 1.4 0 0 1 2.4-1.4L8 14"/>')}${TOOL('<path d="M12 3l6 13-6 5-6-5zM12 3v9"/><circle cx="12" cy="13" r="1.4"/>')}${TOOL('<path d="M5 6V4h14v2M12 4v16M9 20h6"/>')}${TOOL('<rect x="4" y="4" width="16" height="16" rx="3"/>')}<b></b>${TOOL('<circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/>')}${TOOL('<path d="M4 17l5-5 4 4 7-8"/>')}<span class="mws">Workspace · Animation</span><span class="msnap"><i></i>Snapping</span></div>
+<aside class="mproj"><header><b>Project</b><small>11 items</small></header><span class="mfind">${I.search}Find</span>${BIN.map(([n, k]) => `<span class="mbin ${k}"><i></i>${n}</span>`).join('')}</aside>
+<div class="mview"><div class="mcomp">${
+  loop
+    ? `<div class="fc-vid">${loop}</div>`
+    : `<span class="mshadow"></span><svg class="mcorner" viewBox="0 0 ${MARK.w} ${MARK.base}"><path d="${MARK.top}"/></svg><span class="mcomma"><svg viewBox="34 586 247 283"><path d="${MARK.comma}"/></svg></span><b class="mword">${'lost comma'
+        .split('')
+        .map((ch, i) => `<i class="ch${i}">${ch === ' ' ? '&nbsp;' : ch}</i>`)
+        .join('')}</b>`
+}<i class="msafe"></i></div>
+<span class="mvu"><i></i><i></i></span>
+<div class="mtrans"><span class="mres">Full · Fit 19%</span><span class="mbtns"><i>${ico('<path d="M6 5v14M19 5L9 12l10 7z"/>')}</i><i class="big">${I.play}</i><i>${ico('<path d="M18 5v14M5 5l10 7-10 7z"/>')}</i></span><span class="mloop">${ico('<path d="M4 12a6 6 0 0 1 6-6h8M15 3l3 3-3 3M20 12a6 6 0 0 1-6 6H6M9 21l-3-3 3-3"/>')}Loop</span></div></div>
+<aside class="mside"><header><b>Graph</b><span>Comma · Position Y</span></header><svg class="mgsvg" viewBox="0 0 240 100" preserveAspectRatio="none"><path class="gg" d="M0 25H240M0 50H240M0 75H240M60 0V100M120 0V100M180 0V100"/><path class="gc" d="M0 92 C40 92 52 -8 84 6 C104 14 104 40 120 40 C134 40 138 26 150 28 C164 30 170 34 240 34"/><circle class="gh" cx="52" cy="2" r="3"/><circle class="gh" cx="40" cy="92" r="3"/><path class="gl" d="M40 92 L52 2"/></svg><i class="gph"></i>
+<div class="mprops"><b class="ph">Effect controls · Comma</b><span><small>Position</small><b>960 · 412</b><i class="kf"></i></span><span><small>Scale</small><b>100 · 100 %</b><i class="kf"></i></span><span><small>Rotation</small><b>0°</b></span><span><small>Opacity</small><b>100 %</b></span><span><small>Ease</small><b>Out back · 1.56</b></span><span><small>Motion blur</small><b>On · 180°</b></span></div></aside>
+<div class="mtl"><div class="mtch"><span class="mtc"><b>00:00:0</b><span class="msec"><span><b>0<br>1<br>2<br>3</b></span></span><b>:</b><span class="mfr"><span><b>${FRAMES}</b></span></span></span><span class="mplay">${I.play}</span></div>
+<div class="mruler"><i>0s</i><i>1s</i><i>2s</i><i>3s</i><i>4s</i><span class="mwork"></span></div>
+<div class="mrows"><div class="mrow t-m"><span class="mname"><i class="eye"></i><i class="sw"></i>Markers</span><span class="mtrack"><em class="mk m1">drop</em><em class="mk m2">settle</em><em class="mk m3">name</em></span></div>${TRACKS.map(([n, c]) => `<div class="mrow ${c}"><span class="mname"><i class="eye"></i><i class="sw"></i>${n}</span><span class="mtrack"><i class="bar"></i><i class="k a"></i><i class="k b"></i><i class="k c"></i><i class="k d"></i></span></div>`).join('')}
+<div class="mrow t-a"><span class="mname"><i class="eye"></i><i class="sw"></i>sting.wav</span><span class="mtrack"><svg class="mwave" viewBox="0 0 320 20" preserveAspectRatio="none"><path d="${WAVE}"/></svg></span></div></div>
 <i class="mph"></i></div>
+<footer class="mstat"><span>Render queue</span><b>Logo sting · H.264 · 1080p</b><span class="mrq"><i></i></span><span>Frame 58 of 96</span><span class="mgpu">GPU 38%</span></footer>
 </div>`;
 
 /* ---------------- automation · a booking runs through the tools ---------------- */
@@ -388,5 +443,6 @@ export function androidArt(pic: Pic = noPictures): Safe {
 }
 
 export function frameArt(loop: Safe | null = null, pic: Pic = noPictures): Safe[] {
-  return [raw(web(pic)), raw(app(pic)), raw(ID), raw(MO(loop ? loop.value : null)), raw(AUTO)];
+  const board = pic('id-board');
+  return [raw(web(pic)), raw(app(pic)), raw(board ? ID_BOARD(board) : ID), raw(MO(loop ? loop.value : null)), raw(AUTO)];
 }

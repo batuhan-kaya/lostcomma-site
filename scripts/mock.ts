@@ -34,6 +34,6 @@ const out = join(dir, name + '.webp');
 const info = await sharp(resolve(file))
   .rotate()
   .resize(slot.w, slot.h, { fit: 'cover', position: flags.includes('--top') ? 'top' : 'attention' })
-  .webp({ quality: 80, effort: 6 })
+  .webp({ quality: 'q' in slot ? slot.q : 80, effort: 6 })
   .toFile(out);
 console.log(`${name}: ${info.width} × ${info.height} · ${Math.round(info.size / 1024)} kB → src/images/${name}.webp`);

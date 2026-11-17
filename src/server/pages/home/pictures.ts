@@ -12,6 +12,8 @@ export const PICTURES = {
   'web-laser': { w: 720, h: 480, what: 'Lodos fleet · a single handed dinghy with one sailor' },
   'web-cruiser': { w: 720, h: 480, what: 'Lodos fleet · a 40 foot cruiser racer under sail' },
   'web-skipper': { w: 160, h: 160, what: 'Lodos booking · the skipper Defne Arslan' },
+  // identity · Clay (a ceramics studio) · the brand board Batuhan sent (its own size · kept sharp)
+  'id-board': { w: 1254, h: 1254, q: 90, what: 'Clay · the brand board · mark · packaging · type · colour and print' },
   // app · Pocket (a wallet) · people
   'app-deniz': { w: 160, h: 160, what: 'Pocket · Deniz Kaya (the account holder)' },
   'app-ece': { w: 160, h: 160, what: 'Pocket · Ece Yılmaz' },

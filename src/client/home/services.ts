@@ -108,28 +108,32 @@ export class Services {
     this.align(k);
   }
 
+  /** Each frame's height (frame pixels) when it ends with the list · one per option (align). */
+  private tall: number[] = [];
+
   /**
-   * Automation's frame ends where the list on its left ends (with its own row open): --h4 in frame
-   * pixels. Only side by side · else 720. The stage is tall enough for it whichever frame is on show,
-   * so nothing below moves when the frames change.
+   * The website · identity · motion and automation frames end where the list on their left ends
+   * with their own row open (the rows' words differ in length): --hl in frame pixels. Only side by
+   * side · else 720. The phones keep their own size. The stage is tall enough for the tallest of them
+   * whichever frame is on show, so nothing below moves when the frames change.
    */
   private align(k = Number(this.scaler?.style.getPropertyValue('--k')) || 1): void {
     const frm = this.frm;
     const stage = this.stage;
     const opts = this.opts[0]?.parentElement;
-    const auto = this.opts[4];
-    if (!frm || !stage || !opts || !auto) return;
-    let h = 720;
-    if (opts.getBoundingClientRect().right <= stage.getBoundingClientRect().left + 1) {
-      // The list as it is once Automation's own row is open (the open rows may be mid transition).
-      const open = $$<HTMLElement>('.od', opts).reduce((s, od) => s + od.offsetHeight, 0);
-      const mine = $<HTMLElement>('.odi', auto)?.scrollHeight ?? 0;
-      const bottom = opts.getBoundingClientRect().bottom - open + mine;
-      h = (bottom - frm.getBoundingClientRect().top) / k;
-    }
-    h = Math.round(Math.min(860, Math.max(700, h)));
-    frm.style.setProperty('--h4', `${h}px`);
-    stage.style.height = `${Math.round(Math.max(k < 1 ? 700 * k + 90 : 780, 64 + h * k + 56))}px`;
+    if (!frm || !stage || !opts) return;
+    const side = opts.getBoundingClientRect().right <= stage.getBoundingClientRect().left + 1;
+    // The list as it is once a row is open (the open rows may be mid transition).
+    const open = $$<HTMLElement>('.od', opts).reduce((s, od) => s + od.offsetHeight, 0);
+    const bottom = opts.getBoundingClientRect().bottom - open;
+    const top = frm.getBoundingClientRect().top;
+    this.tall = this.opts.map((o) => {
+      const h = side ? (bottom + ($<HTMLElement>('.odi', o)?.scrollHeight ?? 0) - top) / k : 720;
+      return Math.round(Math.min(860, Math.max(700, h)));
+    });
+    frm.style.setProperty('--hl', `${this.tall[this.v] ?? 720}px`);
+    const most = Math.max(610, ...this.tall);
+    stage.style.height = `${Math.round(Math.max(k < 1 ? 700 * k + 90 : 780, 64 + most * k + 56))}px`;
   }
 
   get current(): number {
