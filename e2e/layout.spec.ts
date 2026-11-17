@@ -99,18 +99,21 @@ test('layer names take a second line instead of being cut', async ({ page }) => 
 test('nothing is cut on a 320 px phone', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   const cases: [string, string, string][] = [
-    ['/tr', '.fname b', '.fname'],
     ['/tr/isler/yelken-kulubu', '.swb b', '.swb'],
     ['/tr/isler/yelken-kulubu', '.t-tide .pct', '.t-tide'],
     ['/tr/isler/yelken-kulubu', '.stp b', '.t-steps'],
     ['/tr/isler/yelken-kulubu', '.vi .top > .mono', '.vi'],
     ['/en/work/ferry-timetable', '.nxl b', '.nx'],
-    ['/tr/hizmetler', '.tname', '.tile'],
+    // The index's big names: "Uygulamalar" is one long word and must fit the phone (the letters · not the selection frame around them).
+    ['/tr/hizmetler', '.sv-name [data-word]', '.svr'],
+    ['/en/services', '.sv-name [data-word]', '.svr'],
   ];
   for (const [path, sel, box] of cases) {
     await page.goto(path);
     await page.evaluate(() => document.fonts.ready);
-    expect(Math.max(...(await pokesOut(page, sel, box))), `${sel} on ${path}`).toBe(0);
+    const out = await pokesOut(page, sel, box);
+    expect(out.length, `${sel} exists on ${path}`).toBeGreaterThan(0);
+    expect(Math.max(...out), `${sel} on ${path}`).toBe(0);
     // A truncated name (ellipsis) is cut too.
     const trunc = await page.locator(sel).evaluateAll((els) => els.filter((e) => e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).overflow !== 'visible').length);
     expect(trunc, `${sel} truncated on ${path}`).toBe(0);
