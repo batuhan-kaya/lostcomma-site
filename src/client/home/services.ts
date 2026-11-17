@@ -27,7 +27,11 @@ export class Services {
   });
 
   /** Narrow screens: Lodos and Pocket open full screen (viewer.ts). */
-  private readonly viewer = new Viewer(this.live, (i) => `${this.data.services[i]?.lab ?? ''} · ${i === 0 ? 'Lodos' : 'Pocket'}`);
+  private readonly viewer = new Viewer(this.live, (fc) =>
+    fc.dataset.fca !== undefined
+      ? `${this.data.services[1]?.lab ?? ''} · Pocket · Android`
+      : `${this.data.services[this.v]?.lab ?? ''} · ${this.v === 0 ? 'Lodos' : 'Pocket · iOS'}`,
+  );
   private narrow = false;
 
   constructor(private readonly data: HomeData) {
@@ -62,24 +66,29 @@ export class Services {
         fxp.addEventListener('click', () => this.expand());
       }
       // Too small to use in place: a tap opens it full screen (before the frame itself hears it).
-      const clip = $('.clip', this.frm ?? document);
+      // The selected frame's clip · and the Android artboard beside the iPhone.
       const mine = () => this.narrow && this.v <= 1;
-      clip?.addEventListener('pointerdown', (e) => mine() && e.stopPropagation(), true);
-      clip?.addEventListener(
-        'click',
-        (e) => {
-          if (!mine()) return;
-          e.stopPropagation();
-          e.preventDefault();
-          this.expand();
-        },
-        true,
-      );
+      const clips: [HTMLElement | null, () => HTMLElement | null][] = [
+        [$('.clip', this.frm ?? document), () => $(`[data-fc="${this.v}"]`)],
+        [$('.clip2'), () => $('[data-fca]')],
+      ];
+      for (const [clip, which] of clips) {
+        clip?.addEventListener('pointerdown', (e) => mine() && e.stopPropagation(), true);
+        clip?.addEventListener(
+          'click',
+          (e) => {
+            if (!mine()) return;
+            e.stopPropagation();
+            e.preventDefault();
+            this.expand(which());
+          },
+          true,
+        );
+      }
     }
   }
 
-  private expand(): void {
-    const fc = $(`[data-fc="${this.v}"]`);
+  private expand(fc = $(`[data-fc="${this.v}"]`)): void {
     if (fc && this.v <= 1) {
       this.manualAt = Date.now();
       this.viewer.open(fc);
@@ -116,6 +125,7 @@ export class Services {
     });
     this.frm.className = 'frm v' + i;
     $$('[data-fc]').forEach((f, j) => f.classList.toggle('on', j === i));
+    $('[data-fca]')?.classList.toggle('on', i === 1);
     this.live.shown(i);
     this.loop?.set(i === 3);
     const lab = $('[data-frmlab]');

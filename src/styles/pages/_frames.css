@@ -644,6 +644,40 @@
 @keyframes a-ring2 { 0% { opacity: .6; transform: scale(1.04); } 100% { opacity: 0; transform: scale(2.1); } }
 @keyframes a-in { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
 
+/* the same Pocket on Android (412 × 915 · beside the iPhone · home.css .frm2): a punch hole · Material's
+   status icons · top bars with an arrow and the title on the left · tonal squares · pill buttons ·
+   a navigation bar whose active item sits on a pill · the gesture handle */
+.fc-app.and .ap { width: 412px; height: 915px; transform: scale(.667476); }
+.fc-app .droid b { left: 28px; top: 16px; font-size: 15px; font-weight: 500; }
+.fc-app .pun { left: 50%; top: 13px; width: 24px; height: 24px; border-radius: 50%; background: #0A0A0B; translate: -50% 0; }
+.fc-app .dsig { right: 76px; top: 19px; width: 14px; height: 14px; }
+.fc-app .dsig svg { width: 14px; height: 14px; fill: var(--ink); stroke: none; }
+.fc-app .droid .wifi { right: 52px; top: 19px; width: 18px; height: 14px; }
+.fc-app .dbat { right: 28px; top: 17px; width: 11px; height: 18px; overflow: hidden; border-radius: 3px; background: rgba(14,14,16,.28); }
+.fc-app .dbat i { position: absolute; left: 0; right: 0; bottom: 0; height: 78%; background: var(--ink); }
+.fc-app.and .ahome-ind { bottom: 9px; width: 108px; height: 4px; opacity: .55; }
+.fc-app.and .acard { border-radius: 24px; }
+.fc-app.and .aacts i { border-radius: 18px; }
+.fc-app.and .aweek { border-radius: 20px; }
+.fc-app.and .arows { border-radius: 20px 20px 0 0; }
+.fc-app.and .atab { height: 92px; padding-top: 12px; border-top: 0; background: #ECEBE4; backdrop-filter: none; }
+.fc-app.and .atab span { position: relative; z-index: 0; gap: 8px; font-size: 12px; font-weight: 600; color: #55555B; }
+.fc-app.and .atab span::before { content: ''; position: absolute; left: 50%; top: -4px; z-index: -1; width: 62px; height: 32px; margin-left: -31px; border-radius: 16px; }
+.fc-app.and .atab .on::before { background: #DDF27A; }
+.fc-app.and .anav { justify-content: flex-start; gap: 2px; padding: 0 8px; }
+.fc-app.and .anav > i { background: none; }
+.fc-app.and .anav > i:last-child { margin-left: auto; }
+.fc-app.and .anav > b { margin-left: 8px; font-size: 21px; font-weight: 500; letter-spacing: -.01em; }
+.fc-app.and .ato { margin-left: 6px; }
+.fc-app.and .asearch { height: 52px; border-radius: 999px; padding: 0 18px; }
+.fc-app.and .aiban, .fc-app.and .anote { border-radius: 16px; }
+.fc-app.and .acap { font-size: 14px; font-weight: 650; letter-spacing: 0; text-transform: none; color: var(--ink); }
+.fc-app.and .aon { border-radius: 50%; }
+.fc-app.and :is(.asendb, .adone, .ashare) { border-radius: 999px; }
+.fc-app.and .akeys i::before { inset: 2px 24px; border-radius: 999px; }
+.fc-app.and .aokr { border-radius: 16px; }
+.fc-app.and .t1 { left: 39px; top: 344px; } .fc-app.and .t2 { left: 40px; top: 283px; } .fc-app.and .t3 { left: 184px; top: 581px; } .fc-app.and .t4 { left: 184px; top: 641px; } .fc-app.and .t5 { left: 184px; top: 761px; } .fc-app.and :is(.t6, .t7) { left: 184px; top: 831px; }
+
 /* =========================================================================================
    identity · Clay (a ceramics studio's brand book) · four pages of five seconds
    ========================================================================================= */

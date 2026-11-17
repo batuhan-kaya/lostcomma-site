@@ -3,7 +3,7 @@ import { buildApp } from '../src/server/app';
 import { loadConfig } from '../src/server/config';
 import { readFileSync } from 'node:fs';
 import { HOME } from '../src/server/content/home';
-import { frameArt } from '../src/server/pages/home/frames';
+import { androidArt, frameArt } from '../src/server/pages/home/frames';
 import { PICTURES } from '../src/server/pages/home/pictures';
 
 const app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: 'https://lostcomma.co' }), now: () => new Date('2026-10-28T10:00:00+03:00') });
@@ -74,8 +74,16 @@ describe('03 · the service frames', () => {
     expect(art.map((a) => /^<div class="fc-(\w+)" lang="en">/.exec(a)?.[1])).toEqual(['web', 'app', 'id', 'mo', 'auto']);
   });
 
+  it('Pocket also on Android: the same product · its own skin (a punch hole · arrows back)', () => {
+    const and = androidArt().value;
+    expect(and).toMatch(/^<div class="fc-app and" lang="en">/);
+    expect(and).toContain('class="pun"');
+    expect(and).not.toContain('class="isl"');
+    expect(and.match(/class="arow /g)?.length).toBe(art[1]!.match(/class="arow /g)?.length);
+  });
+
   it('keeps the comma rule in the mock copy too', () => {
-    for (const a of art) {
+    for (const a of [...art, androidArt().value]) {
       const text = a.replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ');
       expect(text, text.slice(0, 80)).not.toContain(',');
     }

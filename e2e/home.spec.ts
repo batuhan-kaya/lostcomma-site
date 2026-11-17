@@ -152,6 +152,30 @@ test.describe('homepage · desktop interactions', () => {
     expect(errors).toEqual([]);
   });
 
+  test('services: Pocket on Android stands beside the iPhone · plays in step · answers on its own', async ({ page }) => {
+    const errors = watchErrors(page);
+    await page.goto('/tr');
+    await toSection(page, 'svc');
+    const and = page.locator('[data-fca]');
+    await expect(page.locator('.frm2')).toBeHidden();
+    await page.locator('[data-opt="1"]').click();
+    await expect(page.locator('.frm2')).toBeVisible();
+    // Upper case on a Turkish page keeps the dotless i (lang="en" on the label).
+    expect(await page.locator('.flab3 span').first().innerText()).toBe('ANDROID');
+    await expect(and).toHaveClass(/on/);
+    await expect.poll(() => and.evaluate((fc) => fc.getAnimations({ subtree: true }).length)).toBeGreaterThan(0);
+    // The visitor takes Android: the iPhone keeps its story.
+    await and.locator('.aacts .send').click();
+    await expect(and).toHaveClass(/live/);
+    await expect(and.locator('.ap')).toHaveClass(/s-send/);
+    await expect(page.locator('[data-fc="1"]')).not.toHaveClass(/live/);
+    // Another tab: Android goes away and back to its story.
+    await page.locator('[data-opt="2"]').click();
+    await expect(page.locator('.frm2')).toBeHidden();
+    await expect(and).not.toHaveClass(/live/);
+    expect(errors).toEqual([]);
+  });
+
   test('board: drag pans · Enter opens a frame · Escape closes and returns focus', async ({ page }) => {
     await page.goto('/tr');
     await toSection(page, 'work');
@@ -268,6 +292,14 @@ test.describe('homepage · phone', () => {
     await expect(ap).toHaveClass(/s-send/);
     await page.keyboard.press('Escape');
     await expect(dlg).toBeHidden();
+    // The Android artboard opens too · at its own size.
+    await page.locator('.clip2').tap({ position: { x: 30, y: 60 } });
+    await expect(dlg).toBeVisible();
+    await expect(dlg.locator('[data-fca] .fc-app.and')).toBeVisible();
+    await expect(dlg.locator('[data-fvt]')).toContainText('Android');
+    await dlg.locator('[data-fvx]').tap();
+    await expect(dlg).toBeHidden();
+    await expect(page.locator('.clip2 [data-fca]')).toHaveCount(1);
     expect(await page.evaluate(() => document.documentElement.classList.contains('fv-open'))).toBe(false);
     expect(errors).toEqual([]);
   });

@@ -2,7 +2,7 @@ import { html, type Safe } from '../../html';
 import type { Ctx } from '../../page';
 import type { ProjectCard } from '../../data/content';
 import { loopVideo } from '../../media/video';
-import { frameArt } from './frames';
+import { androidArt, frameArt } from './frames';
 
 /**
  * 03 · Services. One frame changes shape between website · app · identity · motion · automation.
@@ -37,6 +37,7 @@ export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
 <span class="ftry mono" aria-hidden="true"><i></i><span class="tw">${t('Canlı · bir gün ve saat seç')}</span><span class="ta">${t('Canlı · tutar yaz ve gönder')}</span><span class="tl">${t('Kontrol sende')}</span></span>
 <button type="button" class="fxp mono" data-fxp hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="tw">${t('Tam ekran dene')}</span></button>
 </div>
+<div class="frm2" aria-hidden="true"><div class="flab3 mono" lang="en"><span>Android</span><span>412 × 915</span></div><div class="clip2"><div class="fc" data-fca>${androidArt((n) => ctx.assets.image(n))}</div></div></div>
 </div>
 </div>
 <dialog class="fv" data-fv aria-labelledby="fv-t" tabindex="-1" autofocus>

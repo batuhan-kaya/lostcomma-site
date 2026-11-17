@@ -32,6 +32,7 @@ const I = {
   user: ico('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),
   users: ico('<circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c1-3.6 3.4-5.5 6.5-5.5s5.5 1.9 6.5 5.5"/><path d="M15.5 5.2a3.5 3.5 0 0 1 0 6.6M18 14.8c1.7.7 2.9 2.4 3.5 5.2"/>'),
   back: ico('<path d="M15 5l-7 7 7 7"/>'),
+  arrowL: ico('<path d="M20 12H5M11 5.5L4.5 12l6.5 6.5"/>'),
   next: ico('<path d="M9 5l7 7-7 7"/>'),
   down: ico('<path d="M6 9l6 6 6-6"/>'),
   search: ico('<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>'),
@@ -214,6 +215,9 @@ ${fleetCard('', photo(pic('web-cruiser')), CRUISER, '', 'Beneteau 40.7', '5.0', 
 
 const STATUS = `<span class="ios"><b>9:41</b><span class="isl"></span><span class="sig"><i></i><i></i><i></i><i></i></span><svg class="wifi" viewBox="0 0 18 13"><path d="M9 12.2l2.4-2.9a3.6 3.6 0 0 0-4.8 0zM4.4 7.3l1.4 1.6a5 5 0 0 1 6.4 0l1.4-1.6a7.2 7.2 0 0 0-9.2 0zM1.4 4.1l1.5 1.6a9.4 9.4 0 0 1 12.2 0l1.5-1.6a11.6 11.6 0 0 0-15.2 0z"/></svg><span class="bat"><i></i></span></span>`;
 
+/** Android: a punch hole in the middle · Material's signal · wifi and battery on the right. */
+const STATUS_AND = `<span class="ios droid"><b>9:41</b><span class="pun"></span><span class="dsig"><svg viewBox="0 0 16 16"><path d="M15 1v14H1z"/></svg></span><svg class="wifi" viewBox="0 0 18 13"><path d="M9 12.6L0.6 3.6a12.4 12.4 0 0 1 16.8 0z"/></svg><span class="dbat"><i></i></span></span>`;
+
 /** Our own mark pays the salary (the studio is the employer in the story). */
 const LC = `<svg viewBox="-20 -20 533 909" class="lcm"><path d="${MARK.top}"/><path d="${MARK.comma}"/></svg>`;
 
@@ -222,11 +226,13 @@ const ROW = (cls: string, tile: string, name: string, sub: string, amt: string, 
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'];
 
-function app(pic: Pic): string {
+function app(pic: Pic, os: 'ios' | 'android' = 'ios'): string {
+  const and = os === 'android';
+  const back = and ? I.arrowL : I.back;
   const contact = (who: string, ini: string, name: string, tag: string) =>
     `<span class="acr">${face(pic, who, ini)}<span><b>${name}</b><small>${tag}</small></span><i class="aon">P</i></span>`;
-  return `<div class="fc-app" lang="en"><div class="ap">
-${STATUS}
+  return `<div class="fc-app${and ? ' and' : ''}" lang="en"><div class="ap">
+${and ? STATUS_AND : STATUS}
 <div class="ahome">
 <header class="ahd">${face(pic, 'deniz', 'DK')}<span class="ahi"><small>Good morning</small><b>Deniz Kaya</b></span><span class="aic aic1">${I.search}</span><span class="aic abell">${I.bell}<i></i></span></header>
 <div class="acard"><span class="amesh"><i class="m1"></i><i class="m2"></i><i class="m3"></i></span>
@@ -247,14 +253,14 @@ ${ROW('r3', `<i class="t tf">${I.ferry}</i>`, 'Ferry · Kadıköy', 'Transport �
 <nav class="atab"><span class="on">${I.home}Home</span><span>${I.card}Cards</span><span>${I.chart}Insights</span><span>${I.user}Profile</span></nav>
 </div>
 <div class="aflow">
-<div class="asend"><header class="anav"><i>${I.back}</i><b>Send money</b><i>${I.scan}</i></header>
+<div class="asend"><header class="anav"><i>${back}</i><b>Send money</b><i>${I.scan}</i></header>
 <span class="asearch">${I.search}Name · @tag · phone or IBAN</span>
 <span class="aiban"><i>${I.bank}</i><span><b>Send to a bank account</b><small>Any IBAN in Türkiye · arrives in seconds</small></span>${I.next}</span>
 <small class="acap c1">Recent</small>
 <div class="arec"><span class="ece">${face(pic, 'ece', 'EY')}Ece</span><span>${face(pic, 'mert', 'MA')}Mert</span><span>${face(pic, 'zeynep', 'ZK')}Zeynep</span><span>${face(pic, 'can', 'CD')}Can</span></div>
 <small class="acap c2">On Pocket</small>
 <div class="acon">${contact('ada', 'AB', 'Ada Bulut', '@adabulut')}${contact('berk', 'BO', 'Berk Oral', '@berk')}${contact('cem', 'CT', 'Cem Tan', '@cemtan')}${contact('elif', 'EŞ', 'Elif Şahin', '@elifs')}${contact('kaan', 'KU', 'Kaan Uslu', '@kaanu')}${contact('nil', 'NA', 'Nil Akın', '@nilakin')}</div></div>
-<div class="aamt"><header class="anav"><i>${I.back}</i><span class="ato">${face(pic, 'ece', 'EY')}<span><b>Ece Yılmaz</b><small>@ece · on Pocket</small></span></span><i>${I.dots}</i></header>
+<div class="aamt"><header class="anav"><i>${back}</i><span class="ato">${face(pic, 'ece', 'EY')}<span><b>Ece Yılmaz</b><small>@ece · on Pocket</small></span></span><i>${I.dots}</i></header>
 <span class="aval"><b class="v0">₺0</b><b class="v1">₺2</b><b class="v2">₺25</b><b class="v3">₺250</b></span>
 <small class="aleft">Balance ₺48 210.50</small>
 <span class="achips"><i>₺100</i><i class="c250">₺250</i><i>₺500</i><i>₺1 000</i></span>
@@ -345,6 +351,11 @@ ${NODE('n6', I.chat, 'g6', 'Tell the crew', 'Team chat · #bookings', '96 ms')}
  * The five things inside the service frame (in the order of the content's services). `loop` is the
  * rendered video of the newest live motion project: the editor's preview plays it instead of the sting.
  */
+/** Apps: the same Pocket on Android · a second artboard beside the iPhone (services.ts). */
+export function androidArt(pic: Pic = noPictures): Safe {
+  return raw(app(pic, 'android'));
+}
+
 export function frameArt(loop: Safe | null = null, pic: Pic = noPictures): Safe[] {
   return [raw(web(pic)), raw(app(pic)), raw(ID), raw(MO(loop ? loop.value : null)), raw(AUTO)];
 }

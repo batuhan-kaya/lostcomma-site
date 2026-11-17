@@ -364,8 +364,9 @@ export class LiveMocks {
   >();
 
   constructor(private readonly touched: () => void) {
-    for (const fc of $$('[data-fc]')) {
-      const make = MAKE[fc.dataset.fc ?? ''];
+    // Pocket on Android (data-fca) is the second artboard of the Apps frame: it answers like the iPhone.
+    for (const fc of [...$$('[data-fc]'), ...$$('[data-fca]')]) {
+      const make = MAKE[fc.dataset.fc ?? '1'];
       if (!make) continue;
       const st = { html: fc.innerHTML, make, mock: null as Mock | null, over: false, held: false, last: 0, timer: 0 };
       this.frames.set(fc, st);
@@ -452,7 +453,7 @@ export class LiveMocks {
 
   /** The frame on show changed: the others go back to their stories once they have faded out. */
   shown(i: number): void {
-    for (const [fc, st] of this.frames) if (fc.dataset.fc !== String(i) && st.mock) this.reset(fc, 450);
+    for (const [fc, st] of this.frames) if ((fc.dataset.fc ?? '1') !== String(i) && st.mock) this.reset(fc, 450);
   }
 
   private later(fc: HTMLElement): void {

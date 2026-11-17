@@ -19,7 +19,7 @@ export class Viewer {
 
   constructor(
     private readonly live: LiveMocks,
-    private readonly title: (i: number) => string,
+    private readonly title: (fc: HTMLElement) => string,
   ) {
     $('[data-fvx]')?.addEventListener('click', () => this.dlg?.close());
     // Escape and the close button both end here.
@@ -33,12 +33,12 @@ export class Viewer {
 
   open(fc: HTMLElement): void {
     if (!this.ok || this.fc || !fc.parentNode) return;
-    const i = Number(fc.dataset.fc);
+    const app = !!$('.ap', fc);
     this.fc = fc;
     this.home = { parent: fc.parentNode, next: fc.nextSibling };
-    this.dlg!.classList.toggle('app', i === 1);
+    this.dlg!.classList.toggle('app', app);
     const t = $('[data-fvt]', this.dlg!);
-    if (t) t.textContent = this.title(i);
+    if (t) t.textContent = this.title(fc);
     // The product is a picture to a screen reader · the dialog's name says what it is.
     fc.setAttribute('aria-hidden', 'true');
     this.box!.append(fc);
@@ -46,7 +46,7 @@ export class Viewer {
     this.dlg!.showModal();
     this.size();
     this.live.hold(fc, true);
-    if (i === 0) $('.wv', fc)?.scrollTo(0, 0);
+    if (!app) $('.wv', fc)?.scrollTo(0, 0);
   }
 
   private restore(): void {
@@ -61,18 +61,22 @@ export class Viewer {
     this.live.hold(fc, false);
   }
 
-  /** Pocket fits the screen like a phone · Lodos takes the whole width (its desktop layout scaled from 700 px up). */
+  /** Pocket fits the screen like a phone (either one) · Lodos takes the whole width (its desktop layout scaled from 700 px up). */
   private size(): void {
     const fc = this.fc;
     const box = this.box;
     if (!fc || !box) return;
     const w = document.documentElement.clientWidth;
     const h = innerHeight - BAR - HINT;
-    if (fc.dataset.fc === '1') {
-      const k = Math.min((w - 32) / 390, (h - 12) / 844, 1.15);
+    const ap = $('.ap', fc);
+    if (ap) {
+      // The phone's own size: 390 × 844 (iPhone) or 412 × 915 (Android).
+      const pw = ap.offsetWidth;
+      const ph = ap.offsetHeight;
+      const k = Math.min((w - 32) / pw, (h - 12) / ph, 1.15);
       box.style.setProperty('--vk', k.toFixed(4));
-      box.style.width = `${Math.round(390 * k)}px`;
-      box.style.height = `${Math.round(844 * k)}px`;
+      box.style.width = `${Math.round(pw * k)}px`;
+      box.style.height = `${Math.round(ph * k)}px`;
     } else {
       box.style.setProperty('--wk', w > 700 ? Math.min(1, w / 780).toFixed(4) : '1');
       box.style.width = `${w}px`;
