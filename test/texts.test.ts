@@ -114,7 +114,7 @@ describe('Metinler in the panel', () => {
     // The footer is on every page: a line there changes on all of them · roll labels too.
     await post('/panel/texts', { g: 'chrome', [textField('Bir fikrin mi var?', 'tr')]: 'Yarım bir fikrin mi var?', [textField('Proje başlat', 'en')]: 'Start yours' });
     expect((await get('/tr/studyo')).body).toContain('<h2 class="ft-big">Yarım bir fikrin mi var?</h2>');
-    expect((await get('/tr/isler')).body).toContain('<span aria-hidden="true">Start yours</span>');
+    expect((await get('/tr/isler')).body).toContain('<span aria-hidden="true" lang="en">Start yours</span>');
     const hint = (await get('/panel/texts?g=chrome')).body;
     expect(hint).toContain('Koddaki hâli: TR “Bir fikrin mi var?”');
   });
@@ -152,7 +152,7 @@ describe('Metinler in the panel', () => {
     expect(res.headers.location).toBe('/panel/texts?m=restored');
     const tr = (await get('/tr')).body;
     expect(tr).toContain('data-word>Akılda kalan</span>');
-    expect(tr).toContain('<h2 class="ft-big">Bir fikrin mi var?</h2>');
+    expect((await get('/tr/studyo')).body).toContain('<h2 class="ft-big">Bir fikrin mi var?</h2>');
     expect(await app.db.select().from(settings).where(eq(settings.key, 'texts.home.tr'))).toEqual([]);
   });
 });

@@ -47,7 +47,7 @@ export function board(ctx: Ctx, projects: BoardProject[]): Safe {
   return html`<section class="work" data-sec="work" id="work" data-host="design">
 <span class="rest" data-rest="design" data-rest-at="0.68 0.64" data-rest-at-m="0.7 0.3"></span>
 <div class="wrap whead">
-<div><p class="kick mono"><span>(04)</span><span>${t('Seçili işler')}</span></p><h2 class="h2">${t('Pano.')}</h2><p class="wsub">${t('Gurur duyduğumuz her şey tek bir sonsuz panoda. İstediğin yöne sürükle. Hiç bitmiyor.')}</p></div>
+<div><p class="kick mono"><span>(04)</span><span>${t('Seçili işler')}</span></p><h2 class="h2">${t('Pano.')}</h2><p class="wsub">${t('Gurur duyduğumuz her şey tek bir sonsuz panoda. İstediğin yöne sürükle. Hiç bitmiyor.')}</p><a class="sec-go" href="${href(lang, 'work')}">${t('Bütün işleri gör')} <span aria-hidden="true">→</span></a></div>
 <div class="wtools"><span class="mono">${t('Sürükle ve gez')}</span><span class="zoom mono">100%</span><div class="mm" aria-hidden="true">${list.map((f) => html`<i class="m${f.slot}"></i>`)}<b class="mmv" data-mmv></b></div></div>
 </div>
 <div class="board" data-board>

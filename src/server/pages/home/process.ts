@@ -39,7 +39,7 @@ export function process(ctx: Ctx): Safe {
 <p class="psub">${t('Her proje en alttan kurulur. Beş katman ve her biri bir sonrakinin zemini. Bir adım seç ya da ekibin katmanları kaldırmasını izle.')}</p>
 </div>
 <div class="ly s0" data-ly>
-<p class="ly-cap mono"><b>${t('Örnek proje')}</b>${t('fonra · bir ses ve hareket stüdyosunun sitesi')}</p>
+<p class="ly-cap mono"><b>${t('Örnek proje')}</b><span><span class="ly-nm">fonra</span> · ${t('bir ses ve hareket stüdyosunun sitesi')}</span></p>
 <div class="ly-v" aria-hidden="true"><div class="ly-s"><div class="ly-iso"><i class="ly-gr"></i>
 ${art.map((a, i) => html`<div class="ly-p l${i}${i === 0 ? ' on' : ' fut'}" data-lp="${i}"><i class="ly-ed"></i>${a}<i class="ly-hd"><i></i><i></i><i></i><i></i></i></div>`)}
 </div></div></div>
@@ -48,7 +48,7 @@ ${steps.map(
   (s, i) => html`<li class="ly-r r${i}${i === 0 ? ' on' : ' fut'}" data-lr="${i}"><button type="button" class="ly-b" id="ly-b${i}" aria-expanded="${i === 0 ? 'true' : 'false'}" aria-controls="ly-d${i}" data-lb="${i}"><span class="ly-n mono">${String(i + 1).padStart(2, '0')}</span><span class="ly-t">${s.name}</span><span class="ly-w mono">${s.time}</span></button><div class="ly-d" id="ly-d${i}" role="region" aria-labelledby="ly-b${i}"${i === 0 ? '' : html` aria-hidden="true"`}><p class="ly-x">${s.text}</p><p class="ly-k mono"><span>${t('Sana kalan')}</span>${s.get}</p><p class="ly-at mono"><span>${t('Masada')}</span>${AT[i]!.map((w) => html`<i class="c-${w}"></i>${seat(w)}`)}</p></div></li>`,
 )}
 </ol>
-<div class="ly-ft"><p class="mono">${t('Toplam · yaklaşık on hafta · ilk görüşmeden yayına')}</p><a class="ly-go" href="${href(lang, 'process')}">${t('Süreci hafta hafta gör')} <span aria-hidden="true">→</span></a></div>
+<div class="ly-ft"><p class="mono">${t('Toplam · yaklaşık on hafta · ilk görüşmeden yayına')}</p><a class="sec-go" href="${href(lang, 'process')}">${t('Süreci hafta hafta gör')} <span aria-hidden="true">→</span></a></div>
 </div>
 </div>
 </section>`;

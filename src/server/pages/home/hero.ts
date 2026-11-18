@@ -26,13 +26,13 @@ export function hero(ctx: Ctx): Safe {
 <div class="wrap hw">
 <p class="flab mono"><i class="fi" aria-hidden="true"></i><span data-flab>${t('Ana sayfa')} · 1440 × 900</span></p>
 <h1 class="hl">${lines}</h1>
-<div class="hpin c-motion"><button type="button" class="pinb" aria-describedby="hpin-thr">M</button><span class="thr" id="hpin-thr" role="tooltip"><span><b class="tm">motion</b>${t('Nokta zıplayabilir mi?')}</span><span><b class="td">design</b>${t('Zaten zıplıyor. İzle.')}</span></span></div>
+<div class="hpin c-motion"><button type="button" class="pinb" aria-describedby="hpin-thr">M</button><span class="thr" id="hpin-thr" role="tooltip"><span><b class="tm" lang="en">motion</b>${t('Nokta zıplayabilir mi?')}</span><span><b class="td" lang="en">design</b>${t('Zaten zıplıyor. İzle.')}</span></span></div>
 <div class="hlede">
-<p>${t('Lost Comma İstanbul’da bir tasarım ve yazılım stüdyosu. Web siteleri ve uygulamalar ve kimlikleri sahipleriyle birlikte ve herkesin önünde yapıyoruz.')} <b>${t('Tam şu an olduğu gibi.')}</b></p>
+<p>${t('Lost Comma İstanbul’da bir tasarım ve yazılım stüdyosu. Web siteleri · uygulamalar · kimlikler. Hepsini sahipleriyle birlikte ve herkesin önünde yapıyoruz.')} <b>${t('Tam şu an olduğu gibi.')}</b></p>
 <div class="ctas"><a class="btn f" href="#contact">${t('Proje başlat')} <span aria-hidden="true">↗</span></a><a class="btn g" href="#work">${t('İşlere bak')}</a></div>
 </div>
 <div class="pubc"><span class="ps mono"><i class="live" data-pubdot></i><span data-pubtxt>${t('Yayında · v{n}', { n: 214 })}</span></span><button type="button" class="pubb" data-pub>${t('Yayınla')}</button></div>
-<div class="hfoot mono"><span>${t('Tasarım ve yazılım stüdyosu · İstanbul')}</span><span>${t('Aşağı kaydır · içimizden biri sana eşlik eder')} <span aria-hidden="true">↓</span></span></div>
+<div class="hfoot mono"><span>${t('Tasarım ve yazılım stüdyosu · İstanbul')}</span><span>${t('Aşağı kaydır')}<span class="hf-crew"> · ${t('içimizden biri sana eşlik eder')}</span> <span aria-hidden="true">↓</span></span></div>
 </div>
 </section>`;
 }

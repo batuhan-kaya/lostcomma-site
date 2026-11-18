@@ -1,6 +1,29 @@
 /* ================= header ================= */
-.hd { position: absolute; left: 0; right: 0; top: 0; z-index: 30; height: var(--head); }
-.hd .wrap { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 100%; padding: 0 var(--gut); }
+/*
+ * The header rides along (phase 17 · client/lib/bar.ts). At the top it sits where it always sat and
+ * scrolls away with the page. Once it is gone (.stk) it waits above the screen: a scroll up brings it
+ * back as a slimmer bar on the ground of the section under it (.up · --pbg and the tone .hd-d · .hd-l
+ * are set by the script) with a hairline · a scroll down sends it away. Keyboard focus and the open
+ * menu always show it. Back at the very top it is the page's header again. Only transform moves it.
+ */
+.hd {
+  position: absolute; left: 0; right: 0; top: 0; z-index: 30; height: var(--head); color: var(--pfg);
+  transition: transform .5s cubic-bezier(.2, .8, .2, 1), height .4s cubic-bezier(.2, .8, .2, 1);
+}
+.hd::before {
+  content: ''; position: absolute; inset: 0; background: var(--pbg); box-shadow: inset 0 -1px 0 var(--rule);
+  opacity: 0; pointer-events: none; transition: opacity .3s, background-color .35s;
+}
+.hd .wrap { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 100%; padding: 0 var(--gut); }
+.hd.stk { position: fixed; height: var(--bar); transform: translateY(-100%); }
+.hd.stk::before { opacity: 1; }
+.hd.stk.up, .hd.stk:focus-within, .hd.stk:has(.menu[open]) { transform: none; }
+/* Away: its live dot waits · the switch to the bar and back is never animated (.nt for one frame). */
+.hd.stk:not(.up):not(:focus-within) * { animation-play-state: paused; }
+.hd.nt, .hd.nt::before { transition: none; }
+/* A ground that is not the page's own (a dark section under a light page or the other way round). */
+.hd.hd-d { --pfg: #F2F1EC; --pmu: #8E8E8A; --rule: rgba(242,241,236,.13); --acc: #CDF23A; --ring: #CDF23A; }
+.hd.hd-l { --pfg: #0E0E0F; --pmu: #5E5E5A; --rule: rgba(14,14,15,.14); --acc: #3B35FF; --ring: #3B35FF; }
 .hl2 { display: flex; align-items: center; gap: 22px; }
 .logo {
   display: inline-flex;
@@ -217,6 +240,8 @@
 .ft-mail:hover, .ft-l:hover { color: var(--lime); }
 
 .ft-map { display: grid; grid-template-columns: repeat(auto-fit, minmax(176px, 1fr)); gap: 32px 40px; padding: 40px 0 48px; border-top: 1px solid var(--rule); }
+/* The homepage's footer starts here (its contact sentence already asks). */
+.ft.lite .ft-map { padding-top: 96px; border-top: 0; }
 .ft-col h3 { margin: 0 0 12px; color: var(--pmu); font-weight: 450; }
 .ft-col ul { display: grid; margin: 0; padding: 0; list-style: none; }
 .ft-col li { display: flex; align-items: center; min-height: 38px; }
@@ -254,6 +279,7 @@
   .ft-btns { width: 100%; }
   .ft-b { flex: 1 1 100%; justify-content: center; }
   .ft-map { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; padding: 32px 0 36px; }
+  .ft.lite .ft-map { padding-top: 64px; }
   .ft-col .ft-l, .ft-addr { font-size: 16px; }
   .ft-base { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 40px 0 32px; }
   .ft-bar { padding: 14px 0 22px; }

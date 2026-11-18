@@ -67,6 +67,7 @@ ${line(s.mail, blank({ key: 'mail', input: mail, label: opts.error ? t('Bu adres
 <span class="mono">${t('ya da doğrudan yaz')}</span>
 <a class="smail" href="mailto:${EMAIL}">${EMAIL}</a>
 <button type="button" class="copy mono" data-copy>${t('Adresi kopyala')}</button>
+<a class="sbook" href="${href(lang, 'start')}#book">${t('20 dakikalık görüşme al')} <span aria-hidden="true">→</span></a>
 </div>
 </div>
 </form>`;

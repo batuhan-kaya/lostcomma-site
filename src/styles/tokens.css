@@ -21,6 +21,8 @@
 
   --gut: 40px;
   --head: 92px;
+  /* The header once it rides along (app.ts · headerBar): a slimmer bar. */
+  --bar: 64px;
 }
 
 @media (max-width: 1024px) {
@@ -28,5 +30,5 @@
 }
 
 @media (max-width: 640px) {
-  :root { --gut: 18px; --head: 68px; }
+  :root { --gut: 18px; --head: 68px; --bar: 60px; }
 }

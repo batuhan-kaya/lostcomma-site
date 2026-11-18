@@ -23,7 +23,9 @@
 /* ================= article ================= */
 .art { position: relative; padding: 70px 0 80px; }
 .art .wrap, .nend .wrap { display: grid; grid-template-columns: 220px minmax(0, 700px) minmax(0, 1fr); gap: 60px; }
-.toc { position: sticky; top: 30px; align-self: start; }
+.toc { position: sticky; top: 30px; align-self: start; transition: top .5s cubic-bezier(.2, .8, .2, 1); }
+/* The header bar came back (client/lib/bar.ts): the contents step down under it. */
+html.hd-up .toc { top: calc(var(--bar) + 30px); }
 .toc > .mono { color: var(--pmu); }
 .tl { position: relative; margin: 16px 0 0; padding: 0 0 0 18px; list-style: none; }
 .tl::before { content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 2px; background: var(--rule); }

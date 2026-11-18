@@ -90,7 +90,8 @@
 .hh.hC { left: -10px; bottom: -8px; }
 .hh.hD { right: -10px; bottom: -8px; }
 .wbox .sz { position: absolute; left: -4px; top: calc(100% + 12px); padding: 4px 8px; border-radius: 4px; background: var(--blue); color: var(--milk); white-space: nowrap; opacity: 0; transition: opacity .15s; }
-.wbox .tc { display: inline-block; width: .05em; height: .74em; margin-left: .02em; background: var(--blue); vertical-align: -.02em; opacity: 0; }
+/* The caret takes no room: the period stays on the last letter whatever the word is. */
+.wbox .tc { position: absolute; left: calc(100% - .01em); bottom: .2em; width: .05em; height: .74em; background: var(--blue); opacity: 0; }
 .wbox.sel::before, .wbox.sel .hh, .wbox.sel .sz { opacity: 1; }
 .wbox.sel .wtx { background: rgba(59,53,255,.16); }
 .wbox.typing .tc { opacity: 1; animation: blink .9s steps(1) infinite; }
@@ -126,7 +127,7 @@
 .thr .td { color: var(--kc); }
 .hlede { position: absolute; left: var(--gut); bottom: 96px; width: 580px; }
 .hlede p { margin: 0; font-size: 21px; line-height: 1.42; text-wrap: pretty; }
-.hlede p b { font-weight: 600; }
+.hlede p b { font-weight: 600; white-space: nowrap; } /* the closing line never breaks in two */
 .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .pubc { position: absolute; right: var(--gut); top: 676px; display: flex; align-items: center; gap: 6px; padding: 6px 6px 6px 18px; border: 1.5px solid rgba(14,14,15,.14); border-radius: 999px; background: var(--milk); box-shadow: 0 12px 30px -20px rgba(14,14,15,.45); }
 .ps { display: flex; align-items: center; gap: 10px; color: var(--grey); }
@@ -136,10 +137,12 @@
 .pubb:hover { transform: scale(1.04); }
 .pubb:active { transform: scale(.94); }
 .hfoot { position: absolute; left: var(--gut); right: var(--gut); bottom: 34px; display: flex; justify-content: space-between; gap: 20px; color: var(--grey); }
+/* On a touch screen the team stays in the hero: the hint does not promise company below it. */
+@media (hover: none) { .hf-crew { display: none; } }
 
 /* ================= 02 manifesto ================= */
 .mf { --ring: var(--lime); position: relative; min-height: 1000px; background-color: var(--ink); background-image: radial-gradient(rgba(242,241,236,.07) 1px, transparent 1.6px); background-size: 26px 26px; color: var(--milk); }
-.mf .wrap { padding: 130px var(--gut) 110px; }
+.mf .wrap { padding: 120px var(--gut) 110px; }
 .mf .kick { color: var(--dim); }
 .mhead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; }
 .mhead .h2 { margin-top: 20px; }
@@ -382,11 +385,23 @@ html.fv-open { overflow: hidden; }
 .ar-book .sh { position: absolute; left: 8cqw; right: 8cqw; bottom: 15cqh; height: 3cqh; background: #0E0E0F; }
 .ar-book .tt { position: absolute; left: 8cqw; top: 7cqh; color: #0E0E0F; font-family: var(--display); font-size: 15cqw; line-height: .9; font-variation-settings: 'wdth' 84, 'wght' 820; }
 .ar-lab { display: flex; align-items: center; justify-content: center; gap: 2cqw; background: #161618; color: var(--lime); font-family: var(--display); font-size: 38cqh; line-height: 1; }
-.ar-lab > span { display: block; animation: breathe 2.8s ease-in-out infinite alternate; }
+/* Type that breathes: three breaths once the board shows (an endless loop may only move transform and
+   opacity · font-variation repaints every frame) · it keeps breathing while the frame is under the pointer. */
+.ar-lab > span { display: block; animation: breathe 2.8s ease-in-out 6 alternate both; }
+.bf:is(:hover, :focus-visible) .ar-lab > span { animation-iteration-count: infinite; }
 .ar-lab > span:nth-child(2) { animation-delay: -.7s; }
 .ar-lab > span:nth-child(3) { animation-delay: -1.4s; color: var(--pink); }
 .ar-lab > span:nth-child(4) { animation-delay: -2.1s; }
 .ar-lab .mono { position: absolute; left: 5cqw; bottom: 5cqw; color: var(--dim); font-size: 11px; animation: none; }
+
+/* ================= the way to a section's own page (services · work · process: one pill) ================= */
+.sec-go { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 22px; border: 1.5px solid currentColor; border-radius: 999px; color: var(--pfg, var(--ink)); font-weight: 600; text-decoration: none; transition: background-color .3s, color .3s, border-color .3s; }
+.sec-go span { transition: translate .3s var(--ease-pop); }
+.sec-go:hover { border-color: var(--pfg, var(--ink)); background: var(--pfg, var(--ink)); color: var(--pbg, var(--milk)); }
+.sec-go:hover span { translate: 3px 0; }
+.svc .sec-go { margin-top: 36px; }
+.work .sec-go { margin-top: 28px; color: var(--milk); }
+.work .sec-go:hover { border-color: var(--milk); background: var(--milk); color: var(--ink); }
 
 /* ================= 05 process: layer by layer (the stack lives in _layers.css) ================= */
 .prc { position: relative; background-color: var(--paper); background-image: var(--dots); background-size: 26px 26px; background-position: 13px 13px; }
@@ -413,7 +428,8 @@ html.fv-open { overflow: hidden; }
 /* A light contact after the light Process: a hairline marks where it starts. */
 .ct-paper, .ct-milk { box-shadow: inset 0 1px 0 var(--rule); }
 .ctc :focus-visible { outline-color: var(--sel); }
-.ctc .wrap { position: relative; padding: 72px var(--gut) 112px; }
+/* The kicker sits where every section's kicker sits (120 px) · the sentence comes up by as much: the section keeps its height. */
+.ctc .wrap { position: relative; padding: 120px var(--gut) 112px; }
 .ctop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; color: var(--mu); }
 .ctop .k { display: flex; gap: 14px; margin: 0; font: inherit; letter-spacing: inherit; }
 .clock { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
@@ -424,7 +440,7 @@ html.fv-open { overflow: hidden; }
 .clock b { color: var(--fg); font-weight: 500; }
 .sf[hidden], .sdone[hidden] { display: none; }
 /* the sentence */
-.sen { max-width: 1300px; margin: 120px 0 0; font-family: var(--display); font-size: clamp(30px, 5.3vw, 78px); font-weight: 400; line-height: 1.42; letter-spacing: -.03em; font-variation-settings: 'wdth' 86, 'wght' 760; }
+.sen { max-width: 1300px; margin: 72px 0 0; font-family: var(--display); font-size: clamp(30px, 5.3vw, 78px); font-weight: 400; line-height: 1.42; letter-spacing: -.03em; font-variation-settings: 'wdth' 86, 'wght' 760; }
 .sen .sl { display: block; }
 .bw { position: relative; display: inline-block; margin: 0 .05em; vertical-align: baseline; }
 /* the script measures words here (the blanks are sized to them) */
@@ -475,6 +491,9 @@ html.fv-open { overflow: hidden; }
 .smail:hover { opacity: .7; }
 .copy { min-height: 38px; padding: 0 15px; border: 1.5px solid var(--rule); border-radius: 999px; background: transparent; color: var(--fg); cursor: pointer; transition: background-color .25s, color .25s, border-color .25s; }
 .copy:hover { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+/* The footer's second way (a call) lives here on the homepage: its footer starts with the sitemap. */
+.sbook { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; margin-top: 6px; color: var(--fg); font-size: 15px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--rule); text-decoration-thickness: 1.5px; text-underline-offset: 5px; transition: text-decoration-color .25s; }
+.sbook:hover { text-decoration-color: currentColor; }
 /* after sending: the sentence turns into the thanks */
 .sdone { margin-top: 120px; }
 .dh { max-width: 1240px; margin: 0; font-family: var(--display); font-size: clamp(34px, 6.2vw, 96px); font-weight: 400; line-height: 1.06; letter-spacing: -.035em; font-variation-settings: 'wdth' 86, 'wght' 780; text-wrap: balance; }
@@ -538,15 +557,17 @@ html.fv-open { overflow: hidden; }
   .mf, .svc, .work, .prc { min-height: 0; }
   .paper { padding: 20px 22px 30px; }
   .cmts { grid-template-columns: minmax(0, 1fr); }
-  .mtools { width: 100%; }
+  /* Three buttons on a phone: the switch on its own line · accept and reject side by side (never two and an odd one). */
+  .mtools { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .mtools .mt:first-child { grid-column: 1 / -1; }
   .mt { flex: 1 1 auto; padding: 0 14px; }
   .opt { grid-template-columns: 30px minmax(0, 1fr); }
   .opt .os { grid-column: 2; }
   .whead { padding-top: 88px; }
   .wtools .mm, .wtools .zoom { display: none; }
   .board { height: 460px; margin-top: 32px; --bk: .62; }
-  .ctc .wrap { padding: 56px var(--gut) 80px; }
-  .sen { margin-top: 76px; font-size: clamp(28px, 8vw, 34px); line-height: 1.62; }
+  .ctc .wrap { padding: 88px var(--gut) 80px; }
+  .sen { margin-top: 44px; font-size: clamp(28px, 8vw, 34px); line-height: 1.62; }
   .blank { border-bottom-width: 2px; }
   .btag { bottom: calc(100% + 3px); padding: 2px 6px; font-size: 10.5px; }
   .sact { gap: 24px; margin-top: 56px; }

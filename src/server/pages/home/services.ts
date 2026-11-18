@@ -1,6 +1,7 @@
 import { html, type Safe } from '../../html';
 import type { Ctx } from '../../page';
 import type { ProjectCard } from '../../data/content';
+import { href } from '../../routes';
 import { loopVideo } from '../../media/video';
 import { androidArt, frameArt } from './frames';
 
@@ -23,6 +24,7 @@ export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
 <div class="opts" role="radiogroup" aria-label="${t('Hizmetler')}">${sv.map(
     (o, i) => html`<button type="button" role="radio" aria-checked="${i === 0 ? 'true' : 'false'}" class="opt${i === 0 ? ' act' : ''}" data-opt="${i}"><i class="rd" aria-hidden="true"></i><b>${o.name}</b><span class="os mono">${o.size}</span><span class="od"><span class="odi"><span class="odd">${o.desc}</span><span class="odl mono">${o.dl}</span></span></span></button>`,
   )}</div>
+<a class="sec-go" href="${href(lang, 'services')}">${t('Hizmetleri tek tek gör')} <span aria-hidden="true">→</span></a>
 </div>
 <div class="stage" data-stage>
 <div class="sscale" data-sscale>
