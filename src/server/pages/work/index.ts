@@ -4,6 +4,7 @@ import { msg } from '../../msg';
 import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
 import { coverOrArt, FRAME_SIZE, GROUP_CLASS } from './art';
+import { itemList } from '../../ld';
 
 /** Fills [AY] · [MONTH] with the month from the panel (Site ayarları). */
 const withMonth = (line: string, month: string | null) => (month ? line.replace(/\[(AY|MONTH)\]/, month) : line);
@@ -115,7 +116,8 @@ export const workPage: Page<WorkData> = {
   scripts: ['work'],
   styles: ['work'],
   title: (t) => t('İşler'),
-  description: (t) => t('Tasarladığımız ve kodladığımız projeler.'),
+  description: (t) => t('Tasarlayıp kodladığımız işler: web siteleri · uygulamalar · kimlikler ve hareket. Her birinin hikâyesi · sürüm geçmişi ve sonuçları.'),
+  ld: (ctx, d) => ({ type: 'CollectionPage', nodes: [itemList(ctx, d.live.map((p) => ({ name: p.name, url: href(p.textLang, 'case', { slug: p.slug }) })))] }),
   load: async (ctx) => {
     const all = await listProjects(ctx.db, ctx.lang);
     return { live: all.filter((p) => p.status === 'live'), locked: all.filter((p) => p.status === 'nda'), next: await nextProjectNumber(ctx.db) };

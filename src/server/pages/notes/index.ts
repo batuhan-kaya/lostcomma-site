@@ -7,6 +7,7 @@ import { renderNote, type Bar } from '../../notes/render';
 import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
 import { ago, isoDay } from '../../../shared/dates';
+import { itemList } from '../../ld';
 
 /**
  * Notes · find in file. The list reads like an editor: line numbers you click to save a note for
@@ -160,7 +161,8 @@ export const notesPage: Page<NotesData> = {
   scripts: ['notes'],
   styles: ['notes'],
   title: (t) => t('Notes'),
-  description: (t) => t('Tasarım ve kod üzerine yazdıklarımız.'),
+  description: (t) => t('Tasarım · kod ve hareket üzerine yazdıklarımız: denediklerimiz · öğrendiklerimiz ve neden öyle yaptığımız.'),
+  ld: (ctx, d) => ({ type: 'CollectionPage', nodes: [itemList(ctx, d.notes.map((n) => ({ name: n.title, url: href(n.textLang, 'note', { slug: n.slug }) })))] }),
   load: async (ctx) => {
     const notes = await listNotes(ctx.db, ctx.lang, ctx.now);
     const top = notes.find((n) => n.textLang === ctx.lang) ?? notes[0];

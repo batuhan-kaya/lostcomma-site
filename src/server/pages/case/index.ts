@@ -8,6 +8,7 @@ import { href } from '../../routes';
 import type { NextTone } from '../../themes';
 import { drawnArt } from '../work/art';
 import { SAIL_COVER, SAIL_MOCK } from './sail';
+import { orgRef, pageRef } from '../../ld';
 
 /**
  * A case study. The hero always shows · every other section shows when the story has it:
@@ -198,6 +199,31 @@ export const casePage: Page<ProjectPage> = {
   styles: ['case'],
   title: (_t, p) => p.name,
   description: (_t, p) => p.summary || p.kind,
+  // The case's cover beside its name on the share card (a drawn cover stays on the page only).
+  og: (_ctx, p) => ({ image: p.cover }),
+  // The work in the structured data: what it is · for whom · when · its own site.
+  ld: (ctx, p, image) => ({
+    type: 'ItemPage',
+    modified: p.updatedAt,
+    nodes: [
+      {
+        '@type': 'CreativeWork',
+        '@id': `${ctx.site}${ctx.path}#work`,
+        name: p.name,
+        description: p.summary || p.kind,
+        genre: p.kind,
+        url: ctx.site + ctx.path,
+        inLanguage: ctx.lang,
+        dateCreated: String(p.year),
+        dateModified: p.updatedAt.toISOString(),
+        creator: orgRef(ctx),
+        mainEntityOfPage: pageRef(ctx),
+        ...(p.client && !p.client.includes('[') ? { sourceOrganization: { '@type': 'Organization', name: p.client } } : {}),
+        ...(p.siteUrl ? { sameAs: p.siteUrl } : {}),
+        ...(image ? { image } : {}),
+      },
+    ],
+  }),
   load: (ctx, params) => projectBySlug(ctx.db, ctx.lang, params.slug ?? ''),
   paths: (p) => ({
     tr: p.slugs.tr ? href('tr', 'case', { slug: p.slugs.tr }) : null,

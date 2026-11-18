@@ -93,7 +93,7 @@ export const labPage: Page = {
   scripts: ['lab'],
   styles: ['lab'],
   title: (t) => t('Lab'),
-  description: (t) => t('Küçük deneyler ve canlı örnekler.'),
+  description: (t) => t('Küçük deneyler ve canlı örnekler: imleçler · yaylar ve tarayıcıda çalışan çizimler. Hepsinin gittiği yer de burada.'),
   body: (ctx) => html`${hero(ctx)}
 ${grid(ctx)}
 ${log(ctx)}`,

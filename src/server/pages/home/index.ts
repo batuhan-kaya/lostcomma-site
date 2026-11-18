@@ -1,6 +1,5 @@
 import { boardProjects, newestLoop, type BoardProject, type ProjectCard } from '../../data/content';
-import { SOCIAL } from '../../data/settings';
-import { html, raw, type Safe } from '../../html';
+import { html } from '../../html';
 import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
 import { board } from './board';
@@ -18,22 +17,6 @@ import { services } from './services';
  * (`.ct-*`): ink · night · paper · milk · lime · coral · blue.
  */
 export const CONTACT_THEME: ContactTheme = 'milk';
-
-/** Who we are for search engines: name · logo · the accounts filled in the panel. */
-function organization(ctx: Ctx): Safe {
-  const sameAs = SOCIAL.map((s) => ctx.settings.text(s.key, ctx.lang)).filter((u): u is string => !!u);
-  const ld = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'Lost Comma',
-    url: `${ctx.site}${href(ctx.lang, 'home')}`,
-    logo: `${ctx.site}/icon-512.png`,
-    email: 'hello@lostcomma.co',
-    address: { '@type': 'PostalAddress', addressLocality: 'İstanbul', addressCountry: 'TR' },
-    ...(sameAs.length ? { sameAs } : {}),
-  };
-  return raw(`<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`);
-}
 
 export interface HomeOptions {
   /** Set after a brief was posted without JS (?brief=sent). */
@@ -57,8 +40,8 @@ export function homePage(opts: HomeOptions = {}): Page<HomeData> {
     home: true,
     scripts: ['home'],
     styles: ['home'],
-    title: (t) => t('Yaratıcı yazılım stüdyosu'),
-    description: (t) => t('İstanbul’da web siteleri ve uygulamalar tasarlayıp kodlayan bir ekip.'),
+    title: (t) => t('İstanbul’da tasarım ve yazılım stüdyosu'),
+    description: (t) => t('Lost Comma İstanbul’da web siteleri · uygulamalar · kimlikler ve hareket tasarlayıp kodlayan küçük bir stüdyo. İşin sahipleriyle yan yana çalışırız.'),
     load: async (ctx) => ({ board: await boardProjects(ctx.db, ctx.lang), loop: await newestLoop(ctx.db, ctx.lang) }),
     body: (ctx, d) => html`${hero(ctx)}
 ${manifesto(ctx)}
@@ -66,7 +49,11 @@ ${services(ctx, d.loop)}
 ${board(ctx, d.board)}
 ${process(ctx)}
 ${brief(ctx, { theme: CONTACT_THEME, sent: !!opts.sent, error: !!opts.error })}`,
-    head: (ctx) => organization(ctx),
+    // The share card is the hero itself: its lines with the first word selected (Metinler rewrites both).
+    og: (ctx) => {
+      const c = ctx.texts.home(ctx.lang);
+      return { hero: { lines: c.headline, word: c.words[0] ?? '', foot: ctx.t('Tasarım ve yazılım stüdyosu · İstanbul') } };
+    },
     data: (ctx) => {
       const c = ctx.texts.home(ctx.lang);
       return {

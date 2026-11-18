@@ -63,6 +63,8 @@ export interface ProjectPage extends ProjectCard {
   media: Record<number, MediaRef>;
   /** The next live layer down the list (wraps around to the newest). */
   next: ProjectCard | null;
+  /** The last save in the panel (structured data · sitemap). */
+  updatedAt: Date;
 }
 
 const projectWith = { texts: true, cover: true, loop: { with: { poster: true } } } as const;
@@ -161,6 +163,7 @@ export async function projectBySlug(db: Db, lang: Lang, slug: string, preview = 
     story,
     media: Object.fromEntries(images.map((m) => [m.id, mediaRef(m)!])),
     next: after?.texts.length ? card(after, lang) : null,
+    updatedAt: row.updatedAt,
   };
 }
 
@@ -177,10 +180,16 @@ export async function nextProjectNumber(db: Db): Promise<number> {
   return (row?.n ?? 0) + 1;
 }
 
+/** A page in each language it exists in · when it last changed (sitemap). */
+export interface SlugEntry {
+  slugs: Partial<Record<Lang, string>>;
+  updated: Date;
+}
+
 /** Every live case page in both languages (sitemap). */
-export async function caseSlugs(db: Db): Promise<Partial<Record<Lang, string>>[]> {
+export async function caseSlugs(db: Db): Promise<SlugEntry[]> {
   const rows = await db.query.projects.findMany({ where: eq(projects.status, 'live'), orderBy: desc(projects.no), with: { texts: true } });
-  return rows.map((r) => Object.fromEntries(r.texts.map((x) => [x.lang, x.slug])));
+  return rows.map((r) => ({ slugs: Object.fromEntries(r.texts.map((x) => [x.lang, x.slug])), updated: r.updatedAt }));
 }
 
 export interface NoteCard {
@@ -206,6 +215,8 @@ export interface NotePage extends NoteCard {
   /** The next note back in time and the next one forward. Either may be in the other language only. */
   older: NoteCard | null;
   newer: NoteCard | null;
+  /** The last save in the panel (never before the note went out). */
+  updatedAt: Date;
 }
 
 const noteWith = { texts: true, author: { columns: { crew: true, name: true }, with: { texts: true } } } as const;
@@ -259,6 +270,7 @@ export async function noteBySlug(db: Db, lang: Lang, slug: string, now: Date, pr
   return {
     ...noteCard(row, lang),
     body: hit.body,
+    updatedAt: later(row.updatedAt, row.publishedAt),
     slugs: Object.fromEntries(row.texts.map((x) => [x.lang, x.slug])),
     about: person ? { role: person.role, usually: person.usually } : null,
     older: all[at + 1] ?? null,
@@ -278,10 +290,12 @@ export async function notesIn(db: Db, lang: Lang, now: Date, limit = 30): Promis
 }
 
 /** Every published note in the languages it is written in (sitemap). */
-export async function noteSlugs(db: Db, now: Date): Promise<Partial<Record<Lang, string>>[]> {
+export async function noteSlugs(db: Db, now: Date): Promise<SlugEntry[]> {
   const rows = await db.query.notes.findMany({ where: published(now), orderBy: desc(notes.publishedAt), with: { texts: true } });
-  return rows.map((r) => Object.fromEntries(r.texts.map((x) => [x.lang, x.slug])));
+  return rows.map((r) => ({ slugs: Object.fromEntries(r.texts.map((x) => [x.lang, x.slug])), updated: later(r.updatedAt, r.publishedAt) }));
 }
+
+const later = (a: Date, b: Date | null) => (b && b > a ? b : a);
 
 /** A page of the site in both languages (the 404 map): its addresses and its name per language. */
 export interface MapEntry {

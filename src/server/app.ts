@@ -299,12 +299,16 @@ export async function buildApp({ config, now = () => new Date(), database, maile
   }
 
   // Share images: /og + the page address + .png. Drawn once per content (src/server/og).
-  const og = new OgImages(join(config.DATA_DIR, 'og'), {
-    built: (key) => {
-      const url = assets.font(key);
-      return url ? join(publicDir, url) : null;
+  const og = new OgImages(
+    join(config.DATA_DIR, 'og'),
+    {
+      built: (key) => {
+        const url = assets.font(key);
+        return url ? join(publicDir, url) : null;
+      },
     },
-  });
+    join(config.DATA_DIR, 'media'),
+  );
   const ogRoutes = [
     ...(Object.entries(STATIC_PAGES) as [RouteId, AnyPage][]).flatMap(([id, page]) =>
       LANGS.map((lang) => ({ page, lang, re: new RegExp(`^${href(lang, id)}$`), keys: [] as string[] })),
@@ -319,7 +323,8 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     ),
   ];
   app.get('/og/*', async (req, reply) => {
-    const m = /^(\/.*)\.png$/.exec('/' + (req.params as { '*': string })['*']);
+    // .png or .jpg: the extension the page linked · the card is served in its current format either way.
+    const m = /^(\/.*)\.(?:png|jpg)$/.exec('/' + (req.params as { '*': string })['*']);
     const path = m?.[1] ?? '';
     for (const r of ogRoutes) {
       const hit = r.re.exec(path);
@@ -334,12 +339,12 @@ export async function buildApp({ config, now = () => new Date(), database, maile
       const data = r.page.load ? await r.page.load(ctx, params) : undefined;
       if (r.page.load && data == null) break;
       if (r.page.paths) ctx.path = r.page.paths(data)[r.lang] ?? path;
-      const { key, png } = await og.png(ogSpec(r.page, ctx, data));
+      const { key, ext, body } = await og.image(ogSpec(r.page, ctx, data));
       const fresh = (req.query as Record<string, string>).v === key;
       return reply
-        .type('image/png')
+        .type(ext === 'jpg' ? 'image/jpeg' : 'image/png')
         .header('cache-control', fresh ? 'public, max-age=31536000, immutable' : 'public, max-age=3600')
-        .send(png);
+        .send(body);
     }
     return reply.status(404).type('text/plain; charset=utf-8').send('Not found');
   });
@@ -347,9 +352,13 @@ export async function buildApp({ config, now = () => new Date(), database, maile
   app.get('/robots.txt', (_req, reply) => reply.type('text/plain; charset=utf-8').send(robotsTxt(config.SITE_URL)));
 
   app.get('/sitemap.xml', async (_req, reply) => {
-    const cases = (await caseSlugs(db)).map((slugs) => Object.fromEntries(LANGS.flatMap((l) => (slugs[l] ? [[l, href(l, 'case', { slug: slugs[l] })]] : []))));
-    const services = SERVICE_KEYS.map((k) => Object.fromEntries(LANGS.map((l) => [l, href(l, 'service', { slug: SERVICE_SLUGS[k][l] })])));
-    const notes = (await noteSlugs(db, now())).map((slugs) => Object.fromEntries(LANGS.flatMap((l) => (slugs[l] ? [[l, href(l, 'note', { slug: slugs[l] })]] : []))));
+    const entry = (id: 'case' | 'note', e: { slugs: Partial<Record<Lang, string>>; updated: Date }) => ({
+      paths: Object.fromEntries(LANGS.flatMap((l) => (e.slugs[l] ? [[l, href(l, id, { slug: e.slugs[l]! })]] : []))),
+      lastmod: e.updated,
+    });
+    const cases = (await caseSlugs(db)).map((e) => entry('case', e));
+    const services = SERVICE_KEYS.map((k) => ({ paths: Object.fromEntries(LANGS.map((l) => [l, href(l, 'service', { slug: SERVICE_SLUGS[k][l] })])) }));
+    const notes = (await noteSlugs(db, now())).map((e) => entry('note', e));
     return reply.type('application/xml; charset=utf-8').send(sitemapXml(config.SITE_URL, Object.keys(STATIC_PAGES) as RouteId[], [...services, ...cases, ...notes]));
   });
 

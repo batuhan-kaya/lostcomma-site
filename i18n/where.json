@@ -328,14 +328,14 @@
  "Bir notu sonraya kaydetmek için satır numarasına tıkla": [
   "notes"
  ],
+ "Bir proje ilk görüşmeden yayına hafta hafta nasıl ilerliyor: planla · eskiz · prototip · geliştirme ve yayın. Sonrasında da yanındayız.": [
+  "process"
+ ],
  "Bir proje konuşalım": [
   "process"
  ],
  "Bir proje nasıl ilerler": [
   "service"
- ],
- "Bir projenin ilk görüşmeden yayına kadar nasıl ilerlediği.": [
-  "process"
  ],
  "Bir saat seç": [
   "start"
@@ -961,7 +961,7 @@
  "İstanbul Boğazı": [
   "studio"
  ],
- "İstanbul’da web siteleri ve uygulamalar tasarlayıp kodlayan bir ekip.": [
+ "İstanbul’da tasarım ve yazılım stüdyosu": [
   "home"
  ],
  "İstanbul’un çizilmiş bir haritası. Stüdyo Kadıköy’de vapur iskelesinin yanında.": [
@@ -1153,7 +1153,7 @@
  "Kutunun içinde bir yeri göster": [
   "other"
  ],
- "Küçük deneyler ve canlı örnekler.": [
+ "Küçük deneyler ve canlı örnekler: imleçler · yaylar ve tarayıcıda çalışan çizimler. Hepsinin gittiği yer de burada.": [
   "lab"
  ],
  "Küçük şeyler.": [
@@ -1190,7 +1190,10 @@
  "Lost Comma İstanbul’da bir tasarım ve yazılım stüdyosu. Web siteleri · uygulamalar · kimlikler. Hepsini sahipleriyle birlikte ve herkesin önünde yapıyoruz.": [
   "home"
  ],
- "Lost Comma’nın arkasındaki ekip.": [
+ "Lost Comma İstanbul’da web siteleri · uygulamalar · kimlikler ve hareket tasarlayıp kodlayan küçük bir stüdyo. İşin sahipleriyle yan yana çalışırız.": [
+  "home"
+ ],
+ "Lost Comma’nın arkasındaki ekip: tasarım · kod ve hareket. İstanbul’dan dünyanın her yerine çalışıyoruz.": [
   "studio"
  ],
  "Mağaza": [
@@ -1315,7 +1318,7 @@
  "Ofis": [
   "studio"
  ],
- "Ofis saatlerimizden birini seç ve konuşalım.": [
+ "Ofis saatlerimizden birini seç ya da projeni bir cümleyle anlat. Yirmi dakikalık bir görüşme · bütün ekip okur ve bir gün içinde döneriz.": [
   "start"
  ],
  "Ok tuşlarıyla ekranda gezdir. Enter altındaki eyleme dokunur.": [
@@ -1732,15 +1735,17 @@
  "Tasarım": [
   "other"
  ],
+ "Tasarım · kod ve hareket üzerine yazdıklarımız: denediklerimiz · öğrendiklerimiz ve neden öyle yaptığımız.": [
+  "notes"
+ ],
  "Tasarım ve kod üzerine yazdıklarımız.": [
-  "notes",
   "other"
  ],
  "Tasarım ve yazılım stüdyosu · İstanbul": [
   "chrome",
   "home"
  ],
- "Tasarladığımız ve kodladığımız projeler.": [
+ "Tasarlayıp kodladığımız işler: web siteleri · uygulamalar · kimlikler ve hareket. Her birinin hikâyesi · sürüm geçmişi ve sonuçları.": [
   "work"
  ],
  "tek çizik": [
@@ -1853,7 +1858,7 @@
  "Web siteleri": [
   "work"
  ],
- "Web siteleri · uygulamalar · kimlik ve hareket.": [
+ "Web siteleri · uygulamalar · kimlik ve hareket. Ne yaptığımız · ne kadar sürdüğü ve fiyatın nereden başladığı tek sayfada.": [
   "services"
  ],
  "Web siteleri ve uygulamalar ve kimlikler ve filmler. Gerçek şeyler üreten insanlarla.": [
@@ -1870,9 +1875,6 @@
  ],
  "Yaptığımız hareket işleri · makara": [
   "service"
- ],
- "Yaratıcı yazılım stüdyosu": [
-  "home"
  ],
  "Yarın bu kod da silinir": [
   "legal"

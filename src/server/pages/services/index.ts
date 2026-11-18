@@ -106,7 +106,7 @@ export const servicesPage: Page = {
   scripts: ['services'],
   styles: ['services'],
   title: (t) => t('Hizmetler'),
-  description: (t) => t('Web siteleri · uygulamalar · kimlik ve hareket.'),
+  description: (t) => t('Web siteleri · uygulamalar · kimlik ve hareket. Ne yaptığımız · ne kadar sürdüğü ve fiyatın nereden başladığı tek sayfada.'),
   body: (ctx) => html`${hero(ctx)}
 ${combos(ctx)}
 ${faq(ctx)}`,

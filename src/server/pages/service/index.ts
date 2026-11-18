@@ -10,6 +10,7 @@ import { tierOf } from '../../../shared/checklist';
 import { coverOrArt } from '../work/art';
 import { appHero, appHood, identityHero, identityHood, motionHero, motionHood, webHero, webHood } from './heroes';
 import { loopVideo } from '../../media/video';
+import { orgRef } from '../../ld';
 
 /**
  * A service in detail (Websites · Apps · Identity · Motion). Each one has its own signature hero:
@@ -149,6 +150,26 @@ export const servicePage: Page<ServiceData> = {
     return { key, name: s.name, desc: s.desc, work: await projectsOf(ctx.db, ctx.lang, key) };
   },
   paths: (d) => ({ tr: serviceHref('tr', d.key), en: serviceHref('en', d.key) }),
+  // The service in the structured data: what we make · who makes it · for whom · the work it led to.
+  ld: (ctx, d, image) => ({
+    nodes: [
+      {
+        '@type': 'Service',
+        '@id': `${ctx.site}${ctx.path}#service`,
+        name: d.name,
+        serviceType: d.name,
+        description: d.desc,
+        url: ctx.site + ctx.path,
+        provider: orgRef(ctx),
+        areaServed: 'Worldwide',
+        availableLanguage: ['Turkish', 'English'],
+        ...(image ? { image } : {}),
+        ...(d.work.length
+          ? { subjectOf: d.work.filter((p) => p.status === 'live').map((p) => ({ '@type': 'CreativeWork', name: p.name, url: ctx.site + href(p.textLang, 'case', { slug: p.slug }) })) }
+          : {}),
+      },
+    ],
+  }),
   body: (ctx, d) => {
     const s = SERVICES[ctx.lang].services[d.key];
     const host = HOST[d.key];

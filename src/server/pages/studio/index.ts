@@ -175,8 +175,9 @@ export const studioPage: Page<StudioData> = {
   section: 'studio',
   scripts: ['studio'],
   styles: ['studio'],
+  ld: () => ({ type: 'AboutPage' }),
   title: (t) => t('Stüdyo'),
-  description: (t) => t('Lost Comma’nın arkasındaki ekip.'),
+  description: (t) => t('Lost Comma’nın arkasındaki ekip: tasarım · kod ve hareket. İstanbul’dan dünyanın her yerine çalışıyoruz.'),
   load: async (ctx) => {
     const [people, projects] = await Promise.all([listPeople(ctx.db, ctx.lang), listProjects(ctx.db, ctx.lang)]);
     const since = Math.min(ctx.now.getFullYear(), ...projects.map((p) => p.year));

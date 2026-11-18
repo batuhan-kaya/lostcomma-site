@@ -302,7 +302,7 @@ describe('feeds · share images · sitemap', () => {
     expect((await get('/og/en/work.png')).statusCode).toBe(200);
     expect((await get('/og/en/notes/nope.png')).statusCode).toBe(404);
     expect((await get('/og/en/nowhere.png')).statusCode).toBe(404);
-    expect(ogKey({ lang: 'en', theme: 'milk', kick: 'a', title: 'b', who: 'code' })).not.toBe(ogKey({ lang: 'en', theme: 'milk', kick: 'a', title: 'c', who: 'code' }));
+    expect(ogKey({ lang: 'en', theme: 'milk', kick: 'a', title: 'b', sub: '', who: 'code' })).not.toBe(ogKey({ lang: 'en', theme: 'milk', kick: 'a', title: 'c', sub: '', who: 'code' }));
   });
 
   it('the 404 page has no share image', async () => {
