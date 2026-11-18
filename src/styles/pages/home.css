@@ -428,6 +428,11 @@ html.fv-open { overflow: hidden; }
 /* A light contact after the light Process: a hairline marks where it starts. */
 .ct-paper, .ct-milk { box-shadow: inset 0 1px 0 var(--rule); }
 .ctc :focus-visible { outline-color: var(--sel); }
+/* The visitor's own words (phase 17b): typed into the blanks and said back in the thanks · in the
+   section's selection colour so they stand apart from ours (where that colour is the ink itself · a colour of its own). */
+.ctc { --you: var(--sel); }
+.ctc.ct-lime { --you: #3B35FF; }
+.ctc.ct-coral { --you: #F2F1EC; }
 /* The kicker sits where every section's kicker sits (120 px) · the sentence comes up by as much: the section keeps its height. */
 .ctc .wrap { position: relative; padding: 120px var(--gut) 112px; }
 .ctop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; color: var(--mu); }
@@ -445,7 +450,7 @@ html.fv-open { overflow: hidden; }
 .bw { position: relative; display: inline-block; margin: 0 .05em; vertical-align: baseline; }
 /* the script measures words here (the blanks are sized to them) */
 .bprobe { position: absolute; left: 0; top: 0; visibility: hidden; white-space: pre; pointer-events: none; }
-.blank { box-sizing: content-box; max-width: calc(100vw - 2 * var(--gut) - 32px); margin: 0; padding: 0 .06em; border: 0; border-bottom: 3px dashed var(--ul); border-radius: 0; outline: none; background: transparent; color: var(--fg); caret-color: var(--sel); font: inherit; font-variation-settings: inherit; letter-spacing: inherit; line-height: 1.08; text-overflow: ellipsis; transition: border-color .25s, width .5s cubic-bezier(.2, .8, .3, 1); }
+.blank { box-sizing: content-box; max-width: calc(100vw - 2 * var(--gut) - 32px); margin: 0; padding: 0 .06em; border: 0; border-bottom: 3px dashed var(--ul); border-radius: 0; outline: none; background: transparent; color: var(--you); caret-color: var(--sel); font: inherit; font-variation-settings: inherit; letter-spacing: inherit; line-height: 1.08; text-overflow: ellipsis; transition: border-color .25s, width .5s cubic-bezier(.2, .8, .3, 1); }
 /* typing makes a blank grow at once (the letters never wait) · it shrinks smoothly (the first letter · a deletion) */
 .blank.grow { transition: border-color .25s; }
 .blank::placeholder { color: var(--ph); opacity: 1; }
@@ -500,6 +505,7 @@ html.fv-open { overflow: hidden; }
 .dh > span { display: block; animation: lnIn 1s cubic-bezier(.2,.9,.2,1) both; }
 .dh > span + span { animation-delay: .12s; }
 .dh em { color: var(--pdc); font-style: normal; }
+.dh .dv { color: var(--you); overflow-wrap: anywhere; } /* a long name or address wraps · never runs off */
 .dteam { display: flex; align-items: center; gap: 14px; margin-top: 48px; color: var(--mu); }
 .dteam .av { border-color: var(--bg); }
 .again { display: inline-flex; align-items: center; min-height: 52px; margin-top: 36px; padding: 0 22px; border: 1.5px solid var(--rule); border-radius: 999px; color: var(--fg); font: 600 16px/1 var(--sans); text-decoration: none; transition: background-color .25s, color .25s, border-color .25s; }
