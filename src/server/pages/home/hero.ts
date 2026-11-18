@@ -28,7 +28,7 @@ export function hero(ctx: Ctx): Safe {
 <h1 class="hl">${lines}</h1>
 <div class="hpin c-motion"><button type="button" class="pinb" aria-describedby="hpin-thr">M</button><span class="thr" id="hpin-thr" role="tooltip"><span><b class="tm" lang="en">motion</b>${t('Nokta zıplayabilir mi?')}</span><span><b class="td" lang="en">design</b>${t('Zaten zıplıyor. İzle.')}</span></span></div>
 <div class="hlede">
-<p>${t('Lost Comma İstanbul’da bir tasarım ve yazılım stüdyosu. Web siteleri ve uygulamalar ve kimlikleri sahipleriyle birlikte ve herkesin önünde yapıyoruz.')} <b>${t('Tam şu an olduğu gibi.')}</b></p>
+<p>${t('Lost Comma İstanbul’da bir tasarım ve yazılım stüdyosu. Web siteleri · uygulamalar · kimlikler. Hepsini sahipleriyle birlikte ve herkesin önünde yapıyoruz.')} <b>${t('Tam şu an olduğu gibi.')}</b></p>
 <div class="ctas"><a class="btn f" href="#contact">${t('Proje başlat')} <span aria-hidden="true">↗</span></a><a class="btn g" href="#work">${t('İşlere bak')}</a></div>
 </div>
 <div class="pubc"><span class="ps mono"><i class="live" data-pubdot></i><span data-pubtxt>${t('Yayında · v{n}', { n: 214 })}</span></span><button type="button" class="pubb" data-pub>${t('Yayınla')}</button></div>

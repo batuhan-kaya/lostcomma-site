@@ -82,7 +82,7 @@ ${header(ctx, page.section, { home: page.home })}
 ${page.body(ctx, data)}
 ${!page.bare && page.next ? nextBand(ctx, page.next) : ''}
 </main>
-${page.footer ? page.footer(ctx, data) : footer(ctx)}
+${page.footer ? page.footer(ctx, data) : footer(ctx, { ask: !page.home })}
 ${page.data ? jsonData(page.data(ctx, data)) : ''}
 </div>
 </body>

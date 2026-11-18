@@ -152,7 +152,7 @@ describe('Metinler in the panel', () => {
     expect(res.headers.location).toBe('/panel/texts?m=restored');
     const tr = (await get('/tr')).body;
     expect(tr).toContain('data-word>Akılda kalan</span>');
-    expect(tr).toContain('<h2 class="ft-big">Bir fikrin mi var?</h2>');
+    expect((await get('/tr/studyo')).body).toContain('<h2 class="ft-big">Bir fikrin mi var?</h2>');
     expect(await app.db.select().from(settings).where(eq(settings.key, 'texts.home.tr'))).toEqual([]);
   });
 });

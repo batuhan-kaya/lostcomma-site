@@ -491,6 +491,9 @@ html.fv-open { overflow: hidden; }
 .smail:hover { opacity: .7; }
 .copy { min-height: 38px; padding: 0 15px; border: 1.5px solid var(--rule); border-radius: 999px; background: transparent; color: var(--fg); cursor: pointer; transition: background-color .25s, color .25s, border-color .25s; }
 .copy:hover { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+/* The footer's second way (a call) lives here on the homepage: its footer starts with the sitemap. */
+.sbook { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; margin-top: 6px; color: var(--fg); font-size: 15px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--rule); text-decoration-thickness: 1.5px; text-underline-offset: 5px; transition: text-decoration-color .25s; }
+.sbook:hover { text-decoration-color: currentColor; }
 /* after sending: the sentence turns into the thanks */
 .sdone { margin-top: 120px; }
 .dh { max-width: 1240px; margin: 0; font-family: var(--display); font-size: clamp(34px, 6.2vw, 96px); font-weight: 400; line-height: 1.06; letter-spacing: -.035em; font-variation-settings: 'wdth' 86, 'wght' 780; text-wrap: balance; }

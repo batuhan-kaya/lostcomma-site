@@ -1,4 +1,5 @@
-/** Shared behaviour on every page: team cursors · footer clock and the clock · language switch roll · mobile menu. */
+/** Shared behaviour on every page: team cursors · the header bar · footer clock and the clock · language switch roll · mobile menu. */
+import { headerBar } from './lib/bar';
 import { getCrew } from './lib/crew';
 import { playIntro } from './lib/intro';
 import { reducedMotion } from './lib/motion';
@@ -87,6 +88,7 @@ function offscreen(): void {
 }
 
 offscreen();
+headerBar();
 startStats();
 startClock();
 langSwitch();

@@ -115,17 +115,21 @@ function signature(ctx: Ctx): Safe {
  * The footer of every page (the homepage too): a way to start · the whole site · the sign-off
  * (logo · team · back to top) · the small print. Always on ink · lime is its one accent. Social links come from the
  * panel (Site ayarları · Sosyal) and an empty one does not show · so do an empty phone and address.
+ * `ask: false` (the homepage · phase 17): the contact sentence right above already asks · the
+ * footer starts with the sitemap.
  */
-export function footer(ctx: Ctx): Safe {
+export function footer(ctx: Ctx, o: { ask?: boolean } = {}): Safe {
   const { t, lang, settings } = ctx;
   const month = settings.month('work.nextMonth', lang);
   const phone = settings.text('studio.phone', lang);
   const address = settings.text('studio.address', lang);
   const social = SOCIAL.map((s) => ({ ...s, url: settings.text(s.key, lang) })).filter((s) => s.url);
   const services = SERVICE_KEYS.map((k) => fl(ctx, href(lang, 'service', { slug: SERVICE_SLUGS[k][lang] }), SERVICES[lang].services[k].name));
-  return html`<footer class="ft th-ink" data-sec="ft" data-ft>
+  const ask = o.ask !== false;
+  return html`<footer class="${cx('ft th-ink', !ask && 'lite')}" data-sec="ft" data-ft>
 <div class="wrap">
-<div class="ft-top">
+${ask
+    ? html`<div class="ft-top">
 <div class="ft-ask">
 <p class="ft-avail mono"><i aria-hidden="true"></i><span>${month ? t('Bir sonraki boş yer {m} ayında açılıyor', { m: month }) : t('Yeni projeleri konuşmaya açığız')}</span></p>
 <h2 class="ft-big">${t('Bir fikrin mi var?')}</h2>
@@ -134,7 +138,8 @@ export function footer(ctx: Ctx): Safe {
 <div class="ft-btns"><a class="ft-b f" href="${href(lang, 'start')}">${t('Proje başlat')} <span aria-hidden="true">→</span></a><a class="ft-b g" href="${href(lang, 'start')}#book">${t('20 dakikalık görüşme al')}</a></div>
 <a class="ft-mail" href="mailto:${EMAIL}">${EMAIL}</a>
 </div>
-</div>
+</div>`
+    : ''}
 <nav class="ft-map" aria-label="${t('Site haritası')}">
 <div class="ft-col"><h3 class="mono">${t('Stüdyo')}</h3><ul>${fl(ctx, href(lang, 'work'), t('İşler'))}${fl(ctx, href(lang, 'services'), t('Hizmetler'))}${fl(ctx, href(lang, 'process'), t('Süreç'))}${fl(ctx, href(lang, 'studio'), t('Stüdyo'))}</ul></div>
 <div class="ft-col"><h3 class="mono">${t('Hizmetler')}</h3><ul>${services}</ul></div>

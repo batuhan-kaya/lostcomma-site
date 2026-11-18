@@ -101,6 +101,8 @@
 /* The figure's title in the corner the stack leaves free. */
 .ly-cap { position: absolute; left: 0; top: 0; max-width: 200px; margin: 0; color: var(--grey); font-size: 11px; line-height: 1.6; }
 .ly-cap b { display: block; color: var(--ink); font-weight: 500; }
+/* fonra keeps its own spelling in the upper-case caption (like iOS and Android on the services frames). */
+.ly-cap .ly-nm { color: var(--ink); text-transform: none; }
 
 /* ---------- arrival: the sheets lie on each other · they rise one by one once the section shows ---------- */
 @media (scripting: enabled) {

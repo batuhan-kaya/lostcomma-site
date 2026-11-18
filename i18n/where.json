@@ -92,7 +92,8 @@
   "service"
  ],
  "20 dakikalık görüşme al": [
-  "chrome"
+  "chrome",
+  "home"
  ],
  "29 dk": [
   "service"
@@ -338,6 +339,9 @@
  ],
  "Bir saat seç": [
   "start"
+ ],
+ "bir ses ve hareket stüdyosunun sitesi": [
+  "home"
  ],
  "Bir sonraki boş yer {m} ayında açılıyor": [
   "chrome"
@@ -681,9 +685,6 @@
  ],
  "Fincanlar": [
   "process"
- ],
- "fonra · bir ses ve hareket stüdyosunun sitesi": [
-  "home"
  ],
  "fonra · Planlama": [
   "home"
@@ -1186,7 +1187,7 @@
  "Lost Comma · Ayarlar": [
   "studio"
  ],
- "Lost Comma İstanbul’da bir tasarım ve yazılım stüdyosu. Web siteleri ve uygulamalar ve kimlikleri sahipleriyle birlikte ve herkesin önünde yapıyoruz.": [
+ "Lost Comma İstanbul’da bir tasarım ve yazılım stüdyosu. Web siteleri · uygulamalar · kimlikler. Hepsini sahipleriyle birlikte ve herkesin önünde yapıyoruz.": [
   "home"
  ],
  "Lost Comma’nın arkasındaki ekip.": [
