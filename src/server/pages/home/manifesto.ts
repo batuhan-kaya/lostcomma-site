@@ -34,7 +34,7 @@ export function manifesto(ctx: Ctx): Safe {
 <p class="smeta mono"><span>manifesto.doc</span><span data-docstat>${t('5 öneri · 3 kişi')}</span></p>
 <p class="doc m-track" data-doc>${doc}</p>
 </div>
-<div class="cmts">${c.comments.map((cm, i) => html`<span class="cmt c-${cm.who} show" data-cmt="${i}"><span class="who mono"><i></i>${cm.who}</span><span class="ct">${cm.text}</span></span>`)}</div>
+<div class="cmts">${c.comments.map((cm, i) => html`<span class="cmt c-${cm.who} show" data-cmt="${i}"><span class="who mono" lang="en"><i></i>${cm.who}</span><span class="ct">${cm.text}</span></span>`)}</div>
 </div>
 <p class="mcap mono" role="status"><span data-doccap>${t('Öneriler ekip yazdıkça beliriyor. Tümünü reddet’i dene.')}</span><span class="caret" aria-hidden="true"></span></p>
 </div>

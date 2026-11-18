@@ -193,7 +193,7 @@
  "Asya": [
   "studio"
  ],
- "Aşağı kaydır · içimizden biri sana eşlik eder": [
+ "Aşağı kaydır": [
   "home"
  ],
  "aşağı yukarı 20 dakikada bir": [
@@ -465,6 +465,9 @@
  ],
  "Bütün işler": [
   "case"
+ ],
+ "Bütün işleri gör": [
+  "home"
  ],
  "Bütün katmanlar gizli. Çok minimal.": [
   "work"
@@ -885,6 +888,9 @@
   "services",
   "work"
  ],
+ "Hizmetleri tek tek gör": [
+  "home"
+ ],
  "i18n": [
   "other"
  ],
@@ -896,6 +902,9 @@
  ],
  "İçerik şemasından üretilen form": [
   "service"
+ ],
+ "içimizden biri sana eşlik eder": [
+  "home"
  ],
  "İçindekiler": [
   "legal"

@@ -25,7 +25,8 @@ const TEAM = [
  * The language switch rolls every label before it navigates.
  */
 export function roll(ctx: Ctx, source: string, delay = 0): Safe {
-  return html`<span class="${cx('rl', delay > 0 && 'd' + delay)}"><span>${ctx.t(source)}</span><span aria-hidden="true">${ctx.tAlt(source)}</span></span>`;
+  // The copy underneath is the other language: it keeps its own upper case (LIVE · never LİVE).
+  return html`<span class="${cx('rl', delay > 0 && 'd' + delay)}"><span>${ctx.t(source)}</span><span aria-hidden="true" lang="${ctx.lang === 'tr' ? 'en' : 'tr'}">${ctx.tAlt(source)}</span></span>`;
 }
 
 export function istanbulTime(d: Date): string {
