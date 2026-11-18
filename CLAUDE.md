@@ -63,6 +63,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - Keyboard focus on the endless board glides the frame into view (`reveal` in `home/board.ts`) · the board is `overflow: clip` so focus never scrolls it.
 - Long text in a fixed box wraps or scales and is never cut: layer names wrap · next band names shrink to 40 px · the hero is sized for its longest line with the longest word (EN 8.83 em · TR 9.84 em). `e2e/layout.spec.ts` covers 320 · 360 and the edges of each breakpoint.
 - A sticky bar lives in a wrapper with only what it rides along (`.chkw` on service pages) so it never covers the heading above.
+- The browser's autofill never repaints a field (phase 17b · `base.css`): Chrome and Safari paint a filled or previewed field with their own ground and black letters (!important in their own sheet) · the change is held back for a week with a transition delay so every field keeps its own ground and colour (the contact sentence stays clear · white boxes stay white) · Firefox's tint filter is off · a previewed suggestion takes the field's own letters (`::first-line`). Never give a field `transition` with `!important` of its own: the autofill rule needs it. Checked with a real autofill (`Autofill.trigger` over DevTools in the full Chromium).
 
 ## Homepage (src/server/pages/home · src/client/home)
 
