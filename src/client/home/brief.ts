@@ -268,8 +268,19 @@ export class Brief {
     const s = this.data.sentence;
     const thanks = $('[data-dthanks]');
     const will = $('[data-dwill]');
-    if (thanks && s) thanks.replaceChildren(name ? `${s.thanks} ${name}` : s.thanks, Object.assign(document.createElement('em'), { textContent: '.' }));
-    if (will && s) will.textContent = `${s.will[0]}${mail}${s.will[1]}`;
+    // Their own words come back in their colour (.dv · home.css): the name and the address they typed.
+    // An address may break after its @ and dots (<wbr>): on a phone a long one never runs off the screen.
+    const you = (text: string, address = false) => {
+      const el = Object.assign(document.createElement('span'), { className: 'dv' });
+      for (const bit of address ? text.split(/([@.])/) : [text]) {
+        if (!bit) continue;
+        el.append(bit);
+        if (bit === '@' || bit === '.') el.append(document.createElement('wbr'));
+      }
+      return el;
+    };
+    if (thanks && s) thanks.replaceChildren(...(name ? [`${s.thanks} `, you(name)] : [s.thanks]), Object.assign(document.createElement('em'), { textContent: '.' }));
+    if (will && s) will.replaceChildren(s.will[0], you(mail, true), s.will[1]);
     this.form!.hidden = true;
     if (this.done) this.done.hidden = false;
     const c = this.crew;
