@@ -181,9 +181,6 @@
  "Araçlar.": [
   "other"
  ],
- "Araştırma · Clay": [
-  "home"
- ],
  "Asya": [
   "studio"
  ],
@@ -196,15 +193,13 @@
  "Aşmıyor · sürüklenmiş gibi": [
   "other"
  ],
- "atölye.jpg": [
+ "Atölye kayıtları": [
   "home"
  ],
  "Atölyeler": [
+  "home",
   "process",
   "service"
- ],
- "Atölyeye gelen herkes": [
-  "home"
  ],
  "Avrupa": [
   "studio"
@@ -387,6 +382,9 @@
  "Brief gönder": [
   "chrome"
  ],
+ "bu": [
+  "home"
+ ],
  "Bu adres eksik gibi": [
   "home"
  ],
@@ -492,6 +490,9 @@
   "start"
  ],
  "Clay · Kadıköy’de bir seramik atölyesinin sitesi": [
+  "home"
+ ],
+ "Clay · Planlama": [
   "home"
  ],
  "comma · kayarak gelir": [
@@ -640,9 +641,6 @@
  "El": [
   "service"
  ],
- "El yapımı hissettirmeli": [
-  "home"
- ],
  "Eline ne geçiyor": [
   "process"
  ],
@@ -751,6 +749,7 @@
   "start"
  ],
  "Günlük": [
+  "home",
   "process",
   "service"
  ],
@@ -816,6 +815,9 @@
  ],
  "Hedefe uzaklık": [
   "other"
+ ],
+ "Hedefler": [
+  "home"
  ],
  "Henüz gösteremediğimiz projeler. {list} buraya gitti. Yüz yüze sor ve izin verilen her şeyi anlatalım.": [
   "work"
@@ -908,6 +910,9 @@
  ],
  "İlk not": [
   "note"
+ ],
+ "İlk sunum 2. haftada": [
+  "home"
  ],
  "İmleç · gelir": [
   "service"
@@ -1066,9 +1071,6 @@
  "Kilometre taşı": [
   "process"
  ],
- "Kim için?": [
-  "home"
- ],
  "Kim karar veriyor?": [
   "process"
  ],
@@ -1171,6 +1173,7 @@
   "studio"
  ],
  "Mağaza": [
+  "home",
   "process",
   "service"
  ],
@@ -1213,6 +1216,9 @@
  ],
  "mezun oldu.": [
   "lab"
+ ],
+ "mobil": [
+  "home"
  ],
  "müşteri": [
   "case"
@@ -1312,6 +1318,9 @@
  ],
  "On iki şey.": [
   "service"
+ ],
+ "Online sipariş": [
+  "home"
  ],
  "Oynat": [
   "service"
@@ -1504,6 +1513,9 @@
  "sıcak · el yapımı · yavaş": [
   "process"
  ],
+ "Sıcak bir dil": [
+  "home"
+ ],
  "Sıradaki": [
   "service"
  ],
@@ -1516,14 +1528,12 @@
  "Sipariş +%38": [
   "home"
  ],
- "Siparişler DM’den geliyor": [
-  "home"
- ],
  "Site": [
   "case"
  ],
  "Site haritası": [
-  "chrome"
+  "chrome",
+  "home"
  ],
  "Sitemiz atölyemiz kadar sıcak olsun.": [
   "home"
@@ -1676,6 +1686,9 @@
  ],
  "Takip et ve konular": [
   "notes"
+ ],
+ "Takvim": [
+  "home"
  ],
  "Takvim davetini e-postana gönderiyoruz. Konuşacağın kişi projeni yapacak ekipten biri olacak.": [
   "start"
@@ -1941,6 +1954,7 @@
   "service"
  ],
  "Ziyaret": [
+  "home",
   "process",
   "service"
  ],

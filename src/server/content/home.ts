@@ -117,7 +117,7 @@ const en: HomeContent = {
   lab: { name: 'Type that breathes', what: 'Experiment · ongoing' },
   notes: ['Still my favourite.', 'Look at that type.', 'Can we do this one again?', 'Pixel perfect. Finally.'],
   steps: [
-    { name: 'Listen', time: '1 to 2 weeks', text: 'We ask a lot of questions and then a few more. Workshops and research until the problem is sharper than the brief.', get: 'Brief · research · direction' },
+    { name: 'Plan', time: '1 to 2 weeks', text: 'First we listen and ask a lot of questions. Then we pin down the goal and the scope together and lay out the weeks ahead.', get: 'Brief · scope · calendar' },
     { name: 'Sketch', time: 'About a week', text: 'Ideas on paper first. Cheap to make and easy to throw away. Only the good ones survive the week.', get: 'Concepts · moodboards · flows' },
     { name: 'Prototype', time: '1 to 3 weeks', text: 'Clickable early. You feel the product long before we build it. A lot like this section.', get: 'Prototypes · key screens · motion tests' },
     { name: 'Build', time: '3 to 8 weeks', text: 'Design and code side by side with no handoff walls. Everything tested on real devices.', get: 'Design system · code · QA' },
@@ -187,7 +187,7 @@ const tr: HomeContent = {
   lab: { name: 'Nefes alan yazı', what: 'Deney · sürüyor' },
   notes: ['Hâlâ en sevdiğim.', 'Şu yazıya bak.', 'Bunu bir daha yapalım mı?', 'Piksel piksel. Sonunda.'],
   steps: [
-    { name: 'Dinle', time: '1 ila 2 hafta', text: 'Çok soru sorarız ve sonra birkaç tane daha. Problem brief’ten daha net olana kadar atölyeler ve araştırma.', get: 'Brief · araştırma · yön' },
+    { name: 'Planla', time: '1 ila 2 hafta', text: 'Önce dinler ve çok soru sorarız. Sonra hedefi ve kapsamı birlikte netleştirir ve önümüzdeki haftaları takvime dökeriz.', get: 'Brief · kapsam · takvim' },
     { name: 'Eskiz', time: 'Yaklaşık bir hafta', text: 'Önce kâğıtta fikirler. Yapması ucuz ve atması kolay. Haftayı sadece iyileri çıkarır.', get: 'Konseptler · moodboard · akışlar' },
     { name: 'Prototip', time: '1 ila 3 hafta', text: 'Erkenden tıklanabilir. Ürünü biz kurmadan çok önce hissedersin. Tıpkı bu bölüm gibi.', get: 'Prototipler · ana ekranlar · hareket testleri' },
     { name: 'Geliştirme', time: '3 ila 8 hafta', text: 'Tasarım ve kod yan yana. Devir teslim duvarı yok. Her şey gerçek cihazlarda test edilir.', get: 'Tasarım sistemi · kod · test' },

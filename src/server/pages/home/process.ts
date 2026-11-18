@@ -24,7 +24,11 @@ const AT: Seat[][] = [
 export function process(ctx: Ctx): Safe {
   const { t, lang } = ctx;
   const steps = ctx.texts.home(lang).steps;
-  const art = layerArt(ctx);
+  const art = layerArt(
+    ctx,
+    steps.map((s) => s.name),
+    (n) => ctx.assets.image(n),
+  );
   // The team's names are English words (keep their i in upper case) · the visitor is in the page's language.
   const seat = (s: Seat) => (s === 'you' ? html`<span>${t('sen')}</span>` : html`<span lang="en">${s}</span>`);
   return html`<section class="prc" data-sec="prc" id="process" data-host="code">

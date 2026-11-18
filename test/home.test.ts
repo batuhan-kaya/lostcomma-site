@@ -4,7 +4,7 @@ import { loadConfig } from '../src/server/config';
 import { readFileSync } from 'node:fs';
 import { HOME } from '../src/server/content/home';
 import { androidArt, frameArt } from '../src/server/pages/home/frames';
-import { layerArt } from '../src/server/pages/home/layers';
+import { BOARD, CODE, CROPS, TERM, layerArt } from '../src/server/pages/home/layers';
 import { PICTURES } from '../src/server/pages/home/pictures';
 
 const app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: 'https://lostcomma.co' }), now: () => new Date('2026-10-28T10:00:00+03:00') });
@@ -143,14 +143,60 @@ describe('05 · process · layer by layer', async () => {
     for (const s of HOME.en.steps) expect(sec).toContain(`>${s.name}</span>`);
   });
 
-  it('keeps the comma rule on the sheets too · Clay speaks English · the team’s names keep their i', () => {
+  it('keeps the comma rule on the sheets too · the products and tools speak English · the team’s names keep their i', () => {
     const ctx = { t: (s: string) => s } as never;
-    for (const a of layerArt(ctx)) {
-      const text = a.value.replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ');
-      expect(text, text.slice(0, 80)).not.toContain(',');
+    const names = HOME.tr.steps.map((s) => s.name);
+    const shot = (n: string) => `/assets/img/${n}-0123456789.webp`;
+    for (const pic of [undefined, shot]) {
+      for (const a of layerArt(ctx, names, pic as never)) {
+        const text = a.value.replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ');
+        expect(text, text.slice(0, 80)).not.toContain(',');
+      }
     }
-    expect(layerArt(ctx)[3]!.value).toContain('<div class="ly-site" lang="en">');
+    const art = layerArt(ctx, names, shot as never).map((a) => a.value);
+    expect(art[2]).toContain('<div class="ly-f f2" lang="en">');
+    expect(art[3]).toContain('<div class="ly-f f3" lang="en">');
+    expect(art[4]).toContain('<div class="ws" lang="en">');
     expect(sec).toMatch(/<span lang="en">design<\/span>/);
+    // The plan's calendar names the steps themselves.
+    for (const n of names) expect(art[0]).toContain(`<em>${n}</em>`);
+  });
+
+  it('the launch and build sheets crop Clay’s brand board (one lazy file) · without it the launch sheet keeps its drawing', () => {
+    const ctx = { t: (s: string) => s } as never;
+    const shot = (n: string) => `/assets/img/${n}-0123456789.webp`;
+    const art = layerArt(ctx, ['a', 'b', 'c', 'd', 'e'], shot as never).map((a) => a.value);
+    const imgs = [...art.join('').matchAll(/<img src="([^"]+)"[^>]*>/g)];
+    expect(imgs.length).toBeGreaterThan(8);
+    for (const m of imgs) {
+      expect(m[1]).toBe(shot('id-board'));
+      expect(m[0]).toContain('loading="lazy"');
+    }
+    const drawn = layerArt(ctx, ['a', 'b', 'c', 'd', 'e']).map((a) => a.value).join('');
+    expect(drawn).not.toContain('<img');
+    expect(drawn).toContain('class="ly-site"');
+  });
+
+  it('the CSS keeps the crops’ numbers and each code line’s length (CROPS · CODE · TERM in layers.ts)', () => {
+    const css = readFileSync(new URL('../src/styles/pages/_layers.css', import.meta.url), 'utf8');
+    const num = (re: RegExp) => Number(re.exec(css)?.[1]);
+    for (const [name, [x, y, w, h, W]] of Object.entries(CROPS)) {
+      const k = W / w;
+      expect(num(new RegExp(`\\.ph-${name} \\{ width: ([\\d.]+)px`)), name).toBeCloseTo(W, 0);
+      expect(num(new RegExp(`\\.ph-${name} \\{ width: [\\d.]+px; height: ([\\d.]+)px`)), name).toBeCloseTo(h * k, 0);
+      expect(num(new RegExp(`\\.ph-${name} img \\{ width: ([\\d.]+)px`)), name).toBeCloseTo(BOARD * k, 0);
+      expect(num(new RegExp(`\\.ph-${name} img \\{ width: [\\d.]+px; left: (-?[\\d.]+)px`)), name).toBeCloseTo(-x * k, 0);
+      expect(num(new RegExp(`\\.ph-${name} img \\{ width: [\\d.]+px; left: -?[\\d.]+px; top: (-?[\\d.]+)px`)), name).toBeCloseTo(-y * k, 0);
+    }
+    let last = 0;
+    CODE.forEach((line, i) => {
+      const n = line.reduce((s, [, x]) => s + x.length, 0);
+      expect(num(new RegExp(`\\.k${i + 1} \\{ --n: (\\d+);`)), `line ${i + 1}`).toBe(n);
+      const d = num(new RegExp(`\\.k${i + 1} \\{ --n: \\d+; --d: (\\d+)ms`));
+      expect(d).toBeGreaterThan(last);
+      last = d;
+    });
+    TERM.filter(([k]) => k === '$').forEach(([, s], i) => expect(num(new RegExp(`\\.tc\\.c${i + 1} \\.cl \\{ --n: (\\d+);`))).toBe(s.length));
   });
 });
 

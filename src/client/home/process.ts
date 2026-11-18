@@ -117,8 +117,12 @@ export class Process {
       this.set(nx);
       await c.sleep(700, signal);
       c.home(host);
-      if (nx === 3) c.say(host, t('testler yeşil'), 1600);
       if (nx === 4) c.say(host, t('yayın günü'), 1600);
+      // The build sheet types its code and runs the tests (about seven seconds): let it finish.
+      if (nx === 3) {
+        await c.sleep(6200, signal);
+        c.say(host, t('testler yeşil'), 1600);
+      }
       await c.sleep(4200, signal);
     }
   };

@@ -301,6 +301,24 @@ test.describe('homepage · desktop interactions', () => {
     expect(errors).toEqual([]);
   });
 
+  test('process: the build sheet types its code · the preview reloads · the terminal runs the tests', async ({ page }) => {
+    await page.goto('/en');
+    await toSection(page, 'prc');
+    await expect(page.locator('[data-ly]')).toHaveClass(/\bready\b/);
+    const cover = (sel: string) => page.locator(sel).evaluate((e) => getComputedStyle(e, '::after').transform);
+    const shown = (sel: string) => page.locator(sel).evaluate((e) => Number(getComputedStyle(e).opacity));
+    await page.locator('[data-lb="3"]').click();
+    // Right after the click the later lines wait under their covers and the preview is not there yet.
+    expect(await cover('.f3 .cl.k9')).toBe('none');
+    expect(await shown('.pv-live')).toBe(0);
+    // The first lines are typed one letter at a time · then everything is there.
+    await expect.poll(() => cover('.f3 .cl.k1'), { timeout: 3000 }).not.toBe('none');
+    await expect.poll(() => shown('.ide-term .to.o3'), { timeout: 10_000 }).toBe(1);
+    expect(await cover('.f3 .cl.k13')).not.toBe('none');
+    expect(await shown('.pv-live')).toBe(1);
+    await expect(page.locator('.ide-term .to.o3')).toHaveText('→ preview ready · hero.clay.studio');
+  });
+
   test('process: every note hangs on its sheet: the leader line meets the sheet’s right corner · in both languages', async ({ page }) => {
     for (const [lang, w] of [['en', 1440], ['tr', 1150]] as const) {
       await page.setViewportSize({ width: w, height: 900 });
