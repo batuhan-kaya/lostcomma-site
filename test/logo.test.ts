@@ -81,17 +81,23 @@ describe('the mark', () => {
 });
 
 describe('the footer', () => {
-  it('is the same on every page: a way to start · the whole site · the sign-off · the small print', async () => {
+  it("is on every page: a way to start · the whole site · the sign-off · the small print (the homepage's starts with the sitemap)", async () => {
     for (const lang of ['tr', 'en'] as const) {
       // Every page: the 404 too.
       for (const page of [href(lang, 'home'), href(lang, 'work'), href(lang, 'lab'), href(lang, 'privacy'), `/${lang}/no-such-page`]) {
         const doc = (await get(page)).body;
-        const ft = doc.slice(doc.indexOf('<footer class="ft th-ink" data-sec="ft" data-ft>'));
+        const home = page === href(lang, 'home');
+        const ft = doc.slice(doc.indexOf(`<footer class="ft th-ink${home ? ' lite' : ''}" data-sec="ft" data-ft>`));
         expect(ft.length, page).toBeGreaterThan(100);
         for (const id of ['start', 'work', 'services', 'process', 'studio', 'notes', 'lab', 'now', 'uses', 'rss', 'privacy', 'kvkk', 'cookies'] as const) {
+          if (home && id === 'start') continue;
           expect(ft, `${page} → ${id}`).toContain(`href="${href(lang, id)}"`);
         }
-        expect(ft).toContain(`href="${href(lang, 'start')}#book"`);
+        if (home) {
+          // The contact sentence right above already asks: no second ask · the call link lives under its address.
+          expect(ft).not.toContain('ft-big');
+          expect(doc.slice(0, doc.indexOf('<footer class="ft '))).toContain(`<a class="sbook" href="${href(lang, 'start')}#book">`);
+        } else expect(ft).toContain(`href="${href(lang, 'start')}#book"`);
         expect(ft).toContain(`href="${href(lang, 'home')}#contact"`);
         expect(ft).toContain('href="mailto:hello@lostcomma.co"');
         // The sign-off: the logo · the team and the visitor · the way back up.
