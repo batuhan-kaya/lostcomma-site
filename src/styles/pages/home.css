@@ -127,7 +127,7 @@
 .thr .td { color: var(--kc); }
 .hlede { position: absolute; left: var(--gut); bottom: 96px; width: 580px; }
 .hlede p { margin: 0; font-size: 21px; line-height: 1.42; text-wrap: pretty; }
-.hlede p b { font-weight: 600; }
+.hlede p b { font-weight: 600; white-space: nowrap; } /* the closing line never breaks in two */
 .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .pubc { position: absolute; right: var(--gut); top: 676px; display: flex; align-items: center; gap: 6px; padding: 6px 6px 6px 18px; border: 1.5px solid rgba(14,14,15,.14); border-radius: 999px; background: var(--milk); box-shadow: 0 12px 30px -20px rgba(14,14,15,.45); }
 .ps { display: flex; align-items: center; gap: 10px; color: var(--grey); }
