@@ -15,7 +15,7 @@ const AT: Seat[][] = [
 ];
 
 /**
- * 05 · Process · "Layer by layer". One real project (Clay's website) as five sheets in an
+ * 05 · Process · "Layer by layer". One real project (fonra's website) as five sheets in an
  * isometric stack · the first step at the bottom · the live site on top. Pick a step and the sheets
  * above it lift away like tracing paper · its note opens beside it on a leader line. The stack is
  * drawn in `layers.ts` · its geometry lives in home.css (`.ly`) · the client opens a step
@@ -39,7 +39,7 @@ export function process(ctx: Ctx): Safe {
 <p class="psub">${t('Her proje en alttan kurulur. Beş katman ve her biri bir sonrakinin zemini. Bir adım seç ya da ekibin katmanları kaldırmasını izle.')}</p>
 </div>
 <div class="ly s0" data-ly>
-<p class="ly-cap mono"><b>${t('Örnek proje')}</b>${t('Clay · Kadıköy’de bir seramik atölyesinin sitesi')}</p>
+<p class="ly-cap mono"><b>${t('Örnek proje')}</b>${t('fonra · bir ses ve hareket stüdyosunun sitesi')}</p>
 <div class="ly-v" aria-hidden="true"><div class="ly-s"><div class="ly-iso"><i class="ly-gr"></i>
 ${art.map((a, i) => html`<div class="ly-p l${i}${i === 0 ? ' on' : ' fut'}" data-lp="${i}"><i class="ly-ed"></i>${a}<i class="ly-hd"><i></i><i></i><i></i><i></i></i></div>`)}
 </div></div></div>

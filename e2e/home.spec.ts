@@ -314,9 +314,9 @@ test.describe('homepage · desktop interactions', () => {
     // The first lines are typed one letter at a time · then everything is there.
     await expect.poll(() => cover('.f3 .cl.k1'), { timeout: 3000 }).not.toBe('none');
     await expect.poll(() => shown('.ide-term .to.o3'), { timeout: 10_000 }).toBe(1);
-    expect(await cover('.f3 .cl.k13')).not.toBe('none');
+    expect(await cover('.f3 .cl.k14')).not.toBe('none');
     expect(await shown('.pv-live')).toBe(1);
-    await expect(page.locator('.ide-term .to.o3')).toHaveText('→ preview ready · hero.clay.studio');
+    await expect(page.locator('.ide-term .to.o3')).toHaveText('→ preview ready · fonra.studio');
   });
 
   test('process: every note hangs on its sheet: the leader line meets the sheet’s right corner · in both languages', async ({ page }) => {

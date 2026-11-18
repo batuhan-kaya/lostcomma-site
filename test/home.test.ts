@@ -4,7 +4,7 @@ import { loadConfig } from '../src/server/config';
 import { readFileSync } from 'node:fs';
 import { HOME } from '../src/server/content/home';
 import { androidArt, frameArt } from '../src/server/pages/home/frames';
-import { BOARD, CODE, CROPS, TERM, layerArt } from '../src/server/pages/home/layers';
+import { CODE, TERM, layerArt } from '../src/server/pages/home/layers';
 import { PICTURES } from '../src/server/pages/home/pictures';
 
 const app = await buildApp({ config: loadConfig({ NODE_ENV: 'test', SITE_URL: 'https://lostcomma.co' }), now: () => new Date('2026-10-28T10:00:00+03:00') });
@@ -95,7 +95,9 @@ describe('03 · the service frames', () => {
     expect(drawn).not.toContain('<img');
     expect(drawn).toContain('id="lds-sky"');
     const shot = (n: string) => `/assets/img/${n}-0123456789.webp`;
-    const all = frameArt(null, shot).map((a) => a.value).join('');
+    // The services' frames and the process sheets (the launch photo) share the slots.
+    const sheets = layerArt({ t: (s: string) => s } as never, ['a', 'b', 'c', 'd', 'e'], shot as never).map((a) => a.value);
+    const all = [...frameArt(null, shot).map((a) => a.value), ...sheets].join('');
     for (const n of Object.keys(PICTURES)) expect(all, n).toContain(`src="${shot(n)}"`);
     expect(all).not.toMatch(/id="(lds-sky|lj-s|ll-s|lc-s)"/);
   });
@@ -156,38 +158,30 @@ describe('05 · process · layer by layer', async () => {
     const art = layerArt(ctx, names, shot as never).map((a) => a.value);
     expect(art[2]).toContain('<div class="ly-f f2" lang="en">');
     expect(art[3]).toContain('<div class="ly-f f3" lang="en">');
-    expect(art[4]).toContain('<div class="ws" lang="en">');
+    expect(art[4]).toContain(`<span class="lw"><img src="${shot('ly-launch')}"`);
     expect(sec).toMatch(/<span lang="en">design<\/span>/);
     // The plan's calendar names the steps themselves.
     for (const n of names) expect(art[0]).toContain(`<em>${n}</em>`);
   });
 
-  it('the launch and build sheets crop Clay’s brand board (one lazy file) · without it the launch sheet keeps its drawing', () => {
+  it('fonra’s homepage is one lazy photo: the launch sheet · the build preview · the plan’s mood board · without it the sheets keep their drawings', () => {
     const ctx = { t: (s: string) => s } as never;
     const shot = (n: string) => `/assets/img/${n}-0123456789.webp`;
     const art = layerArt(ctx, ['a', 'b', 'c', 'd', 'e'], shot as never).map((a) => a.value);
     const imgs = [...art.join('').matchAll(/<img src="([^"]+)"[^>]*>/g)];
-    expect(imgs.length).toBeGreaterThan(8);
+    expect(imgs).toHaveLength(3);
     for (const m of imgs) {
-      expect(m[1]).toBe(shot('id-board'));
+      expect(m[1]).toBe(shot('ly-launch'));
       expect(m[0]).toContain('loading="lazy"');
     }
     const drawn = layerArt(ctx, ['a', 'b', 'c', 'd', 'e']).map((a) => a.value).join('');
     expect(drawn).not.toContain('<img');
-    expect(drawn).toContain('class="ly-site"');
+    expect(drawn).toContain('class="lw-drawn" lang="tr"');
   });
 
-  it('the CSS keeps the crops’ numbers and each code line’s length (CROPS · CODE · TERM in layers.ts)', () => {
+  it('the CSS keeps each code line’s length (CODE · TERM in layers.ts · the typing schedule)', () => {
     const css = readFileSync(new URL('../src/styles/pages/_layers.css', import.meta.url), 'utf8');
     const num = (re: RegExp) => Number(re.exec(css)?.[1]);
-    for (const [name, [x, y, w, h, W]] of Object.entries(CROPS)) {
-      const k = W / w;
-      expect(num(new RegExp(`\\.ph-${name} \\{ width: ([\\d.]+)px`)), name).toBeCloseTo(W, 0);
-      expect(num(new RegExp(`\\.ph-${name} \\{ width: [\\d.]+px; height: ([\\d.]+)px`)), name).toBeCloseTo(h * k, 0);
-      expect(num(new RegExp(`\\.ph-${name} img \\{ width: ([\\d.]+)px`)), name).toBeCloseTo(BOARD * k, 0);
-      expect(num(new RegExp(`\\.ph-${name} img \\{ width: [\\d.]+px; left: (-?[\\d.]+)px`)), name).toBeCloseTo(-x * k, 0);
-      expect(num(new RegExp(`\\.ph-${name} img \\{ width: [\\d.]+px; left: -?[\\d.]+px; top: (-?[\\d.]+)px`)), name).toBeCloseTo(-y * k, 0);
-    }
     let last = 0;
     CODE.forEach((line, i) => {
       const n = line.reduce((s, [, x]) => s + x.length, 0);
