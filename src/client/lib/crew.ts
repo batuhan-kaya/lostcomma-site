@@ -547,11 +547,15 @@ export class Crew {
     const vx = rr.left + x;
     const vy = rr.top + y;
     const flip = shouldFlip(x, W, c.tagW);
-    const tl = flip ? vx + A - 4 - c.tagW : vx + L;
-    return [
-      { left: vx + 2 - pad, top: vy + 1 - pad, right: vx + A * 0.72 + pad, bottom: vy + A - 1 + pad },
-      { left: tl - pad, top: vy + T - pad, right: tl + c.tagW + pad, bottom: vy + T + H + pad, strict: true },
-    ];
+    const tag = (f: boolean): Box => {
+      const tl = f ? vx + A - 4 - c.tagW : vx + L;
+      return { left: tl - pad, top: vy + T - pad, right: tl + c.tagW + pad, bottom: vy + T + H + pad, strict: true };
+    };
+    const out: Box[] = [{ left: vx + 2 - pad, top: vy + 1 - pad, right: vx + A * 0.72 + pad, bottom: vy + A - 1 + pad }, tag(flip)];
+    // The tag changes sides at a fixed x (shouldFlip): when a move inside the room crosses it (a fidget
+    // nudges a resting hand a few pixels) the tag's other side has to be clear of words too.
+    if (pad && (shouldFlip(x - pad, W, c.tagW) !== flip || shouldFlip(x + pad, W, c.tagW) !== flip)) out.push(tag(!flip));
+    return out;
   }
 
   /** Could a cursor stand at this point for a moment: on the page · inside its section · on no words? */
