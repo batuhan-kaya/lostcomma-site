@@ -22,7 +22,7 @@ import { MARK, MARK_EM } from '../../shared/logo';
 export const OG_W = 1200;
 export const OG_H = 630;
 /** Bump when the drawing changes so cached images are drawn again. */
-const VERSION = 3;
+const VERSION = 4;
 
 export interface OgSpec {
   lang: Lang;
@@ -250,7 +250,7 @@ function cursor(f: Faces, who: CrewName, x: number, y: number, c: Palette, side:
 }
 
 /** A selected layer (the hero's word box · the board's frames): frame · four handles · its label on top. */
-function selection(f: Faces, x0: number, y0: number, x1: number, y1: number, label: string, c: Palette, wash = true): string {
+function selection(f: Faces, x0: number, y0: number, x1: number, y1: number, label: string, c: Palette, wash = true, below = false): string {
   const h = 11;
   const handles = [
     [x0, y0],
@@ -265,8 +265,9 @@ function selection(f: Faces, x0: number, y0: number, x1: number, y1: number, lab
     (wash ? `<rect x="${n(x0)}" y="${n(y0)}" width="${n(x1 - x0)}" height="${n(y1 - y0)}" fill="${c.wash}"/>` : '') +
     `<rect x="${n(x0)}" y="${n(y0)}" width="${n(x1 - x0)}" height="${n(y1 - y0)}" fill="none" stroke="${c.sel}" stroke-width="2.5"/>` +
     handles +
-    `<rect x="${n(x0 - 1.25)}" y="${n(y0 - 33)}" width="${n(t.width + 20)}" height="25" rx="3" fill="${c.sel}"/>` +
-    at(t, x0 + 9, y0 - 15.5, c.selOn)
+    // The label sits above the layer · under it when a line of words is above (the hero's own way).
+    `<rect x="${n(x0 - 1.25)}" y="${n(below ? y1 + 8 : y0 - 33)}" width="${n(t.width + 20)}" height="25" rx="3" fill="${c.sel}"/>` +
+    at(t, x0 + 9, below ? y1 + 25.5 : y0 - 15.5, c.selOn)
   );
 }
 
@@ -310,13 +311,14 @@ async function picture(spec: NonNullable<OgSpec['image']>, file: string, box: { 
 }
 
 /** Title lines in the display face: the biggest size where the title (and the line under it) fit. */
-function fitTitle(f: Faces, title: string, sub: string, maxW: number, room: number, maxLines: number) {
+function fitTitle(f: Faces, title: string, sub: string, maxW: number, room: number, maxLines: number, labelUnder: boolean) {
   const words = title.trim().split(/\s+/);
   for (let size = 128; size >= 52; size -= 4) {
     const lines = wrap(words, (t) => shape(t, f.display, size, -0.05).width, maxW);
     if (!lines || lines.length > maxLines) continue;
     const subLines = sub ? clamp(sub, (t) => shape(t, f.text, 27).width, Math.min(maxW, 760), 2) : [];
-    const h = size * 0.98 + (lines.length - 1) * size * 1.02 + (subLines.length ? 30 + subLines.length * 27 * 1.38 : 0);
+    const under = labelUnder && lines.length > 1 ? 30 : 0;
+    const h = size * 0.98 + (lines.length - 1) * size * 1.02 + under + (subLines.length ? 30 + subLines.length * 27 * 1.38 : 0);
     if (h <= room) return { size, lines, subLines, h };
   }
   return { size: 52, lines: [title], subLines: [] as string[], h: 52 };
@@ -384,7 +386,7 @@ export async function drawOg(spec: OgSpec, src: FontSource, imageFile?: string):
       const [x0, y0b, x1, y1] = box;
       // The wash goes under the words (right after the ground).
       out.splice(1, 0, `<rect x="${n(x0)}" y="${n(y0b)}" width="${n(x1 - x0)}" height="${n(y1 - y0b)}" fill="${c.wash}"/>`);
-      out.push(selection(f, x0, y0b, x1, y1, upper(`${tagWord} · ${Math.round(size)}`), c, false));
+      out.push(selection(f, x0, y0b, x1, y1, upper(`${tagWord} · ${Math.round(size)}`), c, false, wordLine > 0));
       designAt = { x: (wordEnds ? px + dot : x1) + 10, y: y0b + (y1 - y0b) * 0.3 };
       out.push(cursor(f, 'design', designAt.x, designAt.y, c));
     }
@@ -412,7 +414,7 @@ export async function drawOg(spec: OgSpec, src: FontSource, imageFile?: string):
     const colW = pic ? pic.x - 48 - PAD : OG_W - PAD * 2 - 170;
     const roomTop = PAD + 64;
     const room = ruleY - 34 - roomTop;
-    const fit = fitTitle(f, spec.title, spec.sub, colW, room, pic ? 4 : 3);
+    const fit = fitTitle(f, spec.title, spec.sub, colW, room, pic ? 4 : 3, !pic);
     const lh = fit.size * 1.02;
     const y0 = roomTop + (room - fit.h) / 2;
     let lastLine = { x: PAD, base: y0, text: '' };
@@ -440,12 +442,13 @@ export async function drawOg(spec: OgSpec, src: FontSource, imageFile?: string):
       const sy1 = lastLine.base + fit.size * 0.17;
       out.push(`<rect x="${n(x0)}" y="${n(sy0)}" width="${n(x1 - x0)}" height="${n(sy1 - sy0)}" fill="${c.wash}"/>`);
       out.push(titleOut.join(''));
-      out.push(selection(f, x0, sy0, x1, sy1, upper(`${tagWord} · ${Math.round(fit.size)}`), c, false));
+      out.push(selection(f, x0, sy0, x1, sy1, upper(`${tagWord} · ${Math.round(fit.size)}`), c, false, fit.lines.length > 1));
       // The cursor rests beside the selection (its tag to the right: never over the line under it).
       out.push(cursor(f, spec.who, x1 + 10, sy0 + (sy1 - sy0) * 0.3, c));
     }
+    const under = !pic && fit.lines.length > 1 ? 30 : 0;
     fit.subLines.forEach((line, i) => {
-      out.push(at(shape(line, text, 27), PAD, y0 + fit.size * 0.98 + (fit.lines.length - 1) * lh + 30 + 27 + i * 27 * 1.38, c.mu));
+      out.push(at(shape(line, text, 27), PAD, y0 + fit.size * 0.98 + (fit.lines.length - 1) * lh + 30 + under + 27 + i * 27 * 1.38, c.mu));
     });
 
     out.push(`<rect x="${PAD}" y="${ruleY}" width="${OG_W - PAD * 2}" height="1.5" fill="${c.rule}"/>`);
