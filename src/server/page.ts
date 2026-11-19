@@ -6,7 +6,6 @@ import type { Safe } from './html';
 import type { Lang, T } from './i18n';
 import type { RouteId } from './routes';
 import type { PageLd } from './ld';
-import type { MediaRef } from './media/picture';
 import type { NextTone, ThemeId } from './themes';
 
 export interface Ctx {
@@ -83,15 +82,6 @@ export interface Page<D = undefined> {
   footer?: (ctx: Ctx, data: D) => Safe;
   /** Extra JSON handed to the page's client module (rendered as a non-executable data block). */
   data?: (ctx: Ctx, data: D) => unknown;
-  /**
-   * The share image (src/server/og): the small label · the title · the line under it · whose cursor
-   * rests on the selection · the homepage's hero lines · a picture beside the title (a case's cover).
-   * Defaults: the site and the page's section · the page title · its description · the page host.
-   */
-  og?: (
-    ctx: Ctx,
-    data: D,
-  ) => { kick?: string; title?: string; sub?: string; who?: CrewName; hero?: { lines: string[]; word: string; foot: string }; image?: MediaRef | null };
   /** og:type. Notes are articles. */
   ogType?: 'website' | 'article';
   /** Extra tags for <head> (article dates). Data blocks only: CSP runs no inline script. */

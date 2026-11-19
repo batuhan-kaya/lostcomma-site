@@ -188,7 +188,7 @@ test('RSS and share images answer', async ({ request }) => {
   const rss = await request.get('/tr/notes/rss.xml');
   expect(rss.status()).toBe(200);
   expect(await rss.text()).toContain('<language>tr</language>');
-  const og = await request.get('/og/en/notes/how-our-cursors-move.png');
+  const og = await request.get('/og/en.png');
   expect(og.status()).toBe(200);
   expect(og.headers()['content-type']).toBe('image/png');
 });

@@ -49,11 +49,6 @@ ${services(ctx, d.loop)}
 ${board(ctx, d.board)}
 ${process(ctx)}
 ${brief(ctx, { theme: CONTACT_THEME, sent: !!opts.sent, error: !!opts.error })}`,
-    // The share card is the hero itself: its lines with the first word selected (Metinler rewrites both).
-    og: (ctx) => {
-      const c = ctx.texts.home(ctx.lang);
-      return { hero: { lines: c.headline, word: c.words[0] ?? '', foot: ctx.t('Tasarım ve yazılım stüdyosu · İstanbul') } };
-    },
     data: (ctx) => {
       const c = ctx.texts.home(ctx.lang);
       return {

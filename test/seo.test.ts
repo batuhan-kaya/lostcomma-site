@@ -41,9 +41,11 @@ describe('every page', () => {
       expect(d, p).not.toContain(',');
       expect(meta(doc, 'robots'), p).toBe('index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
       const image = meta(doc, 'og:image') ?? '';
-      expect(image, p).toMatch(new RegExp(`^${SITE}/og${p}\\.(png|jpg)\\?v=[0-9a-f]{12}$`));
+      // One card per language for every page: the homepage hero.
+      expect(image, p).toMatch(new RegExp(`^${SITE}/og/${p.slice(1, 3)}\\.png\\?v=[0-9a-f]{12}$`));
       expect(meta(doc, 'og:image:secure_url'), p).toBe(image);
-      expect(meta(doc, 'og:image:type'), p).toBe(image.includes('.jpg?') ? 'image/jpeg' : 'image/png');
+      expect(meta(doc, 'og:image:type'), p).toBe('image/png');
+      expect(meta(doc, 'og:image:alt'), p).toBe(p.startsWith('/tr') ? 'Lost Comma · Akılda kalan web siteleri ve uygulamalar yapıyoruz' : 'Lost Comma · We design and build websites and apps people remember');
       expect(meta(doc, 'twitter:title'), p).toBe(meta(doc, 'og:title'));
       expect(meta(doc, 'twitter:description'), p).toBe(d);
       expect(meta(doc, 'og:locale:alternate'), p).toBe(p.startsWith('/tr') ? 'en_US' : 'tr_TR');
@@ -94,17 +96,11 @@ describe('a note · a case · a service', () => {
     expect(meta(doc, 'article:modified_time')).toBe(a.dateModified);
   });
 
-  it('a case is a creative work · a case with a photo cover gets a photo card (JPEG · light enough for WhatsApp)', async () => {
+  it('a case is a creative work with the card as its image', async () => {
     const doc = (await get('/en/work/sailing-club')).body;
     const w = of(graph(doc), 'CreativeWork')!;
     expect(w).toMatchObject({ name: 'Sailing club', creator: { '@id': `${SITE}/#org` }, dateCreated: expect.stringMatching(/^\d{4}$/) });
-    const image = meta(doc, 'og:image')!;
-    expect(image).toMatch(/\/og\/en\/work\/sailing-club\.jpg\?v=/);
-    const res = await get(image.replace(SITE, ''));
-    expect(res.headers['content-type']).toBe('image/jpeg');
-    expect(res.rawPayload.length).toBeLessThan(300_000);
-    const m = await sharp(res.rawPayload).metadata();
-    expect([m.format, m.width, m.height]).toEqual(['jpeg', 1200, 630]);
+    expect(w.image).toBe(meta(doc, 'og:image'));
   });
 
   it('a service names its provider', async () => {
@@ -112,16 +108,14 @@ describe('a note · a case · a service', () => {
     expect(s).toMatchObject({ name: 'Websites', provider: { '@id': `${SITE}/#org` }, areaServed: 'Worldwide' });
   });
 
-  it('the cards without a photo are PNG · light · 1200 × 630 · the homepage card is the hero', async () => {
-    for (const p of ['/tr', '/en', '/tr/surec', '/en/notes/how-our-cursors-move']) {
-      const doc = (await get(p)).body;
-      const res = await get(meta(doc, 'og:image')!.replace(SITE, ''));
-      expect(res.headers['content-type'], p).toBe('image/png');
-      expect(res.rawPayload.length, p).toBeLessThan(300_000);
+  it("the two cards are PNG · light enough for WhatsApp · 1200 × 630 · they follow the hero's words", async () => {
+    for (const lang of ['tr', 'en']) {
+      const res = await get(meta((await get(`/${lang}`)).body, 'og:image')!.replace(SITE, ''));
+      expect(res.headers['content-type'], lang).toBe('image/png');
+      expect(res.rawPayload.length, lang).toBeLessThan(300_000);
       const m = await sharp(res.rawPayload).metadata();
-      expect([m.width, m.height], p).toEqual([1200, 630]);
+      expect([m.width, m.height], lang).toEqual([1200, 630]);
     }
-    expect(meta((await get('/en')).body, 'og:image:alt')).toBe('Lost Comma · We design and build websites and apps people remember');
   });
 });
 

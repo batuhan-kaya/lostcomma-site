@@ -199,8 +199,6 @@ export const casePage: Page<ProjectPage> = {
   styles: ['case'],
   title: (_t, p) => p.name,
   description: (_t, p) => p.summary || p.kind,
-  // The case's cover beside its name on the share card (a drawn cover stays on the page only).
-  og: (_ctx, p) => ({ image: p.cover }),
   // The work in the structured data: what it is · for whom · when · its own site.
   ld: (ctx, p, image) => ({
     type: 'ItemPage',

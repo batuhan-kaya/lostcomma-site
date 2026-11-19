@@ -30,7 +30,6 @@
   "notes"
  ],
  "{n} dk": [
-  "note",
   "notes"
  ],
  "{n} dk okuma": [
@@ -1743,7 +1742,8 @@
  ],
  "Tasarım ve yazılım stüdyosu · İstanbul": [
   "chrome",
-  "home"
+  "home",
+  "other"
  ],
  "Tasarlayıp kodladığımız işler: web siteleri · uygulamalar · kimlikler ve hareket. Her birinin hikâyesi · sürüm geçmişi ve sonuçları.": [
   "work"

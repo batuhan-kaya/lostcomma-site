@@ -1,6 +1,6 @@
 import { html, raw, type Safe } from '../html';
 import { LANGS, type Lang } from '../i18n';
-import { OG_H, OG_W, ogExt, ogKey } from '../og';
+import { OG_H, OG_W, ogKey, ogSentence } from '../og';
 import { ogPath, ogSpec } from '../og/spec';
 import type { Ctx, Page } from '../page';
 import { href } from '../routes';
@@ -31,10 +31,11 @@ export function documentHtml<D>(page: Page<D>, ctx: Ctx, data: D): Safe {
   });
   const xDefault = ctx.alt.en ?? ctx.alt.tr;
   // Pages kept out of search engines (404) have no share image.
-  const spec = page.noindex ? null : ogSpec(page, ctx, data);
-  const image = spec ? `${site}${ogPath(ctx.path, spec)}?v=${ogKey(spec)}` : null;
+  // One card per language for every page (the homepage hero) · none on pages kept out of search.
+  const spec = page.noindex ? null : ogSpec(ctx);
+  const image = spec ? `${site}${ogPath(lang)}?v=${ogKey(spec)}` : null;
   // What the card shows in words (for screen readers in the apps that read it).
-  const ogAlt = spec?.hero ? `Lost Comma · ${spec.hero.lines.join(' ').replace('{w}', spec.hero.word)}` : `${name} · Lost Comma`;
+  const ogAlt = spec ? `Lost Comma · ${ogSentence(spec)}` : '';
 
   const fonts = PRELOAD_FONTS.map((f) => assets.font(f)).filter((u): u is string => !!u);
   const css = ['app', ...(page.styles ?? [])].map((n) => assets.css(n)).filter((u): u is string => !!u);
@@ -63,7 +64,7 @@ ${LANGS.filter((l) => l !== lang && ctx.alt[l]).map((l) => html`<meta property="
 ${image && spec
     ? html`<meta property="og:image" content="${image}">
 ${image.startsWith('https:') ? html`<meta property="og:image:secure_url" content="${image}">` : ''}
-<meta property="og:image:type" content="${ogExt(spec) === 'jpg' ? 'image/jpeg' : 'image/png'}">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="${OG_W}">
 <meta property="og:image:height" content="${OG_H}">
 <meta property="og:image:alt" content="${ogAlt}">

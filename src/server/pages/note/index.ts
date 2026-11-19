@@ -88,7 +88,6 @@ export const notePage: Page<NoteData> = {
     tr: d.note.slugs.tr ? href('tr', 'note', { slug: d.note.slugs.tr }) : null,
     en: d.note.slugs.en ? href('en', 'note', { slug: d.note.slugs.en }) : null,
   }),
-  og: (ctx, d) => ({ kick: `Notes · ${longDate(d.note.publishedAt, ctx.lang)} · ${ctx.t('{n} dk', { n: d.note.minutes })}`, title: d.note.title, who: d.note.author.crew }),
   head: (ctx, d) => {
     const n = d.note;
     return html`<meta property="article:published_time" content="${n.publishedAt.toISOString()}">

@@ -298,55 +298,22 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     });
   }
 
-  // Share images: /og + the page address + .png. Drawn once per content (src/server/og).
-  const og = new OgImages(
-    join(config.DATA_DIR, 'og'),
-    {
-      built: (key) => {
-        const url = assets.font(key);
-        return url ? join(publicDir, url) : null;
-      },
+  // The share card: one per language for every page (the homepage hero · src/server/og). Drawn once per wording.
+  const og = new OgImages(join(config.DATA_DIR, 'og'), {
+    built: (key) => {
+      const url = assets.font(key);
+      return url ? join(publicDir, url) : null;
     },
-    join(config.DATA_DIR, 'media'),
-  );
-  const ogRoutes = [
-    ...(Object.entries(STATIC_PAGES) as [RouteId, AnyPage][]).flatMap(([id, page]) =>
-      LANGS.map((lang) => ({ page, lang, re: new RegExp(`^${href(lang, id)}$`), keys: [] as string[] })),
-    ),
-    ...(Object.entries(PARAM_PAGES) as [RouteId, AnyPage][]).flatMap(([id, page]) =>
-      LANGS.map((lang) => ({
-        page,
-        lang,
-        re: new RegExp(`^${ROUTES[id][lang].replace(/:\w+/g, '([^/]+)')}$`),
-        keys: [...ROUTES[id][lang].matchAll(/:(\w+)/g)].map((m) => m[1]!),
-      })),
-    ),
-  ];
-  app.get('/og/*', async (req, reply) => {
-    // .png or .jpg: the extension the page linked · the card is served in its current format either way.
-    const m = /^(\/.*)\.(?:png|jpg)$/.exec('/' + (req.params as { '*': string })['*']);
-    const path = m?.[1] ?? '';
-    for (const r of ogRoutes) {
-      const hit = r.re.exec(path);
-      if (!hit) continue;
-      let params: Record<string, string>;
-      try {
-        params = Object.fromEntries(r.keys.map((k, i) => [k, decodeURIComponent(hit[i + 1]!)]));
-      } catch {
-        break;
-      }
-      const ctx = ctxFor(r.lang, path, { tr: null, en: null });
-      const data = r.page.load ? await r.page.load(ctx, params) : undefined;
-      if (r.page.load && data == null) break;
-      if (r.page.paths) ctx.path = r.page.paths(data)[r.lang] ?? path;
-      const { key, ext, body } = await og.image(ogSpec(r.page, ctx, data));
-      const fresh = (req.query as Record<string, string>).v === key;
-      return reply
-        .type(ext === 'jpg' ? 'image/jpeg' : 'image/png')
-        .header('cache-control', fresh ? 'public, max-age=31536000, immutable' : 'public, max-age=3600')
-        .send(body);
-    }
-    return reply.status(404).type('text/plain; charset=utf-8').send('Not found');
+  });
+  app.get('/og/:file', async (req, reply) => {
+    const lang = /^(tr|en)\.png$/.exec((req.params as { file: string }).file)?.[1];
+    if (!lang || !isLang(lang)) return reply.status(404).type('text/plain; charset=utf-8').send('Not found');
+    const { key, png } = await og.png(ogSpec(ctxFor(lang, href(lang, 'home'), { tr: null, en: null })));
+    const fresh = (req.query as Record<string, string>).v === key;
+    return reply
+      .type('image/png')
+      .header('cache-control', fresh ? 'public, max-age=31536000, immutable' : 'public, max-age=3600')
+      .send(png);
   });
 
   app.get('/robots.txt', (_req, reply) => reply.type('text/plain; charset=utf-8').send(robotsTxt(config.SITE_URL)));
