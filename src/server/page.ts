@@ -5,6 +5,7 @@ import type { Db } from './db';
 import type { Safe } from './html';
 import type { Lang, T } from './i18n';
 import type { RouteId } from './routes';
+import type { PageLd } from './ld';
 import type { NextTone, ThemeId } from './themes';
 
 export interface Ctx {
@@ -81,15 +82,12 @@ export interface Page<D = undefined> {
   footer?: (ctx: Ctx, data: D) => Safe;
   /** Extra JSON handed to the page's client module (rendered as a non-executable data block). */
   data?: (ctx: Ctx, data: D) => unknown;
-  /**
-   * The share image (src/server/og): the small label · the title · whose cursor rests at its end.
-   * Defaults: the page address · the page title · the page host.
-   */
-  og?: (ctx: Ctx, data: D) => { kick?: string; title?: string; who?: CrewName };
   /** og:type. Notes are articles. */
   ogType?: 'website' | 'article';
-  /** Extra tags for <head> (article dates · structured data). Data blocks only: CSP runs no inline script. */
+  /** Extra tags for <head> (article dates). Data blocks only: CSP runs no inline script. */
   head?: (ctx: Ctx, data: D) => Safe;
+  /** What the page is in the structured data (src/server/ld.ts): its kind · its dates · what it is about. */
+  ld?: (ctx: Ctx, data: D, image: string | null) => PageLd;
 }
 
 /** The route table holds pages with different data. */

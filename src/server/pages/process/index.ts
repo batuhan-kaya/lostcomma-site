@@ -171,7 +171,7 @@ export const processPage: Page = {
   scripts: ['process'],
   styles: ['process'],
   title: (t) => t('Süreç'),
-  description: (t) => t('Bir projenin ilk görüşmeden yayına kadar nasıl ilerlediği.'),
+  description: (t) => t('Bir proje ilk görüşmeden yayına hafta hafta nasıl ilerliyor: planla · eskiz · prototip · geliştirme ve yayın. Sonrasında da yanındayız.'),
   body: (ctx) => {
     const copy = PROCESS[ctx.lang];
     return html`${hero(ctx, copy)}

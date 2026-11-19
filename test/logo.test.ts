@@ -76,7 +76,7 @@ describe('the mark', () => {
     expect((await get('/panel/login')).body).toContain('<span class="lc-lock"><svg class="lc-mark"');
     const rss = (await get(href('en', 'rss'))).body;
     expect(rss).toContain(`<image><url>${SITE}/icon-144.png</url>`);
-    expect(doc).toContain(`"logo":"${SITE}/icon-512.png"`);
+    expect(doc).toContain(`"logo":{"@type":"ImageObject","url":"${SITE}/icon-512.png"`);
   });
 });
 

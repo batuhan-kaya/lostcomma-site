@@ -16,42 +16,51 @@ import decompress from 'wawoff2/decompress.js';
 import { esc } from '../html';
 import type { Lang } from '../i18n';
 import type { CrewName } from '../page';
-import { THEMES, type ThemeId } from '../themes';
+import { THEMES } from '../themes';
 import { MARK, MARK_EM } from '../../shared/logo';
 
 export const OG_W = 1200;
 export const OG_H = 630;
 /** Bump when the drawing changes so cached images are drawn again. */
-const VERSION = 2;
+const VERSION = 5;
 
 export interface OgSpec {
   lang: Lang;
-  theme: ThemeId;
-  /** The small label on top (mono · upper case). */
-  kick: string;
-  title: string;
-  /** Whose cursor rests at the end of the title. */
-  who: CrewName;
+  /** The hero's lines (Metinler) · {w} is the selected word. */
+  lines: string[];
+  /** The word in the box (the hero's first word). */
+  word: string;
+  /** The line under the rule (the studio · the city). */
+  foot: string;
 }
 
 export function ogKey(spec: OgSpec): string {
-  return createHash('sha1')
-    .update(JSON.stringify([VERSION, spec.lang, spec.theme, spec.kick, spec.title, spec.who]))
-    .digest('hex')
-    .slice(0, 12);
+  return createHash('sha1').update(JSON.stringify([VERSION, spec.lang, spec.lines, spec.word, spec.foot])).digest('hex').slice(0, 12);
 }
+
+/** The card's words in one sentence (og:image:alt · the SVG title). */
+export const ogSentence = (spec: OgSpec): string => spec.lines.join(' ').replace('{w}', spec.word).replace(/\s+/g, ' ').trim();
 
 /* ---------------- colours ---------------- */
 
 const CREW: Record<CrewName, string> = { design: '#3B35FF', code: '#3EE0A8', motion: '#FF9BD2' };
 const CREW_ON: Record<CrewName, string> = { design: '#F2F1EC', code: '#0E0E0F', motion: '#0E0E0F' };
-const DARK = new Set<ThemeId>(['ink', 'navy', 'blue', 'night', 'lab']);
+const LETTER: Record<CrewName, string> = { design: 'D', code: 'C', motion: 'M' };
+const CORAL = '#FF5A2B';
+const MINT = '#3EE0A8';
 
-function palette(theme: ThemeId) {
-  const dark = DARK.has(theme);
-  const fg = theme === 'navy' ? '#F6EFE6' : dark ? '#F2F1EC' : '#0E0E0F';
-  return { bg: THEMES[theme], fg, mu: dark ? 'rgba(242,241,236,.62)' : 'rgba(14,14,15,.6)', rule: dark ? 'rgba(242,241,236,.16)' : 'rgba(14,14,15,.14)' };
-}
+/** The homepage's paper: ink words · the hero's blue selection. */
+const c = {
+  bg: THEMES.paper,
+  fg: '#0E0E0F',
+  mu: 'rgba(14,14,15,.6)',
+  rule: 'rgba(14,14,15,.14)',
+  dots: 'rgba(14,14,15,.11)',
+  sel: '#3B35FF',
+  selOn: '#F2F1EC',
+  wash: 'rgba(59,53,255,.16)',
+};
+type Palette = typeof c;
 
 /* ---------------- fonts ---------------- */
 
@@ -138,101 +147,177 @@ function at(sh: Shaped, x: number, y: number, fill: string): string {
 }
 
 /** Greedy line breaks. Returns null when a single word is wider than the line. */
-function wrap(words: string[], widthOf: (s: string) => number, max: number): string[] | null {
-  const lines: string[] = [];
-  let line = '';
-  for (const w of words) {
-    if (widthOf(w) > max) return null;
-    const next = line ? `${line} ${w}` : w;
-    if (line && widthOf(next) > max) {
-      lines.push(line);
-      line = w;
-    } else line = next;
-  }
-  if (line) lines.push(line);
-  return lines;
-}
-
 const ARROW = 'M3 2 L3 19.5 L7.8 15.2 L11 22 L14.2 20.6 L11.1 13.9 L17.6 13.7 Z';
 const PAD = 72;
 
-export async function drawOg(spec: OgSpec, src: FontSource): Promise<Buffer> {
-  const [display, mono, sans, mark] = await Promise.all([
-    fontsFor('display', src),
-    fontsFor('mono', src),
-    fontsFor('sans', src),
-    fontsFor('display', src, { wdth: 88, wght: 820 }),
-  ]);
-  const c = palette(spec.theme);
-  const out: string[] = [];
+interface Faces {
+  display: Font[];
+  mono: Font[];
+  sans: Font[];
+  mark: Font[];
+}
 
-  // Kick: mono upper case · muted.
-  const kick = shape(spec.kick.toLocaleUpperCase(spec.lang), mono, 21, 0.03);
-  out.push(at(kick, PAD, PAD + 22, c.mu));
+const n = (v: number) => v.toFixed(1);
 
-  // Title: the biggest size that fits above the footer in three lines at most
-  // (room for the cursor on the last one · leading loose enough for a cedilla over the next line).
-  const words = spec.title.trim().split(/\s+/);
-  const max = OG_W - PAD * 2 - 110;
-  const top = PAD + 92;
-  const room = OG_H - PAD - 58 - 28 - top;
-  const LH = 1.04;
-  let size = 132;
-  let lines: string[] | null = null;
-  for (; size >= 56; size -= 4) {
-    const s = size;
-    lines = wrap(words, (t) => shape(t, display, s, -0.05).width, max);
-    if (lines && lines.length <= 3 && s * (0.78 + 0.2) + (lines.length - 1) * s * LH <= room) break;
-  }
-  lines ??= [spec.title];
-  const lh = size * LH;
-  let endX = PAD;
-  let endY = top;
-  lines.forEach((line, i) => {
-    const sh = shape(line, display, size, -0.05);
-    const y = top + size * 0.78 + i * lh;
-    out.push(at(sh, PAD - size * 0.04, y, c.fg));
-    endX = PAD - size * 0.04 + sh.width;
-    endY = y;
-  });
-
-  // The cursor resting at the end of the title · its name tag.
-  const k = 2.4;
-  const ax = endX + 18;
-  const ay = endY - size * 0.62;
-  const tagText = shape(spec.who, sans, 25);
-  const tagW = tagText.width + 28;
-  const tagFill = CREW[spec.who];
-  const clash = tagFill.toLowerCase() === c.bg.toLowerCase();
-  out.push(
-    `<g transform="translate(${ax.toFixed(1)} ${ay.toFixed(1)})"><path transform="scale(${k})" d="${ARROW}" fill="${tagFill}" stroke="${clash ? '#0E0E0F' : '#FFFFFF'}" stroke-width="1.5" stroke-linejoin="round"/>` +
-      `<rect x="${(17 * k).toFixed(1)}" y="${(20 * k).toFixed(1)}" width="${tagW.toFixed(1)}" height="40" rx="20" fill="${tagFill}"${clash ? ' stroke="#0E0E0F" stroke-width="2"' : ''}/>` +
-      at(tagText, 17 * k + 14, 20 * k + 28, CREW_ON[spec.who]) +
-      '</g>',
+/** The site's dotted ground (26 px like the page) · under everything. */
+function ground(c: Palette): string {
+  return (
+    `<defs><pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="13" cy="13" r="1.25" fill="${c.dots}"/></pattern>` +
+    `<filter id="soft" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="18"/></filter></defs>` +
+    `<rect width="${OG_W}" height="${OG_H}" fill="${c.bg}"/><rect width="${OG_W}" height="${OG_H}" fill="url(#dots)"/>`
   );
+}
 
-  // Footer: rule · the mark and the wordmark (one size: the corner is as tall as
-  // the l · the comma hangs under the baseline) · the three team dots.
-  const fy = OG_H - PAD;
-  out.push(`<rect x="${PAD}" y="${fy - 58}" width="${OG_W - PAD * 2}" height="1.5" fill="${c.rule}"/>`);
-  const WM = 36;
-  const mk = (MARK_EM.h * WM) / MARK.h;
-  out.push(`<g transform="translate(${PAD} ${(fy - MARK.base * mk).toFixed(2)}) scale(${mk.toFixed(5)})" fill="${c.fg}"><path d="${MARK.top}"/><path d="${MARK.comma}"/></g>`);
-  const wx = PAD + MARK_EM.w * WM + 0.16 * WM;
-  const lost = shape('lost', mark, WM, -0.02);
-  const comma = shape('comma', mark, WM, -0.02);
-  out.push(at(lost, wx, fy, c.fg));
-  out.push(at(comma, wx + lost.width + 0.24 * WM, fy, c.fg));
-  (['design', 'code', 'motion'] as const).forEach((n, i) => {
-    const ring = CREW[n].toLowerCase() === c.bg.toLowerCase() ? ` stroke="${c.fg}" stroke-width="1.5"` : '';
-    out.push(`<circle cx="${OG_W - PAD - 9 - (2 - i) * 26}" cy="${fy - 11}" r="9" fill="${CREW[n]}"${ring}/>`);
-  });
+/** The mark and the wordmark (one size: the corner as tall as the l · the comma under the baseline). */
+function lockup(f: Faces, x: number, base: number, size: number, fill: string): { svg: string; w: number } {
+  const mk = (MARK_EM.h * size) / MARK.h;
+  const wx = x + MARK_EM.w * size + 0.16 * size;
+  const lost = shape('lost', f.mark, size, -0.02);
+  const comma = shape('comma', f.mark, size, -0.02);
+  const svg =
+    `<g transform="translate(${n(x)} ${(base - MARK.base * mk).toFixed(2)}) scale(${mk.toFixed(5)})" fill="${fill}"><path d="${MARK.top}"/><path d="${MARK.comma}"/></g>` +
+    at(lost, wx, base, fill) +
+    at(comma, wx + lost.width + 0.24 * size, base, fill);
+  return { svg, w: wx + lost.width + 0.24 * size + comma.width - x };
+}
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}" viewBox="0 0 ${OG_W} ${OG_H}"><title>${esc(spec.title)}</title><rect width="${OG_W}" height="${OG_H}" fill="${c.bg}"/>${out.join('')}</svg>`;
+/** The team in the file (the header's avatars): three overlapping circles · right edge at x. */
+function avatars(f: Faces, right: number, cy: number, c: Palette): string {
+  const r = 17;
+  return (['design', 'code', 'motion'] as const)
+    .map((who, i) => {
+      const cx = right - r - (2 - i) * (2 * r - 8);
+      const l = shape(LETTER[who], f.sans, 15);
+      // An avatar the colour of the ground gets an ink ring (motion on pink · design on blue).
+      const same = CREW[who].toLowerCase() === c.bg.toLowerCase();
+      return (
+        `<circle cx="${n(cx)}" cy="${n(cy)}" r="${r}" fill="${CREW[who]}" stroke="${c.bg}" stroke-width="3"/>` +
+        (same ? `<circle cx="${n(cx)}" cy="${n(cy)}" r="${r - 1.5}" fill="none" stroke="#0E0E0F" stroke-width="1.5"/>` : '') +
+        at(l, cx - l.width / 2, cy + 5.3, CREW_ON[who])
+      );
+    })
+    .join('');
+}
+
+/** A teammate's cursor with its name tag · the tip at (x y) · the tag to the left when there is no room. */
+function cursor(f: Faces, who: CrewName, x: number, y: number, c: Palette, side: 'auto' | 'left' = 'auto'): string {
+  const k = 2.2;
+  const name = shape(who, f.sans, 22);
+  const tw = name.width + 26;
+  const left = side === 'left' || x + 17 * k + tw > OG_W - 24;
+  const tx = left ? -tw - 4 : 15 * k;
+  const fill = CREW[who];
+  const clash = fill.toLowerCase() === c.bg.toLowerCase();
+  const edge = clash ? '#0E0E0F' : '#FFFFFF';
+  return (
+    `<g transform="translate(${n(x - 3 * k)} ${n(y - 2 * k)})"><path transform="scale(${k})" d="${ARROW}" fill="${fill}" stroke="${edge}" stroke-width="1.5" stroke-linejoin="round"/>` +
+    `<rect x="${n(tx)}" y="${n(19 * k)}" width="${n(tw)}" height="36" rx="18" fill="${fill}"${clash ? ' stroke="#0E0E0F" stroke-width="2"' : ''}/>` +
+    at(name, tx + 13, 19 * k + 25, CREW_ON[who]) +
+    '</g>'
+  );
+}
+
+/** A selected layer (the hero's word box · the board's frames): frame · four handles · its label on top. */
+function selection(f: Faces, x0: number, y0: number, x1: number, y1: number, label: string, c: Palette, wash = true, below = false): string {
+  const h = 11;
+  const handles = [
+    [x0, y0],
+    [x1, y0],
+    [x0, y1],
+    [x1, y1],
+  ]
+    .map(([x, y]) => `<rect x="${n(x! - h / 2)}" y="${n(y! - h / 2)}" width="${h}" height="${h}" fill="${c.bg}" stroke="${c.sel}" stroke-width="2.5"/>`)
+    .join('');
+  const t = shape(label, f.mono, 14, 0.04);
+  return (
+    (wash ? `<rect x="${n(x0)}" y="${n(y0)}" width="${n(x1 - x0)}" height="${n(y1 - y0)}" fill="${c.wash}"/>` : '') +
+    `<rect x="${n(x0)}" y="${n(y0)}" width="${n(x1 - x0)}" height="${n(y1 - y0)}" fill="none" stroke="${c.sel}" stroke-width="2.5"/>` +
+    handles +
+    // The label sits above the layer · under it when a line of words is above (the hero's own way).
+    `<rect x="${n(x0 - 1.25)}" y="${n(below ? y1 + 8 : y0 - 33)}" width="${n(t.width + 20)}" height="25" rx="3" fill="${c.sel}"/>` +
+    at(t, x0 + 9, below ? y1 + 25.5 : y0 - 15.5, c.selOn)
+  );
+}
+
+/** The one card every page shares in its language: the homepage hero as it stands in the file. */
+export async function drawOg(spec: OgSpec, src: FontSource): Promise<Buffer> {
+  const [display, mono, sans, mark] = await Promise.all([fontsFor('display', src), fontsFor('mono', src), fontsFor('sans', src), fontsFor('display', src, { wdth: 88, wght: 820 })]);
+  const f: Faces = { display, mono, sans, mark };
+  const out: string[] = [ground(c)];
+  const upper = (t: string) => t.toLocaleUpperCase(spec.lang);
+  const tagWord = spec.lang === 'tr' ? 'Metin' : 'Text';
+  const domain = shape('lostcomma.co', mono, 18, 0.03);
+  const ruleY = OG_H - PAD - 50;
+
+    // The homepage: the header's line · the hero sentence with its word selected · the team at work.
+    const top = lockup(f, PAD, PAD + 22, 30, c.fg);
+    out.push(top.svg);
+    const lx = PAD + top.w + 26;
+    const live = shape(upper(spec.lang === 'tr' ? 'Canlı' : 'Live'), mono, 15, 0.05);
+    out.push(`<circle cx="${n(lx + 5)}" cy="${n(PAD + 15)}" r="5" fill="${MINT}"/>` + at(live, lx + 18, PAD + 20.5, c.mu));
+    out.push(avatars(f, lx + 18 + live.width + 26 + 3 * 34 - 16, PAD + 14, c));
+    out.push(at(domain, OG_W - PAD - domain.width, PAD + 20, c.mu));
+
+    const lines = spec.lines.map((l) => l.replace('{w}', spec.word));
+    const maxW = OG_W - PAD * 2 - 40;
+    let size = 116;
+    for (; size > 56; size -= 2) if (lines.every((l) => shape(l, display, size, -0.05).width <= maxW) && size * 0.98 + (lines.length - 1) * size * 1.02 <= ruleY - 40 - (PAD + 92)) break;
+    const lh = size * 1.02;
+    const blockH = size * 0.98 + (lines.length - 1) * lh;
+    const y0 = PAD + 70 + (ruleY - 30 - (PAD + 70) - blockH) / 2;
+    const ends: { x: number; y: number }[] = [];
+    let wordBox = null as [number, number, number, number] | null;
+    for (const [i, raw] of spec.lines.entries()) {
+      const line = raw.replace('{w}', spec.word);
+      const base = y0 + size * 0.8 + i * lh;
+      const x = PAD - size * 0.04;
+      const sh = shape(line, display, size, -0.05);
+      const wi = raw.indexOf('{w}');
+      if (wi >= 0) {
+        const pre = shape(raw.slice(0, wi), display, size, -0.05).width;
+        const ww = shape(spec.word, display, size, -0.05).width;
+        wordBox = [x + pre - 8, base - size * 0.8, x + pre + ww + 10, base + size * 0.17];
+      }
+      out.push(at(sh, x, base, c.fg));
+      ends.push({ x: x + sh.width, y: base });
+    }
+    // The period: the hero's coral square (outside the word box when the word ends the sentence).
+    const last = ends[ends.length - 1]!;
+    const dot = size * 0.13;
+    const wordLine = spec.lines.findIndex((l) => l.includes('{w}'));
+    const box = wordBox as [number, number, number, number] | null;
+    const wordEnds = !!box && wordLine === lines.length - 1 && spec.lines[wordLine]!.trimEnd().endsWith('{w}');
+    const px = wordEnds ? box![2] + 5 : last.x + size * 0.02;
+    out.push(`<rect x="${n(px)}" y="${n(last.y - dot)}" width="${n(dot)}" height="${n(dot)}" fill="${CORAL}"/>`);
+    let designAt = { x: 0, y: 0 };
+    if (box) {
+      const [x0, y0b, x1, y1] = box;
+      // The wash goes under the words (right after the ground).
+      out.splice(1, 0, `<rect x="${n(x0)}" y="${n(y0b)}" width="${n(x1 - x0)}" height="${n(y1 - y0b)}" fill="${c.wash}"/>`);
+      out.push(selection(f, x0, y0b, x1, y1, upper(`${tagWord} · ${Math.round(size)}`), c, false, wordLine > 0));
+      designAt = { x: (wordEnds ? px + dot : x1) + 10, y: y0b + (y1 - y0b) * 0.3 };
+      out.push(cursor(f, 'design', designAt.x, designAt.y, c));
+    }
+    // code and motion rest beside the other lines where they leave room (never on a word) · on the
+    // word's line after design when the others are full.
+    const spots = ends
+      .map((e, i) => ({ x: (i === ends.length - 1 ? px + dot : e.x) + 60, y: e.y - size * 0.55, i }))
+      .filter((e) => e.i !== wordLine && e.x + 150 < OG_W - PAD);
+    if (box && designAt.x + 220 + 190 < OG_W - PAD) spots.push({ x: designAt.x + 220, y: designAt.y, i: wordLine });
+    (['code', 'motion'] as const).forEach((who, j) => {
+      const e = spots[j];
+      if (e) out.push(cursor(f, who, e.x, e.y, c));
+    });
+
+    out.push(`<rect x="${PAD}" y="${ruleY}" width="${OG_W - PAD * 2}" height="1.5" fill="${c.rule}"/>`);
+    const foot = shape(upper(spec.foot), mono, 17, 0.05);
+    out.push(at(foot, PAD, OG_H - PAD - 4, c.mu));
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}" viewBox="0 0 ${OG_W} ${OG_H}"><title>${esc(ogSentence(spec))}</title>${out.join('')}</svg>`;
   return sharp(Buffer.from(svg)).png({ compressionLevel: 9, palette: false }).toBuffer();
 }
 
-/** Draws once per content · keeps the PNG on disk (DATA_DIR/og) and answers repeats from there. */
+/** Draws once per language and wording · keeps the PNG on disk (DATA_DIR/og) and answers repeats from there. */
 export class OgImages {
   private pending = new Map<string, Promise<Buffer>>();
   constructor(

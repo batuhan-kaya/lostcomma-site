@@ -6,7 +6,8 @@ import type { Ctx, NextBand } from '../page';
 import { href, type RouteId } from '../routes';
 import { lockup } from './logo';
 
-const NAV: [RouteId, string][] = [
+/** The header's sections (the share cards say which one a page lives under). */
+export const NAV: [RouteId, string][] = [
   ['work', msg('İşler')],
   ['services', msg('Hizmetler')],
   ['studio', msg('Stüdyo')],

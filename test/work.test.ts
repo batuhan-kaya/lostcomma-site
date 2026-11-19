@@ -161,7 +161,12 @@ describe('Case · short pages and misses', () => {
 
   it('lists every case page in the sitemap with both languages', async () => {
     const xml = (await get('/sitemap.xml')).body;
-    expect(xml).toContain(`<loc>${SITE}/tr/isler/yelken-kulubu</loc><xhtml:link rel="alternate" hreflang="tr" href="${SITE}/tr/isler/yelken-kulubu"/><xhtml:link rel="alternate" hreflang="en" href="${SITE}/en/work/sailing-club"/>`);
+    // When it last changed (a save in the panel) · both languages · English as the default.
+    expect(xml).toMatch(
+      new RegExp(
+        `<loc>${SITE}/tr/isler/yelken-kulubu</loc><lastmod>\\d{4}-\\d\\d-\\d\\dT[^<]+</lastmod><xhtml:link rel="alternate" hreflang="tr" href="${SITE}/tr/isler/yelken-kulubu"/><xhtml:link rel="alternate" hreflang="en" href="${SITE}/en/work/sailing-club"/><xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/en/work/sailing-club"/>`,
+      ),
+    );
     expect(xml).not.toContain('nda-012');
   });
 });

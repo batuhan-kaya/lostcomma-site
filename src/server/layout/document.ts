@@ -1,12 +1,13 @@
 import { html, raw, type Safe } from '../html';
 import { LANGS, type Lang } from '../i18n';
-import { OG_H, OG_W, ogKey } from '../og';
+import { OG_H, OG_W, ogKey, ogSentence } from '../og';
 import { ogPath, ogSpec } from '../og/spec';
 import type { Ctx, Page } from '../page';
 import { href } from '../routes';
 import { THEMES } from '../themes';
 import { footer, header, nextBand } from './chrome';
 import { intro } from './intro';
+import { ldGraph } from '../ld';
 
 const OG_LOCALE: Record<Lang, string> = { tr: 'tr_TR', en: 'en_US' };
 const PRELOAD_FONTS = ['anybody-latin', 'geist-latin', 'martian-latin'];
@@ -30,7 +31,11 @@ export function documentHtml<D>(page: Page<D>, ctx: Ctx, data: D): Safe {
   });
   const xDefault = ctx.alt.en ?? ctx.alt.tr;
   // Pages kept out of search engines (404) have no share image.
-  const image = page.noindex ? null : `${site}${ogPath(ctx.path)}?v=${ogKey(ogSpec(page, ctx, data))}`;
+  // One card per language for every page (the homepage hero) · none on pages kept out of search.
+  const spec = page.noindex ? null : ogSpec(ctx);
+  const image = spec ? `${site}${ogPath(lang)}?v=${ogKey(spec)}` : null;
+  // What the card shows in words (for screen readers in the apps that read it).
+  const ogAlt = spec ? `Lost Comma · ${ogSentence(spec)}` : '';
 
   const fonts = PRELOAD_FONTS.map((f) => assets.font(f)).filter((u): u is string => !!u);
   const css = ['app', ...(page.styles ?? [])].map((n) => assets.css(n)).filter((u): u is string => !!u);
@@ -45,7 +50,8 @@ export function documentHtml<D>(page: Page<D>, ctx: Ctx, data: D): Safe {
 <meta name="description" content="${description}">
 ${page.noindex
     ? html`<meta name="robots" content="noindex">`
-    : html`<link rel="canonical" href="${url}">
+    : html`<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<link rel="canonical" href="${url}">
 ${alternates}
 ${xDefault ? html`<link rel="alternate" hreflang="x-default" href="${site + xDefault}">` : ''}`}
 <meta property="og:type" content="${page.ogType ?? 'website'}">
@@ -54,16 +60,23 @@ ${xDefault ? html`<link rel="alternate" hreflang="x-default" href="${site + xDef
 <meta property="og:description" content="${description}">
 <meta property="og:url" content="${url}">
 <meta property="og:locale" content="${OG_LOCALE[lang]}">
-${image
+${LANGS.filter((l) => l !== lang && ctx.alt[l]).map((l) => html`<meta property="og:locale:alternate" content="${OG_LOCALE[l]}">`)}
+${image && spec
     ? html`<meta property="og:image" content="${image}">
+${image.startsWith('https:') ? html`<meta property="og:image:secure_url" content="${image}">` : ''}
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="${OG_W}">
 <meta property="og:image:height" content="${OG_H}">
-<meta property="og:image:alt" content="${name}">
-<meta name="twitter:image" content="${image}">`
+<meta property="og:image:alt" content="${ogAlt}">
+<meta name="twitter:image" content="${image}">
+<meta name="twitter:image:alt" content="${ogAlt}">`
     : ''}
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${title}">
+<meta name="twitter:description" content="${description}">
 <link rel="alternate" type="application/rss+xml" title="Lost Comma · Notes" href="${site + href(lang, 'rss')}">
 ${page.head ? page.head(ctx, data) : ''}
+${page.noindex ? '' : ldGraph(ctx, page, data, { name, title, description, image })}
 <meta name="theme-color" content="${THEMES[theme]}">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">

@@ -7,6 +7,7 @@ import type { Ctx, Page } from '../../page';
 import { href } from '../../routes';
 import { isoDay, longDate } from '../../../shared/dates';
 import { inLang, latin, noteLink, stop, tagLabel } from '../notes';
+import { orgRef, pageRef } from '../../ld';
 
 /**
  * A note. The text in the middle · a table of contents that knows how far you have read ·
@@ -87,23 +88,39 @@ export const notePage: Page<NoteData> = {
     tr: d.note.slugs.tr ? href('tr', 'note', { slug: d.note.slugs.tr }) : null,
     en: d.note.slugs.en ? href('en', 'note', { slug: d.note.slugs.en }) : null,
   }),
-  og: (ctx, d) => ({ kick: `Notes · ${longDate(d.note.publishedAt, ctx.lang)} · ${ctx.t('{n} dk', { n: d.note.minutes })}`, title: d.note.title, who: d.note.author.crew }),
   head: (ctx, d) => {
     const n = d.note;
-    const ld = {
-      '@context': 'https://schema.org',
-      '@type': 'BlogPosting',
-      headline: n.title,
-      description: n.excerpt,
-      datePublished: n.publishedAt.toISOString(),
-      inLanguage: ctx.lang,
-      url: ctx.site + ctx.path,
-      author: { '@type': 'Person', name: n.author.name },
-      publisher: { '@type': 'Organization', name: 'Lost Comma', logo: { '@type': 'ImageObject', url: `${ctx.site}/icon-512.png`, width: 512, height: 512 } },
-    };
     return html`<meta property="article:published_time" content="${n.publishedAt.toISOString()}">
-${n.tags.map((k) => html`<meta property="article:tag" content="${tagLabel(ctx, k)}">`)}
-${raw(`<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`)}`;
+<meta property="article:modified_time" content="${n.updatedAt.toISOString()}">
+<meta property="article:author" content="${n.author.name}">
+${n.tags.map((k) => html`<meta property="article:tag" content="${tagLabel(ctx, k)}">`)}`;
+  },
+  // The article in the structured data (src/server/ld.ts): who wrote it · when · how long it reads.
+  ld: (ctx, d, image) => {
+    const n = d.note;
+    return {
+      published: n.publishedAt,
+      modified: n.updatedAt,
+      nodes: [
+        {
+          '@type': 'BlogPosting',
+          '@id': `${ctx.site}${ctx.path}#article`,
+          headline: n.title,
+          description: n.excerpt,
+          url: ctx.site + ctx.path,
+          inLanguage: ctx.lang,
+          datePublished: n.publishedAt.toISOString(),
+          dateModified: n.updatedAt.toISOString(),
+          timeRequired: `PT${n.minutes}M`,
+          keywords: n.tags.map((k) => tagLabel(ctx, k)).join(' · '),
+          author: { '@type': 'Person', name: n.author.name, ...(n.about?.role ? { jobTitle: n.about.role } : {}), worksFor: orgRef(ctx) },
+          publisher: orgRef(ctx),
+          mainEntityOfPage: pageRef(ctx),
+          isPartOf: { '@type': 'Blog', name: 'Lost Comma · Notes', url: `${ctx.site}${href(ctx.lang, 'notes')}` },
+          ...(image ? { image } : {}),
+        },
+      ],
+    };
   },
   data: (ctx, d) => ({ minutes: d.note.minutes, url: ctx.site + ctx.path, title: d.note.title, who: d.note.author.crew }),
   body: (ctx, d) => html`${head(ctx, d)}

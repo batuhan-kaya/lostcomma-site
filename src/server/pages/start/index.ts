@@ -149,8 +149,9 @@ export const startPage: Page<StartData> = {
   section: 'start',
   scripts: ['start'],
   styles: ['start'],
+  ld: () => ({ type: 'ContactPage' }),
   title: (t) => t('Proje başlat'),
-  description: (t) => t('Ofis saatlerimizden birini seç ve konuşalım.'),
+  description: (t) => t('Ofis saatlerimizden birini seç ya da projeni bir cümleyle anlat. Yirmi dakikalık bir görüşme · bütün ekip okur ve bir gün içinde döneriz.'),
   load: async (ctx) => {
     const open = await openDays(ctx.db, ctx.now);
     const list = open.days;

@@ -286,10 +286,13 @@ describe('feeds · share images · sitemap', () => {
     expect(trXml).toContain('<language>tr</language>');
   });
 
-  it('every page links its share image · the image is a 1200 × 630 PNG cached by content', async () => {
+  it("every page links its language's share card (the homepage hero) · a 1200 × 630 PNG cached by its words", async () => {
     const doc = (await get('/tr/notes/imleclerimiz-nasil-hareket-ediyor')).body;
     const url = /<meta property="og:image" content="([^"]+)">/.exec(doc)?.[1];
-    expect(url).toMatch(/^https:\/\/lostcomma\.co\/og\/tr\/notes\/imleclerimiz-nasil-hareket-ediyor\.png\?v=[0-9a-f]{12}$/);
+    expect(url).toMatch(/^https:\/\/lostcomma\.co\/og\/tr\.png\?v=[0-9a-f]{12}$/);
+    // The same card on every Turkish page · its own card on every English one.
+    expect((await get('/tr/isler')).body).toContain(`<meta property="og:image" content="${url}">`);
+    expect((await get('/en/notes/how-our-cursors-move')).body).toMatch(/<meta property="og:image" content="https:\/\/lostcomma\.co\/og\/en\.png\?v=[0-9a-f]{12}">/);
     const res = await get(url!.replace(SITE, ''));
     expect(res.statusCode).toBe(200);
     expect(res.headers['content-type']).toBe('image/png');
@@ -297,12 +300,13 @@ describe('feeds · share images · sitemap', () => {
     const meta = await sharp(res.rawPayload).metadata();
     expect([meta.width, meta.height]).toEqual([1200, 630]);
 
-    const stale = await get('/og/tr/notes/imleclerimiz-nasil-hareket-ediyor.png?v=old');
+    const stale = await get('/og/tr.png?v=old');
     expect(stale.headers['cache-control']).toBe('public, max-age=3600');
-    expect((await get('/og/en/work.png')).statusCode).toBe(200);
+    expect((await get('/og/en.png')).statusCode).toBe(200);
+    expect((await get('/og/de.png')).statusCode).toBe(404);
     expect((await get('/og/en/notes/nope.png')).statusCode).toBe(404);
-    expect((await get('/og/en/nowhere.png')).statusCode).toBe(404);
-    expect(ogKey({ lang: 'en', theme: 'milk', kick: 'a', title: 'b', who: 'code' })).not.toBe(ogKey({ lang: 'en', theme: 'milk', kick: 'a', title: 'c', who: 'code' }));
+    const spec = { lang: 'en' as const, lines: ['people {w}'], word: 'remember', foot: 'Istanbul' };
+    expect(ogKey(spec)).not.toBe(ogKey({ ...spec, word: 'screenshot' }));
   });
 
   it('the 404 page has no share image', async () => {
