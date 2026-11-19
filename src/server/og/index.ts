@@ -1,10 +1,13 @@
 /**
- * Share images (og:image). Drawn by the server from our own fonts: fontkit turns every letter into
- * an outline · the outlines go into an SVG · sharp turns it into a 1200 × 630 PNG.
+ * The share card (og:image · phase 17e · Batuhan picked the design and the line "Bir virgül. Koca
+ * fark."): the found comma on a night ground · selected in the file with its real size · the team
+ * reaching for it on dotted ways · faint artboards around · the slogan with the coral period. One per
+ * language for every page. Drawn by the server from our own fonts: fontkit turns every letter into an
+ * outline · the outlines go into an SVG · sharp turns it into a 1200 × 630 JPEG.
  *
  * fontkit cannot apply variation axes to woff2 files, so each font is unpacked to TTF once
- * (wawoff2) and kept in memory. Images are cached on disk by a hash of what they show:
- * a changed title draws a new image and nothing is drawn twice.
+ * (wawoff2) and kept in memory. Cards are cached on disk by a hash of their words: a slogan
+ * rewritten in Metinler draws a new card and nothing is drawn twice.
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -15,52 +18,39 @@ import sharp from 'sharp';
 import decompress from 'wawoff2/decompress.js';
 import { esc } from '../html';
 import type { Lang } from '../i18n';
-import type { CrewName } from '../page';
-import { THEMES } from '../themes';
 import { MARK, MARK_EM } from '../../shared/logo';
 
 export const OG_W = 1200;
 export const OG_H = 630;
 /** Bump when the drawing changes so cached images are drawn again. */
-const VERSION = 5;
+const VERSION = 6;
 
 export interface OgSpec {
   lang: Lang;
-  /** The hero's lines (Metinler) · {w} is the selected word. */
-  lines: string[];
-  /** The word in the box (the hero's first word). */
-  word: string;
-  /** The line under the rule (the studio · the city). */
+  /** The line under the mark (Metinler · "Bir virgül. Koca fark."). */
+  slogan: string;
+  /** The small line under it (the studio · the city). */
   foot: string;
+  /** The header's live label (Canlı · Live). */
+  live: string;
 }
 
 export function ogKey(spec: OgSpec): string {
-  return createHash('sha1').update(JSON.stringify([VERSION, spec.lang, spec.lines, spec.word, spec.foot])).digest('hex').slice(0, 12);
+  return createHash('sha1').update(JSON.stringify([VERSION, spec.lang, spec.slogan, spec.foot, spec.live])).digest('hex').slice(0, 12);
 }
 
-/** The card's words in one sentence (og:image:alt · the SVG title). */
-export const ogSentence = (spec: OgSpec): string => spec.lines.join(' ').replace('{w}', spec.word).replace(/\s+/g, ' ').trim();
+/** The card in words (og:image:alt · the SVG title). */
+export const ogSentence = (spec: OgSpec): string => spec.slogan.trim();
 
 /* ---------------- colours ---------------- */
 
-const CREW: Record<CrewName, string> = { design: '#3B35FF', code: '#3EE0A8', motion: '#FF9BD2' };
-const CREW_ON: Record<CrewName, string> = { design: '#F2F1EC', code: '#0E0E0F', motion: '#0E0E0F' };
-const LETTER: Record<CrewName, string> = { design: 'D', code: 'C', motion: 'M' };
-const CORAL = '#FF5A2B';
+const INK = '#0E0E0F';
+const MILK = '#F2F1EC';
+const BLUE = '#3B35FF';
 const MINT = '#3EE0A8';
-
-/** The homepage's paper: ink words · the hero's blue selection. */
-const c = {
-  bg: THEMES.paper,
-  fg: '#0E0E0F',
-  mu: 'rgba(14,14,15,.6)',
-  rule: 'rgba(14,14,15,.14)',
-  dots: 'rgba(14,14,15,.11)',
-  sel: '#3B35FF',
-  selOn: '#F2F1EC',
-  wash: 'rgba(59,53,255,.16)',
-};
-type Palette = typeof c;
+const PINK = '#FF9BD2';
+const CORAL = '#FF5A2B';
+const milk = (a: number) => `rgba(242,241,236,${a})`;
 
 /* ---------------- fonts ---------------- */
 
@@ -148,7 +138,6 @@ function at(sh: Shaped, x: number, y: number, fill: string): string {
 
 /** Greedy line breaks. Returns null when a single word is wider than the line. */
 const ARROW = 'M3 2 L3 19.5 L7.8 15.2 L11 22 L14.2 20.6 L11.1 13.9 L17.6 13.7 Z';
-const PAD = 72;
 
 interface Faces {
   display: Font[];
@@ -158,15 +147,6 @@ interface Faces {
 }
 
 const n = (v: number) => v.toFixed(1);
-
-/** The site's dotted ground (26 px like the page) · under everything. */
-function ground(c: Palette): string {
-  return (
-    `<defs><pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="13" cy="13" r="1.25" fill="${c.dots}"/></pattern>` +
-    `<filter id="soft" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="18"/></filter></defs>` +
-    `<rect width="${OG_W}" height="${OG_H}" fill="${c.bg}"/><rect width="${OG_W}" height="${OG_H}" fill="url(#dots)"/>`
-  );
-}
 
 /** The mark and the wordmark (one size: the corner as tall as the l · the comma under the baseline). */
 function lockup(f: Faces, x: number, base: number, size: number, fill: string): { svg: string; w: number } {
@@ -181,143 +161,129 @@ function lockup(f: Faces, x: number, base: number, size: number, fill: string): 
   return { svg, w: wx + lost.width + 0.24 * size + comma.width - x };
 }
 
-/** The team in the file (the header's avatars): three overlapping circles · right edge at x. */
-function avatars(f: Faces, right: number, cy: number, c: Palette): string {
-  const r = 17;
-  return (['design', 'code', 'motion'] as const)
-    .map((who, i) => {
-      const cx = right - r - (2 - i) * (2 * r - 8);
-      const l = shape(LETTER[who], f.sans, 15);
-      // An avatar the colour of the ground gets an ink ring (motion on pink · design on blue).
-      const same = CREW[who].toLowerCase() === c.bg.toLowerCase();
-      return (
-        `<circle cx="${n(cx)}" cy="${n(cy)}" r="${r}" fill="${CREW[who]}" stroke="${c.bg}" stroke-width="3"/>` +
-        (same ? `<circle cx="${n(cx)}" cy="${n(cy)}" r="${r - 1.5}" fill="none" stroke="#0E0E0F" stroke-width="1.5"/>` : '') +
-        at(l, cx - l.width / 2, cy + 5.3, CREW_ON[who])
-      );
-    })
-    .join('');
-}
+/** Mono labels: upper case in the card's language · a little air between the letters. */
+const label = (f: Faces, text: string, lang: Lang, size: number) => shape(text.toLocaleUpperCase(lang), f.mono, size, 0.06);
 
-/** A teammate's cursor with its name tag · the tip at (x y) · the tag to the left when there is no room. */
-function cursor(f: Faces, who: CrewName, x: number, y: number, c: Palette, side: 'auto' | 'left' = 'auto'): string {
-  const k = 2.2;
-  const name = shape(who, f.sans, 22);
-  const tw = name.width + 26;
-  const left = side === 'left' || x + 17 * k + tw > OG_W - 24;
-  const tx = left ? -tw - 4 : 15 * k;
-  const fill = CREW[who];
-  const clash = fill.toLowerCase() === c.bg.toLowerCase();
-  const edge = clash ? '#0E0E0F' : '#FFFFFF';
+/**
+ * The night ground: ink · a soft light over the middle · the site's dots only where the light is ·
+ * a warm breath behind the comma · a fine grain so the dark reads as paper and not as a screen.
+ */
+function ground(): string {
   return (
-    `<g transform="translate(${n(x - 3 * k)} ${n(y - 2 * k)})"><path transform="scale(${k})" d="${ARROW}" fill="${fill}" stroke="${edge}" stroke-width="1.5" stroke-linejoin="round"/>` +
-    `<rect x="${n(tx)}" y="${n(19 * k)}" width="${n(tw)}" height="36" rx="18" fill="${fill}"${clash ? ' stroke="#0E0E0F" stroke-width="2"' : ''}/>` +
-    at(name, tx + 13, 19 * k + 25, CREW_ON[who]) +
-    '</g>'
+    '<defs>' +
+    '<radialGradient id="light" cx="600" cy="277" r="560" gradientUnits="userSpaceOnUse" gradientTransform="translate(600 277) scale(1 .72) translate(-600 -277)"><stop offset="0" stop-color="#F2F1EC" stop-opacity=".085"/><stop offset=".55" stop-color="#F2F1EC" stop-opacity=".025"/><stop offset=".78" stop-color="#F2F1EC" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="warm" cx="580" cy="360" r="90" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF5A2B" stop-opacity=".12"/><stop offset="1" stop-color="#FF5A2B" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="fade" cx="600" cy="277" r="620" gradientUnits="userSpaceOnUse" gradientTransform="translate(600 277) scale(1 .7) translate(-600 -277)"><stop offset=".2" stop-color="#fff"/><stop offset=".78" stop-color="#000"/></radialGradient>' +
+    '<mask id="near"><rect width="1200" height="630" fill="url(#fade)"/></mask>' +
+    '<pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="13" cy="13" r="1.15" fill="#F2F1EC" fill-opacity=".13"/></pattern>' +
+    '<filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 0"/></filter>' +
+    '<filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>' +
+    '</defs>' +
+    `<rect width="${OG_W}" height="${OG_H}" fill="${INK}"/>` +
+    `<rect width="${OG_W}" height="${OG_H}" fill="url(#light)"/>` +
+    `<rect width="${OG_W}" height="${OG_H}" fill="url(#warm)"/>` +
+    `<rect width="${OG_W}" height="${OG_H}" fill="url(#dots)" mask="url(#near)"/>` +
+    `<rect width="${OG_W}" height="${OG_H}" filter="url(#grain)" opacity=".055"/>`
   );
 }
 
-/** A selected layer (the hero's word box · the board's frames): frame · four handles · its label on top. */
-function selection(f: Faces, x0: number, y0: number, x1: number, y1: number, label: string, c: Palette, wash = true, below = false): string {
-  const h = 11;
-  const handles = [
-    [x0, y0],
-    [x1, y0],
-    [x0, y1],
-    [x1, y1],
-  ]
-    .map(([x, y]) => `<rect x="${n(x! - h / 2)}" y="${n(y! - h / 2)}" width="${h}" height="${h}" fill="${c.bg}" stroke="${c.sel}" stroke-width="2.5"/>`)
+/** Faint artboards around the edges (the homepage's endless board) · their size above each. */
+function ghosts(f: Faces): string {
+  const frames: [number, number, number, number, string][] = [
+    [40, 170, 230, 150, '1440 × 900'],
+    [140, 410, 110, 240, '390 × 844'],
+    [950, 110, 200, 200, '1080 × 1080'],
+    [960, 390, 300, 160, '1920 × 1080'],
+  ];
+  return frames
+    .map(([x, y, w, h, t]) => `<rect x="${x + 0.5}" y="${y + 0.5}" width="${w}" height="${h}" rx="6" fill="none" stroke="${milk(0.075)}"/>` + at(shape(t, f.mono, 10.5, 0.06), x, y - 8, milk(0.22)))
     .join('');
-  const t = shape(label, f.mono, 14, 0.04);
+}
+
+/** Each teammate's way in: a soft arc of dots in their colour that fades toward the edge. */
+function trails(): string {
+  const way = (d: string, c: string) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0 9"/>`;
   return (
-    (wash ? `<rect x="${n(x0)}" y="${n(y0)}" width="${n(x1 - x0)}" height="${n(y1 - y0)}" fill="${c.wash}"/>` : '') +
-    `<rect x="${n(x0)}" y="${n(y0)}" width="${n(x1 - x0)}" height="${n(y1 - y0)}" fill="none" stroke="${c.sel}" stroke-width="2.5"/>` +
-    handles +
-    // The label sits above the layer · under it when a line of words is above (the hero's own way).
-    `<rect x="${n(x0 - 1.25)}" y="${n(below ? y1 + 8 : y0 - 33)}" width="${n(t.width + 20)}" height="25" rx="3" fill="${c.sel}"/>` +
-    at(t, x0 + 9, below ? y1 + 25.5 : y0 - 15.5, c.selOn)
+    way('M-20 150 C 140 112, 300 80, 440 104', 'rgba(59,53,255,.55)') +
+    way('M1230 250 C 1050 230, 920 250, 812 270', 'rgba(62,224,168,.5)') +
+    way('M60 640 C 170 560, 300 420, 470 372', 'rgba(255,155,210,.5)')
   );
 }
 
-/** The one card every page shares in its language: the homepage hero as it stands in the file. */
+/** A teammate's cursor: the tip at (x y) · its name in a pill under it to the right (or the left). */
+function cursor(f: Faces, who: 'design' | 'code' | 'motion', x: number, y: number, side: 'right' | 'left' = 'right'): string {
+  const fill = { design: BLUE, code: MINT, motion: PINK }[who];
+  const on = who === 'design' ? MILK : INK;
+  const k = 1.7;
+  const name = shape(who, f.sans, 13);
+  const w = name.width + 20;
+  const tx = side === 'right' ? x + 20 : x - w - 2;
+  const ty = y + 27;
+  return (
+    `<path transform="translate(${n(x - 3 * k)} ${n(y - 2 * k)}) scale(${k})" d="${ARROW}" fill="${fill}" stroke="${MILK}" stroke-width="${(1.1).toFixed(2)}" stroke-linejoin="round"/>` +
+    `<rect x="${n(tx)}" y="${n(ty)}" width="${n(w)}" height="22" rx="11" fill="${fill}"/>` +
+    at(name, tx + 10, ty + 15.4, on)
+  );
+}
+
+/** The one card every page shares in its language: the found comma · the team reaching for it · the line under it. */
 export async function drawOg(spec: OgSpec, src: FontSource): Promise<Buffer> {
-  const [display, mono, sans, mark] = await Promise.all([fontsFor('display', src), fontsFor('mono', src), fontsFor('sans', src), fontsFor('display', src, { wdth: 88, wght: 820 })]);
+  const [display, mono, sans, mark] = await Promise.all([
+    fontsFor('display', src),
+    fontsFor('mono', src, { wdth: 87.5, wght: 430 }),
+    fontsFor('sans', src, { wght: 600 }),
+    fontsFor('display', src, { wdth: 88, wght: 820 }),
+  ]);
   const f: Faces = { display, mono, sans, mark };
-  const out: string[] = [ground(c)];
-  const upper = (t: string) => t.toLocaleUpperCase(spec.lang);
-  const tagWord = spec.lang === 'tr' ? 'Metin' : 'Text';
-  const domain = shape('lostcomma.co', mono, 18, 0.03);
-  const ruleY = OG_H - PAD - 50;
+  const out: string[] = [ground(), ghosts(f), trails()];
 
-    // The homepage: the header's line · the hero sentence with its word selected · the team at work.
-    const top = lockup(f, PAD, PAD + 22, 30, c.fg);
-    out.push(top.svg);
-    const lx = PAD + top.w + 26;
-    const live = shape(upper(spec.lang === 'tr' ? 'Canlı' : 'Live'), mono, 15, 0.05);
-    out.push(`<circle cx="${n(lx + 5)}" cy="${n(PAD + 15)}" r="5" fill="${MINT}"/>` + at(live, lx + 18, PAD + 20.5, c.mu));
-    out.push(avatars(f, lx + 18 + live.width + 26 + 3 * 34 - 16, PAD + 14, c));
-    out.push(at(domain, OG_W - PAD - domain.width, PAD + 20, c.mu));
+  // The header's line: the logo · live · the team.
+  out.push(lockup(f, 56, 66, 22, MILK).svg);
+  const avR = 13;
+  const avRight = OG_W - 56;
+  (['design', 'code', 'motion'] as const).forEach((who, i) => {
+    const cx = avRight - avR - (2 - i) * (2 * avR - 7);
+    const l = shape({ design: 'D', code: 'C', motion: 'M' }[who], sans, 10);
+    out.push(`<circle cx="${n(cx)}" cy="57" r="${avR}" fill="${{ design: BLUE, code: MINT, motion: PINK }[who]}" stroke="${INK}" stroke-width="2.5"/>` + at(l, cx - l.width / 2, 60.6, who === 'design' ? MILK : INK));
+  });
+  const live = label(f, spec.live, spec.lang, 11);
+  const lx = avRight - 3 * (2 * avR - 7) - 7 - 14 - live.width;
+  out.push(at(live, lx, 61, milk(0.6)));
+  out.push(`<circle cx="${n(lx - 17)}" cy="57" r="7.5" fill="${MINT}" fill-opacity=".14"/><circle cx="${n(lx - 17)}" cy="57" r="3.5" fill="${MINT}"/>`);
 
-    const lines = spec.lines.map((l) => l.replace('{w}', spec.word));
-    const maxW = OG_W - PAD * 2 - 40;
-    let size = 116;
-    for (; size > 56; size -= 2) if (lines.every((l) => shape(l, display, size, -0.05).width <= maxW) && size * 0.98 + (lines.length - 1) * size * 1.02 <= ruleY - 40 - (PAD + 92)) break;
-    const lh = size * 1.02;
-    const blockH = size * 0.98 + (lines.length - 1) * lh;
-    const y0 = PAD + 70 + (ruleY - 30 - (PAD + 70) - blockH) / 2;
-    const ends: { x: number; y: number }[] = [];
-    let wordBox = null as [number, number, number, number] | null;
-    for (const [i, raw] of spec.lines.entries()) {
-      const line = raw.replace('{w}', spec.word);
-      const base = y0 + size * 0.8 + i * lh;
-      const x = PAD - size * 0.04;
-      const sh = shape(line, display, size, -0.05);
-      const wi = raw.indexOf('{w}');
-      if (wi >= 0) {
-        const pre = shape(raw.slice(0, wi), display, size, -0.05).width;
-        const ww = shape(spec.word, display, size, -0.05).width;
-        wordBox = [x + pre - 8, base - size * 0.8, x + pre + ww + 10, base + size * 0.17];
-      }
-      out.push(at(sh, x, base, c.fg));
-      ends.push({ x: x + sh.width, y: base });
-    }
-    // The period: the hero's coral square (outside the word box when the word ends the sentence).
-    const last = ends[ends.length - 1]!;
-    const dot = size * 0.13;
-    const wordLine = spec.lines.findIndex((l) => l.includes('{w}'));
-    const box = wordBox as [number, number, number, number] | null;
-    const wordEnds = !!box && wordLine === lines.length - 1 && spec.lines[wordLine]!.trimEnd().endsWith('{w}');
-    const px = wordEnds ? box![2] + 5 : last.x + size * 0.02;
-    out.push(`<rect x="${n(px)}" y="${n(last.y - dot)}" width="${n(dot)}" height="${n(dot)}" fill="${CORAL}"/>`);
-    let designAt = { x: 0, y: 0 };
-    if (box) {
-      const [x0, y0b, x1, y1] = box;
-      // The wash goes under the words (right after the ground).
-      out.splice(1, 0, `<rect x="${n(x0)}" y="${n(y0b)}" width="${n(x1 - x0)}" height="${n(y1 - y0b)}" fill="${c.wash}"/>`);
-      out.push(selection(f, x0, y0b, x1, y1, upper(`${tagWord} · ${Math.round(size)}`), c, false, wordLine > 0));
-      designAt = { x: (wordEnds ? px + dot : x1) + 10, y: y0b + (y1 - y0b) * 0.3 };
-      out.push(cursor(f, 'design', designAt.x, designAt.y, c));
-    }
-    // code and motion rest beside the other lines where they leave room (never on a word) · on the
-    // word's line after design when the others are full.
-    const spots = ends
-      .map((e, i) => ({ x: (i === ends.length - 1 ? px + dot : e.x) + 60, y: e.y - size * 0.55, i }))
-      .filter((e) => e.i !== wordLine && e.x + 150 < OG_W - PAD);
-    if (box && designAt.x + 220 + 190 < OG_W - PAD) spots.push({ x: designAt.x + 220, y: designAt.y, i: wordLine });
-    (['code', 'motion'] as const).forEach((who, j) => {
-      const e = spots[j];
-      if (e) out.push(cursor(f, who, e.x, e.y, c));
-    });
+  // The mark as it stands in the file: selected · its real size under the frame.
+  const mh = 250;
+  const k = mh / MARK.h;
+  const mw = MARK.w * k;
+  const [x0, y0, x1, y1] = [490, 122, 710, 428];
+  out.push(`<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" fill="none" stroke="${BLUE}" stroke-width="6" stroke-opacity=".35" filter="url(#glow)"/>`);
+  out.push(`<g transform="translate(${n(600 - mw / 2)} ${n((y0 + y1) / 2 - mh / 2)}) scale(${k.toFixed(5)})"><path d="${MARK.top}" fill="${MILK}"/><path d="${MARK.comma}" fill="${CORAL}"/></g>`);
+  out.push(`<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" fill="none" stroke="${BLUE}" stroke-width="2"/>`);
+  for (const [hx, hy] of [[x0, y0], [x1, y0], [x0, y1], [x1, y1]] as const) out.push(`<rect x="${hx - 5.5}" y="${hy - 5.5}" width="11" height="11" fill="${INK}" stroke="${BLUE}" stroke-width="2"/>`);
+  const size = shape(`${MARK.w} × ${MARK.h}`, mono, 10.5, 0.06);
+  const sw = size.width + 16;
+  out.push(`<rect x="${n(600 - sw / 2)}" y="${y1 + 9}" width="${n(sw)}" height="21" rx="3" fill="${BLUE}"/>` + at(size, 600 - size.width / 2, y1 + 23.6, MILK));
 
-    out.push(`<rect x="${PAD}" y="${ruleY}" width="${OG_W - PAD * 2}" height="1.5" fill="${c.rule}"/>`);
-    const foot = shape(upper(spec.foot), mono, 17, 0.05);
-    out.push(at(foot, PAD, OG_H - PAD - 4, c.mu));
+  // The team reaching for it.
+  out.push(cursor(f, 'design', 441, 101));
+  out.push(cursor(f, 'code', 813, 265));
+  out.push(cursor(f, 'motion', 471, 373, 'left'));
+
+  // The line under it: the slogan with the coral period · the studio and the city.
+  const s = shape(spec.slogan.replace(/[.!?]\s*$/, ''), display, 52, -0.04);
+  const dot = 52 * 0.13;
+  const sx = 600 - (s.width + 52 * 0.04 + dot) / 2;
+  out.push(at(s, sx, 512, MILK));
+  out.push(`<rect x="${n(sx + s.width + 52 * 0.04)}" y="${n(512 - dot)}" width="${n(dot)}" height="${n(dot)}" fill="${CORAL}"/>`);
+  const foot = label(f, spec.foot, spec.lang, 11.5);
+  out.push(at(foot, 600 - foot.width / 2, 556, milk(0.55)));
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}" viewBox="0 0 ${OG_W} ${OG_H}"><title>${esc(ogSentence(spec))}</title>${out.join('')}</svg>`;
-  return sharp(Buffer.from(svg)).png({ compressionLevel: 9, palette: false }).toBuffer();
+  // A JPEG: the grain and the light would make a PNG several times heavier (WhatsApp wants it light).
+  return sharp(Buffer.from(svg)).jpeg({ quality: 88, mozjpeg: true, chromaSubsampling: '4:4:4' }).toBuffer();
 }
 
-/** Draws once per language and wording · keeps the PNG on disk (DATA_DIR/og) and answers repeats from there. */
+/** Draws once per language and wording · keeps the JPEG on disk (DATA_DIR/og) and answers repeats from there. */
 export class OgImages {
   private pending = new Map<string, Promise<Buffer>>();
   constructor(
@@ -325,20 +291,20 @@ export class OgImages {
     private readonly src: FontSource,
   ) {}
 
-  async png(spec: OgSpec): Promise<{ key: string; png: Buffer }> {
+  async jpg(spec: OgSpec): Promise<{ key: string; jpg: Buffer }> {
     const key = ogKey(spec);
-    const file = join(this.dir, `${key}.png`);
-    if (existsSync(file)) return { key, png: readFileSync(file) };
+    const file = join(this.dir, `${key}.jpg`);
+    if (existsSync(file)) return { key, jpg: readFileSync(file) };
     let p = this.pending.get(key);
     if (!p) {
-      p = drawOg(spec, this.src).then((png) => {
+      p = drawOg(spec, this.src).then((jpg) => {
         mkdirSync(this.dir, { recursive: true });
-        writeFileSync(file, png);
-        return png;
+        writeFileSync(file, jpg);
+        return jpg;
       });
       p.finally(() => this.pending.delete(key)).catch(() => {});
       this.pending.set(key, p);
     }
-    return { key, png: await p };
+    return { key, jpg: await p };
   }
 }

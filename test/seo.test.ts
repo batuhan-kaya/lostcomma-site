@@ -42,10 +42,10 @@ describe('every page', () => {
       expect(meta(doc, 'robots'), p).toBe('index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
       const image = meta(doc, 'og:image') ?? '';
       // One card per language for every page: the homepage hero.
-      expect(image, p).toMatch(new RegExp(`^${SITE}/og/${p.slice(1, 3)}\\.png\\?v=[0-9a-f]{12}$`));
+      expect(image, p).toMatch(new RegExp(`^${SITE}/og/${p.slice(1, 3)}\\.jpg\\?v=[0-9a-f]{12}$`));
       expect(meta(doc, 'og:image:secure_url'), p).toBe(image);
-      expect(meta(doc, 'og:image:type'), p).toBe('image/png');
-      expect(meta(doc, 'og:image:alt'), p).toBe(p.startsWith('/tr') ? 'Lost Comma · Akılda kalan web siteleri ve uygulamalar yapıyoruz' : 'Lost Comma · We design and build websites and apps people remember');
+      expect(meta(doc, 'og:image:type'), p).toBe('image/jpeg');
+      expect(meta(doc, 'og:image:alt'), p).toBe(p.startsWith('/tr') ? 'Lost Comma · Bir virgül. Koca fark.' : 'Lost Comma · One comma. All the difference.');
       expect(meta(doc, 'twitter:title'), p).toBe(meta(doc, 'og:title'));
       expect(meta(doc, 'twitter:description'), p).toBe(d);
       expect(meta(doc, 'og:locale:alternate'), p).toBe(p.startsWith('/tr') ? 'en_US' : 'tr_TR');
@@ -108,10 +108,10 @@ describe('a note · a case · a service', () => {
     expect(s).toMatchObject({ name: 'Websites', provider: { '@id': `${SITE}/#org` }, areaServed: 'Worldwide' });
   });
 
-  it("the two cards are PNG · light enough for WhatsApp · 1200 × 630 · they follow the hero's words", async () => {
+  it("the two cards are JPEG · light enough for WhatsApp · 1200 × 630", async () => {
     for (const lang of ['tr', 'en']) {
       const res = await get(meta((await get(`/${lang}`)).body, 'og:image')!.replace(SITE, ''));
-      expect(res.headers['content-type'], lang).toBe('image/png');
+      expect(res.headers['content-type'], lang).toBe('image/jpeg');
       expect(res.rawPayload.length, lang).toBeLessThan(300_000);
       const m = await sharp(res.rawPayload).metadata();
       expect([m.width, m.height], lang).toEqual([1200, 630]);

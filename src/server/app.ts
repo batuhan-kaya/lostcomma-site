@@ -298,7 +298,8 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     });
   }
 
-  // The share card: one per language for every page (the homepage hero · src/server/og). Drawn once per wording.
+  // The share card: one per language for every page (src/server/og). Drawn once per wording · a .png
+  // address (the old card's) gets the same JPEG.
   const og = new OgImages(join(config.DATA_DIR, 'og'), {
     built: (key) => {
       const url = assets.font(key);
@@ -306,14 +307,14 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     },
   });
   app.get('/og/:file', async (req, reply) => {
-    const lang = /^(tr|en)\.png$/.exec((req.params as { file: string }).file)?.[1];
+    const lang = /^(tr|en)\.(?:jpg|png)$/.exec((req.params as { file: string }).file)?.[1];
     if (!lang || !isLang(lang)) return reply.status(404).type('text/plain; charset=utf-8').send('Not found');
-    const { key, png } = await og.png(ogSpec(ctxFor(lang, href(lang, 'home'), { tr: null, en: null })));
+    const { key, jpg } = await og.jpg(ogSpec(ctxFor(lang, href(lang, 'home'), { tr: null, en: null })));
     const fresh = (req.query as Record<string, string>).v === key;
     return reply
-      .type('image/png')
+      .type('image/jpeg')
       .header('cache-control', fresh ? 'public, max-age=31536000, immutable' : 'public, max-age=3600')
-      .send(png);
+      .send(jpg);
   });
 
   app.get('/robots.txt', (_req, reply) => reply.type('text/plain; charset=utf-8').send(robotsTxt(config.SITE_URL)));
