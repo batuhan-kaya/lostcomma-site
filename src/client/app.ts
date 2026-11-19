@@ -57,6 +57,22 @@ function menu(): void {
 }
 
 /**
+ * A field with a value says so (data-filled): base.css hides the browser's small autofill preview
+ * only in a field that is still empty (a previewed suggestion is not the field's value yet).
+ */
+function filled(): void {
+  const mark = (el: EventTarget | null) => {
+    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) el.toggleAttribute('data-filled', el.value !== '');
+  };
+  const all = () => document.querySelectorAll('input, textarea').forEach(mark);
+  for (const type of ['input', 'change']) document.addEventListener(type, (e) => mark(e.target), true);
+  // A reset empties a form without input events · a page from the back button may bring its values back.
+  document.addEventListener('reset', () => setTimeout(all), true);
+  addEventListener('pageshow', all);
+  all();
+}
+
+/**
  * Images from the pipeline carry their dominant colour (data-c). It fills the box while the image
  * loads and is removed afterwards. Set through the CSSOM: the CSP allows no style attributes.
  */
@@ -89,6 +105,7 @@ function offscreen(): void {
 
 offscreen();
 headerBar();
+filled();
 startStats();
 startClock();
 langSwitch();

@@ -433,6 +433,11 @@ html.fv-open { overflow: hidden; }
 .ctc { --you: var(--sel); }
 .ctc.ct-lime { --you: #3B35FF; }
 .ctc.ct-coral { --you: #F2F1EC; }
+/* Selecting the sentence (phase 17c): the hero's own selection (a wash of the visitor's colour ·
+   rgba(59,53,255,.16) on milk) instead of the site's lime highlighter next to the blue words. */
+.ctc { --selbg: color-mix(in srgb, var(--you) 16%, transparent); }
+.ctc ::selection { background: var(--selbg); color: var(--fg); }
+.ctc :is(.blank, .dv)::selection { color: var(--you); }
 /* The kicker sits where every section's kicker sits (120 px) · the sentence comes up by as much: the section keeps its height. */
 .ctc .wrap { position: relative; padding: 120px var(--gut) 112px; }
 .ctop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; color: var(--mu); }
