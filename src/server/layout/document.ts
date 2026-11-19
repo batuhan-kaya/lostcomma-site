@@ -31,7 +31,7 @@ export function documentHtml<D>(page: Page<D>, ctx: Ctx, data: D): Safe {
   });
   const xDefault = ctx.alt.en ?? ctx.alt.tr;
   // Pages kept out of search engines (404) have no share image.
-  // One card per language for every page (the homepage hero) · none on pages kept out of search.
+  // One card per language for every page (the found comma and the slogan) · none on pages kept out of search.
   const spec = page.noindex ? null : ogSpec(ctx);
   const image = spec ? `${site}${ogPath(lang)}?v=${ogKey(spec)}` : null;
   // What the card shows in words (for screen readers in the apps that read it).
@@ -64,7 +64,7 @@ ${LANGS.filter((l) => l !== lang && ctx.alt[l]).map((l) => html`<meta property="
 ${image && spec
     ? html`<meta property="og:image" content="${image}">
 ${image.startsWith('https:') ? html`<meta property="og:image:secure_url" content="${image}">` : ''}
-<meta property="og:image:type" content="image/png">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="${OG_W}">
 <meta property="og:image:height" content="${OG_H}">
 <meta property="og:image:alt" content="${ogAlt}">

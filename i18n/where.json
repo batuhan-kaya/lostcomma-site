@@ -354,6 +354,9 @@
  "Bir şey eksik kaldı. Gün ve saat ve adın ve e-postan gerekli.": [
   "start"
  ],
+ "Bir virgül. Koca fark.": [
+  "other"
+ ],
  "Biraz aşıyor": [
   "other"
  ],
@@ -486,7 +489,8 @@
   "lab"
  ],
  "Canlı": [
-  "chrome"
+  "chrome",
+  "other"
  ],
  "Canlı · bir gün ve saat seç": [
   "home"

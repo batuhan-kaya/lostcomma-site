@@ -286,27 +286,28 @@ describe('feeds · share images · sitemap', () => {
     expect(trXml).toContain('<language>tr</language>');
   });
 
-  it("every page links its language's share card (the homepage hero) · a 1200 × 630 PNG cached by its words", async () => {
+  it("every page links its language's share card · a 1200 × 630 JPEG cached by its words", async () => {
     const doc = (await get('/tr/notes/imleclerimiz-nasil-hareket-ediyor')).body;
     const url = /<meta property="og:image" content="([^"]+)">/.exec(doc)?.[1];
-    expect(url).toMatch(/^https:\/\/lostcomma\.co\/og\/tr\.png\?v=[0-9a-f]{12}$/);
+    expect(url).toMatch(/^https:\/\/lostcomma\.co\/og\/tr\.jpg\?v=[0-9a-f]{12}$/);
     // The same card on every Turkish page · its own card on every English one.
     expect((await get('/tr/isler')).body).toContain(`<meta property="og:image" content="${url}">`);
-    expect((await get('/en/notes/how-our-cursors-move')).body).toMatch(/<meta property="og:image" content="https:\/\/lostcomma\.co\/og\/en\.png\?v=[0-9a-f]{12}">/);
+    expect((await get('/en/notes/how-our-cursors-move')).body).toMatch(/<meta property="og:image" content="https:\/\/lostcomma\.co\/og\/en\.jpg\?v=[0-9a-f]{12}">/);
     const res = await get(url!.replace(SITE, ''));
     expect(res.statusCode).toBe(200);
-    expect(res.headers['content-type']).toBe('image/png');
+    expect(res.headers['content-type']).toBe('image/jpeg');
     expect(res.headers['cache-control']).toContain('immutable');
     const meta = await sharp(res.rawPayload).metadata();
-    expect([meta.width, meta.height]).toEqual([1200, 630]);
+    expect([meta.format, meta.width, meta.height]).toEqual(['jpeg', 1200, 630]);
 
-    const stale = await get('/og/tr.png?v=old');
+    const stale = await get('/og/tr.jpg?v=old');
     expect(stale.headers['cache-control']).toBe('public, max-age=3600');
-    expect((await get('/og/en.png')).statusCode).toBe(200);
-    expect((await get('/og/de.png')).statusCode).toBe(404);
+    // The old card's address answers with the new card.
+    expect((await get('/og/en.png')).headers['content-type']).toBe('image/jpeg');
+    expect((await get('/og/de.jpg')).statusCode).toBe(404);
     expect((await get('/og/en/notes/nope.png')).statusCode).toBe(404);
-    const spec = { lang: 'en' as const, lines: ['people {w}'], word: 'remember', foot: 'Istanbul' };
-    expect(ogKey(spec)).not.toBe(ogKey({ ...spec, word: 'screenshot' }));
+    const spec = { lang: 'en' as const, slogan: 'One comma. All the difference.', foot: 'Istanbul', live: 'Live' };
+    expect(ogKey(spec)).not.toBe(ogKey({ ...spec, slogan: 'Another line.' }));
   });
 
   it('the 404 page has no share image', async () => {
