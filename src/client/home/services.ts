@@ -1,6 +1,7 @@
 /** 03 · Services: one frame that changes shape · an inspector that shows its CSS. */
 import type { Crew } from '../lib/crew';
 import { Loop } from '../lib/loops';
+import { reducedMotion } from '../lib/motion';
 import { LiveMocks } from './live';
 import { Viewer } from './viewer';
 import { t } from '../lib/t';
@@ -34,7 +35,10 @@ export class Services {
   );
   private narrow = false;
 
-  constructor(private readonly data: HomeData) {
+  constructor(
+    private readonly data: HomeData,
+    crew: Crew | null = null,
+  ) {
     this.opts.forEach((o, i) =>
       o.addEventListener('click', () => {
         this.manualAt = Date.now();
@@ -59,6 +63,7 @@ export class Services {
     });
     this.fit();
     addEventListener('resize', () => this.fit(), { passive: true });
+    if (!crew?.animates('svc') && !reducedMotion() && !document.documentElement.classList.contains('still')) this.alone();
     // The list's height depends on its letters: measure again once the fonts are in.
     void document.fonts?.ready.then(() => this.align());
     if (this.viewer.ok) {
@@ -145,6 +150,35 @@ export class Services {
     return Date.now() - this.manualAt < 12_000;
   }
 
+  /**
+   * No team below the hero (a touch screen): the frames change by themselves every few seconds
+   * while the stage is on screen · the visitor's first choice (a chip · the frame · full screen)
+   * makes it theirs for good.
+   */
+  private alone(): void {
+    const stage = this.stage;
+    if (!stage) return;
+    let shown = false;
+    let timer = 0;
+    const tick = () => {
+      timer = 0;
+      if (!shown || this.manualAt) return;
+      if (!this.live.holding) this.pick((this.v + 1) % this.opts.length);
+      timer = window.setTimeout(tick, 6500);
+    };
+    new IntersectionObserver(
+      (es) => {
+        shown = es.some((e) => e.isIntersecting);
+        if (shown && !timer && !this.manualAt) timer = window.setTimeout(tick, 4200);
+        else if (!shown && timer) {
+          clearTimeout(timer);
+          timer = 0;
+        }
+      },
+      { threshold: 0.6 },
+    ).observe(stage);
+  }
+
   pick(i: number): void {
     const sv = this.data.services[i];
     if (!sv || !this.frm) return;
@@ -154,6 +188,16 @@ export class Services {
       o.setAttribute('aria-checked', String(j === i));
       o.tabIndex = j === i ? 0 : -1;
     });
+    // A phone: the picked row's words under the frame · its chip comes into the row's view.
+    $$('[data-sd]').forEach((d, j) => d.classList.toggle('on', j === i));
+    const row = this.opts[i]?.parentElement;
+    const chip = this.opts[i];
+    if (row && chip && row.scrollWidth > row.clientWidth + 1) {
+      const pad = parseFloat(getComputedStyle(row).paddingLeft) || 0;
+      const left = chip.offsetLeft - row.offsetLeft - pad;
+      const right = left + chip.offsetWidth + 2 * pad - row.clientWidth;
+      if (left < row.scrollLeft || right > row.scrollLeft) row.scrollTo({ left: left < row.scrollLeft ? left : right, behavior: 'smooth' });
+    }
     this.frm.className = 'frm v' + i;
     $$('[data-fc]').forEach((f, j) => f.classList.toggle('on', j === i));
     $('[data-fca]')?.classList.toggle('on', i === 1);

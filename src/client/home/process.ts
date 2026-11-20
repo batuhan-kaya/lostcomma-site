@@ -2,9 +2,11 @@
  * 05 · Process · "Layer by layer": one step open at a time. The stack and the notes follow one class
  * on `.ly` (s0–s4 · the geometry is all CSS · _layers.css): the sheets above the open one lift away
  * and turn to tracing paper · its note opens on its leader line. The sheets rise once the section
- * shows (`.in`). The host (code) opens the steps one by one unless the visitor is doing it.
+ * shows (`.in`). The host (code) opens the steps one by one unless the visitor is doing it · where
+ * the team does not come below the hero (touch screens) they open by themselves while the stack shows.
  */
 import type { Crew } from '../lib/crew';
+import { reducedMotion } from '../lib/motion';
 import { t } from '../lib/t';
 import { $, $$, doing } from './shared';
 
@@ -16,7 +18,7 @@ export class Process {
   private step = 0;
   private manualAt = 0;
 
-  constructor() {
+  constructor(crew: Crew | null = null) {
     const box = this.box;
     if (!box) return;
     this.buttons.forEach((b, i) =>
@@ -43,10 +45,41 @@ export class Process {
       { threshold: 0.3 },
     );
     io.observe(box);
+    if (!crew?.animates('prc') && !reducedMotion() && !document.documentElement.classList.contains('still')) this.alone();
     // The notes' words come from the panel (Metinler): give the open note more room if they need it.
     this.room();
     void document.fonts?.ready.then(() => this.room());
     addEventListener('resize', () => this.room(), { passive: true });
+  }
+
+  /**
+   * No team below the hero (a touch screen): the steps open by themselves while the stack is on
+   * screen (the build step waits for its terminal) · the visitor's first tap makes it theirs.
+   */
+  private alone(): void {
+    const v = $('.ly-v', this.box ?? document);
+    if (!v) return;
+    let shown = false;
+    let timer = 0;
+    const tick = () => {
+      timer = 0;
+      if (!shown || this.manualAt) return;
+      const nx = (this.step + 1) % this.rows.length;
+      this.set(nx);
+      timer = window.setTimeout(tick, nx === 3 ? 8200 : 4600);
+    };
+    new IntersectionObserver(
+      (es) => {
+        shown = es.some((e) => e.isIntersecting);
+        // The first time: after the sheets have risen (.ready).
+        if (shown && !timer && !this.manualAt) timer = window.setTimeout(tick, this.box?.classList.contains('ready') ? 2600 : 4200);
+        else if (!shown && timer) {
+          clearTimeout(timer);
+          timer = 0;
+        }
+      },
+      { threshold: 0.6 },
+    ).observe(v);
   }
 
   /** The tallest note in the side by side layout · --D grows (never shrinks below the CSS room). */

@@ -14,9 +14,9 @@ const crew = getCrew();
 
 const hero = new Hero(data, crew);
 const manifesto = new Manifesto(crew);
-const services = new Services(data);
+const services = new Services(data, crew);
 const board = new Board(data);
-const process = new Process();
+const process = new Process(crew);
 const brief = new Brief(data, crew);
 
 crew?.enableIdle();

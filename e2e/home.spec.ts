@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import pg from 'pg';
+import { HOME } from '../src/server/content/home';
 import { watchErrors } from './checks';
 
 const visibleCursors = (page: Page) =>
@@ -41,6 +42,45 @@ test.describe('homepage · desktop interactions', () => {
       for (let i = 0; i < 6; i++) {
         expect((await visibleCursors(page)).length, sec).toBeLessThanOrEqual(1);
         await page.waitForTimeout(400);
+      }
+    }
+  });
+
+  test('hero: the size label says the real size and never covers a word · in both languages', async ({ page }) => {
+    // No scenes: the team does not change the word under the test.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    for (const lang of ['tr', 'en'] as const) {
+      for (const width of [1440, 1024]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(`/${lang}`);
+        await page.evaluate(() => document.fonts.ready);
+        await page.waitForTimeout(300);
+        const px = await page.locator('.hl').evaluate((h) => Math.round(parseFloat(getComputedStyle(h).fontSize)));
+        await expect(page.locator('.wbox .sz')).toHaveText(`${lang === 'tr' ? 'Metin' : 'Text'} · ${px}`);
+        // Every word the team types: the label (under or beside the box) touches no other line.
+        const hits = await page.evaluate((list) => {
+          const box = document.querySelector<HTMLElement>('[data-wbox]')!;
+          box.classList.add('sel');
+          const out: string[] = [];
+          for (const w of list) {
+            document.querySelector('[data-word]')!.textContent = w;
+            const sz = box.querySelector('.sz')!;
+            if (!sz.getClientRects().length) continue;
+            const r = sz.getBoundingClientRect();
+            const walk = document.createTreeWalker(document.querySelector('[data-sec="hero"]')!, NodeFilter.SHOW_TEXT);
+            const range = document.createRange();
+            for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+              const host = n.parentElement!;
+              if (!n.nodeValue?.trim() || box.contains(host) || host.closest('[aria-hidden="true"]')) continue;
+              if (!host.checkVisibility({ visibilityProperty: true })) continue;
+              range.selectNodeContents(n);
+              for (const l of range.getClientRects()) if (r.left < l.right && l.left < r.right && r.top < l.bottom && l.top < r.bottom) out.push(`${w} × ${n.nodeValue.trim().slice(0, 20)}`);
+            }
+            if (r.right > document.documentElement.clientWidth) out.push(`${w} off screen`);
+          }
+          return out;
+        }, HOME[lang].words);
+        expect(hits, `${lang} at ${width}`).toEqual([]);
       }
     }
   });
@@ -366,6 +406,87 @@ test.describe('homepage · desktop interactions', () => {
 
 test.describe('homepage · phone', () => {
   test.skip(({ isMobile }) => !isMobile, 'phone layout');
+
+  test('hero: the headline keeps its own lines · the size label stays out of the way · the buttons fill the width', async ({ page }) => {
+    for (const lang of ['tr', 'en']) {
+      await page.goto(`/${lang}`);
+      await page.evaluate(() => document.fonts.ready);
+      // Three lines of about 34 to 38 px (never the old 50 px that broke them).
+      const lines = await page.locator('.hl .ln').evaluateAll((ls) => ls.map((l) => Math.round(l.getBoundingClientRect().height)));
+      expect(lines).toHaveLength(3);
+      const px = await page.locator('.hl').evaluate((h) => parseFloat(getComputedStyle(h).fontSize));
+      expect(px, lang).toBeLessThan(42);
+      expect(Math.max(...lines), lang).toBeLessThan(px * 1.2);
+      await expect(page.locator('.wbox .sz')).toBeHidden();
+      const [a, b] = await page.locator('.ctas .btn').evaluateAll((bs) => bs.map((e) => e.getBoundingClientRect()).map((r) => ({ l: Math.round(r.left), r: Math.round(r.right) })));
+      const wrap = await page.locator('.ctas').evaluate((e) => Math.round(e.getBoundingClientRect().right));
+      // Side by side or one under the other: either way the row ends at the column's edge.
+      expect(Math.max(a!.r, b!.r), lang).toBeGreaterThanOrEqual(wrap - 1);
+    }
+  });
+
+  test('manifesto: the edit plays by itself once the document is on screen · the review bar lives in the document · a choice ends it', async ({ page }) => {
+    const errors = watchErrors(page);
+    await page.goto('/en');
+    // Rewound while it is still below.
+    await expect(page.locator('[data-ch="0"] ins')).toHaveText('');
+    const paper = page.locator('.mf .paper');
+    await expect(paper.locator('.mtools [data-mode]')).toHaveCount(3);
+    const tall = await paper.evaluate((e) => e.getBoundingClientRect().height);
+    await paper.evaluate((e) => window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 40));
+    await expect(page.locator('[data-ch="0"] ins')).toHaveText('small design and engineering studio', { timeout: 10_000 });
+    // The document keeps its finished height while it is typed.
+    expect(Math.abs((await paper.evaluate((e) => e.getBoundingClientRect().height)) - tall)).toBeLessThan(1);
+    await page.getByRole('button', { name: 'Reject all' }).tap();
+    await expect(page.locator('[data-doc]')).toHaveClass(/m-orig/);
+    await expect(page.locator('[data-docstat]')).toHaveText('All changes rejected');
+    // Every change is finished at once (the edit is the visitor's now).
+    await expect(page.locator('[data-ch="4"] ins')).toHaveText('Live and in the open.');
+    await page.getByRole('button', { name: 'Accept all' }).tap();
+    await expect(page.locator('[data-doc]')).toHaveClass(/m-final/);
+    // The comments are a strip the keyboard can scroll too · the page never scrolls sideways.
+    await expect(page.locator('[data-cmts]')).toHaveAttribute('role', 'region');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    expect(errors).toEqual([]);
+  });
+
+  test('manifesto: reduced motion keeps the finished edit', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/en');
+    await expect(page.locator('[data-ch="0"] ins')).toHaveText('small design and engineering studio');
+    await expect(page.locator('[data-docstat]')).toHaveText('5 suggestions · 3 people');
+  });
+
+  test('services: chips right over the frame · the frames change by themselves while they show · a tap makes them yours', async ({ page }) => {
+    await page.goto('/en');
+    const chips = await page.locator('.opts').boundingBox();
+    const frame = await page.locator('[data-frm]').boundingBox();
+    expect(chips!.y + chips!.height).toBeLessThan(frame!.y);
+    // The picked row's words under the frame.
+    await expect(page.locator('[data-sd="0"]')).toBeVisible();
+    await expect(page.locator('[data-opt="0"] .od')).toBeHidden();
+    await page.locator('[data-stage]').evaluate((e) => window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 120));
+    await expect(page.locator('.opt.act')).toHaveAttribute('data-opt', '1', { timeout: 9000 });
+    await expect(page.locator('[data-sd="1"]')).toBeVisible();
+    await expect(page.locator('[data-sd="0"]')).toBeHidden();
+    await page.locator('[data-opt="3"]').tap();
+    await expect(page.locator('[data-frm]')).toHaveClass(/\bv3\b/);
+    await page.waitForTimeout(7500);
+    await expect(page.locator('.opt.act')).toHaveAttribute('data-opt', '3');
+  });
+
+  test('process: the steps open by themselves while the stack shows', async ({ page }) => {
+    await page.goto('/en');
+    await page.locator('.ly-v').evaluate((e) => window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 40));
+    await expect(page.locator('[data-ly]')).toHaveClass(/\bs1\b/, { timeout: 10_000 });
+    await expect(page.locator('#ly-d1')).toBeVisible();
+  });
+
+  test('board: a phone shows exactly the window the frames wrap in (no empty band · no frame popping in)', async ({ page }) => {
+    await page.goto('/en');
+    const [h, k] = await page.locator('[data-board]').evaluate((b) => [b.clientHeight, parseFloat(getComputedStyle(b).getPropertyValue('--bk'))]);
+    expect(Math.abs(h! - 620 * k!)).toBeLessThan(1);
+  });
 
   test('process: the stack on top · the steps as a list · a tap opens one', async ({ page }) => {
     await page.goto('/en');

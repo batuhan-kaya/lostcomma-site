@@ -334,12 +334,20 @@ export class Crew {
 
   /**
    * Leave the mouse where it is (hands on the keyboard: nobody moves a mouse while they type).
-   * `dx dy` lets it slide off what it just clicked first.
+   * `dx dy` lets it slide off what it just clicked first · `clear` lets it land where its tag
+   * covers no words (the nearest such spot: a phone's headline has little room around a word).
    */
-  stay(name: Name, dx = 0, dy = 0): void {
+  stay(name: Name, dx = 0, dy = 0, clear = false): void {
     const c = this.cursors[name];
     if (c.hidden || !c.placed) return;
-    this.send(c, { at: { x: c.x + dx, y: c.y + dy } });
+    const at = { x: c.x + dx, y: c.y + dy };
+    const S = clear && this.section ? this.sec(this.section) : null;
+    if (S && this.section) {
+      const tg = this.clear(this.section, S, c, { at });
+      at.x += tg.dx ?? 0;
+      at.y += tg.dy ?? 0;
+    }
+    this.send(c, { at });
   }
 
   /** Where a cursor's arrow tip is right now in viewport coordinates · null when it is off stage. */

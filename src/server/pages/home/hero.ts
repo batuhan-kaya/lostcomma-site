@@ -5,11 +5,14 @@ import type { Ctx } from '../../page';
  * 01 · Hero. The team is live in the file: design rewrites a word of the headline,
  * motion bounces the period, code publishes a new version.
  */
+/** The headline's size on a wide screen (home.css): the size label's first state · the script shows the real one. */
+const HL_PX = { tr: 136, en: 146 } as const;
+
 export function hero(ctx: Ctx): Safe {
   const { t, lang } = ctx;
   const c = ctx.texts.home(lang);
   const word = c.words[0] ?? '';
-  const box = html`<button type="button" class="wbox" data-wbox title="${t('Kelimeyi değiştir')}"><span class="wtx" data-word>${word}</span><i class="tc" aria-hidden="true"></i><i class="hh hA" aria-hidden="true"></i><i class="hh hB" aria-hidden="true"></i><i class="hh hC" aria-hidden="true"></i><i class="hh hD" aria-hidden="true"></i><span class="sz mono" aria-hidden="true">${t('Metin')} · 146</span></button>`;
+  const box = html`<button type="button" class="wbox" data-wbox title="${t('Kelimeyi değiştir')}"><span class="wtx" data-word>${word}</span><i class="tc" aria-hidden="true"></i><i class="hh hA" aria-hidden="true"></i><i class="hh hB" aria-hidden="true"></i><i class="hh hC" aria-hidden="true"></i><i class="hh hD" aria-hidden="true"></i><span class="sz mono" aria-hidden="true">${t('Metin')} · ${HL_PX[lang]}</span></button>`;
   const dot = html`<button type="button" class="dot" data-dot title="${t('Noktayı zıplat')}">.</button>`;
   // The lines come from the content (panel · Metinler): {w} is the word box · the period ends the last line.
   // Turkish puts the variable word first · English at the end.
