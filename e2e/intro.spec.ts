@@ -34,19 +34,27 @@ test.afterAll(() => {
 test.describe('preloader', () => {
   test('arriving from outside: the comma is found · the mark lands on the logo · the page is free', async ({ page }, info) => {
     const errors = watchErrors(page);
+    // Nobody fades in on stage: at the start all three cursors and the comma are outside the screen
+    // (design left · code right · motion under the bottom edge with the comma). Read in the page the
+    // moment the preloader starts (.go): design glides in from .382 s and the load event can come
+    // later than that on a busy machine.
+    await page.addInitScript(() => {
+      const out = (sel: string) => {
+        const parts = [...document.querySelectorAll(`${sel}, ${sel} *`)].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0);
+        return parts.length > 0 && parts.every((r) => r.right <= 0 || r.left >= innerWidth || r.top >= innerHeight);
+      };
+      const mo = new MutationObserver(() => {
+        if (!document.querySelector('[data-intro]')?.classList.contains('go')) return;
+        mo.disconnect();
+        (window as unknown as { __start: unknown }).__start = { design: out('.lci-design'), code: out('.lci-code'), comma: out('.lci-cm') };
+      });
+      mo.observe(document, { subtree: true, attributes: true, attributeFilter: ['class'] });
+    });
     await page.goto(`${base}/en`);
     const box = page.locator('[data-intro]');
     await expect(box).toBeVisible();
     await expect(box).toHaveClass(/go/);
-    // Nobody fades in on stage: at the start all three cursors and the comma are outside the screen
-    // (design left · code right · motion under the bottom edge with the comma).
-    const outside = await page.evaluate(() => {
-      const out = (sel: string) => {
-        const parts = [...document.querySelectorAll(`${sel}, ${sel} *`)].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0);
-        return parts.every((r) => r.right <= 0 || r.left >= innerWidth || r.top >= innerHeight);
-      };
-      return { design: out('.lci-design'), code: out('.lci-code'), comma: out('.lci-cm') };
-    });
+    const outside = await page.evaluate(() => (window as unknown as { __start: unknown }).__start);
     expect(outside).toEqual({ design: true, code: true, comma: true });
     // The logo's place in the header is empty until the mark lands on it.
     expect(await page.locator('.hd .lc-mark').evaluate((el) => getComputedStyle(el).visibility)).toBe('hidden');
