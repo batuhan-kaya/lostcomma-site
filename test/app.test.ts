@@ -112,6 +112,17 @@ describe('not found', () => {
   });
 });
 
+describe('compression (phase 17g)', () => {
+  it('pages leave compressed: brotli where the browser takes it · gzip else · nothing for a client that asks for none', async () => {
+    const br = await get('/tr', { 'accept-encoding': 'gzip, deflate, br' });
+    expect(br.headers['content-encoding']).toBe('br');
+    expect(String(br.headers.vary)).toMatch(/accept-encoding/i);
+    expect(br.rawPayload.length).toBeLessThan(40_000);
+    expect((await get('/en/work', { 'accept-encoding': 'gzip' })).headers['content-encoding']).toBe('gzip');
+    expect((await get('/tr')).headers['content-encoding']).toBeUndefined();
+  });
+});
+
 describe('headers and meta files', () => {
   it('sends a strict CSP and the usual hardening headers on HTML', async () => {
     const res = await get('/en');

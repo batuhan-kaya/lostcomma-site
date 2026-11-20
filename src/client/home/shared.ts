@@ -31,5 +31,24 @@ export function replay(el: Element, cls: string): void {
   el.classList.add(cls);
 }
 
+/**
+ * Run `fn` once `el` comes within a screen of the viewport. Sections further down are not laid out
+ * until then (content-visibility · data-far in home.css): measuring them at load would lay them out
+ * for nothing and hold the page's first second (Lighthouse: blocking time).
+ */
+export function whenNear(el: Element | null, fn: () => void): void {
+  if (!el) return;
+  if (!('IntersectionObserver' in window)) return fn();
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      io.disconnect();
+      fn();
+    },
+    { rootMargin: '100% 0px' },
+  );
+  io.observe(el);
+}
+
 /** What each teammate is doing (header popovers). Scenes update it. */
 export const doing: Record<string, string> = {};

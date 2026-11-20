@@ -14,7 +14,7 @@ Studio site for Lost Comma (Istanbul creative software studio: web · apps · id
 ## Brand rules (enforced by tests)
 
 - No commas in visible copy, in either language. The comma appears only as a graphic easter egg (`.egg` or `aria-hidden`).
-- Fonts are self-hosted woff2 (Anybody · Geist · Martian Mono from fontsource). Never load Google Fonts or any third-party font CDN.
+- Fonts are self-hosted woff2 (Anybody · Geist · Martian Mono from fontsource · cut to the site's letters by `npm run fonts`). Never load Google Fonts or any third-party font CDN.
 - Team framing: the studio speaks as "we". Three team cursors: design (blue) · code (mint) · motion (pink) · plus "you" (lime).
 - Blog is called "Notes" in both languages.
 - Every page has its own signature interaction. Never reuse the homepage animation on an inner page.
@@ -55,6 +55,18 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 - The server's first state equals the client's first state (the Websites frame: `src/shared/frame.ts` · a unit test checks the CSS). Animated reflow on purpose (the frame being dragged) is the only layout shift allowed.
 - A scaled-down mock keeps its tools at reading size: `scale: calc(1 / var(--k))` on labels and buttons (home services `--k` · process flow `--pk` · board `--bk`).
 - Tap targets are at least 24 px (an invisible `::before` pad where the drawing must stay small). Text on screen is at least 10.5 px (decorative miniatures with `role="img"` or `aria-hidden` excepted).
+
+## First paint (phase 17g · Lighthouse 100 on mobile · TR and EN)
+
+- Measured the way the live site is served: HTTPS + HTTP/2 (Caddy in front) · mobile · simulated throttling. Every page checked reads 100 · 100 · 100 · 100. Plain local HTTP/1.1 (`npm run preview`) reads 98–99: six connections and their handshakes · not the page. Lighthouse counts every request that finishes before the first paint toward FCP and LCP: keep that set small.
+- Compression: the build writes brotli and gzip copies of every text asset (`precompress` in `scripts/build.ts` · `preCompressed` on `/assets/`) · pages · feeds and the sitemap leave through `@fastify/compress` (brotli quality 5 · gzip · `Vary: Accept-Encoding`). The homepage is 26 kb on the wire (118 raw).
+- Fonts: `npm run fonts` (`scripts/fonts.ts` · `src/shared/fonts.ts`) cuts each family into `src/fonts/<family>-core.woff2` (ASCII · the Latin-1 and typography the site writes · ı) and `<family>-tr.woff2` (Ğ ğ İ Ş ş) and writes `src/styles/fonts.css`: the cuts with exactly the letters they hold · fontsource's files for every other letter they have (no letter in two faces · `document.fonts.check` stays true · a name in a note still has its letters). About 100 kb in six files instead of 210 in six (the 87 kb of latin-ext used to be discovered during the first layout at the highest priority). The document preloads the core cuts · Turkish pages the Turkish ones too (`PRELOAD_FONTS` in `layout/document.ts`). Run `npm run fonts` again after adding a character to the copy that is not in `CORE` (a test lists what every family must hold).
+- Late CSS: `page.lateStyles` (the homepage's `home-art.css`: the products in the services frames `_frames.css` and the process layers `_layers.css` · three quarters of its CSS) is a `<template data-late>` in the head · `app.ts` puts it in after the first paint · a `<noscript>` link without scripts. Never put the first screen's CSS there.
+- Far drawings: a section the server marks `data-far` (services · work · process) does not lay out its aria-hidden drawings (`.clip` · `.clip2` · `.ly-v` · `.bf .ba` · `content-visibility: hidden` and `visibility: hidden`: sized from outside so the page keeps its height) until a screen before it comes up (`offscreen` in `app.ts`) · once the visitor moves (scroll · touch · key) the sections three screens ahead get them in a quiet moment (`requestIdleCallback`). Never use `content-visibility: auto` on a whole section: its guessed height made a jump down the page land in the wrong place.
+- A services frame that is not on show is not laid out (`.fc` · `content-visibility: hidden` · `visibility: hidden` · its fade keeps it a moment) · once shown it stays laid out (`.seen`) and the next one is laid out in a quiet moment before its turn (`warm` in `home/services.ts`). The motion frame's video poster waits too (`loopVideo(…, { lazyPoster })` · `loops.ts` sets it on screen).
+- Scripts do no measuring at load for sections further down: `whenNear()` (`home/shared.ts`) runs the services stage's `fit` · the process notes' `room` · the board's first `render` · the contact blanks' sizing a screen before their section. The header bar reads `--head` on the first scroll · the hero's size label is placed when the box is selected · the Istanbul clock is counted (UTC+3) · not formatted with `Intl`.
+- The crew layer and the preloader's cursors are `inert` (drawings: their tags fade · checkers and the keyboard pass them by).
+- To measure: build · run the server with `SITE_URL` set to the address Lighthouse opens (the stats beacon checks its Origin) · put a TLS + HTTP/2 front before it (any local proxy) · `lighthouse <url> --chrome-flags="--headless=new --no-sandbox"` (mobile is the default) · run it more than once: a single run moves by a point.
 
 ## Focus and layout (UI pass · e2e/focus.spec.ts · e2e/layout.spec.ts)
 
@@ -246,6 +258,7 @@ Board: https://claude.ai/artifact/JxLVX6BbRNJbHrZDXka4RS (Main = Work page · Ca
 | `npm run mail -- test <address>\|outbox\|retry` | check the mail settings · see or resend the outbox |
 | `npm run panel -- password\|totp off\|signout` | set the panel password · turn two-step off · sign every browser out |
 | `npm run icons` | draw the favicon and icons from the mark into `public/` |
+| `npm run fonts` | cut the fonts to the site's letters into `src/fonts/` and write `src/styles/fonts.css` |
 | `npm run mock -- list\|<name> <file>` | the photo slots of the service mocks · crop a photo into `src/images/` |
 
 ## Layout

@@ -10,7 +10,14 @@ import { intro } from './intro';
 import { ldGraph } from '../ld';
 
 const OG_LOCALE: Record<Lang, string> = { tr: 'tr_TR', en: 'en_US' };
-const PRELOAD_FONTS = ['anybody-latin', 'geist-latin', 'martian-latin'];
+/**
+ * The fonts' own cuts (scripts/fonts.ts · fonts-core.css): every page writes in the three core files ·
+ * a Turkish page in the three small Turkish ones too. Preloaded so the first paint finds them under way.
+ */
+const PRELOAD_FONTS: Record<Lang, string[]> = {
+  tr: ['anybody-core', 'geist-core', 'martian-core', 'anybody-tr', 'geist-tr', 'martian-tr'],
+  en: ['anybody-core', 'geist-core', 'martian-core'],
+};
 
 /** A JSON data block for the page script. Not executed, so CSP allows it. `<` is escaped so it can never close the tag. */
 export function jsonData(value: unknown): Safe {
@@ -37,8 +44,9 @@ export function documentHtml<D>(page: Page<D>, ctx: Ctx, data: D): Safe {
   // What the card shows in words (for screen readers in the apps that read it).
   const ogAlt = spec ? `Lost Comma · ${ogSentence(spec)}` : '';
 
-  const fonts = PRELOAD_FONTS.map((f) => assets.font(f)).filter((u): u is string => !!u);
+  const fonts = PRELOAD_FONTS[lang].map((f) => assets.font(f)).filter((u): u is string => !!u);
   const css = ['app', ...(page.styles ?? [])].map((n) => assets.css(n)).filter((u): u is string => !!u);
+  const late = (page.lateStyles ?? []).map((n) => assets.css(n)).filter((u): u is string => !!u);
   const js = ['app', ...(page.scripts ?? [])].map((n) => assets.js(n, lang)).filter((u): u is string => !!u);
 
   return html`<!doctype html>
@@ -84,6 +92,7 @@ ${page.noindex ? '' : ldGraph(ctx, page, data, { name, title, description, image
 <link rel="manifest" href="/site.webmanifest">
 ${fonts.map((f) => html`<link rel="preload" href="${f}" as="font" type="font/woff2" crossorigin>`)}
 ${css.map((c) => html`<link rel="stylesheet" href="${c}">`)}
+${late.map((c) => html`<template data-late><link rel="stylesheet" href="${c}"></template><noscript><link rel="stylesheet" href="${c}"></noscript>`)}
 ${js.map((s) => html`<script type="module" src="${s}"></script>`)}
 </head>
 <body>

@@ -5,7 +5,7 @@ import { reducedMotion } from '../lib/motion';
 import { LiveMocks } from './live';
 import { Viewer } from './viewer';
 import { t } from '../lib/t';
-import { $, $$, doing, type HomeData } from './shared';
+import { $, $$, doing, type HomeData, whenNear } from './shared';
 
 export class Services {
   private readonly opts = $$<HTMLButtonElement>('[data-opt]');
@@ -61,11 +61,16 @@ export class Services {
       this.manualAt = Date.now();
       this.inspect(this.code?.hidden ?? true);
     });
-    this.fit();
-    addEventListener('resize', () => this.fit(), { passive: true });
+    // The stage is measured once the section comes near (whenNear): further down it is not laid out yet.
+    let near = false;
+    whenNear(this.stage, () => {
+      near = true;
+      this.fit();
+      // The list's height depends on its letters: measure again once the fonts are in.
+      void document.fonts?.ready.then(() => this.align());
+    });
+    addEventListener('resize', () => near && this.fit(), { passive: true });
     if (!crew?.animates('svc') && !reducedMotion() && !document.documentElement.classList.contains('still')) this.alone();
-    // The list's height depends on its letters: measure again once the fonts are in.
-    void document.fonts?.ready.then(() => this.align());
     if (this.viewer.ok) {
       const fxp = $<HTMLButtonElement>('[data-fxp]');
       if (fxp) {
@@ -165,11 +170,16 @@ export class Services {
       if (!shown || this.manualAt) return;
       if (!this.live.holding) this.pick((this.v + 1) % this.opts.length);
       timer = window.setTimeout(tick, 6500);
+      // The one after: laid out now in a quiet moment · not when it changes.
+      window.setTimeout(() => this.warm((this.v + 1) % this.opts.length), 2500);
     };
     new IntersectionObserver(
       (es) => {
         shown = es.some((e) => e.isIntersecting);
-        if (shown && !timer && !this.manualAt) timer = window.setTimeout(tick, 4200);
+        if (shown && !timer && !this.manualAt) {
+          timer = window.setTimeout(tick, 4200);
+          this.warm((this.v + 1) % this.opts.length);
+        }
         else if (!shown && timer) {
           clearTimeout(timer);
           timer = 0;
@@ -179,10 +189,27 @@ export class Services {
     ).observe(stage);
   }
 
+  /**
+   * Lay out a frame in a quiet moment before its turn (a product mock is a tenth of a second of work
+   * for a phone · better now than in the moment it changes). Once laid out it stays (.seen).
+   */
+  warm(i: number): void {
+    const fc = $(`[data-fc="${i}"]`);
+    if (!fc || fc.classList.contains('seen')) return;
+    const go = () => {
+      fc.classList.add('seen');
+      if (i === 1) $('[data-fca]')?.classList.add('seen');
+    };
+    if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 1200 });
+    else setTimeout(go, 100);
+  }
+
   pick(i: number): void {
     const sv = this.data.services[i];
     if (!sv || !this.frm) return;
     this.v = i;
+    $(`[data-fc="${i}"]`)?.classList.add('seen');
+    if (i === 1) $('[data-fca]')?.classList.add('seen');
     this.opts.forEach((o, j) => {
       o.classList.toggle('act', j === i);
       o.setAttribute('aria-checked', String(j === i));
@@ -230,6 +257,8 @@ export class Services {
       const nx = (this.v + 1) % this.opts.length;
       const opt = this.opts[nx];
       if (!opt || !this.frm) return;
+      // Laid out while the host reaches for it.
+      this.warm(nx);
       doing[host] = t('Çerçeveyi değiştiriyor');
       await c.go(host, { el: opt, fx: 0, fy: 0.5, dx: 12 }, signal);
       c.press(host);

@@ -204,9 +204,11 @@ export function posterUrl(p: MediaRef, want = 1280): string {
 /**
  * A muted looping <video>. It never autoplays from markup: the page script plays it while it is
  * on screen and the visitor has not asked for less motion. Until then the poster shows.
+ * `lazyPoster`: the poster waits too (`data-poster` · loops.ts sets it once the video is on screen) ·
+ * for a loop hidden in a frame that is not on show (a poster is never fetched lazily by the browser).
  */
-export function loopVideo(v: VideoRef, o: { lang: Lang; alt?: string; posterWidth?: number; class?: string }): Safe {
+export function loopVideo(v: VideoRef, o: { lang: Lang; alt?: string; posterWidth?: number; class?: string; lazyPoster?: boolean }): Safe {
   const other: Lang = o.lang === 'tr' ? 'en' : 'tr';
   const alt = o.alt ?? v.alt[o.lang] ?? v.alt[other] ?? '';
-  return html`<video class="loopv${o.class ? ' ' + o.class : ''}" muted loop playsinline disableremoteplayback preload="none" poster="${posterUrl(v.poster, o.posterWidth)}" width="${v.width}" height="${v.height}" data-loopv${alt ? html` aria-label="${alt}"` : html` aria-hidden="true"`}>${v.webm ? html`<source src="${loopUrl(v.key, 'webm')}" type="video/webm">` : ''}<source src="${loopUrl(v.key, 'mp4')}" type="video/mp4"></video>`;
+  return html`<video class="loopv${o.class ? ' ' + o.class : ''}" muted loop playsinline disableremoteplayback preload="none" ${o.lazyPoster ? html`data-poster` : html`poster`}="${posterUrl(v.poster, o.posterWidth)}" width="${v.width}" height="${v.height}" data-loopv${alt ? html` aria-label="${alt}"` : html` aria-hidden="true"`}>${v.webm ? html`<source src="${loopUrl(v.key, 'webm')}" type="video/webm">` : ''}<source src="${loopUrl(v.key, 'mp4')}" type="video/mp4"></video>`;
 }

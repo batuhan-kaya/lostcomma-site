@@ -44,7 +44,7 @@ function frames(ctx: Ctx, projects: BoardProject[]): Frame[] {
 export function board(ctx: Ctx, projects: BoardProject[]): Safe {
   const { t, lang } = ctx;
   const list = frames(ctx, projects);
-  return html`<section class="work" data-sec="work" id="work" data-host="design">
+  return html`<section class="work" data-sec="work" id="work" data-host="design" data-far>
 <span class="rest" data-rest="design" data-rest-at="0.68 0.64" data-rest-at-m="0.7 0.3"></span>
 <div class="wrap whead">
 <div><p class="kick mono"><span>(04)</span><span>${t('Seçili işler')}</span></p><h2 class="h2">${t('Pano.')}</h2><p class="wsub">${t('Gurur duyduğumuz her şey tek bir sonsuz panoda. İstediğin yöne sürükle. Hiç bitmiyor.')}</p><a class="sec-go" href="${href(lang, 'work')}">${t('Bütün işleri gör')} <span aria-hidden="true">→</span></a></div>

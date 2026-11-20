@@ -8,7 +8,7 @@
 import type { Crew } from '../lib/crew';
 import { reducedMotion } from '../lib/motion';
 import { t } from '../lib/t';
-import { $, $$, doing } from './shared';
+import { $, $$, doing, whenNear } from './shared';
 
 export class Process {
   private readonly box = $('[data-ly]');
@@ -47,9 +47,14 @@ export class Process {
     io.observe(box);
     if (!crew?.animates('prc') && !reducedMotion() && !document.documentElement.classList.contains('still')) this.alone();
     // The notes' words come from the panel (Metinler): give the open note more room if they need it.
-    this.room();
-    void document.fonts?.ready.then(() => this.room());
-    addEventListener('resize', () => this.room(), { passive: true });
+    // Measured once the section comes near (whenNear): further down it is not laid out yet.
+    let near = false;
+    whenNear(box, () => {
+      near = true;
+      this.room();
+      void document.fonts?.ready.then(() => this.room());
+    });
+    addEventListener('resize', () => near && this.room(), { passive: true });
   }
 
   /**

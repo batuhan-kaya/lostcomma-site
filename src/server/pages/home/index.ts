@@ -40,6 +40,7 @@ export function homePage(opts: HomeOptions = {}): Page<HomeData> {
     home: true,
     scripts: ['home'],
     styles: ['home'],
+    lateStyles: ['home-art'],
     title: (t) => t('İstanbul’da tasarım ve yazılım stüdyosu'),
     description: (t) => t('Lost Comma İstanbul’da web siteleri · uygulamalar · kimlikler ve hareket tasarlayıp kodlayan küçük bir stüdyo. İşin sahipleriyle yan yana çalışırız.'),
     load: async (ctx) => ({ board: await boardProjects(ctx.db, ctx.lang), loop: await newestLoop(ctx.db, ctx.lang) }),

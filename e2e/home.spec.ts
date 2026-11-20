@@ -56,6 +56,11 @@ test.describe('homepage · desktop interactions', () => {
         await page.evaluate(() => document.fonts.ready);
         await page.waitForTimeout(300);
         const px = await page.locator('.hl').evaluate((h) => Math.round(parseFloat(getComputedStyle(h).fontSize)));
+        // The label is placed when the box is selected (the scene does it · here a resize while it shows).
+        await page.evaluate(() => {
+          document.querySelector('[data-wbox]')!.classList.add('sel');
+          window.dispatchEvent(new Event('resize'));
+        });
         await expect(page.locator('.wbox .sz')).toHaveText(`${lang === 'tr' ? 'Metin' : 'Text'} · ${px}`);
         // Every word the team types: the label (under or beside the box) touches no other line.
         const hits = await page.evaluate((list) => {
@@ -546,6 +551,39 @@ test.describe('homepage · phone', () => {
     expect(errors).toEqual([]);
   });
 
+});
+
+test.describe('homepage · the first paint (phase 17g · Lighthouse)', () => {
+  test('the page writes in the font cuts · the drawings below are linked after the first paint and laid out a screen before their section', async ({ page }) => {
+    const fonts: string[] = [];
+    page.on('request', (r) => r.resourceType() === 'font' && fonts.push(r.url()));
+    await page.goto('/tr');
+    await page.evaluate(() => document.fonts.ready);
+    // The late sheet (page.lateStyles) is in the head now · its template is gone.
+    await expect(page.locator('head link[rel="stylesheet"][href*="/home-art-"]')).toHaveCount(1);
+    await expect(page.locator('template[data-late]')).toHaveCount(0);
+    // Turkish needs nothing from fontsource's own files.
+    expect(fonts.length).toBeGreaterThan(0);
+    expect(fonts.filter((u) => !/\/(anybody|geist|martian)-(core|tr)-/.test(u))).toEqual([]);
+    // Far down the drawings wait · a screen before the section they are there.
+    const prc = page.locator('[data-sec="prc"]');
+    await expect(prc).toHaveAttribute('data-far', '');
+    expect(await page.locator('.ly-v').evaluate((e) => getComputedStyle(e).visibility)).toBe('hidden');
+    await prc.evaluate((e) => window.scrollTo(0, e.getBoundingClientRect().top + scrollY - innerHeight * 1.5));
+    await expect(prc).not.toHaveAttribute('data-far');
+    expect(await page.locator('.ly-v').evaluate((e) => getComputedStyle(e).visibility)).toBe('visible');
+  });
+
+  test('a frame that is not on show is not laid out · the one picked shows', async ({ page }) => {
+    // No team and no autoplay: only the click changes the frame.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/en');
+    await page.locator('[data-stage]').evaluate((e) => window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 100));
+    const vis = () => page.locator('[data-fc]').evaluateAll((fs) => fs.map((f) => getComputedStyle(f).visibility));
+    await expect.poll(vis).toEqual(['visible', 'hidden', 'hidden', 'hidden', 'hidden']);
+    await page.locator('[data-opt="2"]').click();
+    await expect.poll(vis).toEqual(['hidden', 'hidden', 'visible', 'hidden', 'hidden']);
+  });
 });
 
 test.describe('homepage · contact sentence', () => {

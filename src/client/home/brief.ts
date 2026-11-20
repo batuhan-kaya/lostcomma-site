@@ -7,7 +7,7 @@
 import type { Crew } from '../lib/crew';
 import { reducedMotion } from '../lib/motion';
 import { t } from '../lib/t';
-import { $, $$, doing, type HomeData, lang } from './shared';
+import { $, $$, doing, type HomeData, lang, whenNear } from './shared';
 
 const MAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const KEYS = ['name', 'what', 'mail'] as const;
@@ -56,15 +56,21 @@ export class Brief {
       e.preventDefault();
       this.again();
     });
-    for (const k of KEYS) this.size(k);
-    // The display face and the sentence's size (it follows the window) change the widths.
-    void document.fonts?.ready.then(() => this.sizeAll());
+    // Sized once the section comes near (whenNear: further down it is not laid out yet · until then
+    // the browser sizes the blanks as it does without JS). The display face and the sentence's size
+    // (it follows the window) change the widths.
+    let near = false;
+    whenNear(f, () => {
+      near = true;
+      this.sizeAll();
+      void document.fonts?.ready.then(() => this.sizeAll());
+    });
     let rt = 0;
     window.addEventListener('resize', () => {
+      if (!near) return;
       clearTimeout(rt);
       rt = window.setTimeout(() => this.sizeAll(), 120);
     });
-    this.select();
     this.suggest();
   }
 

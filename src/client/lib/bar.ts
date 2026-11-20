@@ -31,7 +31,9 @@ export function headerBar(): void {
   const hd = document.querySelector<HTMLElement>('.hd');
   if (!hd) return;
   const root = document.documentElement;
-  let head = 0;
+  // The header's height (--head): read on the first scroll that needs it · not at load (a style
+  // recalculation of the whole page before anything moved).
+  let head = -1;
   let last = scrollY;
   let from = scrollY;
   let dir = 0;
@@ -106,6 +108,7 @@ export function headerBar(): void {
       return;
     }
     if (!stuck) {
+      if (head < 0) measure();
       if (y <= head) return;
       stuck = true;
       quiet(() => hd.classList.add('stk'));
@@ -115,13 +118,12 @@ export function headerBar(): void {
     else if (up) tone();
   };
 
-  measure();
   update();
   addEventListener('scroll', update, { passive: true });
   addEventListener(
     'resize',
     () => {
-      measure();
+      head = -1;
       update();
     },
     { passive: true },

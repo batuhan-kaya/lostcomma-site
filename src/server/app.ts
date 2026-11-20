@@ -1,5 +1,7 @@
 import { mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { constants as zlib } from 'node:zlib';
+import compress from '@fastify/compress';
 import formbody from '@fastify/formbody';
 import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
@@ -100,6 +102,15 @@ export async function buildApp({ config, now = () => new Date(), database, maile
   const texts = new TextStore(db);
   await texts.load();
 
+  // Pages · feeds · the sitemap leave compressed (brotli at a quick level · gzip else). The assets
+  // were compressed by the build (preCompressed below) · images and fonts are compressed already.
+  await app.register(compress, {
+    global: true,
+    threshold: 1024,
+    encodings: ['br', 'gzip'],
+    brotliOptions: { params: { [zlib.BROTLI_PARAM_QUALITY]: 5 } },
+  });
+
   // One canonical form per URL: no trailing slash (except the root).
   app.addHook('onRequest', async (req, reply) => {
     const [path = '/', query] = req.url.split('?');
@@ -175,6 +186,8 @@ export async function buildApp({ config, now = () => new Date(), database, maile
     index: false,
     immutable: true,
     maxAge: '365d',
+    // The build writes brotli and gzip copies of the text assets (scripts/build.ts · precompress).
+    preCompressed: true,
   });
 
   // Image variants and loops from the pipeline. Content-hashed names · cached for a year · range requests

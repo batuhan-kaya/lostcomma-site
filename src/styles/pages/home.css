@@ -2,8 +2,7 @@
    Homepage · the approved "Live" design
    Desktop numbers follow the 1440 board · below 1100 px everything flows.
    ===================================================================== */
-@import './_frames.css';
-@import './_layers.css';
+/* The products in the services frames and the process layers are home-art.css: linked after the first paint (app.ts). */
 
 [data-page="home"] {
   --dots: radial-gradient(rgba(14,14,15,.13) 1px, transparent 1.6px);
@@ -145,6 +144,17 @@
 /* On a touch screen the team stays in the hero: the hint does not promise company below it. */
 @media (hover: none) { .hf-crew { display: none; } }
 
+/*
+ * Further down (`data-far` until a screen before it comes up · app.ts) the drawings are not laid out at
+ * all: the products · the layer stack · the board's art. Only what is aria-hidden and sized from outside
+ * (so the page keeps its height: a whole section left out with content-visibility: auto had a guessed
+ * height and a jump down the page landed in the wrong place) · headings · words and every button stay for
+ * readers and the keyboard. Without scripts everything shows.
+ */
+@media (scripting: enabled) {
+  [data-far] :is(.clip, .clip2, .ly-v, .bf .ba) { content-visibility: hidden; visibility: hidden; }
+}
+
 /* ================= 02 manifesto ================= */
 .mf { --ring: var(--lime); position: relative; min-height: 1000px; background-color: var(--ink); background-image: radial-gradient(rgba(242,241,236,.07) 1px, transparent 1.6px); background-size: 26px 26px; color: var(--milk); }
 .mf .wrap { padding: 120px var(--gut) 110px; }
@@ -278,8 +288,13 @@
 .fv-hint { flex: none; margin: 14px 0 0; font-size: 11px; letter-spacing: .04em; color: rgba(242,241,236,.6); }
 .fv.app .fv-hint .tw, .fv:not(.app) .fv-hint .ta { display: none; }
 html.fv-open { overflow: hidden; }
-.fc { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .4s; }
-.fc.on { opacity: 1; pointer-events: auto; transition: opacity .5s .5s; }
+/* A frame that is not on show is not laid out or painted (content-visibility · its fade out keeps it a moment): the
+   page lays out one product at a time · its images wait until it shows. */
+.fc { position: absolute; inset: 0; opacity: 0; visibility: hidden; pointer-events: none; content-visibility: hidden; transition: opacity .4s, visibility 0s .4s, content-visibility .4s allow-discrete; }
+.fc.on { opacity: 1; visibility: visible; pointer-events: auto; content-visibility: visible; transition: opacity .5s .5s, visibility 0s, content-visibility 0s allow-discrete; }
+/* A frame that has shown once · or the next one (laid out in a quiet moment before its turn · services.ts warm):
+   it stays laid out so changing frames costs nothing but the fade. */
+.fc.seen { content-visibility: visible; }
 .fc.on.swap { opacity: 0; transition: opacity .3s; }
 .fc > div { position: absolute; inset: 0; }
 .fc { -webkit-tap-highlight-color: transparent; }

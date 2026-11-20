@@ -34,12 +34,12 @@ export class Hero {
       this.crew?.say('code', t('yayınladın. süper'), 1800);
     });
     this.frameLabel();
-    this.label();
-    // Late fonts change the words' boxes (fonts.ready alone can settle before the display face starts loading).
-    void document.fonts?.ready.then(() => this.label());
+    // The size label is placed when the box is selected (the scene) · again while it shows if the
+    // window or the letters change (late fonts change the words' boxes).
+    const relabel = () => this.box?.classList.contains('sel') && this.label();
     document.fonts?.addEventListener('loadingdone', () => {
       this.widths.clear();
-      this.label();
+      relabel();
     });
     let width = innerWidth;
     addEventListener('resize', () => {
@@ -49,9 +49,9 @@ export class Hero {
       if (this.hl && innerWidth !== width) {
         this.hl.style.minHeight = '';
         this.widths.clear();
-        this.label();
       }
       width = innerWidth;
+      relabel();
     }, { passive: true });
     this.popovers();
   }
