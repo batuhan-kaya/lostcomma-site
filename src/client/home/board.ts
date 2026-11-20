@@ -2,7 +2,7 @@
 import type { Crew } from '../lib/crew';
 import { reducedMotion } from '../lib/motion';
 import { t } from '../lib/t';
-import { $, $$, doing, type HomeData } from './shared';
+import { $, $$, doing, type HomeData, whenNear } from './shared';
 
 /** Positions on the 2000 × 1080 tile from the design. */
 const POS: [number, number][] = [
@@ -77,7 +77,8 @@ export class Board {
       this.inView = entries.some((en) => en.isIntersecting);
       if (this.inView) this.wake();
     }).observe(B);
-    this.render();
+    // The frames sit where the CSS puts them (the same spots) until the board comes near.
+    whenNear(B, () => this.render());
   }
 
   private scale(): number {

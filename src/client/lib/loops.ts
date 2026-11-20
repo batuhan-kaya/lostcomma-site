@@ -47,6 +47,12 @@ export class Loop {
   }
 
   sync(): void {
+    // A poster that waited for the video to come on screen (loopVideo · lazyPoster).
+    const late = this.el.dataset.poster;
+    if (this.visible && late) {
+      this.el.poster = late;
+      delete this.el.dataset.poster;
+    }
     const go = this.wanted && this.visible && (!reduce || this.asked);
     if (go) {
       if (this.el.preload !== 'auto') this.el.preload = 'auto';

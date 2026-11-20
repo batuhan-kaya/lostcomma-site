@@ -1,4 +1,5 @@
 /** Shared behaviour on every page: team cursors · the header bar · footer clock and the clock · language switch roll · mobile menu. */
+import { IST_OFFSET } from '../shared/booking';
 import { headerBar } from './lib/bar';
 import { getCrew } from './lib/crew';
 import { playIntro } from './lib/intro';
@@ -8,8 +9,10 @@ import { startStats, track } from './lib/stats';
 const LANG_COOKIE = 'lang';
 const ROLL_MS = 560;
 
+/** "14:05" in Istanbul (UTC+3 all year · src/shared/booking.ts): no date formatter to build on every page load. */
 function istanbulTime(d: Date): string {
-  return new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' }).format(d);
+  const t = new Date(d.getTime() + IST_OFFSET * 60_000);
+  return `${String(t.getUTCHours()).padStart(2, '0')}:${String(t.getUTCMinutes()).padStart(2, '0')}`;
 }
 
 function startClock(): void {
@@ -88,12 +91,18 @@ function placeholders(): void {
 
 /**
  * Endless CSS loops (live dots · drawn art · the board's frames) only play in sections on screen.
+ * The drawings of a section far down the page (`data-far` from the server) are laid out a screen
+ * before it comes up: the first paint does the first screen only.
  * A section out of view gets data-off: its animations pause where they are and pick up again
  * when it comes back (base.css). Nothing changes for the visitor · the page stops working
  * on things nobody sees.
  */
 function offscreen(): void {
-  if (!('IntersectionObserver' in window)) return;
+  const far = document.querySelectorAll<HTMLElement>('[data-far]');
+  if (!('IntersectionObserver' in window)) {
+    for (const el of far) el.removeAttribute('data-far');
+    return;
+  }
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) (e.target as HTMLElement).toggleAttribute('data-off', !e.isIntersecting);
@@ -101,8 +110,50 @@ function offscreen(): void {
     { rootMargin: '160px 0px' },
   );
   for (const el of document.querySelectorAll('[data-sec]')) io.observe(el);
+  // A section the server marked far (its drawings are not laid out yet · home.css) gets them a
+  // screen before it comes up at the latest · once. Once the visitor starts moving down the page the
+  // sections three screens ahead get them in a quiet moment (laying out a product mock takes a
+  // phone a tenth of a second: better between two gestures than in one). Nothing before that: a
+  // page nobody scrolls (a first look · Lighthouse) never pays for them.
+  const reveal = (el: Element) => {
+    if (!el.hasAttribute('data-far')) return;
+    el.removeAttribute('data-far');
+    near.unobserve(el);
+    soon.unobserve(el);
+  };
+  const near = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) if (e.isIntersecting) reveal(e.target);
+    },
+    { rootMargin: '100% 0px' },
+  );
+  const idle = (fn: () => void) => ('requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 200));
+  const soon = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) if (e.isIntersecting) idle(() => reveal(e.target));
+    },
+    { rootMargin: '300% 0px' },
+  );
+  for (const el of far) near.observe(el);
+  const moved = () => {
+    for (const el of document.querySelectorAll('[data-far]')) soon.observe(el);
+    for (const t of ['scroll', 'touchstart', 'keydown'] as const) removeEventListener(t, moved);
+  };
+  for (const t of ['scroll', 'touchstart', 'keydown'] as const) addEventListener(t, moved, { passive: true });
 }
 
+/**
+ * Late stylesheets (page.lateStyles · a template in the head: the browser does not fetch them yet ·
+ * a noscript link without scripts): linked after the first paint. The drawings they style are
+ * further down the page.
+ */
+function lateStyles(): void {
+  const late = document.querySelectorAll<HTMLTemplateElement>('template[data-late]');
+  if (!late.length) return;
+  requestAnimationFrame(() => setTimeout(() => late.forEach((t) => t.replaceWith(t.content))));
+}
+
+lateStyles();
 offscreen();
 headerBar();
 filled();

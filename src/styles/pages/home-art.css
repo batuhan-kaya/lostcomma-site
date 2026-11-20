@@ -1,0 +1,8 @@
+/*
+ * The homepage's drawings below the first screen: the five products in the services frames and the
+ * process layers. A late stylesheet (page.lateStyles): the head links it disabled and app.ts turns it
+ * on after the first paint · without scripts a noscript link loads it at once. Their sections lay
+ * them out only when they come near (data-far · home.css).
+ */
+@import './_frames.css';
+@import './_layers.css';

@@ -9,6 +9,7 @@
 import { createHash } from 'node:crypto';
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, join, relative, resolve } from 'node:path';
+import { brotliCompressSync, constants as zlib, gzipSync } from 'node:zlib';
 import * as esbuild from 'esbuild';
 import { inlineTranslations, toJs } from './lib/i18n';
 
@@ -144,6 +145,26 @@ function copyImages() {
   }
 }
 
+/**
+ * Brotli and gzip copies of every text asset next to it (`x.css.br` · `x.css.gz`): the server sends
+ * the smallest one the browser takes without compressing on every request (app.ts · preCompressed).
+ * Fonts and images are compressed already.
+ */
+function precompress(dir = assetsDir): void {
+  for (const f of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, f.name);
+    if (f.isDirectory()) {
+      precompress(p);
+      continue;
+    }
+    if (!/\.(css|js|svg|json)$/.test(f.name)) continue;
+    const buf = readFileSync(p);
+    if (buf.length < 1024) continue;
+    writeFileSync(`${p}.br`, brotliCompressSync(buf, { params: { [zlib.BROTLI_PARAM_QUALITY]: 11, [zlib.BROTLI_PARAM_SIZE_HINT]: buf.length } }));
+    writeFileSync(`${p}.gz`, gzipSync(buf, { level: 9 }));
+  }
+}
+
 async function buildOnce() {
   rmSync(dist, { recursive: true, force: true });
   mkdirSync(assetsDir, { recursive: true });
@@ -164,6 +185,7 @@ async function buildOnce() {
   recordJs('en', en.metafile!);
   recordCss(css.metafile!);
   writeManifest();
+  precompress();
 
   await esbuild.build({
     entryPoints: { index: join(root, 'src/server/index.ts'), cli: join(root, 'src/server/cli.ts') },
@@ -182,7 +204,7 @@ async function buildOnce() {
     ...Object.entries(manifest.css).map(([k, v]) => [`css ${k}`, v]),
     ...Object.entries(manifest.js).flatMap(([k, v]) => LANGS.map((l) => [`js ${k}.${l}`, v[l] ?? ''])),
   ];
-  for (const [k, v] of rows) console.log(`${k?.padEnd(16)} ${String(size(join(pub, v ?? ''))).padStart(7)} B  ${v}`);
+  for (const [k, v] of rows) console.log(`${k?.padEnd(16)} ${String(size(join(pub, v ?? ''))).padStart(7)} B ${String(size(join(pub, `${v}.br`))).padStart(7)} B br  ${v}`);
   console.log(`fonts            ${Object.keys(manifest.fonts).length} files`);
   console.log(`images           ${Object.keys(manifest.images).length} files`);
 }

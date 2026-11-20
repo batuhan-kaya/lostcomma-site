@@ -148,6 +148,8 @@ export class Crew {
     this.layer = document.createElement('div');
     this.layer.className = 'crew' + (this.touch ? ' touch' : '');
     this.layer.setAttribute('aria-hidden', 'true');
+    // A drawing over the page: tags and bubbles fade in and out (contrast checkers pass it by) · never a target.
+    this.layer.inert = true;
 
     const make = (name: Name): Cursor => {
       const el = document.createElement('div');

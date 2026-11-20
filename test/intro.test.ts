@@ -55,6 +55,7 @@ describe('the preloader', () => {
     const box = doc.slice(doc.indexOf('<div class="lci"'), doc.indexOf('<a class="skip"'));
     expect(box.replace(/<[^>]+>/g, ' ')).not.toContain(',');
     expect(box).toContain('<path class="lci-t" d="M0 82C0 47.6');
-    expect(box).toContain('<span class="lci-cur lci-motion">');
+    // A drawing: inert (its tags fade · checkers and the keyboard pass it by).
+    expect(box).toContain('<span class="lci-cur lci-motion" inert>');
   });
 });

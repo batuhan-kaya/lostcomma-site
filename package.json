@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "i18n": "tsx scripts/i18n.ts",
     "icons": "tsx scripts/icons.ts",
+    "fonts": "tsx scripts/fonts.ts",
     "mock": "tsx scripts/mock.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/server/cli.ts migrate",
@@ -27,6 +28,7 @@
     "check": "npm run typecheck && npm run i18n -- --check && npm run test && npm run build && npm run test:e2e"
   },
   "dependencies": {
+    "@fastify/compress": "^8.3.1",
     "@fastify/formbody": "^8.0.2",
     "@fastify/multipart": "^9.4.0",
     "@fastify/static": "^10.1.8",
@@ -59,6 +61,7 @@
     "acorn-walk": "^8.3.5",
     "drizzle-kit": "^0.31.11",
     "esbuild": "^0.28.2",
+    "subset-font": "^2.4.0",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7"

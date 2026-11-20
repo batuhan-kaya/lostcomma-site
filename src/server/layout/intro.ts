@@ -23,7 +23,8 @@ export function arrivesFromOutside(req: Pick<FastifyRequest, 'headers'>): boolea
 const ARROW = 'M3 2 L3 19.5 L7.8 15.2 L11 22 L14.2 20.6 L11.1 13.9 L17.6 13.7 Z';
 
 function cursor(who: 'design' | 'code' | 'motion'): Safe {
-  return html`<span class="lci-cur lci-${who}"><svg width="20" height="24" viewBox="0 0 20 24"><path d="${ARROW}"></path></svg><b>${who}</b></span>`;
+  // inert: a drawing (its tag fades in and out · checkers and the keyboard pass it by).
+  return html`<span class="lci-cur lci-${who}" inert><svg width="20" height="24" viewBox="0 0 20 24"><path d="${ARROW}"></path></svg><b>${who}</b></span>`;
 }
 
 /** The overlay. Drawn by the server so it is there on the first paint · CSS shows it only with JS and motion. */
