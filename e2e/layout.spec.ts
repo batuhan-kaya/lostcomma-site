@@ -41,7 +41,8 @@ test('the header fits a 320 and a 360 px phone with its gutter', async ({ page }
 test('the hero headline fits at every width with every word', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   for (const lang of ['tr', 'en'] as const) {
-    for (const width of [761, 820, 1024, 1100, 1101, 1280, 1440]) {
+    // Phones keep the headline's own lines too (phase 17f): each one fits the screen.
+    for (const width of [320, 360, 375, 390, 430, 760, 761, 820, 1024, 1100, 1101, 1280, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`/${lang}`);
       await page.evaluate(() => document.fonts.ready);

@@ -89,7 +89,12 @@
 .hh.hB { right: -10px; top: -8px; }
 .hh.hC { left: -10px; bottom: -8px; }
 .hh.hD { right: -10px; bottom: -8px; }
+/* The size label goes where it covers no words (hero.ts · label()): under the box · beside it (.side) · or nowhere (.off). */
 .wbox .sz { position: absolute; left: -4px; top: calc(100% + 12px); padding: 4px 8px; border-radius: 4px; background: var(--blue); color: var(--milk); white-space: nowrap; opacity: 0; transition: opacity .15s; }
+.wbox .sz.side { left: calc(100% + 14px); top: -2px; }
+.wbox .sz.off { display: none; }
+/* Measures the words in the headline's own letters (hero.ts · widthOf). */
+.wprobe { position: absolute; left: 0; top: 0; white-space: nowrap; visibility: hidden; pointer-events: none; }
 /* The caret takes no room: the period stays on the last letter whatever the word is. */
 .wbox .tc { position: absolute; left: calc(100% - .01em); bottom: .2em; width: .05em; height: .74em; background: var(--blue); opacity: 0; }
 .wbox.sel::before, .wbox.sel .hh, .wbox.sel .sz { opacity: 1; }
@@ -144,15 +149,26 @@
 .mf { --ring: var(--lime); position: relative; min-height: 1000px; background-color: var(--ink); background-image: radial-gradient(rgba(242,241,236,.07) 1px, transparent 1.6px); background-size: 26px 26px; color: var(--milk); }
 .mf .wrap { padding: 120px var(--gut) 110px; }
 .mf .kick { color: var(--dim); }
-.mhead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; }
 .mhead .h2 { margin-top: 20px; }
-.mtools { display: flex; flex-wrap: wrap; gap: 8px; }
-.mt { min-height: 46px; padding: 0 20px; white-space: nowrap; border: 1.5px solid rgba(242,241,236,.3); border-radius: 999px; background: transparent; color: var(--milk); font: 500 15px/1 var(--sans); cursor: pointer; transition: background-color .3s, color .3s, border-color .3s; }
-.mt:hover { border-color: var(--milk); }
-.mt.act { border-color: var(--milk); background: var(--milk); color: var(--ink); }
+.msub { max-width: 560px; margin: 22px 0 0; color: var(--dim); font-size: 19px; line-height: 1.45; text-wrap: pretty; }
 .mbody { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 36px; margin-top: 48px; align-items: start; }
-.paper { position: relative; padding: 28px 60px 60px; border-radius: 12px; background: var(--milk); color: var(--ink); box-shadow: 0 50px 90px -40px rgba(0,0,0,.9); }
-.smeta { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 30px; padding-bottom: 16px; border-bottom: 1px solid rgba(14,14,15,.12); color: var(--grey); }
+/* A light card on the ink section: its own focus ring. */
+.paper { --ring: var(--blue); position: relative; padding: 22px 60px 60px; border-radius: 12px; background: var(--milk); color: var(--ink); box-shadow: 0 50px 90px -40px rgba(0,0,0,.9); }
+/* The document's bar: its name and state · the review buttons (a segmented control: one of three ways to read it). */
+.mbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; margin: 0 0 30px; padding-bottom: 18px; border-bottom: 1px solid rgba(14,14,15,.12); }
+.smeta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin: 0; color: var(--grey); }
+.mstat { white-space: nowrap; }
+.mdot { display: inline-block; width: 8px; height: 8px; margin-right: 7px; border-radius: 50%; background: var(--c); vertical-align: .05em; }
+.mtools { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(14,14,15,.07); }
+.mt { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 0 16px 0 13px; white-space: nowrap; border: 0; border-radius: 999px; background: transparent; color: var(--ink); font: 500 15px/1 var(--sans); cursor: pointer; transition: background-color .25s, color .25s; }
+.mt svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mt:hover { background: rgba(14,14,15,.07); }
+.mt.act { background: var(--ink); color: var(--milk); }
+.mt .ms { display: none; }
+/* The finished edit under the document keeps its height (the server's ghost). */
+.dstack { display: grid; }
+.dstack > .doc { grid-area: 1 / 1; }
+.doc.ghost { visibility: hidden; pointer-events: none; }
 .doc { margin: 0; font-family: var(--display); font-size: clamp(26px, 3.2vw, 46px); line-height: 1.28; letter-spacing: -.022em; font-variation-settings: 'wdth' 80, 'wght' 560; }
 .doc del { text-decoration: none; background: linear-gradient(var(--coral), var(--coral)) no-repeat 0 60% / 0 4px; transition: background-size .7s cubic-bezier(.6,0,.2,1), color .5s; }
 .doc ins { margin-left: .18em; padding: 0 .08em .02em; border-radius: 5px; text-decoration: none; color: var(--ink); background: var(--hi); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
@@ -174,8 +190,8 @@
 .cmt .ct { display: block; margin-top: 7px; font-size: 16px; line-height: 1.38; }
 .mf-orig .cmt { opacity: 0; transform: translateX(24px); }
 .mf-final .cmt.show { opacity: .42; }
-.mcap { display: flex; align-items: center; margin: 34px 0 0; color: var(--lime); }
-.mcap .caret { height: 1em; margin-left: .25em; }
+.mcap { margin: 34px 0 0; color: var(--lime); }
+.mcap .caret { height: 1em; margin-left: .3em; vertical-align: -.15em; }
 
 /* ================= 03 services ================= */
 .svc { position: relative; min-height: 1000px; background-color: var(--paper); background-image: var(--dots); background-size: 26px 26px; background-position: 13px 13px; }
@@ -198,6 +214,8 @@
 .odi { display: block; min-height: 0; overflow: hidden; }
 .odd { display: block; padding-top: 10px; font-size: 16px; line-height: 1.45; color: #3A3A38; }
 .odl { display: block; margin-top: 10px; color: var(--grey); }
+/* The picked row's words under the frame: a phone's only (home.css · 760). */
+.sdesc { display: none; }
 .stage { position: relative; height: 850px; padding: 64px 0 0 70px; overflow: visible; }
 .sscale { transform-origin: 0 0; transform: scale(var(--k, 1)); }
 .frm { position: relative; width: var(--w); height: var(--h); border-radius: var(--r); background: #FFFFFF; box-shadow: 0 0 0 2px var(--blue), 0 50px 80px -40px rgba(14,14,15,.45); transition: width .95s var(--ease-roll), height .95s var(--ease-roll), border-radius .95s var(--ease-roll); }
@@ -214,7 +232,7 @@
  */
 .flab2 { position: absolute; left: 0; bottom: calc(100% + 12px); width: calc(100% * var(--k, 1)); display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--blue); scale: calc(1 / var(--k, 1)); transform-origin: 0 100%; }
 .flab2 > span { display: flex; align-items: center; gap: 9px; }
-.ib2 { min-height: 32px; padding: 0 12px; border: 1.5px solid var(--blue); border-radius: 999px; background: var(--paper); color: var(--blue); font: inherit; cursor: pointer; transition: background-color .3s, color .3s; }
+.ib2 { min-height: 32px; padding: 0 12px; white-space: nowrap; border: 1.5px solid var(--blue); border-radius: 999px; background: var(--paper); color: var(--blue); font: inherit; cursor: pointer; transition: background-color .3s, color .3s; }
 .ib2:hover, .ib2[aria-pressed="true"] { background: var(--blue); color: var(--milk); }
 .hd2 { position: absolute; z-index: 3; width: 13px; height: 13px; border: 2px solid var(--blue); background: #FFFFFF; }
 .hd2.a { left: -7px; top: -7px; }
@@ -243,6 +261,10 @@
 .fxp svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .stage.nw .frm:is(.v0, .v1) .fxp { display: inline-flex; }
 .stage.nw .frm .ftry { display: none; }
+/* A narrow stage: the Android label keeps its name only (its size would break the line). */
+.stage.nw .flab3 > span + span { display: none; }
+/* The iPhone frame on a narrow stage is too narrow for its label and the inspect button: the label stays (the button would run into Android). */
+.stage.nw .frm.v1 .ib2 { display: none; }
 .fv { position: fixed; inset: 0; width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; padding: 0; border: 0; overflow: hidden; background: #0E0E0F; color: #F2F1EC; --ring: var(--lime); }
 .fv[open] { display: flex; flex-direction: column; align-items: center; }
 .fv::backdrop { background: #0E0E0F; }
@@ -561,22 +583,53 @@ html.fv-open { overflow: hidden; }
 }
 
 @media (max-width: 760px) {
-  .hl, :lang(tr) .hl { white-space: normal; font-size: 13.4vw; line-height: .95; }
+  /* Phones keep the headline's own lines: each one fits the screen (the 1100 rule's size · TR about 34 px · EN 38 at 375). */
+  /* The selection's size label has no room beside a phone's headline: the frame · handles and caret say it is being edited. */
+  .wbox .sz { display: none; }
+  /* The two buttons share a line when they fit (TR) · else each takes the whole width (EN). */
+  .ctas > .btn { flex: 1 1 auto; justify-content: center; }
   .hlede p { font-size: 19px; }
   .pubc { padding-left: 14px; }
   .mf .wrap, .svc .wrap, .prc .wrap { padding-top: 88px; padding-bottom: 80px; }
   .mf, .svc, .work, .prc { min-height: 0; }
-  .paper { padding: 20px 22px 30px; }
-  .cmts { grid-template-columns: minmax(0, 1fr); }
-  /* Three buttons on a phone: the switch on its own line · accept and reject side by side (never two and an odd one). */
-  .mtools { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
-  .mtools .mt:first-child { grid-column: 1 / -1; }
-  .mt { flex: 1 1 auto; padding: 0 14px; }
-  .opt { grid-template-columns: 30px minmax(0, 1fr); }
-  .opt .os { grid-column: 2; }
+  .msub { font-size: 17px; }
+  .mbody { gap: 18px; margin-top: 36px; }
+  .paper { padding: 16px 18px 28px; }
+  .mbar { gap: 12px; margin-bottom: 22px; padding-bottom: 14px; }
+  .smeta { width: 100%; justify-content: space-between; }
+  /* A phone's review buttons: three equal segments · the icon over a short word (the full words stay their names). */
+  .mtools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; border-radius: 14px; }
+  .mt { flex-direction: column; gap: 5px; min-height: 54px; padding: 6px 4px; border-radius: 11px; font-size: 13.5px; }
+  .mt .ml { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .mt .ms { display: block; }
+  /* The comments are a strip under the document: one at a time · swipe for the next (the next one peeks in). */
+  .cmts { display: flex; flex-direction: row; gap: 10px; margin: 0 calc(-1 * var(--gut)); padding: 2px var(--gut) 6px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gut); scrollbar-width: none; }
+  .cmts::-webkit-scrollbar { display: none; }
+  .cmt { flex: 0 0 84%; scroll-snap-align: start; transform: translateY(10px); }
+  .mf-orig .cmt { transform: translateY(10px); }
+  .mcap { margin-top: 26px; }
+  /* 03 on a phone: the list becomes a row of chips right over the frame · the picked row's words
+     under the frame (.sdesc · as tall as the longest so nothing below moves) · then the way on. */
+  .svc .wrap { gap: 0; }
+  .svc .sl { display: contents; }
+  .svc .stage { order: 1; }
+  .sdesc { order: 2; display: grid; margin-top: 34px; }
+  .svc .sl > .sec-go { order: 3; justify-self: start; }
+  .opts { display: flex; gap: 8px; margin: 30px calc(-1 * var(--gut)) 0; padding: 2px var(--gut) 4px; overflow-x: auto; border: 0; scroll-padding: 0 var(--gut); scrollbar-width: none; }
+  .opts::-webkit-scrollbar { display: none; }
+  .opt { flex: none; display: inline-flex; width: auto; min-height: 44px; padding: 0 17px; border: 1.5px solid rgba(14,14,15,.2); border-radius: 999px; transition: background-color .3s, border-color .3s; }
+  .opt :is(.rd, .os, .od) { display: none; }
+  .opt b { font: 600 15px/1 var(--sans); letter-spacing: 0; font-variation-settings: normal; }
+  .opt:not(.act) b { color: var(--ink); }
+  .opt.act { border-color: var(--ink); background: var(--ink); }
+  .opt.act b { color: var(--milk); }
+  .sdi { grid-area: 1 / 1; margin: 0; opacity: 0; visibility: hidden; transition: opacity .3s, visibility 0s .3s; }
+  .sdi.on { opacity: 1; visibility: visible; transition: opacity .45s .2s, visibility 0s; }
+  .sdi .odd { padding-top: 0; font-size: 17px; }
   .whead { padding-top: 88px; }
   .wtools .mm, .wtools .zoom { display: none; }
-  .board { height: 460px; margin-top: 32px; --bk: .62; }
+  /* The board wraps its frames over 620 board pixels (board.ts): a phone shows exactly that height · no empty band · no frame popping in. */
+  .board { --bk: .56; height: calc(620px * var(--bk)); margin-top: 28px; }
   .ctc .wrap { padding: 88px var(--gut) 80px; }
   .sen { margin-top: 44px; font-size: clamp(28px, 8vw, 34px); line-height: 1.62; }
   .blank { border-bottom-width: 2px; }
@@ -589,6 +642,8 @@ html.fv-open { overflow: hidden; }
 
 /* Section headings on the homepage follow the Live board (80 px). */
 [data-page="home"] .h2 { font-size: clamp(44px, 5.6vw, 80px); line-height: .94; letter-spacing: -.04em; font-variation-settings: 'wdth' 80, 'wght' 760; }
+/* A phone's section headings stay under the hero's size (about 32 px at 375). */
+@media (max-width: 760px) { [data-page="home"] .h2 { font-size: clamp(30px, 8.6vw, 44px); } }
 /* The design cursor on the blue contact section gets a light ring. */
 .crew[data-sec="ctc"] .c-design :is(.tag, .bub) { box-shadow: inset 0 0 0 1.5px #F2F1EC; }
 

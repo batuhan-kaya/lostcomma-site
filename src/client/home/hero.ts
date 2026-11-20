@@ -34,12 +34,23 @@ export class Hero {
       this.crew?.say('code', t('yayınladın. süper'), 1800);
     });
     this.frameLabel();
+    this.label();
+    // Late fonts change the words' boxes (fonts.ready alone can settle before the display face starts loading).
+    void document.fonts?.ready.then(() => this.label());
+    document.fonts?.addEventListener('loadingdone', () => {
+      this.widths.clear();
+      this.label();
+    });
     let width = innerWidth;
     addEventListener('resize', () => {
       this.frameLabel();
       // New width · new line breaks: let the headline find its own height again.
       // (A phone's toolbar sliding away changes only the height: keep it then.)
-      if (this.hl && innerWidth !== width) this.hl.style.minHeight = '';
+      if (this.hl && innerWidth !== width) {
+        this.hl.style.minHeight = '';
+        this.widths.clear();
+        this.label();
+      }
       width = innerWidth;
     }, { passive: true });
     this.popovers();
@@ -49,6 +60,74 @@ export class Hero {
   private frameLabel(): void {
     const el = $('[data-flab]');
     if (el) el.textContent = `${t('Ana sayfa')} · ${innerWidth} × ${innerHeight}`;
+  }
+
+  /** Widths of the words in the headline's own letters (a hidden probe beside the box) · per screen width. */
+  private readonly widths = new Map<string, number>();
+  private probe: HTMLElement | null = null;
+
+  private widthOf(word: string): number {
+    const have = this.widths.get(word);
+    if (have !== undefined) return have;
+    if (!this.hl) return 0;
+    if (!this.probe) {
+      this.probe = document.createElement('span');
+      this.probe.className = 'wprobe';
+      this.probe.setAttribute('aria-hidden', 'true');
+      this.hl.append(this.probe);
+    }
+    this.probe.textContent = word;
+    const w = this.probe.getBoundingClientRect().width;
+    this.widths.set(word, w);
+    return w;
+  }
+
+  /** How much wider the box will be with the widest word than it is now. */
+  private room(): number {
+    const now = this.word?.getBoundingClientRect().width ?? 0;
+    return Math.max(0, ...this.data.words.map((w) => this.widthOf(w) - now));
+  }
+
+  /** Lines of words in the hero outside the box (and the shown chrome around it: label · lead · buttons). */
+  private wordsAround(): DOMRect[] {
+    const S = this.hl?.closest('[data-sec]');
+    if (!S || !this.box) return [];
+    const out: DOMRect[] = [];
+    const walk = document.createTreeWalker(S, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+      const host = n.parentElement;
+      if (!host || !n.nodeValue?.trim() || this.box.contains(host) || host.closest('[aria-hidden="true"],.wprobe')) continue;
+      // Not opacity: the headline's lines fade in when the page opens and are words all the same.
+      if (!(host.checkVisibility?.({ visibilityProperty: true }) ?? true)) continue;
+      range.selectNodeContents(n);
+      out.push(...range.getClientRects());
+    }
+    return out;
+  }
+
+  /**
+   * The size label says the headline's real size and goes where it covers no words: under the box
+   * (a word on the last line) · beside it (a word with its line to itself · room for the widest
+   * word counted in: the label rides on the box's edge) · else nowhere. Phones hide it (home.css).
+   */
+  private label(): void {
+    const sz = this.box?.querySelector<HTMLElement>('.sz');
+    if (!sz || !this.hl) return;
+    sz.textContent = `${t('Metin')} · ${Math.round(parseFloat(getComputedStyle(this.hl).fontSize))}`;
+    sz.classList.remove('side', 'off');
+    if (!sz.getClientRects().length) return;
+    const words = this.wordsAround();
+    const vw = document.documentElement.clientWidth;
+    // `grow`: the label rides on the box's edge from where it is to where the widest word ends.
+    const hits = (r: DOMRect, list: DOMRect[], grow = 0) =>
+      r.right + grow > vw - 8 || list.some((w) => r.left < w.right + 6 && w.left - 6 < r.right + grow && r.top < w.bottom + 4 && w.top - 4 < r.bottom);
+    // Under the box only the lines under it count (a line's box reaches into its neighbours').
+    const end = this.box!.getBoundingClientRect().bottom;
+    if (!hits(sz.getBoundingClientRect(), words.filter((w) => (w.top + w.bottom) / 2 > end))) return;
+    sz.classList.add('side');
+    if (!hits(sz.getBoundingClientRect(), words, this.room())) return;
+    sz.classList.replace('side', 'off');
   }
 
   /**
@@ -168,9 +247,13 @@ export class Hero {
         await c.sleep(1600, signal);
       }
       if (!this.typing) {
+        this.label();
         this.box.classList.add('sel');
-        // Hands on the keyboard: the mouse slides off the word and stays where it is left.
-        c.stay('design', 10 + Math.random() * 10, 8 + Math.random() * 8);
+        // Hands on the keyboard: the mouse slides off the word (past where the next one will end) and
+        // stays where its tag covers no words (a phone's headline: beside the word on its own line).
+        const next = this.data.words[(this.wi + 1) % this.data.words.length] ?? '';
+        const grow = Math.max(0, this.widthOf(next) - (this.word?.getBoundingClientRect().width ?? 0));
+        c.stay('design', grow + 10 + Math.random() * 10, 8 + Math.random() * 8, true);
         await c.sleep(650, signal);
         await this.typeNext(signal);
         this.setLive(false);

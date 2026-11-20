@@ -8,7 +8,9 @@ import { androidArt, frameArt } from './frames';
 /**
  * 03 · Services. One frame changes shape between website · app · identity · motion · automation.
  * Each shape plays a real looking product (frames.ts). The motion frame plays a real loop once a
- * live project has one: inside the editor's preview.
+ * live project has one: inside the editor's preview. A phone turns the list into a row of chips
+ * over the frame and shows the picked row's words under it (`.sdesc` · the rows' own words are
+ * hidden there): the change happens where the finger is.
  */
 export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
   const { t, lang } = ctx;
@@ -42,6 +44,7 @@ export function services(ctx: Ctx, loop: ProjectCard | null = null): Safe {
 <div class="frm2" aria-hidden="true"><div class="flab3 mono" lang="en"><span>Android</span><span>412 × 915</span></div><div class="clip2"><div class="fc" data-fca>${androidArt((n) => ctx.assets.image(n))}</div></div></div>
 </div>
 </div>
+<div class="sdesc" data-sdesc>${sv.map((o, i) => html`<p class="sdi${i === 0 ? ' on' : ''}" data-sd="${i}"><span class="odd">${o.desc}</span><span class="odl mono">${o.dl}</span></p>`)}</div>
 <dialog class="fv" data-fv aria-labelledby="fv-t" tabindex="-1" autofocus>
 <div class="fv-bar"><span class="fv-t mono" id="fv-t" data-fvt>${first.lab}</span><button type="button" class="fv-x mono" data-fvx>${t('Kapat')}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
 <div class="fv-box" data-fvbox></div>
