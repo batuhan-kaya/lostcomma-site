@@ -23,9 +23,6 @@ export function manifesto(ctx: Ctx): Safe {
     const i = n++;
     return html`<span class="chg on" data-ch="${i}" data-who="${seg.who}"><del>${seg.del}</del><ins data-ins="${seg.ins}">${seg.ins}</ins></span>`;
   });
-  // The finished edit once more under the document (hidden): the page keeps that height while the
-  // edit plays and when a mode hides words · nothing below it moves.
-  const ghost = c.manifesto.map((seg) => (typeof seg === 'string' ? seg : html`<span class="chg on"><del>${seg.del}</del><ins>${seg.ins}</ins></span>`));
   // [mode · the full label (its name) · the short one a phone shows]
   const modes: [keyof typeof ICON, string, string][] = [
     ['track', t('Önerileri göster'), t('Öneriler')],
@@ -49,7 +46,7 @@ export function manifesto(ctx: Ctx): Safe {
       html`<button type="button" class="mt${m === 'track' ? ' act' : ''}" data-mode="${m}" aria-pressed="${m === 'track' ? 'true' : 'false'}"><svg viewBox="0 0 24 24" aria-hidden="true">${raw(ICON[m])}</svg><span class="ml">${full}</span><span class="ms" aria-hidden="true">${short}</span></button>`,
   )}</div>
 </div>
-<div class="dstack"><p class="doc m-track ghost" aria-hidden="true">${ghost}</p><p class="doc m-track" data-doc>${doc}</p></div>
+<p class="doc m-track" data-doc>${doc}</p>
 </div>
 <div class="cmts" data-cmts>${c.comments.map((cm, i) => html`<span class="cmt c-${cm.who} show" data-cmt="${i}"><span class="who mono" lang="en"><i></i>${cm.who}</span><span class="ct">${cm.text}</span></span>`)}</div>
 </div>
