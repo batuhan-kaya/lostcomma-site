@@ -440,8 +440,8 @@ test.describe('homepage · phone', () => {
     const tall = await paper.evaluate((e) => e.getBoundingClientRect().height);
     await paper.evaluate((e) => window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 40));
     await expect(page.locator('[data-ch="0"] ins')).toHaveText('small design and engineering studio', { timeout: 10_000 });
-    // The document keeps its finished height while it is typed.
-    expect(Math.abs((await paper.evaluate((e) => e.getBoundingClientRect().height)) - tall)).toBeLessThan(1);
+    // The document grows as it is typed (it never holds an empty page under the first lines · phase 17h).
+    expect(await paper.evaluate((e) => e.getBoundingClientRect().height)).toBeGreaterThan(tall);
     await page.getByRole('button', { name: 'Reject all' }).tap();
     await expect(page.locator('[data-doc]')).toHaveClass(/m-orig/);
     await expect(page.locator('[data-docstat]')).toHaveText('All changes rejected');

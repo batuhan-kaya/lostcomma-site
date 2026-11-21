@@ -74,6 +74,8 @@ export class Manifesto {
     const cm = $<HTMLElement>(`[data-cmt="${i}"]`);
     if (!cm) return;
     cm.classList.add('show');
+    // Under the document a comment takes room once it is written: the strip may scroll now.
+    this.fitStrip?.();
     // A phone's comments are a strip: bring the new one in (the strip scrolls · never the page).
     const s = this.cmts;
     if (bring && s && s.scrollWidth > s.clientWidth + 1) {
@@ -81,6 +83,8 @@ export class Manifesto {
       s.scrollTo({ left: cm.offsetLeft - s.offsetLeft - pad, behavior: 'smooth' });
     }
   }
+
+  private fitStrip: (() => void) | null = null;
 
   /** The comments become a strip on a phone: then it is a region the keyboard can scroll too. */
   private strip(): void {
@@ -98,6 +102,7 @@ export class Manifesto {
         s.removeAttribute('tabindex');
       }
     };
+    this.fitStrip = fit;
     fit();
     addEventListener('resize', fit, { passive: true });
   }

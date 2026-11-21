@@ -175,10 +175,8 @@
 .mt:hover { background: rgba(14,14,15,.07); }
 .mt.act { background: var(--ink); color: var(--milk); }
 .mt .ms { display: none; }
-/* The finished edit under the document keeps its height (the server's ghost). */
-.dstack { display: grid; }
-.dstack > .doc { grid-area: 1 / 1; }
-.doc.ghost { visibility: hidden; pointer-events: none; }
+/* The document grows as the edit is typed into it (a page being written): nothing holds its finished height ·
+   an empty page under the first four lines read as broken (phase 17h · Batuhan). */
 .doc { margin: 0; font-family: var(--display); font-size: clamp(26px, 3.2vw, 46px); line-height: 1.28; letter-spacing: -.022em; font-variation-settings: 'wdth' 80, 'wght' 560; }
 .doc del { text-decoration: none; background: linear-gradient(var(--coral), var(--coral)) no-repeat 0 60% / 0 4px; transition: background-size .7s cubic-bezier(.6,0,.2,1), color .5s; }
 .doc ins { margin-left: .18em; padding: 0 .08em .02em; border-radius: 5px; text-decoration: none; color: var(--ink); background: var(--hi); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
@@ -587,7 +585,12 @@ html.fv-open { overflow: hidden; }
   .hfoot { flex-wrap: wrap; margin-top: 12px; }
 
   .mbody { grid-template-columns: minmax(0, 1fr); }
+  /* One column: the page is as wide as the screen · its letters follow the width (not the two column size). */
+  .doc { font-size: clamp(26px, 4.2vw, 42px); }
   .cmts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Under the document a comment takes room once it is written (an empty band waited under the page). */
+  .cmt:not(.show) { display: none; }
+  @starting-style { .cmt.show { opacity: 0; transform: translateY(10px); } }
 
   .svc .wrap { grid-template-columns: minmax(0, 1fr); gap: 48px; }
   .stage { height: auto; padding: 48px 0 70px; }
@@ -620,6 +623,8 @@ html.fv-open { overflow: hidden; }
   /* The comments are a strip under the document: one at a time · swipe for the next (the next one peeks in). */
   .cmts { display: flex; flex-direction: row; gap: 10px; margin: 0 calc(-1 * var(--gut)); padding: 2px var(--gut) 6px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gut); scrollbar-width: none; }
   .cmts::-webkit-scrollbar { display: none; }
+  /* The strip waits for its first comment. */
+  .cmts:not(:has(.cmt.show)) { display: none; }
   .cmt { flex: 0 0 84%; scroll-snap-align: start; transform: translateY(10px); }
   .mf-orig .cmt { transform: translateY(10px); }
   .mcap { margin-top: 26px; }
